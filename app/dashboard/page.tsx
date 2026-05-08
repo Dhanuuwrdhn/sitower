@@ -1,99 +1,216 @@
-import { towers, petirPerZona, gangguanHistory } from "@/lib/data";
-import { Radio, AlertTriangle, Zap, Wrench, CheckCircle } from "lucide-react";
-import StatCard from "@/components/StatCard";
-import AlertBanner from "@/components/AlertBanner";
-import ActivityTimeline from "@/components/ActivityTimeline";
-import BarChart from "@/components/BarChart";
-import PageHeader from "@/components/PageHeader";
-import TowerMapDynamic from "@/components/TowerMapDynamic";
-import StatusBadge from "@/components/StatusBadge";
-import { statusColor, kerawananColor } from "@/lib/utils";
+'use client'
 
+import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
+import { AlertTriangle } from 'lucide-react'
+import { laporanApi, towersApi } from '@/lib/api'
+
+const TowerMap = dynamic(() => import('@/components/map/TowerMap'), { ssr: false })
+
+// ── Types ────────────────────────────────────────────────────────────────────
+interface Stats {
+  ppl: number
+  kebakaran: number
+  layangan: number
+  pencurian: number
+  pemanfaatan: number
+}
+
+interface RecentRow {
+  id: number
+  tanggal: string
+  tower: string
+  jenisGangguan: string
+  pelapor: string
+  status: string
+}
+
+// ── Fallback data ─────────────────────────────────────────────────────────────
+const MOCK_STATS: Stats = { ppl: 12, kebakaran: 3, layangan: 8, pencurian: 2, pemanfaatan: 5 }
+
+const MOCK_RECENT: RecentRow[] = [
+  { id: 1, tanggal: '2025-05-01', tower: 'T-001 SUTET', jenisGangguan: 'PPL',        pelapor: 'Ahmad S.',  status: 'berlangsung' },
+  { id: 2, tanggal: '2025-04-30', tower: 'T-045 SUTT',  jenisGangguan: 'Layangan',   pelapor: 'Budi R.',   status: 'ditangani' },
+  { id: 3, tanggal: '2025-04-29', tower: 'T-112 SUTT',  jenisGangguan: 'Kebakaran',  pelapor: 'Citra D.',  status: 'selesai' },
+  { id: 4, tanggal: '2025-04-28', tower: 'T-023 SKTT',  jenisGangguan: 'Pencurian',  pelapor: 'Dedi M.',   status: 'pemantauan' },
+  { id: 5, tanggal: '2025-04-27', tower: 'T-078 SUTET', jenisGangguan: 'Pemanfaatan',pelapor: 'Eka P.',   status: 'selesai' },
+]
+
+// ── Stat card config ───────────────────────────────────────────────────────────
+const STAT_CARDS = [
+  { key: 'ppl',         label: 'Pekerjaan Pihak Lain',    emoji: '🚜', numColor: '#005DAA' },
+  { key: 'kebakaran',   label: 'Kebakaran',                emoji: '🔥', numColor: '#FD2D03' },
+  { key: 'layangan',    label: 'Layangan',                 emoji: '🪁', numColor: '#3B84CE' },
+  { key: 'pencurian',   label: 'Pencurian',                emoji: '🥷', numColor: '#1B1B1B' },
+  { key: 'pemanfaatan', label: 'Pemanfaatan Pihak Lain',  emoji: '🏡', numColor: '#059669' },
+] as const
+
+// ── Status pill ───────────────────────────────────────────────────────────────
+const STATUS_CLASS: Record<string, string> = {
+  berlangsung: 'badge-berlangsung badge-blink',
+  ditangani:   'badge-ditangani',
+  selesai:     'badge-selesai',
+  pemantauan:  'badge-pemantauan',
+  eskalasi:    'badge-eskalasi',
+  menunggu:    'badge-menunggu',
+}
+
+function StatusPill({ status }: { status: string }) {
+  const cls = STATUS_CLASS[status] ?? 'badge-menunggu'
+  return <span className={cls}>{status}</span>
+}
+
+// ── Stat card ─────────────────────────────────────────────────────────────────
+function StatCard({
+  label, emoji, value, numColor,
+}: {
+  label: string
+  emoji: string
+  value: number | string
+  numColor: string
+}) {
+  return (
+    <div
+      style={{
+        background: '#FFFFFF',
+        borderRadius: 8,
+        border: '1px solid #E8EDF2',
+        padding: '16px',
+        minHeight: 120,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 6,
+        flex: 1,
+        minWidth: 0,
+      }}
+    >
+      {/* Emoji icon */}
+      <div style={{ fontSize: 32, lineHeight: 1 }}>{emoji}</div>
+
+      {/* Label */}
+      <p style={{ fontSize: 11, color: '#5F737F', lineHeight: 1.3, marginTop: 4 }}>{label}</p>
+
+      {/* Number */}
+      <p style={{ fontSize: 32, fontWeight: 700, color: numColor, lineHeight: 1, marginTop: 'auto' }}>{value}</p>
+    </div>
+  )
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
-  const total = towers.length;
-  const normal = towers.filter((t) => t.kondisi === "normal").length;
-  const gangguan = towers.filter((t) => t.kondisi === "gangguan").length;
-  const waspada = towers.filter((t) => t.kondisi === "waspada").length;
-  const maintenance = towers.filter((t) => t.kondisi === "maintenance").length;
+  const [stats, setStats] = useState<Stats>(MOCK_STATS)
+  const [recent, setRecent] = useState<RecentRow[]>(MOCK_RECENT)
+  const [alertCount, setAlertCount] = useState(0)
+  const [towerKerawanan, setTowerKerawanan] = useState<any[]>([])
 
-  const activeGangguan = gangguanHistory.filter((g) => g.status === "ongoing")[0];
+  useEffect(() => {
+    laporanApi.getStats()
+      .then((res) => setStats(res.data))
+      .catch(() => {})
 
-  const topKerawanan = [...towers]
-    .sort((a, b) => {
-      const rank = { tinggi: 3, sedang: 2, rendah: 1 };
-      return rank[b.kerawanan] - rank[a.kerawanan];
-    })
-    .slice(0, 5);
+    laporanApi.getAll({ limit: 5 })
+      .then((res) => {
+        const rows = (res.data.data ?? res.data) as any[]
+        setRecent(rows.slice(0, 5).map((r: any) => ({
+          id: r.id,
+          tanggal: r.tanggal?.slice(0, 10) ?? '—',
+          tower: r.tower?.id ?? r.tower?.nama ?? '—',
+          jenisGangguan: r.jenisGangguan ?? '—',
+          pelapor: r.pelapor?.nama ?? r.pegawai?.nama ?? '—',
+          status: r.status?.toLowerCase() ?? '—',
+        })))
+      })
+      .catch(() => {})
 
-  const barData = petirPerZona.map((z) => ({ label: z.zona.replace("Zona ", ""), value: z.count }));
+    // Pakai endpoint /towers/map untuk data kerawanan di peta
+    towersApi.getMap()
+      .then((res) => {
+        const data = Array.isArray(res.data) ? res.data : []
+        setAlertCount(data.filter((t: any) => t.kerawanan?.length > 0).length)
+        setTowerKerawanan(data)
+      })
+      .catch(() => {})
+  }, [])
+
+  const statValues: Record<string, number> = {
+    ppl: stats.ppl,
+    kebakaran: stats.kebakaran,
+    layangan: stats.layangan,
+    pencurian: stats.pencurian,
+    pemanfaatan: stats.pemanfaatan,
+  }
 
   return (
-    <div className="p-6">
-      <PageHeader title="Dashboard" subtitle="Rekap kondisi tower transmisi — 1 Mei 2025" />
-
-      {activeGangguan && (
-        <AlertBanner
-          message={`Gangguan aktif: ${activeGangguan.jenis} di ${activeGangguan.towerNama}`}
-          tower={activeGangguan.towerId}
-        />
+    <div className="space-y-4">
+      {/* Alert banner */}
+      {alertCount > 0 && (
+        <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-[#fffbeb] border border-[#fde68a] text-[#b45309]">
+          <AlertTriangle size={18} className="shrink-0" />
+          <p className="text-[13px] font-semibold">
+            {alertCount} tower dalam kondisi gangguan aktif — segera tindaklanjuti
+          </p>
+        </div>
       )}
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Total Tower" value={total} sub="Seluruh zona" icon={<Radio size={18} />} />
-        <StatCard label="Gangguan Aktif" value={gangguan} sub="Perlu penanganan" icon={<AlertTriangle size={18} />} variant="danger" />
-        <StatCard label="Waspada" value={waspada} sub="Pemantauan intensif" icon={<Zap size={18} />} variant="warning" />
-        <StatCard label="Maintenance" value={maintenance} sub="Dalam perbaikan" icon={<Wrench size={18} />} />
+      <div className="flex gap-4">
+        {STAT_CARDS.map((card) => (
+          <StatCard
+            key={card.key}
+            label={card.label}
+            emoji={card.emoji}
+            value={statValues[card.key]}
+            numColor={card.numColor}
+          />
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-        {/* Peta mini */}
-        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-4">
-          <p className="text-sm font-semibold text-slate-800 mb-3">Peta Sebaran Tower</p>
-          <div style={{ height: 300 }}>
-            <TowerMapDynamic />
-          </div>
+      {/* Map */}
+      <div style={{ background: '#FFFFFF', borderRadius: 8 }}>
+        <div
+          className="flex items-center justify-between px-6 py-3"
+          style={{ borderBottom: '1px solid #E8EDF2' }}
+        >
+          <h2 className="text-[14px] font-semibold text-app-text">Peta Jalur</h2>
         </div>
-
-        {/* Activity timeline */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4">
-          <p className="text-sm font-semibold text-slate-800 mb-3">Aktivitas Terkini</p>
-          <ActivityTimeline />
+        <div style={{ height: 480, borderRadius: '0 0 8px 8px', overflow: 'hidden' }}>
+          <TowerMap towers={towerKerawanan.length > 0 ? towerKerawanan : undefined} />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Bar chart petir */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4">
-          <p className="text-sm font-semibold text-slate-800 mb-4">Sambaran Petir per Zona</p>
-          <BarChart data={barData} />
+      {/* Recent gangguan */}
+      <div
+        className="overflow-hidden"
+        style={{ background: '#FFFFFF', borderRadius: 8 }}
+      >
+        <div
+          className="flex items-center justify-between px-6 py-4"
+          style={{ borderBottom: '1px solid #E8EDF2' }}
+        >
+          <h2 className="text-[14px] font-semibold text-app-text">Riwayat Gangguan Terbaru</h2>
+          <a href="/laporan/gangguan" className="text-[12px] font-medium" style={{ color: '#076C9E' }}>
+            Lihat Semua Riwayat Gangguan →
+          </a>
         </div>
-
-        {/* Tabel kerawanan */}
-        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-4">
-          <p className="text-sm font-semibold text-slate-800 mb-3">Top Kerawanan Tower</p>
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="data-table">
             <thead>
-              <tr className="border-b border-slate-100">
-                <th className="text-left py-2 text-xs font-medium text-slate-500">ID</th>
-                <th className="text-left py-2 text-xs font-medium text-slate-500">Nama</th>
-                <th className="text-left py-2 text-xs font-medium text-slate-500">Status</th>
-                <th className="text-left py-2 text-xs font-medium text-slate-500">Kerawanan</th>
-                <th className="text-left py-2 text-xs font-medium text-slate-500">Petir</th>
+              <tr>
+                <th>Tanggal</th>
+                <th>Tower</th>
+                <th>Jenis Gangguan</th>
+                <th>Pelapor</th>
+                <th>Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
-              {topKerawanan.map((t) => (
-                <tr key={t.id} className="hover:bg-slate-50">
-                  <td className="py-2.5 font-mono text-xs text-blue-600">{t.id}</td>
-                  <td className="py-2.5 text-slate-800 font-medium">{t.nama}</td>
-                  <td className="py-2.5">
-                    <StatusBadge label={t.kondisi} className={statusColor(t.kondisi)} blink={t.kondisi === "gangguan"} />
-                  </td>
-                  <td className="py-2.5">
-                    <StatusBadge label={t.kerawanan} className={kerawananColor(t.kerawanan)} />
-                  </td>
-                  <td className="py-2.5 font-mono text-xs text-slate-600">{t.petir}</td>
+            <tbody>
+              {recent.map((row) => (
+                <tr key={row.id}>
+                  <td className="font-mono text-[12px] text-app-muted">{row.tanggal}</td>
+                  <td className="font-semibold text-app-text">{row.tower}</td>
+                  <td className="text-app-text">{row.jenisGangguan}</td>
+                  <td className="text-app-muted">{row.pelapor}</td>
+                  <td><StatusPill status={row.status} /></td>
                 </tr>
               ))}
             </tbody>
@@ -101,5 +218,5 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

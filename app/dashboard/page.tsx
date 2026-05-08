@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic'
 import { AlertTriangle } from 'lucide-react'
 import { laporanApi, towersApi } from '@/lib/api'
 
-const TowerMap = dynamic(() => import('@/components/map/TowerMap'), { ssr: false })
+const TowerMap = dynamic(() => import('@/components/map/TowerMapGoogle'), { ssr: false })
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface Stats {

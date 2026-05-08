@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
   Search, Plus, Calendar, RefreshCw,
@@ -747,15 +747,7 @@ export default function GangguanPage() {
   const [deleteRow, setDeleteRow] = useState<any | null>(null)
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
-
-  // Debounced search
-  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const [debouncedSearch, setDebouncedSearch] = useState('')
-  useEffect(() => {
-    if (searchTimer.current) clearTimeout(searchTimer.current)
-    searchTimer.current = setTimeout(() => setDebouncedSearch(search), 350)
-    return () => { if (searchTimer.current) clearTimeout(searchTimer.current) }
-  }, [search])
+  const hasActiveFilters = Boolean(search.trim() || jenis || tglMulai || tglAkhir)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -763,7 +755,7 @@ export default function GangguanPage() {
       const res = await laporanApi.getAll({
         page,
         limit: pageSize,
-        search: debouncedSearch || undefined,
+        search: search.trim() || undefined,
         jenisGangguan: jenis || undefined,
         tglMulai: tglMulai || undefined,
         tglAkhir: tglAkhir || undefined,
@@ -782,7 +774,7 @@ export default function GangguanPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize, debouncedSearch, jenis, tglMulai, tglAkhir])
+  }, [page, pageSize, search, jenis, tglMulai, tglAkhir])
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -809,90 +801,103 @@ export default function GangguanPage() {
   return (
     <>
       {/* Header + action */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="mb-6 flex items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-app-text">Riwayat Gangguan</h1>
         <button onClick={openAdd} className="btn-primary">
           <Plus size={16} /> Tambah Laporan Baru
         </button>
       </div>
 
-      {/* Filter bar */}
-      <div className="card card-body mb-4 space-y-3">
-        {/* Row 1: search */}
-        <div className="flex items-center gap-3">
-          <div className="relative" style={{ width: 300 }}>
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-app-muted" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-              placeholder="Cari berdasarkan nama tower"
-              className="form-input pl-9"
-              style={{ height: 40 }}
-            />
-          </div>
-        </div>
-
-        {/* Row 2: filters */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <select
-            value={jenis}
-            onChange={(e) => { setJenis(e.target.value); setPage(1) }}
-            className="form-input w-auto pr-8"
-            style={{ height: 40 }}
-          >
-            {JENIS_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-
-          <div className="relative">
-            <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-app-muted" />
-            <input
-              type="date"
-              value={tglMulai}
-              onChange={(e) => { setTglMulai(e.target.value); setPage(1) }}
-              className="form-input pl-9 w-44"
-              style={{ height: 40 }}
-              placeholder="Tanggal Mulai"
-            />
-          </div>
-
-          <div className="relative">
-            <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-app-muted" />
-            <input
-              type="date"
-              value={tglAkhir}
-              onChange={(e) => { setTglAkhir(e.target.value); setPage(1) }}
-              className="form-input pl-9 w-44"
-              style={{ height: 40 }}
-              placeholder="Tanggal Berakhir"
-            />
-          </div>
-
-          <button onClick={resetFilters} className="btn-outline-red">
-            <RefreshCw size={14} /> Hapus Filter
-          </button>
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <div className="relative w-full max-w-[352px]">
+          <Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-app-muted" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+            placeholder="Cari berdasarkan nama tower"
+            className="form-input h-11 rounded-lg border-[#e1e8ec] pl-11 pr-4 text-[14px] placeholder:text-[#566b75]"
+          />
         </div>
       </div>
 
       {/* Table */}
-      <div className="card overflow-hidden">
+      <div className="card overflow-hidden border-[#e1e8ec]">
+        <div className="border-b border-app-border px-6 pb-6 pt-5">
+          <div className="flex flex-wrap items-end gap-4">
+            <div className="w-full max-w-[200px]">
+              <label className="mb-1 block text-[14px] font-bold text-app-text">
+                Jenis Gangguan
+              </label>
+              <select
+                value={jenis}
+                onChange={(e) => { setJenis(e.target.value); setPage(1) }}
+                className="form-input h-11 rounded-lg border-[#e1e8ec] pr-8 text-[14px]"
+              >
+                {JENIS_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="w-full max-w-[184px]">
+              <label className="mb-1 block text-[14px] font-bold text-app-text">
+                Tanggal Mulai
+              </label>
+              <div className="relative">
+                <input
+                  type="date"
+                  value={tglMulai}
+                  onChange={(e) => { setTglMulai(e.target.value); setPage(1) }}
+                  className="form-input h-11 rounded-lg border-[#e1e8ec] pl-4 pr-12 text-[14px]"
+                />
+                <div className="pointer-events-none absolute inset-y-px right-px flex w-11 items-center justify-center rounded-r-lg border-l border-[#e1e8ec] bg-[#f6f9fc] text-app-muted">
+                  <Calendar size={16} />
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full max-w-[184px]">
+              <label className="mb-1 block text-[14px] font-bold text-app-text">
+                Tanggal Berakhir
+              </label>
+              <div className="relative">
+                <input
+                  type="date"
+                  value={tglAkhir}
+                  onChange={(e) => { setTglAkhir(e.target.value); setPage(1) }}
+                  className="form-input h-11 rounded-lg border-[#e1e8ec] pl-4 pr-12 text-[14px]"
+                />
+                <div className="pointer-events-none absolute inset-y-px right-px flex w-11 items-center justify-center rounded-r-lg border-l border-[#e1e8ec] bg-[#f6f9fc] text-app-muted">
+                  <Calendar size={16} />
+                </div>
+              </div>
+            </div>
+
+            {hasActiveFilters && (
+              <button onClick={resetFilters} className="inline-flex h-11 items-center gap-2 rounded-lg border border-[#d92d20] bg-white px-4 text-[14px] font-medium text-[#d92d20] transition-colors hover:bg-red-50">
+                <RefreshCw size={16} />
+                Hapus Filter
+              </button>
+            )}
+          </div>
+        </div>
+
         <div className="overflow-x-auto">
           <table className="data-table">
             <thead>
               <tr>
-                <th>Tanggal</th>
-                <th>Tower</th>
-                <th>Jenis Gangguan</th>
-                <th>Teknisi</th>
-                <th>Status</th>
-                <th className="text-right pr-5">Aksi</th>
+                <th className="bg-[#f6f9fc]">Tanggal</th>
+                <th className="bg-[#f6f9fc]">Tower</th>
+                <th className="bg-[#f6f9fc]">Jenis Gangguan</th>
+                <th className="bg-[#f6f9fc]">Teknisi</th>
+                <th className="bg-[#f6f9fc]">Status</th>
+                <th className="bg-[#f6f9fc] text-right pr-5">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
+                Array.from({ length: pageSize }).map((_, i) => (
                   <tr key={i}>
                     {Array.from({ length: 6 }).map((_, j) => (
                       <td key={j}><div className="h-4 bg-gray-100 rounded animate-pulse" /></td>
@@ -908,14 +913,14 @@ export default function GangguanPage() {
               ) : (
                 rows.map((row) => (
                   <tr key={row.id}>
-                    <td className="text-app-muted text-[12px]">{formatTanggal(row.tanggal)}</td>
+                    <td className="text-[14px] text-[#5f737f]">{formatTanggal(row.tanggal)}</td>
                     <td>
-                      <span className="font-mono text-[12px] text-blue-600 font-semibold">
+                      <span className="font-mono text-[14px] font-medium text-[#5f737f]">
                         {row.tower?.nomorTower ?? row.towerId ?? '—'}
                       </span>
                     </td>
-                    <td>{JENIS_LABEL[row.jenisGangguan] ?? row.jenisGangguan ?? '—'}</td>
-                    <td className="text-app-muted">{row.pelapor?.nama ?? row.pegawai?.nama ?? '—'}</td>
+                    <td className="text-[14px] text-[#5f737f]">{JENIS_LABEL[row.jenisGangguan] ?? row.jenisGangguan ?? '—'}</td>
+                    <td className="text-[14px] text-[#5f737f]">{row.teknisi ?? row.pelapor?.nama ?? row.pegawai?.nama ?? '—'}</td>
                     <td><StatusPill status={row.status?.toLowerCase()} /></td>
                     <td className="text-right pr-4">
                       <RowActions
@@ -933,23 +938,24 @@ export default function GangguanPage() {
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-t border-app-border bg-white">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-app-border bg-white px-5 py-3.5">
           {/* Page size */}
           <div className="flex items-center gap-2">
             <select
               value={pageSize}
               onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1) }}
-              className="form-input w-auto pr-8 py-1.5 text-[12px]"
+              className="form-input w-auto rounded-md border-[#e1e8ec] py-1.5 pr-8 text-[12px]"
             >
               {PAGE_SIZE_OPTIONS.map((n) => (
-                <option key={n} value={n}>{n} baris per halaman</option>
+                <option key={n} value={n}>{n}</option>
               ))}
             </select>
+            <p className="text-[12px] text-[#97aab3]">baris per halaman</p>
           </div>
 
           {/* Info */}
-          <p className="text-[12px] text-app-muted">
-            {total === 0 ? 'Tidak ada data' : `Menampilkan ${from}–${to} dari ${total} data`}
+          <p className="text-[12px] text-app-text">
+            {total === 0 ? 'Tidak ada data' : `Menampilkan ${from} - ${to} dari ${total} data`}
           </p>
 
           {/* Page nav */}
@@ -957,23 +963,24 @@ export default function GangguanPage() {
             <select
               value={page}
               onChange={(e) => setPage(Number(e.target.value))}
-              className="form-input w-auto pr-8 py-1.5 text-[12px]"
+              className="form-input w-auto rounded-md border-[#e1e8ec] py-1.5 pr-8 text-[12px]"
             >
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                <option key={p} value={p}>{p} dari {totalPages} halaman</option>
+                <option key={p} value={p}>{p}</option>
               ))}
             </select>
+            <p className="text-[12px] text-[#97aab3]">dari {totalPages} halaman</p>
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="p-1.5 rounded-lg border border-app-border hover:bg-app-bg disabled:opacity-40 transition-colors"
+              className="rounded-md border border-app-border bg-[#f6f9fc] p-1.5 transition-colors hover:bg-app-bg disabled:opacity-40"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="p-1.5 rounded-lg border border-app-border hover:bg-app-bg disabled:opacity-40 transition-colors"
+              className="rounded-md border border-app-border bg-[#f6f9fc] p-1.5 transition-colors hover:bg-app-bg disabled:opacity-40"
             >
               <ChevronRight size={16} />
             </button>

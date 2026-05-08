@@ -1,5 +1,5 @@
 // AUTO-GENERATED dari KML Jalur Transmisi UPT Durikosambi
-// Total: 35 Gardu Induk, 427 Tower SUTET 500kV, 562 Tower SUTT 150kV, 174 Tower SKTT, 52 Jalur
+// Total: 39 Gardu Induk, 431 Tower SUTET 500kV, 607 Tower SUTT 150kV, 339 Tower SKTT, 52 Jalur
 
 export interface GeoPoint {
   lat: number
@@ -37,8414 +37,9940 @@ export const JALUR_COLORS = {
   other:       '#94a3b8',  // abu
 }
 
-// 35 Gardu Induk
+// 39 Gardu Induk
 export const garduInduk: GarduInduk[] = [
   {
-    "name": "GIS Lontar",
-    "lat": -6.060055,
-    "lng": 106.463862,
+    "name": "GI Teluk Naga",
     "style": "#icon-1548-000000",
+    "lng": 106.636328,
+    "lat": -6.064451,
+    "type": "gardu"
+  },
+  {
+    "name": "Pasar Kemis (UPT Cikupa)",
+    "style": "#icon-1548-000000",
+    "lng": 106.529727,
+    "lat": -6.18315,
+    "type": "gardu"
+  },
+  {
+    "name": "GIS Lontar",
+    "style": "#icon-1548-000000",
+    "lng": 106.463862,
+    "lat": -6.060055,
+    "type": "gardu"
+  },
+  {
+    "name": "Pasar Kemis Baru (UPT Cikupa)",
+    "style": "#icon-1548-000000",
+    "lng": 106.5600025,
+    "lat": -6.1423514,
     "type": "gardu"
   },
   {
     "name": "GISTET Kembangan",
-    "lat": -6.188128,
-    "lng": 106.719739,
     "style": "#icon-1548-000000",
+    "lng": 106.719739,
+    "lat": -6.188128,
     "type": "gardu"
   },
   {
     "name": "GI Angke",
-    "lat": -6.134313,
-    "lng": 106.791144,
     "style": "#icon-1548-000000",
+    "lng": 106.791144,
+    "lat": -6.134313,
     "type": "gardu"
   },
   {
     "name": "GI Durikosambi",
-    "lat": -6.170969,
-    "lng": 106.725938,
     "style": "#icon-1548-000000",
+    "lng": 106.725938,
+    "lat": -6.170969,
     "type": "gardu"
   },
   {
     "name": "GIS Grogol",
-    "lat": -6.166449,
-    "lng": 106.783709,
     "style": "#icon-1548-000000",
+    "lng": 106.783709,
+    "lat": -6.166449,
     "type": "gardu"
   },
   {
     "name": "GIS Kebon Jeruk",
-    "lat": -6.190578,
-    "lng": 106.781952,
     "style": "#icon-1548-000000",
+    "lng": 106.781952,
+    "lat": -6.190578,
     "type": "gardu"
   },
   {
     "name": "GIS Kembangan",
-    "lat": -6.188128,
-    "lng": 106.719739,
     "style": "#icon-1548-000000",
+    "lng": 106.719739,
+    "lat": -6.188128,
     "type": "gardu"
   },
   {
     "name": "GI Muarakarang Baru",
-    "lat": -6.109815,
-    "lng": 106.781579,
     "style": "#icon-1548-000000",
+    "lng": 106.781579,
+    "lat": -6.109815,
     "type": "gardu"
   },
   {
     "name": "GIS New Senayan",
-    "lat": -6.227583,
-    "lng": 106.771707,
     "style": "#icon-1548-000000",
+    "lng": 106.771707,
+    "lat": -6.227583,
     "type": "gardu"
   },
   {
     "name": "GI Muarakarang Lama",
-    "lat": -6.11142,
-    "lng": 106.7868,
     "style": "#icon-1548-000000",
+    "lng": 106.7868,
+    "lat": -6.11142,
     "type": "gardu"
   },
   {
     "name": "GIS Pantai Indah Kapuk",
-    "lat": -6.12383,
-    "lng": 106.751088,
     "style": "#icon-1548-000000",
+    "lng": 106.751088,
+    "lat": -6.12383,
     "type": "gardu"
   },
   {
     "name": "GIS Daan Mogot",
-    "lat": -6.150516,
-    "lng": 106.739139,
     "style": "#icon-1548-000000",
+    "lng": 106.739139,
+    "lat": -6.150516,
     "type": "gardu"
   },
   {
     "name": "GI Jatake",
-    "lat": -6.214297,
-    "lng": 106.583157,
     "style": "#icon-1548-000000",
+    "lng": 106.583157,
+    "lat": -6.214297,
     "type": "gardu"
   },
   {
     "name": "GI Maximangando",
-    "lat": -6.211318,
-    "lng": 106.588769,
     "style": "#icon-1548-000000",
+    "lng": 106.588769,
+    "lat": -6.211318,
     "type": "gardu"
   },
   {
     "name": "GI Curug",
-    "lat": -6.242565,
-    "lng": 106.609061,
     "style": "#icon-1548-000000",
+    "lng": 106.609061,
+    "lat": -6.242565,
     "type": "gardu"
   },
   {
     "name": "GI Tangerang Baru",
-    "lat": -6.156176,
-    "lng": 106.606202,
     "style": "#icon-1548-000000",
+    "lng": 106.606202,
+    "lat": -6.156176,
     "type": "gardu"
   },
   {
     "name": "GI Cengkareng",
-    "lat": -6.150885,
-    "lng": 106.659203,
     "style": "#icon-1548-000000",
+    "lng": 106.659203,
+    "lat": -6.150885,
     "type": "gardu"
   },
   {
     "name": "GI Ciledug",
-    "lat": -6.211287,
-    "lng": 106.680257,
     "style": "#icon-1548-000000",
+    "lng": 106.680257,
+    "lat": -6.211287,
     "type": "gardu"
   },
   {
     "name": "GI Tangerang Lama",
-    "lat": -6.206991,
-    "lng": 106.641036,
     "style": "#icon-1548-000000",
+    "lng": 106.641036,
+    "lat": -6.206991,
     "type": "gardu"
   },
   {
     "name": "GIS Alam Sutera",
-    "lat": -6.2201907,
-    "lng": 106.6564,
     "style": "#icon-1548-000000",
+    "lng": 106.6564,
+    "lat": -6.2201907,
     "type": "gardu"
   },
   {
     "name": "GI Cengkareng Baru",
-    "lat": -6.1497712,
-    "lng": 106.6588676,
     "style": "#icon-1548-000000",
+    "lng": 106.6588676,
+    "lat": -6.1497712,
     "type": "gardu"
   },
   {
-    "name": "GI Gajah Tunggal",
-    "lat": -6.1825037,
-    "lng": 106.5548475,
+    "name": "Petukangan (UPT Gandul)",
     "style": "#icon-1548-000000",
+    "lng": 106.7433022,
+    "lat": -6.2528873,
+    "type": "gardu"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1548-000000",
+    "lng": 106.5548475,
+    "lat": -6.1825037,
     "type": "gardu"
   },
   {
     "name": "GISTET Durikosambi",
-    "lat": -6.1726893,
-    "lng": 106.7245195,
     "style": "#icon-1548-000000",
+    "lng": 106.7245195,
+    "lat": -6.1726893,
     "type": "gardu"
   },
   {
     "name": "GIS Grogol Baru",
-    "lat": -6.1634634,
-    "lng": 106.7669607,
     "style": "#icon-1548-000000",
+    "lng": 106.7669607,
+    "lat": -6.1634634,
     "type": "gardu"
   },
   {
     "name": "GIS Summarecon Gading Serpong",
-    "lat": -6.2433162,
-    "lng": 106.6433661,
     "style": "#icon-1548-000000",
+    "lng": 106.6433661,
+    "lat": -6.2433162,
     "type": "gardu"
   },
   {
     "name": "GI Sindang Jaya",
-    "lat": -6.1479719,
-    "lng": 106.4831675,
     "style": "#icon-1548-000000",
+    "lng": 106.4831675,
+    "lat": -6.1479719,
     "type": "gardu"
   },
   {
     "name": "GIS Jatake Baru",
-    "lat": -6.2202855,
+    "style": "#icon-1548-000000",
     "lng": 106.5942003,
-    "style": "#icon-1548-000000",
+    "lat": -6.2202855,
     "type": "gardu"
   },
   {
-    "name": "GIS Ulujami",
-    "lat": -6.2452821,
+    "name": "Unnamed",
+    "style": "#icon-1548-000000",
     "lng": 106.7631123,
-    "style": "#icon-1548-000000",
+    "lat": -6.2452821,
     "type": "gardu"
   },
   {
-    "name": "GI ITS",
-    "lat": -6.1613831,
-    "lng": 106.6259415,
+    "name": "Unnamed",
     "style": "#icon-1548-000000",
+    "lng": 106.6259415,
+    "lat": -6.1613831,
     "type": "gardu"
   },
   {
     "name": "GIS Tomang",
-    "lat": -6.18738,
+    "style": "#icon-1548-000000",
     "lng": 106.775401,
-    "style": "#icon-1548-000000",
+    "lat": -6.18738,
     "type": "gardu"
   },
   {
-    "name": "GIS Muarakarang Baru",
-    "lat": -6.1093789,
+    "name": "Unnamed",
+    "style": "#icon-1548-000000",
     "lng": 106.7808477,
-    "style": "#icon-1548-000000",
+    "lat": -6.1093789,
     "type": "gardu"
   },
   {
-    "name": "GIS Metland",
-    "lat": -6.1978907,
+    "name": "Unnamed",
+    "style": "#icon-1548-000000",
     "lng": 106.7105339,
-    "style": "#icon-1548-000000",
+    "lat": -6.1978907,
     "type": "gardu"
   },
   {
-    "name": "GI Dadap",
-    "lat": -6.0601215,
+    "name": "Unnamed",
+    "style": "#icon-1548-000000",
     "lng": 106.6776818,
-    "style": "#icon-1548-000000",
+    "lat": -6.0601215,
     "type": "gardu"
   },
   {
-    "name": "GITET Gandul (UPT Gandul)",
-    "lat": -6.3469217,
+    "name": "Unnamed",
+    "style": "#icon-1548-000000",
     "lng": 106.78767,
-    "style": "#icon-1548-880E4F",
+    "lat": -6.3469217,
     "type": "gardu"
   },
   {
     "name": "GISTET MUARAKARANG",
-    "lat": -6.1105958,
-    "lng": 106.781497,
     "style": "#icon-1548-000000",
+    "lng": 106.781497,
+    "lat": -6.1105958,
     "type": "gardu"
   }
-]
+];
 
-// 427 Tower SUTET 500kV
+// 431 Tower SUTET
 export const towerSUTET: TowerPoint[] = [
   {
+    "name": "TOWER SUTET JAWA7-BLRJA 500kV #L01",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.098318,
+    "lat": -5.99029,
+    "type": "SUTET_500kV"
+  },
+  {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #L02",
-    "lat": -5.990828,
+    "style": "#icon-1899-0288D1",
     "lng": 106.097195,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -5.990828,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #L03",
-    "lat": -5.993304,
+    "style": "#icon-1899-0288D1",
     "lng": 106.094551,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -5.993304,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #L04",
-    "lat": -5.997127,
+    "style": "#icon-1899-0288D1",
     "lng": 106.095541,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -5.997127,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D2A",
-    "lat": -6.00277,
+    "style": "#icon-1899-0288D1",
     "lng": 106.09847,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.00277,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH02",
-    "lat": -5.99923,
+    "style": "#icon-1899-0288D1",
     "lng": 106.09857,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -5.99923,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D3",
-    "lat": -6.00647,
+    "style": "#icon-1899-0288D1",
     "lng": 106.0984,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.00647,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D4",
-    "lat": -6.01061,
+    "style": "#icon-1899-0288D1",
     "lng": 106.09828,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.01061,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A5",
-    "lat": -6.01349,
+    "style": "#icon-1899-0288D1",
     "lng": 106.09806,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.01349,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D6",
-    "lat": -6.0162,
+    "style": "#icon-1899-0288D1",
     "lng": 106.0974,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.0162,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D6B",
-    "lat": -6.01795,
+    "style": "#icon-1899-0288D1",
     "lng": 106.09699,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.01795,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH7",
-    "lat": -6.020819,
+    "style": "#icon-1899-0288D1",
     "lng": 106.09619,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.020819,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D8",
-    "lat": -6.02337,
+    "style": "#icon-1899-0288D1",
     "lng": 106.09833,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.02337,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D9 (Sudah dibongkar, pindah tempat menjadi tower AH9A",
-    "lat": -6.026557,
+    "style": "#icon-1899-0288D1",
     "lng": 106.101674,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.026557,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH10",
-    "lat": -6.02806,
+    "style": "#icon-1899-0288D1",
     "lng": 106.10419,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.02806,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH11",
-    "lat": -6.030824,
+    "style": "#icon-1899-0288D1",
     "lng": 106.103858,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.030824,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D12",
-    "lat": -6.03366,
+    "style": "#icon-1899-0288D1",
     "lng": 106.10666,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.03366,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D13",
-    "lat": -6.03641,
+    "style": "#icon-1899-0288D1",
     "lng": 106.10909,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.03641,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D14",
-    "lat": -6.03931,
+    "style": "#icon-1899-0288D1",
     "lng": 106.111816,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.03931,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D15",
-    "lat": -6.04232,
+    "style": "#icon-1899-0288D1",
     "lng": 106.11441,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.04232,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D16",
-    "lat": -6.04523,
+    "style": "#icon-1899-0288D1",
     "lng": 106.11707,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.04523,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D17",
-    "lat": -6.04813,
+    "style": "#icon-1899-0288D1",
     "lng": 106.11975,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.04813,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D18",
-    "lat": -6.05095,
+    "style": "#icon-1899-0288D1",
     "lng": 106.1224,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.05095,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D19",
-    "lat": -6.053725,
+    "style": "#icon-1899-0288D1",
     "lng": 106.124715,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.053725,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D20",
-    "lat": -6.0562,
+    "style": "#icon-1899-0288D1",
     "lng": 106.12726,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.0562,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D21",
-    "lat": -6.05944,
+    "style": "#icon-1899-0288D1",
     "lng": 106.13013,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.05944,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH22",
-    "lat": -6.06144,
+    "style": "#icon-1899-0288D1",
     "lng": 106.13175,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.06144,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D23",
-    "lat": -6.06167,
+    "style": "#icon-1899-0288D1",
     "lng": 106.13558,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.06167,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D24",
-    "lat": -6.06199,
+    "style": "#icon-1899-0288D1",
     "lng": 106.13869,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.06199,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D25",
-    "lat": -6.06235,
+    "style": "#icon-1899-0288D1",
     "lng": 106.14267,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.06235,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH26",
-    "lat": -6.062789,
+    "style": "#icon-1899-0288D1",
     "lng": 106.144815,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.062789,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH27",
-    "lat": -6.06589,
+    "style": "#icon-1899-0288D1",
     "lng": 106.14723,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.06589,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH28",
-    "lat": -6.06731,
+    "style": "#icon-1899-0288D1",
     "lng": 106.1508,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.06731,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH29",
-    "lat": -6.06669,
+    "style": "#icon-1899-0288D1",
     "lng": 106.153922,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.06669,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH30",
-    "lat": -6.064474,
+    "style": "#icon-1899-0288D1",
     "lng": 106.155549,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.064474,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH31",
-    "lat": -6.06341,
+    "style": "#icon-1899-0288D1",
     "lng": 106.15872,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.06341,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A32",
-    "lat": -6.06513,
+    "style": "#icon-1899-0288D1",
     "lng": 106.16288,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.06513,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D33",
-    "lat": -6.067027,
+    "style": "#icon-1899-0288D1",
     "lng": 106.165936,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.067027,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A34",
-    "lat": -6.068451,
+    "style": "#icon-1899-0288D1",
     "lng": 106.168395,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.068451,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D35",
-    "lat": -6.07027,
+    "style": "#icon-1899-0288D1",
     "lng": 106.17277,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.07027,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D36",
-    "lat": -6.07147,
+    "style": "#icon-1899-0288D1",
     "lng": 106.17538,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.07147,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D37",
-    "lat": -6.07265,
+    "style": "#icon-1899-0288D1",
     "lng": 106.17804,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.07265,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D38",
-    "lat": -6.074,
+    "style": "#icon-1899-0288D1",
     "lng": 106.18092,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.074,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A39",
-    "lat": -6.07542,
+    "style": "#icon-1899-0288D1",
     "lng": 106.183668,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.07542,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D40",
-    "lat": -6.07811,
+    "style": "#icon-1899-0288D1",
     "lng": 106.18641,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.07811,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D41",
-    "lat": -6.08104,
+    "style": "#icon-1899-0288D1",
     "lng": 106.18908,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.08104,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D42",
-    "lat": -6.08395,
+    "style": "#icon-1899-0288D1",
     "lng": 106.19158,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.08395,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D43",
-    "lat": -6.08656,
+    "style": "#icon-1899-0288D1",
     "lng": 106.19386,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.08656,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D44",
-    "lat": -6.08903,
+    "style": "#icon-1899-0288D1",
     "lng": 106.19609,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.08903,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D45",
-    "lat": -6.0916,
+    "style": "#icon-1899-0288D1",
     "lng": 106.19829,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.0916,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH46",
-    "lat": -6.094222,
+    "style": "#icon-1899-0288D1",
     "lng": 106.200395,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.094222,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A47",
-    "lat": -6.09548,
+    "style": "#icon-1899-0288D1",
     "lng": 106.203751,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.09548,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A48",
-    "lat": -6.097794,
+    "style": "#icon-1899-0288D1",
     "lng": 106.205818,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.097794,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A49",
-    "lat": -6.09974,
+    "style": "#icon-1899-0288D1",
     "lng": 106.207872,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.09974,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D50",
-    "lat": -6.100998,
+    "style": "#icon-1899-0288D1",
     "lng": 106.210966,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.100998,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D51",
-    "lat": -6.10263,
+    "style": "#icon-1899-0288D1",
     "lng": 106.21412,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.10263,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D52",
-    "lat": -6.1039,
+    "style": "#icon-1899-0288D1",
     "lng": 106.21757,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.1039,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D53",
-    "lat": -6.10524,
+    "style": "#icon-1899-0288D1",
     "lng": 106.22043,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.10524,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A54",
-    "lat": -6.106603,
+    "style": "#icon-1899-0288D1",
     "lng": 106.223293,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.106603,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A55",
-    "lat": -6.10764,
+    "style": "#icon-1899-0288D1",
     "lng": 106.22803,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.10764,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A56",
-    "lat": -6.10855,
+    "style": "#icon-1899-0288D1",
     "lng": 106.23095,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.10855,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D57",
-    "lat": -6.11055,
+    "style": "#icon-1899-0288D1",
     "lng": 106.23453,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.11055,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A58",
-    "lat": -6.112101,
+    "style": "#icon-1899-0288D1",
     "lng": 106.237445,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.112101,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A59",
-    "lat": -6.113263,
+    "style": "#icon-1899-0288D1",
     "lng": 106.240692,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.113263,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D60",
-    "lat": -6.112872,
+    "style": "#icon-1899-0288D1",
     "lng": 106.244446,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.112872,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D61",
-    "lat": -6.112333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.248244,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.112333,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D62",
-    "lat": -6.111908,
+    "style": "#icon-1899-0288D1",
     "lng": 106.252296,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.111908,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D63",
-    "lat": -6.111431,
+    "style": "#icon-1899-0288D1",
     "lng": 106.256056,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.111431,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D64",
-    "lat": -6.110899,
+    "style": "#icon-1899-0288D1",
     "lng": 106.259895,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.110899,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D65",
-    "lat": -6.110459,
+    "style": "#icon-1899-0288D1",
     "lng": 106.263792,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.110459,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D66",
-    "lat": -6.109901,
+    "style": "#icon-1899-0288D1",
     "lng": 106.267659,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.109901,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D67",
-    "lat": -6.10921,
+    "style": "#icon-1899-0288D1",
     "lng": 106.27217,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.10921,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D68",
-    "lat": -6.10901,
+    "style": "#icon-1899-0288D1",
     "lng": 106.27567,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.10901,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D69",
-    "lat": -6.108563,
+    "style": "#icon-1899-0288D1",
     "lng": 106.279182,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.108563,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A70",
-    "lat": -6.108063,
+    "style": "#icon-1899-0288D1",
     "lng": 106.2829,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.108063,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D71",
-    "lat": -6.10688,
+    "style": "#icon-1899-0288D1",
     "lng": 106.28532,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.10688,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D72",
-    "lat": -6.1058,
+    "style": "#icon-1899-0288D1",
     "lng": 106.28801,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.1058,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH73",
-    "lat": -6.104421,
+    "style": "#icon-1899-0288D1",
     "lng": 106.290779,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.104421,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D74",
-    "lat": -6.105733,
+    "style": "#icon-1899-0288D1",
     "lng": 106.293458,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.105733,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D75",
-    "lat": -6.107472,
+    "style": "#icon-1899-0288D1",
     "lng": 106.296693,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.107472,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A75B",
-    "lat": -6.109196,
+    "style": "#icon-1899-0288D1",
     "lng": 106.300131,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.109196,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D76",
-    "lat": -6.111948,
+    "style": "#icon-1899-0288D1",
     "lng": 106.302195,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.111948,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A76B",
-    "lat": -6.11433,
+    "style": "#icon-1899-0288D1",
     "lng": 106.30382,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.11433,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D77",
-    "lat": -6.117332,
+    "style": "#icon-1899-0288D1",
     "lng": 106.305384,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.117332,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D78",
-    "lat": -6.120503,
+    "style": "#icon-1899-0288D1",
     "lng": 106.306825,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.120503,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D79",
-    "lat": -6.123832,
+    "style": "#icon-1899-0288D1",
     "lng": 106.308518,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.123832,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D80",
-    "lat": -6.127031,
+    "style": "#icon-1899-0288D1",
     "lng": 106.310063,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.127031,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D81",
-    "lat": -6.130306,
+    "style": "#icon-1899-0288D1",
     "lng": 106.311614,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.130306,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A82",
-    "lat": -6.13348,
+    "style": "#icon-1899-0288D1",
     "lng": 106.313165,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.13348,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D83",
-    "lat": -6.136075,
+    "style": "#icon-1899-0288D1",
     "lng": 106.315712,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.136075,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D84",
-    "lat": -6.13861,
+    "style": "#icon-1899-0288D1",
     "lng": 106.318264,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.13861,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D85",
-    "lat": -6.141776,
+    "style": "#icon-1899-0288D1",
     "lng": 106.321337,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.141776,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH86",
-    "lat": -6.143202,
+    "style": "#icon-1899-0288D1",
     "lng": 106.322738,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.143202,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH87",
-    "lat": -6.142988,
+    "style": "#icon-1899-0288D1",
     "lng": 106.325067,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.142988,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH88",
-    "lat": -6.145421,
+    "style": "#icon-1899-0288D1",
     "lng": 106.329341,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.145421,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH89",
-    "lat": -6.149772,
+    "style": "#icon-1899-0288D1",
     "lng": 106.329903,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.149772,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D90",
-    "lat": -6.15194,
+    "style": "#icon-1899-0288D1",
     "lng": 106.332086,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.15194,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D91",
-    "lat": -6.154443,
+    "style": "#icon-1899-0288D1",
     "lng": 106.334696,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.154443,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D92B",
-    "lat": -6.155933,
+    "style": "#icon-1899-0288D1",
     "lng": 106.336412,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.155933,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH92",
-    "lat": -6.157934,
+    "style": "#icon-1899-0288D1",
     "lng": 106.338723,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.157934,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH93A",
-    "lat": -6.15835,
+    "style": "#icon-1899-0288D1",
     "lng": 106.342195,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.15835,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH93",
-    "lat": -6.161667,
+    "style": "#icon-1899-0288D1",
     "lng": 106.342743,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.161667,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH94",
-    "lat": -6.161807,
+    "style": "#icon-1899-0288D1",
     "lng": 106.345189,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.161807,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D95",
-    "lat": -6.16335,
+    "style": "#icon-1899-0288D1",
     "lng": 106.34646,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.16335,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH96",
-    "lat": -6.166593,
+    "style": "#icon-1899-0288D1",
     "lng": 106.349054,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.166593,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D97",
-    "lat": -6.16652,
+    "style": "#icon-1899-0288D1",
     "lng": 106.35294,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.16652,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D98",
-    "lat": -6.16673,
+    "style": "#icon-1899-0288D1",
     "lng": 106.35681,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.16673,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D99",
-    "lat": -6.16683,
+    "style": "#icon-1899-0288D1",
     "lng": 106.36067,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.16683,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D100",
-    "lat": -6.166956,
+    "style": "#icon-1899-0288D1",
     "lng": 106.36421,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.166956,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D101",
-    "lat": -6.167081,
+    "style": "#icon-1899-0288D1",
     "lng": 106.368284,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.167081,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D102",
-    "lat": -6.167237,
+    "style": "#icon-1899-0288D1",
     "lng": 106.372334,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.167237,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D103",
-    "lat": -6.167402,
+    "style": "#icon-1899-0288D1",
     "lng": 106.376107,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.167402,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D104",
-    "lat": -6.16762,
+    "style": "#icon-1899-0288D1",
     "lng": 106.38031,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.16762,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D105",
-    "lat": -6.167722,
+    "style": "#icon-1899-0288D1",
     "lng": 106.38409,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.167722,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A106",
-    "lat": -6.167953,
+    "style": "#icon-1899-0288D1",
     "lng": 106.388404,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.167953,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D107",
-    "lat": -6.16803,
+    "style": "#icon-1899-0288D1",
     "lng": 106.39171,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.16803,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D108",
-    "lat": -6.16815,
+    "style": "#icon-1899-0288D1",
     "lng": 106.39433,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.16815,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D109",
-    "lat": -6.1684,
+    "style": "#icon-1899-0288D1",
     "lng": 106.39811,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.1684,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D110",
-    "lat": -6.168576,
+    "style": "#icon-1899-0288D1",
     "lng": 106.401076,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.168576,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D111A",
-    "lat": -6.168856,
+    "style": "#icon-1899-0288D1",
     "lng": 106.404396,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.168856,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH111",
-    "lat": -6.169578,
+    "style": "#icon-1899-0288D1",
     "lng": 106.404811,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.169578,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D112",
-    "lat": -6.17251,
+    "style": "#icon-1899-0288D1",
     "lng": 106.406596,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.17251,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D113",
-    "lat": -6.17601,
+    "style": "#icon-1899-0288D1",
     "lng": 106.40869,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.17601,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A114",
-    "lat": -6.17958,
+    "style": "#icon-1899-0288D1",
     "lng": 106.41073,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.17958,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D115",
-    "lat": -6.18257,
+    "style": "#icon-1899-0288D1",
     "lng": 106.41254,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.18257,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D116",
-    "lat": -6.18571,
+    "style": "#icon-1899-0288D1",
     "lng": 106.41451,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.18571,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D117",
-    "lat": -6.18911,
+    "style": "#icon-1899-0288D1",
     "lng": 106.41662,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.18911,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH118",
-    "lat": -6.19179,
+    "style": "#icon-1899-0288D1",
     "lng": 106.41816,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.19179,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #AH119",
-    "lat": -6.19428,
+    "style": "#icon-1899-0288D1",
     "lng": 106.417682,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.19428,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A120 (Diganti menjadi Jalur BalKem Tower A2)",
-    "lat": -6.1961,
+    "style": "#icon-1899-0288D1",
     "lng": 106.41989,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.1961,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #D121 (Unstringing)",
-    "lat": -6.198128,
+    "style": "#icon-1899-0288D1",
     "lng": 106.422022,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.198128,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #EA122",
-    "lat": -6.199431,
+    "style": "#icon-1899-0288D1",
     "lng": 106.421552,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.199431,
     "type": "SUTET_500kV"
   },
   {
     "name": "Tower SUTET JAWA7-BLRJA 500kV #AH9A(NEW)",
-    "lat": -6.025325,
+    "style": "#icon-1899-0288D1",
     "lng": 106.101541,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.025325,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET JAWA7-BLRJA 500kV #A120N(NEW)",
-    "lat": -6.197541,
+    "style": "#icon-1899-0288D1",
     "lng": 106.420352,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.197541,
     "type": "SUTET_500kV"
   },
   {
-    "name": "SKTT KMBNG-NSYAN SPAN JP13-JP14\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7674049,-6.2233601,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBNG-NSYAN SPAN JP12-JP13\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7651195,-6.2203825,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBNG-NSYAN SPAN JP11-JP12\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7619625,-6.2173223,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBNG-NSYAN SPAN JP10-JP11</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7579646,-6.2156817,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBNG-NSYAN SPAN JP9-JP10</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7560606,-6.2099835,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBNG-NSYAN SPAN JP8-JP9</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7527776,-6.2048742,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBNG-NSYAN SPAN JP7-JP8</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7510528,-6.1995106,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBNG-NSYAN SPAN JP6-JP7</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.745782,-6.1974559,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBNG-NSYAN SPAN JP5-JP6</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7431067,-6.1932881,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBNG-NSYAN SPAN JP3-JP4</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7338027,-6.1900997,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBNG-NSYAN SPAN JP2-JP3</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7308672,-6.186788,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBNG-NSYAN SPAN JP1-JP2</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7266997,-6.1857295,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBNG-NSYAN SPAN SEALING END-JP1\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7213856,-6.1880984,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP17-JP18</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7829594,-6.1893675,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP16-JP17</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7818047,-6.1860893,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP15-JP16</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7779558,-6.186742,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP14-JP15</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7735579,-6.1884076,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP13-JP14</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7693382,-6.1894816,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP12-JP13</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7661111,-6.1897464,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP11-JP12</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.761333,-6.1900456,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP10-JP11</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7567784,-6.1903655,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP9-JP10</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7535633,-6.1906781,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP8-JP9</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7482364,-6.1909661,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP8A-JP8</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7445233,-6.1910067,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP7-JP8A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7423034,-6.1911932,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP6-JP7</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7390603,-6.1912805,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP5-JP6</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7350328,-6.1911593,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP4-JP5</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7318136,-6.1896483,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP3-JP4</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7299517,-6.1854355,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP2-JP3</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7288802,-6.1811039,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP1-JP2</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7282286,-6.1769485,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN SEALING END-JP1</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7268163,-6.1725198,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-DKSBI SPAN SEALING END-JP1</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7276576,-6.1702631,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-DKSBI SPAN JP1-JP2</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7278219,-6.1732176,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-DKSBI SPAN JP2-JP3</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7281274,-6.1769396,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-DKSBI SPAN JP3-JP4</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7285522,-6.1797687,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-DKSBI SPAN JP4-JP5</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7292777,-6.183114,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-DKSBI SPAN JP5-JP6</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7282109,-6.1847328,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-DKSBI SPAN JP6-JP7</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7256934,-6.1863027,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-DKSBI SPAN JP7-JP8</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7234926,-6.1874132,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-DKSBI SPAN JP8-SEALING END\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7209676,-6.1875489,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-PTKGN SPAN SEALING END-JP1A\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7212565,-6.1879597,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-PTKGN SPAN JP1A-JP2A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.723788,-6.1870994,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-PTKGN SPAN JP2A-JP3A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7260418,-6.1860184,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-PTKGN SPAN JP3A-JP4A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7281801,-6.1847193,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-PTKGN SPAN JP4A-JP5A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7304323,-6.1877214,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-PTKGN SPAN JP5A-SEALING END\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7299365,-6.1907604,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-PTKGN SPAN JP5B-SEALING END</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7298515,-6.1907481,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-PTKGN SPAN JP4B-JP5B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7303844,-6.1877187,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-PTKGN SPAN JP3B-JP4B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7282122,-6.1847806,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-PTKGN SPAN JP2B-JP3B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7260886,-6.1860864,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-PTKGN SPAN JP1B-JP2B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7238148,-6.1871827,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBGN-PTKGN SPAN SEALING END-JP1B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7212795,-6.1880144,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN SEALING END-JP1\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7844271,-6.1126899,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN SEALING END-JP1A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7844816,-6.112686,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP1-JP2</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7840324,-6.1153307,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP1A-JP2A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.784078,-6.1153294,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP2-JP3</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7835025,-6.1191249,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP2A-JP3A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7835373,-6.1191209,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP3-JP4</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7833568,-6.1220378,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP3A-JP4A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7833889,-6.1220325,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP4-JP5</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7833731,-6.1255463,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP4A-JP5A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7834126,-6.1255414,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP5-JP6</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7840601,-6.1288927,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP5A-JP6A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7841044,-6.1288727,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP6A-JP7A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7863586,-6.1312891,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP6-JP7</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7864256,-6.1313745,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP7-JP8</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7891119,-6.1317648,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP7A-JP8A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7891426,-6.1317226,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP8A-SEALING END\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7907285,-6.1338001,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT MKRLM-ANGKE SPAN JP8A-SEALING END</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7906802,-6.1337975,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT JTAKE-MAXIM SPAN SEALING END-JP1</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.5851584,-6.2142582,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT JTAKE-MAXIM SPAN JP1-JP2</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.584835,-6.2113681,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT JTAKE-MAXIM SPAN JP2-SEALING END\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.5869724,-6.2106147,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP13A-SEALING END\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7170841,-6.1894165,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP13B-SEALING END</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7170908,-6.1894512,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP12A-JP13A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7146051,-6.1903612,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP12B-JP13B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7145944,-6.1904228,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP11A-JP12A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7112007,-6.1907772,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP11B-JP12B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7112436,-6.1908012,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP10A-JP11A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7093986,-6.1944244,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP10B-JP11B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7094778,-6.1944164,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP9A-JP10A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7063993,-6.197188,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP9B-JP10B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7063858,-6.1972701,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP8A-JP9A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7028578,-6.1969122,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP8B-JP9B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7028433,-6.1969707,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP7A-JP8A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6998216,-6.1955248,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP7B-JP8B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6998699,-6.1955448,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP6A-JP7A\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6983683,-6.1997032,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP6B-JP7B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6984058,-6.1997565,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP5A-JP6A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6940263,-6.19865,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP5B-JP6B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.693986,-6.1987366,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP4A-JP5A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6897439,-6.2003402,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP4B-JP5B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6897499,-6.200385,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP3B-JP4B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6881061,-6.2038472,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP3A-JP4A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.688031,-6.2037872,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP2A-JP3A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6881115,-6.2090333,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP2B-JP3B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6881692,-6.2090413,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP1A-JP2A\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6852884,-6.2109917,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN JP1B-JP2B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6852964,-6.2110477,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN SEALING END-JP1B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6815263,-6.2120289,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CLDUG-KMBGN SPAN SEALING END-JP1A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6815236,-6.2119743,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN JP7A-SEALING END\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6801244,-6.2135512,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN JP7B-SEALING END</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6801432,-6.2135725,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN JP6A-JP7A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6783331,-6.2150722,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN JP6B-JP7B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.678384,-6.2150829,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN JP5A-JP6A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6746362,-6.2161111,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN JP5B-JP6B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6746858,-6.2161124,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN JP4A-JP5A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6711799,-6.2176305,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN JP4B-JP5B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6711415,-6.217641,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN JP3A-JP4A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6688973,-6.2189871,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN JP3B-JP4B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.668904,-6.2189217,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN JP2B-JP3B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6644724,-6.2207553,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN JP2A-JP3A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6645334,-6.2207461,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN JP1A-JP2A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6603731,-6.2209321,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN JP1B-JP2B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6604066,-6.2209588,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN SEALING END-JP1A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6574682,-6.2206222,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT ALSTA-CLDUG SPAN SEALING END-JP1B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6574921,-6.2206662,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP14A-SEALING END\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6553311,-6.2200892,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP14B-SEALING END</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6553166,-6.2201277,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP13A-JP14A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6524769,-6.22034,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP13B-JP14B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6525118,-6.220368,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP12A-JP13A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6482284,-6.2217607,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP12B-JP13B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6482472,-6.2217981,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP11A-JP12A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6445302,-6.2226179,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP11B-JP12B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6446214,-6.2226219,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP10A-JP11A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6402637,-6.2244624,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP10B-JP11B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6403213,-6.2244643,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP9A-JP10A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6384833,-6.2264266,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP9B-JP10B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.638482,-6.2264706,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP8A-JP9A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6407582,-6.2293903,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP8B-JP9B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6407609,-6.2294383,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP7A-JP8A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6383024,-6.2309359,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP7B-JP8B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6383427,-6.2310132,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP6A-JP7A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6357212,-6.2289195,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP6B-JP7B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.635736,-6.2289515,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP5A-JP6A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6330795,-6.231795,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP5B-JP6B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.633164,-6.231715,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP4A-JP5A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6317922,-6.2354149,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP4B-JP5B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6318606,-6.2353376,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP3A-JP4A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6323085,-6.2386487,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP3B-JP4B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6323497,-6.2385603,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP2A-JP3A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6368722,-6.2393407,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP2B-JP3B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6370659,-6.2393027,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP1A-JP2A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6381432,-6.2412996,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN JP1B-JP2B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6381271,-6.2411796,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN SEALING END-JP1A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6414691,-6.2433581,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT SGSPG-ALSTA SPAN SEALING END-JP1B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6415241,-6.2432981,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP8A-SEALING END</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6416032,-6.2433184,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP8B-SEALING END</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6416649,-6.2433331,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP7A-JP8A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6387594,-6.2425662,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP7B-JP8B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6387031,-6.2427088,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP6A-JP7A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6368606,-6.244809,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP6B-JP7B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6369424,-6.2447437,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP5A-JP6A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.633176,-6.2443875,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP5B-JP6B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6330929,-6.2443475,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP4A-JP5A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6295128,-6.2434818,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP4B-JP5B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6296281,-6.2435324,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP3A-JP4A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6230062,-6.2424788,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP3B-JP4B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6229847,-6.2425695,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP2A-JP3A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6195029,-6.2432389,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP2B-JP3B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6194399,-6.2433616,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP1A-JP2A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6142459,-6.2439045,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN JP1B-JP2B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6143156,-6.2440512,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN SEALING END-JP1A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6110608,-6.2436406,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT CURUG-SGSPG SPAN SEALING END-JP1B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6110187,-6.2437503,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT KMBNG-NSYAN SPAN JP4-JP5</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7387455,-6.1919274,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT DKSBI-KBJRK SPAN JP18-SEALING END\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7820968,-6.1905798,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT Gajah Tunggal-Pasar Kemis Baru Sealing End-JP1B\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.5539449,-6.180951,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT Gajah Tunggal - Pasar Kemis Baru JP1B-JP2B\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.5542018,-6.1782457,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT Gajah Tunggal - Pasar Kemis Baru JP2B-JP3B\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.5516427,-6.1746884,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT Gajah Tunggal - Pasar Kemis Baru JP3B-JP4B\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.551724,-6.1721645,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT Gajah Tunggal - Pasar Kemis Baru JP4B-Gantry\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.5485565,-6.16728,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT Gajah Tunggal - Pasar Kemis JP4A-Gantry\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.5489201,-6.1672629,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT Gajah Tunggal - Pasar Kemis JP3A-JP4A\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.5516878,-6.1721748,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT Gajah Tunggal - Pasar Kemis JP2A-JP3A\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.5516063,-6.1746899,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT Gajah Tunggal - Pasar Kemis JP1A-JP2A\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.5541497,-6.1782471,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SKTT Gajah Tunggal - Pasar Kemis Sealing End-JP1A\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.5539106,-6.18095,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT GGGOL-TMANG #1\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7862969,-6.1674578,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT GGGOL-TMANG #2\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7877226,-6.1699758,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT GGGOL-TMANG #3</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7881882,-6.1736906,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT GGGOL-TMANG #4</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7852747,-6.1737512,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT GGGOL-TMANG #5</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7835985,-6.1777468,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT GGGOL-TMANG #6</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7836045,-6.1824347,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT GGGOL-TMANG #7</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7833394,-6.1847259,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT GGGOL-TMANG #7-SE</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.779162,-6.1863338,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT NSYAN-ULJMI #1\n</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7630091,-6.2425895,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT NSYAN-ULJMI #2</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7634003,-6.2395174,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT NSYAN-ULJMI #3</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7688453,-6.2380348,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT NSYAN-ULJMI #4</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7719917,-6.2374107,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT NSYAN-ULJMI #5</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7718719,-6.2328354,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT NSYAN-ULJMI #5-SE</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7719056,-6.229509,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT MKBRU-MKRNG #000SE-SE</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7821455,-6.110032,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT CNKNG-CKBRU #000SE-SE</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6588635,-6.1502036,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT CKBRU-TGRBR #000SE-SE</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6590592,-6.1501154,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT MKBRU-GMKRU #00SE-SE</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7816639,-6.1102228,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT METLAND-KEMBANGAN JP1A-2A</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.7076818,-6.196876,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>SPAN SKTT METLAND-KEMBANGAN JP1B-2B</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.707773,-6.196924,0\n          </coordinates>\n        </Point>\n      </Placemark>\n      <Placemark>\n        <name>Point 305</name>\n        <styleUrl>#icon-1739-000000-nodesc</styleUrl>\n        <Point>\n          <coordinates>\n            106.6432935,-6.2121077,0\n          </coordinates>\n        </Point>\n      </Placemark>\n    </Folder>\n    <Folder>\n      <name>Jalur SUTET Balaraja - Kembangan.xlsx</name>\n      <Placemark>\n        <name>TOWER SUTET 500KV BLRJA-KMBNG #0001",
-    "lat": -6.19878949,
+    "name": "TOWER SUTET 500KV BLRJA-KMBNG #0001",
+    "style": "#icon-1899-0288D1",
     "lng": 106.4216126,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.19878949,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0002",
-    "lat": -6.196171561,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4198616,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.196171561,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0003",
-    "lat": -6.192347362,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4194086,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.192347362,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0004",
-    "lat": -6.188090909,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4182677,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.188090909,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0005",
-    "lat": -6.184736048,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4181593,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.184736048,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0006",
-    "lat": -6.180927854,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4184835,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.180927854,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0007",
-    "lat": -6.177092531,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4188076,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.177092531,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0008",
-    "lat": -6.173899415,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4190883,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.173899415,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0009",
-    "lat": -6.170655674,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4180044,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.170655674,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0010",
-    "lat": -6.1689557,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4179276,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.1689557,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0011",
-    "lat": -6.166217029,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4207485,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.166217029,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0012",
-    "lat": -6.164950606,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4242601,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.164950606,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0013",
-    "lat": -6.163738714,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4276634,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.163738714,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0014",
-    "lat": -6.162572458,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4309042,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.162572458,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0015",
-    "lat": -6.161305784,
+    "style": "#icon-1899-0288D1",
     "lng": 106.434488,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.161305784,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0016",
-    "lat": -6.160139444,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4377468,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.160139444,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0017",
-    "lat": -6.15946104,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4411515,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.15946104,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0018",
-    "lat": -6.158903116,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4434722,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.158903116,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0019",
-    "lat": -6.158069618,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4473643,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.158069618,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0020",
-    "lat": -6.158302866,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4513858,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.158302866,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0021",
-    "lat": -6.160454575,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4549337,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.160454575,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0022",
-    "lat": -6.163956822,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4573468,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.163956822,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0023",
-    "lat": -6.163791854,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4614486,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.163791854,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0024",
-    "lat": -6.165310398,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4650128,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.165310398,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0025",
-    "lat": -6.166989574,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4693456,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.166989574,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0026",
-    "lat": -6.168553021,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4730003,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.168553021,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0027",
-    "lat": -6.168825007,
+    "style": "#icon-1899-0288D1",
     "lng": 106.476019,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.168825007,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0028",
-    "lat": -6.169152338,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4786403,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.169152338,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0029",
-    "lat": -6.171937754,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4786119,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.171937754,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0030",
-    "lat": -6.174234835,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4785821,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.174234835,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0031",
-    "lat": -6.177396872,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4764494,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.177396872,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0032",
-    "lat": -6.181241904,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4758637,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.181241904,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0033",
-    "lat": -6.184970305,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4781963,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.184970305,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0034",
-    "lat": -6.187099071,
+    "style": "#icon-1899-0288D1",
     "lng": 106.480154,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.187099071,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0035",
-    "lat": -6.190202928,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4826747,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.190202928,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0036",
-    "lat": -6.191183434,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4845388,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.191183434,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0037",
-    "lat": -6.195518843,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4832226,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.195518843,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0038",
-    "lat": -6.196768094,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4827653,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.196768094,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0039",
-    "lat": -6.198774657,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4863673,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.198774657,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0040",
-    "lat": -6.198495982,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4889961,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.198495982,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0041",
-    "lat": -6.199534417,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4927581,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.199534417,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0042",
-    "lat": -6.199935935,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4946839,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.199935935,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0043",
-    "lat": -6.200533714,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4975591,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.200533714,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0044",
-    "lat": -6.201257082,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5007871,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.201257082,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0045",
-    "lat": -6.201559606,
+    "style": "#icon-1899-0288D1",
     "lng": 106.502532,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.201559606,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0046",
-    "lat": -6.202329465,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5052992,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.202329465,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0047",
-    "lat": -6.202846384,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5079664,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.202846384,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0048",
-    "lat": -6.203579962,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5107607,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.203579962,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0049",
-    "lat": -6.204054087,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5125693,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.204054087,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0050",
-    "lat": -6.204373543,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5147027,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.204373543,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0051",
-    "lat": -6.204763911,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5173334,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.204763911,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0052",
-    "lat": -6.204901474,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5198188,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.204901474,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0053",
-    "lat": -6.206009,
+    "style": "#icon-1899-0288D1",
     "lng": 106.520874,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.206009,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0054",
-    "lat": -6.208103,
+    "style": "#icon-1899-0288D1",
     "lng": 106.519697,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.208103,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0055",
-    "lat": -6.210685,
+    "style": "#icon-1899-0288D1",
     "lng": 106.519944,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.210685,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0056",
-    "lat": -6.213653,
+    "style": "#icon-1899-0288D1",
     "lng": 106.52032,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.213653,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0057",
-    "lat": -6.216162,
+    "style": "#icon-1899-0288D1",
     "lng": 106.520612,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.216162,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0058",
-    "lat": -6.218767,
+    "style": "#icon-1899-0288D1",
     "lng": 106.521033,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.218767,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0059",
-    "lat": -6.221337,
+    "style": "#icon-1899-0288D1",
     "lng": 106.521234,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.221337,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0060",
-    "lat": -6.223471,
+    "style": "#icon-1899-0288D1",
     "lng": 106.522579,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.223471,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0061",
-    "lat": -6.224735,
+    "style": "#icon-1899-0288D1",
     "lng": 106.52346,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.224735,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0062",
-    "lat": -6.225716,
+    "style": "#icon-1899-0288D1",
     "lng": 106.524328,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.225716,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0063",
-    "lat": -6.2279,
+    "style": "#icon-1899-0288D1",
     "lng": 106.523647,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.2279,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0064",
-    "lat": -6.229499,
+    "style": "#icon-1899-0288D1",
     "lng": 106.523639,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.229499,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0065",
-    "lat": -6.232325,
+    "style": "#icon-1899-0288D1",
     "lng": 106.523949,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.232325,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0066",
-    "lat": -6.232805,
+    "style": "#icon-1899-0288D1",
     "lng": 106.525518,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.232805,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0067",
-    "lat": -6.233326,
+    "style": "#icon-1899-0288D1",
     "lng": 106.527934,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.233326,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0068",
-    "lat": -6.233877,
+    "style": "#icon-1899-0288D1",
     "lng": 106.530646,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.233877,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0069",
-    "lat": -6.234367,
+    "style": "#icon-1899-0288D1",
     "lng": 106.533083,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.234367,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0070",
-    "lat": -6.234948,
+    "style": "#icon-1899-0288D1",
     "lng": 106.535856,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.234948,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0071",
-    "lat": -6.235439,
+    "style": "#icon-1899-0288D1",
     "lng": 106.538168,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.235439,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0072",
-    "lat": -6.236023,
+    "style": "#icon-1899-0288D1",
     "lng": 106.540713,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.236023,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0073",
-    "lat": -6.236586,
+    "style": "#icon-1899-0288D1",
     "lng": 106.543514,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.236586,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0074",
-    "lat": -6.235231,
+    "style": "#icon-1899-0288D1",
     "lng": 106.547309,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.235231,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0075",
-    "lat": -6.233886,
+    "style": "#icon-1899-0288D1",
     "lng": 106.551279,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.233886,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0076",
-    "lat": -6.234291,
+    "style": "#icon-1899-0288D1",
     "lng": 106.553625,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.234291,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0077",
-    "lat": -6.234631,
+    "style": "#icon-1899-0288D1",
     "lng": 106.555786,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.234631,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0078",
-    "lat": -6.235106,
+    "style": "#icon-1899-0288D1",
     "lng": 106.558439,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.235106,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0079",
-    "lat": -6.235507,
+    "style": "#icon-1899-0288D1",
     "lng": 106.561401,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.235507,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0080",
-    "lat": -6.235952,
+    "style": "#icon-1899-0288D1",
     "lng": 106.563586,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.235952,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0081",
-    "lat": -6.236043,
+    "style": "#icon-1899-0288D1",
     "lng": 106.565367,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.236043,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0082",
-    "lat": -6.236123,
+    "style": "#icon-1899-0288D1",
     "lng": 106.567419,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.236123,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0083",
-    "lat": -6.23434,
+    "style": "#icon-1899-0288D1",
     "lng": 106.569946,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.23434,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0084",
-    "lat": -6.2354443,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5719804,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.2354443,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0085",
-    "lat": -6.236756,
+    "style": "#icon-1899-0288D1",
     "lng": 106.574371,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.236756,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0086",
-    "lat": -6.238093,
+    "style": "#icon-1899-0288D1",
     "lng": 106.576974,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.238093,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0087",
-    "lat": -6.238683,
+    "style": "#icon-1899-0288D1",
     "lng": 106.578167,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.238683,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0088",
-    "lat": -6.239395,
+    "style": "#icon-1899-0288D1",
     "lng": 106.57947,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.239395,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0089",
-    "lat": -6.2408,
+    "style": "#icon-1899-0288D1",
     "lng": 106.582111,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.2408,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0090",
-    "lat": -6.242173,
+    "style": "#icon-1899-0288D1",
     "lng": 106.584679,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.242173,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0091",
-    "lat": -6.243585,
+    "style": "#icon-1899-0288D1",
     "lng": 106.587233,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.243585,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0092",
-    "lat": -6.244726,
+    "style": "#icon-1899-0288D1",
     "lng": 106.589314,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.244726,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0094",
-    "lat": -6.246154,
+    "style": "#icon-1899-0288D1",
     "lng": 106.594426,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.246154,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0095",
-    "lat": -6.246258,
+    "style": "#icon-1899-0288D1",
     "lng": 106.596941,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.246258,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0096",
-    "lat": -6.246359,
+    "style": "#icon-1899-0288D1",
     "lng": 106.599863,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.246359,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0097",
-    "lat": -6.246433,
+    "style": "#icon-1899-0288D1",
     "lng": 106.602421,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.246433,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0098",
-    "lat": -6.2469393,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6051746,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.2469393,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0093",
-    "lat": -6.246069,
+    "style": "#icon-1899-0288D1",
     "lng": 106.591762,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.246069,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0099",
-    "lat": -6.2474314,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6071975,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.2474314,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0100",
-    "lat": -6.2473793,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6089976,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.2473793,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0101",
-    "lat": -6.247031,
+    "style": "#icon-1899-0288D1",
     "lng": 106.609628,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.247031,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0102",
-    "lat": -6.247182,
+    "style": "#icon-1899-0288D1",
     "lng": 106.611513,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.247182,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0103",
-    "lat": -6.247311,
+    "style": "#icon-1899-0288D1",
     "lng": 106.613612,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.247311,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0104",
-    "lat": -6.245974,
+    "style": "#icon-1899-0288D1",
     "lng": 106.616375,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.245974,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0105",
-    "lat": -6.24477,
+    "style": "#icon-1899-0288D1",
     "lng": 106.618926,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.24477,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0106",
-    "lat": -6.24331,
+    "style": "#icon-1899-0288D1",
     "lng": 106.621805,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.24331,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0107",
-    "lat": -6.241943,
+    "style": "#icon-1899-0288D1",
     "lng": 106.624766,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.241943,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0108",
-    "lat": -6.240783,
+    "style": "#icon-1899-0288D1",
     "lng": 106.627001,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.240783,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0109",
-    "lat": -6.238977,
+    "style": "#icon-1899-0288D1",
     "lng": 106.627702,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.238977,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0110",
-    "lat": -6.237172,
+    "style": "#icon-1899-0288D1",
     "lng": 106.628398,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.237172,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0111",
-    "lat": -6.2376,
+    "style": "#icon-1899-0288D1",
     "lng": 106.629545,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.2376,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0112",
-    "lat": -6.238785,
+    "style": "#icon-1899-0288D1",
     "lng": 106.632859,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.238785,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0113",
-    "lat": -6.239103,
+    "style": "#icon-1899-0288D1",
     "lng": 106.635359,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.239103,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0114",
-    "lat": -6.239548,
+    "style": "#icon-1899-0288D1",
     "lng": 106.638946,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.239548,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0115",
-    "lat": -6.239747,
+    "style": "#icon-1899-0288D1",
     "lng": 106.641319,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.239747,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0116",
-    "lat": -6.239879,
+    "style": "#icon-1899-0288D1",
     "lng": 106.643607,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.239879,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0117",
-    "lat": -6.238191,
+    "style": "#icon-1899-0288D1",
     "lng": 106.64453,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.238191,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0118",
-    "lat": -6.236973,
+    "style": "#icon-1899-0288D1",
     "lng": 106.646177,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.236973,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0119",
-    "lat": -6.235004,
+    "style": "#icon-1899-0288D1",
     "lng": 106.64808,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.235004,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0120",
-    "lat": -6.233419,
+    "style": "#icon-1899-0288D1",
     "lng": 106.649603,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.233419,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0121",
-    "lat": -6.231634,
+    "style": "#icon-1899-0288D1",
     "lng": 106.650176,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.231634,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0122",
-    "lat": -6.228977,
+    "style": "#icon-1899-0288D1",
     "lng": 106.65117,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.228977,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0123",
-    "lat": -6.226638,
+    "style": "#icon-1899-0288D1",
     "lng": 106.652389,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.226638,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0124",
-    "lat": -6.224542,
+    "style": "#icon-1899-0288D1",
     "lng": 106.653614,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.224542,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0125",
-    "lat": -6.222567,
+    "style": "#icon-1899-0288D1",
     "lng": 106.654553,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.222567,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0126",
-    "lat": -6.220546,
+    "style": "#icon-1899-0288D1",
     "lng": 106.655758,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.220546,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0127",
-    "lat": -6.218755,
+    "style": "#icon-1899-0288D1",
     "lng": 106.65651,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.218755,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0128",
-    "lat": -6.216917,
+    "style": "#icon-1899-0288D1",
     "lng": 106.657763,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.216917,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0129",
-    "lat": -6.215152,
+    "style": "#icon-1899-0288D1",
     "lng": 106.658865,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.215152,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0130",
-    "lat": -6.214808,
+    "style": "#icon-1899-0288D1",
     "lng": 106.661297,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.214808,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0131",
-    "lat": -6.214416,
+    "style": "#icon-1899-0288D1",
     "lng": 106.663974,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.214416,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0132",
-    "lat": -6.214019,
+    "style": "#icon-1899-0288D1",
     "lng": 106.666669,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.214019,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0133",
-    "lat": -6.213635,
+    "style": "#icon-1899-0288D1",
     "lng": 106.669166,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.213635,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0134",
-    "lat": -6.213206,
+    "style": "#icon-1899-0288D1",
     "lng": 106.671827,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.213206,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0135",
-    "lat": -6.212845,
+    "style": "#icon-1899-0288D1",
     "lng": 106.674499,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.212845,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0136",
-    "lat": -6.212489,
+    "style": "#icon-1899-0288D1",
     "lng": 106.676823,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.212489,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0137",
-    "lat": -6.212125,
+    "style": "#icon-1899-0288D1",
     "lng": 106.679311,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.212125,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0138",
-    "lat": -6.211743,
+    "style": "#icon-1899-0288D1",
     "lng": 106.681887,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.211743,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0139",
-    "lat": -6.211505,
+    "style": "#icon-1899-0288D1",
     "lng": 106.683958,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.211505,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0140",
-    "lat": -6.211011,
+    "style": "#icon-1899-0288D1",
     "lng": 106.686492,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.211011,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0141",
-    "lat": -6.210568,
+    "style": "#icon-1899-0288D1",
     "lng": 106.688918,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.210568,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0142",
-    "lat": -6.210288,
+    "style": "#icon-1899-0288D1",
     "lng": 106.691423,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.210288,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0143",
-    "lat": -6.209264,
+    "style": "#icon-1899-0288D1",
     "lng": 106.693669,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.209264,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0144",
-    "lat": -6.208148,
+    "style": "#icon-1899-0288D1",
     "lng": 106.696033,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.208148,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0145",
-    "lat": -6.206271,
+    "style": "#icon-1899-0288D1",
     "lng": 106.698675,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.206271,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0146",
-    "lat": -6.205273,
+    "style": "#icon-1899-0288D1",
     "lng": 106.700231,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.205273,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0147",
-    "lat": -6.203722,
+    "style": "#icon-1899-0288D1",
     "lng": 106.70251,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.203722,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0148",
-    "lat": -6.202343,
+    "style": "#icon-1899-0288D1",
     "lng": 106.704488,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.202343,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0149",
-    "lat": -6.200933,
+    "style": "#icon-1899-0288D1",
     "lng": 106.706341,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.200933,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0150",
-    "lat": -6.199411,
+    "style": "#icon-1899-0288D1",
     "lng": 106.708366,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.199411,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0151",
-    "lat": -6.197396,
+    "style": "#icon-1899-0288D1",
     "lng": 106.710771,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.197396,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0152",
-    "lat": -6.194768,
+    "style": "#icon-1899-0288D1",
     "lng": 106.711759,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.194768,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0153",
-    "lat": -6.192577,
+    "style": "#icon-1899-0288D1",
     "lng": 106.712679,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.192577,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0154",
-    "lat": -6.191138,
+    "style": "#icon-1899-0288D1",
     "lng": 106.714389,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.191138,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0155",
-    "lat": -6.190008,
+    "style": "#icon-1899-0288D1",
     "lng": 106.715658,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.190008,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0156",
-    "lat": -6.188882,
+    "style": "#icon-1899-0288D1",
     "lng": 106.717085,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.188882,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV BLRJA-KMBNG #0157",
-    "lat": -6.187348,
+    "style": "#icon-1899-0288D1",
     "lng": 106.719203,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.187348,
+    "type": "SUTET_500kV"
+  },
+  {
+    "name": "TOWER SUTET 500kV GNDUL-KMBNG #0001",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7874167,
+    "lat": -6.3452933,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0002",
-    "lat": -6.3449956,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7865333,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3449956,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0003",
-    "lat": -6.3462988,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7854232,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3462988,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0004",
-    "lat": -6.3478038,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7845528,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3478038,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0005",
-    "lat": -6.3504655,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7829978,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3504655,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0006",
-    "lat": -6.3522896,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7819515,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3522896,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0007",
-    "lat": -6.3543415,
+    "style": "#icon-1899-0288D1",
     "lng": 106.780808,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3543415,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0008",
-    "lat": -6.3567986,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7793907,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3567986,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0009",
-    "lat": -6.3578163,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7776549,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3578163,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0010",
-    "lat": -6.3590969,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7753182,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3590969,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0011",
-    "lat": -6.3600938,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7735991,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3600938,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0012",
-    "lat": -6.3622167,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7718914,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3622167,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0013",
-    "lat": -6.3639819,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7704513,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3639819,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0014",
-    "lat": -6.3668924,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7681212,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3668924,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0015",
-    "lat": -6.3690854,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7663897,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3690854,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0016",
-    "lat": -6.3717491,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7642386,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3717491,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0017",
-    "lat": -6.3747445,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7618863,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3747445,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0018",
-    "lat": -6.3769409,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7601453,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3769409,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0019",
-    "lat": -6.37881,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7586591,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.37881,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0020",
-    "lat": -6.3788117,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7563905,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3788117,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0021",
-    "lat": -6.3788063,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7535761,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3788063,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0022",
-    "lat": -6.378753,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7504181,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.378753,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0023",
-    "lat": -6.3787625,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7478693,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3787625,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0024",
-    "lat": -6.3787491,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7443646,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3787491,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0025",
-    "lat": -6.3786824,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7407037,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3786824,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0026",
-    "lat": -6.3786484,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7368465,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3786484,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0027",
-    "lat": -6.3757204,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7361247,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3757204,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0028",
-    "lat": -6.3727895,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7354412,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3727895,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0029",
-    "lat": -6.3693673,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7346183,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3693673,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0030",
-    "lat": -6.3665468,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7339597,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3665468,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0031",
-    "lat": -6.363023,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7331225,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.363023,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0032",
-    "lat": -6.3603266,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7324011,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3603266,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0033",
-    "lat": -6.3566211,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7303141,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3566211,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0034",
-    "lat": -6.3541251,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7288727,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3541251,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0035",
-    "lat": -6.35157,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7274204,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.35157,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0036",
-    "lat": -6.3485723,
+    "style": "#icon-1899-0288D1",
     "lng": 106.725688,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3485723,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0037",
-    "lat": -6.345433,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7238716,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.345433,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0038",
-    "lat": -6.341873,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7238849,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.341873,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0039",
-    "lat": -6.3378623,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7239123,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3378623,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0040",
-    "lat": -6.3351492,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7239182,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3351492,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0041",
-    "lat": -6.3317382,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7239304,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3317382,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0042",
-    "lat": -6.3281038,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7239506,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3281038,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0043",
-    "lat": -6.3248327,
+    "style": "#icon-1899-0288D1",
     "lng": 106.723954,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3248327,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0044",
-    "lat": -6.3219027,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7232766,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3219027,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0045",
-    "lat": -6.318947,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7225534,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.318947,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0046",
-    "lat": -6.315972,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7218486,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.315972,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0047",
-    "lat": -6.3123544,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7209411,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3123544,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0048",
-    "lat": -6.308582,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7199469,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.308582,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0049",
-    "lat": -6.3049216,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7191223,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3049216,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0050",
-    "lat": -6.3016683,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7184061,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.3016683,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0051",
-    "lat": -6.2978306,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7175663,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2978306,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0052",
-    "lat": -6.2944256,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7167674,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2944256,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0053",
-    "lat": -6.2913311,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7160299,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2913311,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0054",
-    "lat": -6.2885646,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7154178,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2885646,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0055",
-    "lat": -6.2853337,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7145923,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2853337,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0056",
-    "lat": -6.2823924,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7139126,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2823924,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0057",
-    "lat": -6.2794474,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7132716,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2794474,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0058",
-    "lat": -6.277064,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7127262,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.277064,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0059",
-    "lat": -6.273331,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7118769,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.273331,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0060",
-    "lat": -6.2701965,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7111143,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2701965,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0061",
-    "lat": -6.2668514,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7103313,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2668514,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0062",
-    "lat": -6.2631315,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7095109,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2631315,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0063",
-    "lat": -6.2604578,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7088402,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2604578,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0064",
-    "lat": -6.2575613,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7082148,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2575613,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0065",
-    "lat": -6.2535955,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7072921,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2535955,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0066",
-    "lat": -6.2500312,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7065062,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2500312,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0067",
-    "lat": -6.2467314,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7056522,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2467314,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0068",
-    "lat": -6.2434967,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7048182,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2434967,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0069",
-    "lat": -6.2400238,
+    "style": "#icon-1899-0288D1",
     "lng": 106.703957,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2400238,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0070",
-    "lat": -6.2370659,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7032325,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2370659,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0071",
-    "lat": -6.2337219,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7016695,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2337219,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0072",
-    "lat": -6.2303928,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7001462,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2303928,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0073",
-    "lat": -6.2272104,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6986356,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2272104,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0074",
-    "lat": -6.2242089,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6972322,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2242089,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0075",
-    "lat": -6.2223031,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6982905,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2223031,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0076",
-    "lat": -6.219001,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7001261,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.219001,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0077",
-    "lat": -6.2164075,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7015019,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2164075,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0078",
-    "lat": -6.2128258,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7034496,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2128258,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0079",
-    "lat": -6.2107593,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7046232,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2107593,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0080",
-    "lat": -6.2079407,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7061542,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2079407,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0081",
-    "lat": -6.2047995,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7078936,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2047995,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0082",
-    "lat": -6.2017514,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7095845,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.2017514,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0083",
-    "lat": -6.1993708,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7123039,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.1993708,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0084",
-    "lat": -6.1970986,
+    "style": "#icon-1899-0288D1",
     "lng": 106.71489,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.1970986,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0085",
-    "lat": -6.1954299,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7168056,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.1954299,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG #0086",
-    "lat": -6.1934578,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7190112,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.1934578,
+    "type": "SUTET_500kV"
+  },
+  {
+    "name": "TOWER SUTET 500kV GNDUL-KMBNG+DKSBI #0087",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7196491,
+    "lat": -6.1911967,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG+DKSBI #0088",
-    "lat": -6.189681,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7196077,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.189681,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500kV GNDUL-KMBNG+DKSBI #0089",
-    "lat": -6.188925,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7199444,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.188925,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0001",
-    "lat": -6.172373671,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7254149,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.172373671,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0002",
-    "lat": -6.17150524,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7265221,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.17150524,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0003",
-    "lat": -6.170568963,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7285154,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.170568963,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0004",
-    "lat": -6.170111266,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7290794,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.170111266,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0005",
-    "lat": -6.167955689,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7301109,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.167955689,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0006",
-    "lat": -6.16538523,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7312954,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.16538523,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0007",
-    "lat": -6.162916317,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7325247,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.162916317,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0008",
-    "lat": -6.160463161,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7336925,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.160463161,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0009",
-    "lat": -6.157707609,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7350064,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.157707609,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0010",
-    "lat": -6.155340006,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7360613,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.155340006,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0011",
-    "lat": -6.15398,
+    "style": "#icon-1899-0288D1",
     "lng": 106.73677,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.15398,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0012",
-    "lat": -6.15234,
+    "style": "#icon-1899-0288D1",
     "lng": 106.73784,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.15234,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0013",
-    "lat": -6.150131833,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7396385,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.150131833,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0014",
-    "lat": -6.148019169,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7413532,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.148019169,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0015",
-    "lat": -6.145766468,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7430335,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.145766468,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0016",
-    "lat": -6.143471634,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7448763,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.143471634,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0017",
-    "lat": -6.141118128,
+    "style": "#icon-1899-0288D1",
     "lng": 106.746804,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.141118128,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0018",
-    "lat": -6.138874451,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7485545,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.138874451,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0019",
-    "lat": -6.136573699,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7503842,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.136573699,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0020",
-    "lat": -6.13407,
+    "style": "#icon-1899-0288D1",
     "lng": 106.75231,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.13407,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0021",
-    "lat": -6.1313,
+    "style": "#icon-1899-0288D1",
     "lng": 106.75275,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.1313,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0022",
-    "lat": -6.12872,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7525,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.12872,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0023",
-    "lat": -6.12585,
+    "style": "#icon-1899-0288D1",
     "lng": 106.75223,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.12585,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0024",
-    "lat": -6.12304,
+    "style": "#icon-1899-0288D1",
     "lng": 106.75199,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.12304,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0025",
-    "lat": -6.1199,
+    "style": "#icon-1899-0288D1",
     "lng": 106.75171,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.1199,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0026",
-    "lat": -6.117324555,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7513827,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.117324555,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0027",
-    "lat": -6.11436,
+    "style": "#icon-1899-0288D1",
     "lng": 106.75127,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.11436,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0028",
-    "lat": -6.11313,
+    "style": "#icon-1899-0288D1",
     "lng": 106.75357,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.11313,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0029",
-    "lat": -6.11172,
+    "style": "#icon-1899-0288D1",
     "lng": 106.756,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.11172,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0030",
-    "lat": -6.1104,
+    "style": "#icon-1899-0288D1",
     "lng": 106.75841,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.1104,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0031",
-    "lat": -6.10895413,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7610291,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.10895413,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0032",
-    "lat": -6.107661255,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7633864,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.107661255,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0033",
-    "lat": -6.106300316,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7659002,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.106300316,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0034",
-    "lat": -6.106228703,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7686248,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.106228703,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0035",
-    "lat": -6.107221255,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7713705,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.107221255,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0036",
-    "lat": -6.108167752,
+    "style": "#icon-1899-0288D1",
     "lng": 106.774011,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.108167752,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0037",
-    "lat": -6.10937,
+    "style": "#icon-1899-0288D1",
     "lng": 106.77732,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.10937,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET 500KV MUARAKARANG-DURIKOSAMBI #0038",
-    "lat": -6.110677782,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7807488,
-    "style": "#icon-1739-0288D1-labelson",
+    "lat": -6.110677782,
+    "type": "SUTET_500kV"
+  },
+  {
+    "name": "TOWER SUTET KMBGN-DKSBI 500kV #PA01",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.725541,
+    "lat": -6.172895,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET KMBGN-DKSBI 500kV #PA02",
-    "lat": -6.172267779,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7274149,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.172267779,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET KMBGN-DKSBI 500kV #PA02A",
-    "lat": -6.173349405,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7276389,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.173349405,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET KMBGN-DKSBI 500kV #PD08",
-    "lat": -6.190809964,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7310955,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.190809964,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET KMBGN-DKSBI 500kV #PD03",
-    "lat": -6.176214984,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7278866,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.176214984,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET KMBGN-DKSBI 500kV #PA10",
-    "lat": -6.190542195,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7285522,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.190542195,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET KMBGN-DKSBI 500kV #PA11",
-    "lat": -6.19006011,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7253423,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.19006011,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET KMBGN-DKSBI 500kV #PA12",
-    "lat": -6.190418532,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7230357,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.190418532,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET KMBGN-DKSBI 500kV #PA13",
-    "lat": -6.191091742,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7207176,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.191091742,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET KMBGN-DKSBI 500kV #PA04",
-    "lat": -6.17927171,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7281357,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.17927171,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET KMBGN-DKSBI 500kV #PD05",
-    "lat": -6.182143159,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7288297,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.182143159,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET KMBGN-DKSBI 500kV #PD06",
-    "lat": -6.184840979,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7295284,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.184840979,
     "type": "SUTET_500kV"
   },
   {
     "name": "TOWER SUTET KMBGN-DKSBI 500kV #PD07",
-    "lat": -6.187702803,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7302883,
-    "style": "#icon-1739-0288D1",
+    "lat": -6.187702803,
     "type": "SUTET_500kV"
   }
-]
+];
 
-// 562 Tower SUTT 150kV  
+// 607 Tower SUTT
 export const towerSUTT: TowerPoint[] = [
   {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5486879,
+    "lat": -6.1707133,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5487826,
+    "lat": -6.1705039,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5489847,
+    "lat": -6.1659711,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.551698,
+    "lat": -6.1723297,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5517187,
+    "lat": -6.1725287,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5515535,
+    "lat": -6.1768853,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.55166,
+    "lat": -6.1769798,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.554088,
+    "lat": -6.1791659,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5540802,
+    "lat": -6.1794943,
+    "type": "SUTT_150kV"
+  },
+  {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA+TGBRU #EA1",
-    "lat": -6.060488446,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4639559,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.060488446,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA+TGBRU #A2",
-    "lat": -6.063126619,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4648729,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.063126619,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA+TGBRU #A3",
-    "lat": -6.063488881,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4669515,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.063488881,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA+TGBRU #D4",
-    "lat": -6.065149434,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4686664,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.065149434,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA+TGBRU #D5",
-    "lat": -6.067109222,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4706282,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.067109222,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA+TGBRU #AH6",
-    "lat": -6.068949826,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4724811,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.068949826,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D7",
-    "lat": -6.067755184,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4751275,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.067755184,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D8",
-    "lat": -6.066787637,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4773504,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.066787637,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A9",
-    "lat": -6.065555253,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4799218,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.065555253,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A10",
-    "lat": -6.06380468,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4828027,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.06380468,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A11",
-    "lat": -6.063343679,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4848119,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.063343679,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D12",
-    "lat": -6.062234668,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4872651,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.062234668,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D13",
-    "lat": -6.061136014,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4896403,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.061136014,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D14",
-    "lat": -6.059903968,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4923501,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.059903968,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D15",
-    "lat": -6.058821339,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4947389,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.058821339,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D16",
-    "lat": -6.057593191,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4972698,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.057593191,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D17",
-    "lat": -6.056490006,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4999552,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.056490006,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D18",
-    "lat": -6.055471665,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5022731,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.055471665,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A19",
-    "lat": -6.054163558,
+    "style": "#icon-1899-0288D1",
     "lng": 106.50497,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.054163558,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D20",
-    "lat": -6.053030948,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5073891,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.053030948,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D21",
-    "lat": -6.051693629,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5103296,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.051693629,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D22",
-    "lat": -6.050439427,
+    "style": "#icon-1899-0288D1",
     "lng": 106.513083,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.050439427,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D23",
-    "lat": -6.049366589,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5154035,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.049366589,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D24",
-    "lat": -6.048391539,
+    "style": "#icon-1899-0288D1",
     "lng": 106.517627,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.048391539,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D25",
-    "lat": -6.04739,
+    "style": "#icon-1899-0288D1",
     "lng": 106.51989,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.04739,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D26",
-    "lat": -6.04625562,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5224307,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.04625562,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D27",
-    "lat": -6.045197864,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5247822,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.045197864,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D28",
-    "lat": -6.044004,
+    "style": "#icon-1899-0288D1",
     "lng": 106.527442,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.044004,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A29",
-    "lat": -6.042793957,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5300339,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.042793957,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D30",
-    "lat": -6.043103851,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5328125,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.043103851,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D31",
-    "lat": -6.04342585,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5355127,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.04342585,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D32",
-    "lat": -6.043741589,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5382814,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.043741589,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D33",
-    "lat": -6.044047255,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5409906,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.044047255,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D34",
-    "lat": -6.044341405,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5435436,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.044341405,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D35",
-    "lat": -6.044633805,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5462335,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.044633805,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D36",
-    "lat": -6.044967049,
+    "style": "#icon-1899-0288D1",
     "lng": 106.549101,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.044967049,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D37",
-    "lat": -6.04528032,
+    "style": "#icon-1899-0288D1",
     "lng": 106.55176,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.04528032,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D38",
-    "lat": -6.045517,
+    "style": "#icon-1899-0288D1",
     "lng": 106.554361,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.045517,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D39",
-    "lat": -6.045743,
+    "style": "#icon-1899-0288D1",
     "lng": 106.556505,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.045743,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A40",
-    "lat": -6.046175,
+    "style": "#icon-1899-0288D1",
     "lng": 106.559017,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.046175,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D41",
-    "lat": -6.046428069,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5618914,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.046428069,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D42",
-    "lat": -6.046739,
+    "style": "#icon-1899-0288D1",
     "lng": 106.564496,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.046739,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D43",
-    "lat": -6.047026381,
+    "style": "#icon-1899-0288D1",
     "lng": 106.566744,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.047026381,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D44",
-    "lat": -6.04738909,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5694941,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.04738909,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A45",
-    "lat": -6.047647333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5719833,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.047647333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D46",
-    "lat": -6.048239,
+    "style": "#icon-1899-0288D1",
     "lng": 106.574389,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.048239,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A47",
-    "lat": -6.04883,
+    "style": "#icon-1899-0288D1",
     "lng": 106.577228,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.04883,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A48",
-    "lat": -6.048623675,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5799167,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.048623675,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D49",
-    "lat": -6.048934,
+    "style": "#icon-1899-0288D1",
     "lng": 106.582712,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.048934,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D50",
-    "lat": -6.049324792,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5856892,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.049324792,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D51",
-    "lat": -6.049661388,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5886185,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.049661388,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D52",
-    "lat": -6.049863593,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5907055,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.049863593,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A53",
-    "lat": -6.05020032,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5936323,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.05020032,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A54",
-    "lat": -6.050265169,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5966296,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.050265169,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A55",
-    "lat": -6.050830162,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5991632,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.050830162,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D56",
-    "lat": -6.051104,
+    "style": "#icon-1899-0288D1",
     "lng": 106.602046,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.051104,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D57",
-    "lat": -6.051439691,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6043551,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.051439691,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D58",
-    "lat": -6.051696967,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6066604,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.051696967,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D59",
-    "lat": -6.051976701,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6093024,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.051976701,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D60",
-    "lat": -6.052326577,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6119789,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.052326577,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D61",
-    "lat": -6.052615326,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6147794,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.052615326,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D62",
-    "lat": -6.05293522,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6174344,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.05293522,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D63",
-    "lat": -6.053299314,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6205503,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.053299314,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D64",
-    "lat": -6.053556673,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6231528,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.053556673,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D65",
-    "lat": -6.053866233,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6258344,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.053866233,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A66",
-    "lat": -6.054173165,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6281992,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.054173165,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D67",
-    "lat": -6.054676475,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6301477,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.054676475,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A68",
-    "lat": -6.055209777,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6320572,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.055209777,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A69",
-    "lat": -6.055324733,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6343023,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.055324733,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #A70",
-    "lat": -6.056237,
+    "style": "#icon-1899-0288D1",
     "lng": 106.637002,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.056237,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #AH71",
-    "lat": -6.058629076,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6382349,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.058629076,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #D72",
-    "lat": -6.060977936,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6369735,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.060977936,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #AH73",
-    "lat": -6.063337887,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6357239,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.063337887,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TLKGA #EA74",
-    "lat": -6.064028353,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6358014,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.064028353,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D1",
-    "lat": -6.07056,
+    "style": "#icon-1899-0288D1",
     "lng": 106.47415,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.07056,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D2",
-    "lat": -6.07235,
+    "style": "#icon-1899-0288D1",
     "lng": 106.47572,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.07235,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D3",
-    "lat": -6.0745,
+    "style": "#icon-1899-0288D1",
     "lng": 106.47781,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0745,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D4",
-    "lat": -6.076517107,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4799529,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.076517107,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A5",
-    "lat": -6.0786,
+    "style": "#icon-1899-0288D1",
     "lng": 106.48189,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0786,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D6",
-    "lat": -6.07976,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4843,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.07976,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D7",
-    "lat": -6.08119945,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4870122,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.08119945,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D8",
-    "lat": -6.082647932,
+    "style": "#icon-1899-0288D1",
     "lng": 106.48989,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.082647932,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D9",
-    "lat": -6.08359,
+    "style": "#icon-1899-0288D1",
     "lng": 106.49194,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.08359,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D10",
-    "lat": -6.08487339,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4942599,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.08487339,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D11",
-    "lat": -6.08614,
+    "style": "#icon-1899-0288D1",
     "lng": 106.49672,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.08614,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D12",
-    "lat": -6.08733,
+    "style": "#icon-1899-0288D1",
     "lng": 106.49931,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.08733,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D13",
-    "lat": -6.0884,
+    "style": "#icon-1899-0288D1",
     "lng": 106.50149,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0884,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A14",
-    "lat": -6.08986,
+    "style": "#icon-1899-0288D1",
     "lng": 106.50417,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.08986,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D15",
-    "lat": -6.09069,
+    "style": "#icon-1899-0288D1",
     "lng": 106.50654,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.09069,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D16",
-    "lat": -6.09166,
+    "style": "#icon-1899-0288D1",
     "lng": 106.50954,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.09166,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D17",
-    "lat": -6.092498521,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5120912,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.092498521,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D18",
-    "lat": -6.093384857,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5146495,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.093384857,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A19",
-    "lat": -6.094223721,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5169111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.094223721,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A20",
-    "lat": -6.09473,
+    "style": "#icon-1899-0288D1",
     "lng": 106.51809,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.09473,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #AH21",
-    "lat": -6.095550507,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5209927,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.095550507,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D22",
-    "lat": -6.0984338,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5217593,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0984338,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D23",
-    "lat": -6.10153,
+    "style": "#icon-1899-0288D1",
     "lng": 106.52249,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.10153,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D24",
-    "lat": -6.104185867,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5232181,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.104185867,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D25",
-    "lat": -6.10692497,
+    "style": "#icon-1899-0288D1",
     "lng": 106.523919,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.10692497,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D26",
-    "lat": -6.10926,
+    "style": "#icon-1899-0288D1",
     "lng": 106.52448,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.10926,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D27",
-    "lat": -6.1122,
+    "style": "#icon-1899-0288D1",
     "lng": 106.52531,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1122,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D28",
-    "lat": -6.115331715,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5260451,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.115331715,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A29",
-    "lat": -6.11797,
+    "style": "#icon-1899-0288D1",
     "lng": 106.52675,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.11797,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D30",
-    "lat": -6.120770286,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5274612,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.120770286,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D31",
-    "lat": -6.123621883,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5281858,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.123621883,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A32",
-    "lat": -6.125914526,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5287256,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.125914526,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A33",
-    "lat": -6.12698,
+    "style": "#icon-1899-0288D1",
     "lng": 106.52965,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.12698,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #AH34",
-    "lat": -6.12865,
+    "style": "#icon-1899-0288D1",
     "lng": 106.52965,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.12865,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A35",
-    "lat": -6.1295673,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5313062,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1295673,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A36",
-    "lat": -6.129154061,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5324524,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.129154061,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D37",
-    "lat": -6.128683518,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5343079,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.128683518,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D38",
-    "lat": -6.128062851,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5364576,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.128062851,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A39",
-    "lat": -6.128247633,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5397334,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.128247633,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D40",
-    "lat": -6.129169364,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5417168,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.129169364,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D41",
-    "lat": -6.13027,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5439,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.13027,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A42",
-    "lat": -6.13131,
+    "style": "#icon-1899-0288D1",
     "lng": 106.54598,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.13131,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D43",
-    "lat": -6.13397,
+    "style": "#icon-1899-0288D1",
     "lng": 106.54761,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.13397,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D44",
-    "lat": -6.13667,
+    "style": "#icon-1899-0288D1",
     "lng": 106.54926,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.13667,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A45",
-    "lat": -6.13876,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5505,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.13876,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D46",
-    "lat": -6.1399,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5535,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1399,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D47",
-    "lat": -6.14097,
+    "style": "#icon-1899-0288D1",
     "lng": 106.55619,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.14097,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #AH48",
-    "lat": -6.141838135,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5587102,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.141838135,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU GANTRY",
-    "lat": -6.142187832,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5591186,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.142187832,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D49",
-    "lat": -6.142694084,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5593878,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.142694084,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D50",
-    "lat": -6.142905395,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5607976,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.142905395,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D51",
-    "lat": -6.143364089,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5634786,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.143364089,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D52",
-    "lat": -6.143230853,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5667315,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.143230853,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A53",
-    "lat": -6.14308,
+    "style": "#icon-1899-0288D1",
     "lng": 106.56991,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.14308,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A54",
-    "lat": -6.142963412,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5735589,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.142963412,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A55",
-    "lat": -6.144901909,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5756805,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.144901909,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D56",
-    "lat": -6.146083362,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5769496,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.146083362,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D57",
-    "lat": -6.147618748,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5780298,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.147618748,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D58",
-    "lat": -6.147808092,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5799276,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.147808092,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D59",
-    "lat": -6.14793,
+    "style": "#icon-1899-0288D1",
     "lng": 106.58174,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.14793,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D60",
-    "lat": -6.148097317,
+    "style": "#icon-1899-0288D1",
     "lng": 106.583498,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.148097317,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D61",
-    "lat": -6.1482,
+    "style": "#icon-1899-0288D1",
     "lng": 106.58511,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1482,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D62",
-    "lat": -6.14834,
+    "style": "#icon-1899-0288D1",
     "lng": 106.58635,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.14834,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D63",
-    "lat": -6.148447534,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5880019,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.148447534,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D64",
-    "lat": -6.1485245,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5892556,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1485245,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A65",
-    "lat": -6.14867,
+    "style": "#icon-1899-0288D1",
     "lng": 106.59053,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.14867,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #AH66",
-    "lat": -6.148355799,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5917069,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.148355799,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D67",
-    "lat": -6.148525841,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5928548,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.148525841,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D68",
-    "lat": -6.148556173,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5939142,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.148556173,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D69",
-    "lat": -6.14858,
+    "style": "#icon-1899-0288D1",
     "lng": 106.59475,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.14858,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D70",
-    "lat": -6.148675786,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5957002,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.148675786,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D71",
-    "lat": -6.1488,
+    "style": "#icon-1899-0288D1",
     "lng": 106.59672,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1488,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D72",
-    "lat": -6.148887031,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5975931,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.148887031,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D73",
-    "lat": -6.148962709,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5984106,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.148962709,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D74",
-    "lat": -6.14906564,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5994293,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.14906564,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A75",
-    "lat": -6.14923,
+    "style": "#icon-1899-0288D1",
     "lng": 106.60034,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.14923,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #A76",
-    "lat": -6.149692245,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6012888,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.149692245,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D77",
-    "lat": -6.150615237,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6023194,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.150615237,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D78",
-    "lat": -6.151106274,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6028419,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.151106274,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D79",
-    "lat": -6.151843176,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6035666,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.151843176,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D80",
-    "lat": -6.152623874,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6042824,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.152623874,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D81",
-    "lat": -6.15314,
+    "style": "#icon-1899-0288D1",
     "lng": 106.60477,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.15314,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D82",
-    "lat": -6.153700985,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6053287,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.153700985,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #D83",
-    "lat": -6.15421,
+    "style": "#icon-1899-0288D1",
     "lng": 106.60583,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.15421,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #AH84",
-    "lat": -6.15466,
+    "style": "#icon-1899-0288D1",
     "lng": 106.60622,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.15466,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-TGBRU #EA85",
-    "lat": -6.155624,
+    "style": "#icon-1899-0288D1",
     "lng": 106.606115,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.155624,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #EA13A",
-    "lat": -6.141745,
+    "style": "#icon-1899-0288D1",
     "lng": 106.559692,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.141745,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #D13",
-    "lat": -6.142570428,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5587612,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.142570428,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #D14",
-    "lat": -6.144460316,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5568145,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.144460316,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #D15",
-    "lat": -6.1468,
+    "style": "#icon-1899-0288D1",
     "lng": 106.55448,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1468,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #D16",
-    "lat": -6.148293196,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5528985,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.148293196,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #D17",
-    "lat": -6.149756119,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5514843,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.149756119,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #D18",
-    "lat": -6.151824522,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5493469,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.151824522,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #D19",
-    "lat": -6.153838722,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5473053,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.153838722,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #D20",
-    "lat": -6.155715754,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5453262,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.155715754,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #D21",
-    "lat": -6.157560313,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5434445,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.157560313,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #AH22",
-    "lat": -6.15947,
+    "style": "#icon-1899-0288D1",
     "lng": 106.54158,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.15947,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #A23",
-    "lat": -6.160599564,
+    "style": "#icon-1899-0288D1",
     "lng": 106.538725,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.160599564,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #AH24",
-    "lat": -6.1606,
+    "style": "#icon-1899-0288D1",
     "lng": 106.53563,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1606,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #A25",
-    "lat": -6.16202961,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5331739,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.16202961,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #D26",
-    "lat": -6.16233,
+    "style": "#icon-1899-0288D1",
     "lng": 106.53063,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.16233,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #D27",
-    "lat": -6.162578648,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5283171,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.162578648,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #AH28",
-    "lat": -6.16287482,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5260188,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.16287482,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #D29",
-    "lat": -6.165404381,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5255531,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.165404381,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #D30",
-    "lat": -6.16716643,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5251585,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.16716643,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #A31",
-    "lat": -6.169158463,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5249256,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.169158463,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #A32",
-    "lat": -6.172177174,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5250503,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.172177174,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #A33",
-    "lat": -6.17492234,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5248365,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.17492234,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #A34",
-    "lat": -6.177871159,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5254862,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.177871159,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #A35",
-    "lat": -6.180666105,
+    "style": "#icon-1899-0288D1",
     "lng": 106.527428,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.180666105,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PSKBR-PSKMS #EA36",
-    "lat": -6.182709043,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5293314,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.182709043,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A1",
-    "lat": -6.1689167,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7269444,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1689167,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A2",
-    "lat": -6.1679444,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7272778,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1679444,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #D3",
-    "lat": -6.1662778,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7270278,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1662778,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #D4",
-    "lat": -6.164366292,
+    "style": "#icon-1899-0288D1",
     "lng": 106.726943,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.164366292,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #D5",
-    "lat": -6.162545971,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7269166,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.162545971,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #D6",
-    "lat": -6.1608333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7268889,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1608333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A7",
-    "lat": -6.1595,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7269444,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1595,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A8",
-    "lat": -6.1580833,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7268611,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1580833,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A9",
-    "lat": -6.157,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7278056,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.157,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #AH10",
-    "lat": -6.1553056,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7279722,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1553056,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A11",
-    "lat": -6.1546944,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7288889,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1546944,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A12",
-    "lat": -6.1551111,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7303333,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1551111,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A13",
-    "lat": -6.1551667,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7320556,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1551667,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A14",
-    "lat": -6.1548889,
+    "style": "#icon-1899-0288D1",
     "lng": 106.73375,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1548889,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A15",
-    "lat": -6.1548333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7354722,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1548333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A16",
-    "lat": -6.1548333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7371667,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1548333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A17",
-    "lat": -6.1548333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7387222,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1548333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A18",
-    "lat": -6.1548889,
+    "style": "#icon-1899-0288D1",
     "lng": 106.74025,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1548889,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A19",
-    "lat": -6.1549722,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7420278,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1549722,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #D20",
-    "lat": -6.15507,
+    "style": "#icon-1899-0288D1",
     "lng": 106.74367,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.15507,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #D21",
-    "lat": -6.155308486,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7454508,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.155308486,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #D22",
-    "lat": -6.1555,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7471944,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1555,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #D23",
-    "lat": -6.1556667,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7488333,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1556667,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A24",
-    "lat": -6.1558333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7506111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1558333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A25",
-    "lat": -6.1560833,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7521944,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1560833,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A26",
-    "lat": -6.1562778,
+    "style": "#icon-1899-0288D1",
     "lng": 106.754,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1562778,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #D27",
-    "lat": -6.1567222,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7555278,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1567222,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A28",
-    "lat": -6.1571667,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7572778,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1571667,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #D29",
-    "lat": -6.1576944,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7588889,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1576944,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A30",
-    "lat": -6.15825,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7606111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.15825,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A31",
-    "lat": -6.1586667,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7621111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1586667,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A32",
-    "lat": -6.1586389,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7634722,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1586389,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A33",
-    "lat": -6.1591944,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7647222,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1591944,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A34",
-    "lat": -6.1602222,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7665278,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1602222,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #A35",
-    "lat": -6.1621389,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7668889,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1621389,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GRLBR-GRGOL #A36",
-    "lat": -6.1633889,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7680556,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1633889,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GRLBR-GRGOL #A37",
-    "lat": -6.16375,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7698056,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.16375,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GRLBR-GRGOL#A38",
-    "lat": -6.1643056,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7715,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1643056,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GRLBR-GRGOL #A39",
-    "lat": -6.1651944,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7730833,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1651944,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GRLBR-GRGOL #A40",
-    "lat": -6.1655833,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7749722,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1655833,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GRLBR-GRGOL #A41",
-    "lat": -6.1664722,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7766111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1664722,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GRLBR-GRGOL #A42",
-    "lat": -6.166581709,
+    "style": "#icon-1899-0288D1",
     "lng": 106.778368,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.166581709,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GRLBR-GRGOL #A43",
-    "lat": -6.166,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7799444,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.166,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GRLBR-GRGOL #A44",
-    "lat": -6.16599563,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7809456,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.16599563,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GRLBR-GRGOL #A45",
-    "lat": -6.166419255,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7822283,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.166419255,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GRLBR-GRGOL #EA46",
-    "lat": -6.1667778,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7836389,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1667778,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-GRLBR #EA0",
-    "lat": -6.1691667,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7261944,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1691667,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #DH9",
-    "lat": -6.193387415,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7317598,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.193387415,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D10",
-    "lat": -6.1956389,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7329722,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1956389,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D11",
-    "lat": -6.1983889,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7342222,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1983889,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D12",
-    "lat": -6.2007778,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7354444,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2007778,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D13",
-    "lat": -6.2034444,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7369444,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2034444,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #DH14",
-    "lat": -6.2060833,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7380833,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2060833,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D15",
-    "lat": -6.2088889,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7392222,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2088889,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D16",
-    "lat": -6.2116111,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7403333,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2116111,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D17",
-    "lat": -6.2143333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7414167,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2143333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D18",
-    "lat": -6.2167778,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7423333,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2167778,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D19",
-    "lat": -6.2191667,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7433889,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2191667,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #DH20",
-    "lat": -6.2215278,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7443333,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2215278,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D21",
-    "lat": -6.2245278,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7441111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2245278,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D22",
-    "lat": -6.2274444,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7439167,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2274444,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D23",
-    "lat": -6.23024162,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7435124,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.23024162,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D24",
-    "lat": -6.2329444,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7434722,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2329444,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D25",
-    "lat": -6.2358611,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7432778,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2358611,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D26",
-    "lat": -6.2383056,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7431111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2383056,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D27",
-    "lat": -6.2413056,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7428889,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2413056,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D28",
-    "lat": -6.2438611,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7426944,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2438611,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D29",
-    "lat": -6.2470556,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7424444,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2470556,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #D30",
-    "lat": -6.2496111,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7422778,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2496111,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #AH31",
-    "lat": -6.2523611,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7419444,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2523611,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-PTKNG #EA32",
-    "lat": -6.2525278,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7425833,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2525278,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #SP01A",
-    "lat": -6.112091144,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7873705,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.112091144,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #SP01B",
-    "lat": -6.112103637,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7875132,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.112103637,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #SP02",
-    "lat": -6.112124464,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7870806,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.112124464,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #SP03",
-    "lat": -6.112128779,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7866134,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.112128779,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #SP04",
-    "lat": -6.112141567,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7859343,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.112141567,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #SP05",
-    "lat": -6.112149628,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7853068,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.112149628,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #AH1",
-    "lat": -6.1122222,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7846111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1122222,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #D2",
-    "lat": -6.1147222,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7841944,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1147222,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #D3",
-    "lat": -6.1172222,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7838611,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1172222,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #A4",
-    "lat": -6.1201389,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7835,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1201389,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #D5",
-    "lat": -6.122942689,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7835306,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.122942689,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #A6",
-    "lat": -6.12575,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7835,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.12575,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #A7",
-    "lat": -6.1283333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7840278,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1283333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #AH8",
-    "lat": -6.1310556,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7848056,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1310556,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #D9",
-    "lat": -6.1315556,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7874722,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1315556,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #AH10",
-    "lat": -6.1320278,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7898611,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1320278,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #AH11",
-    "lat": -6.1327222,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7906667,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1327222,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKLMA-ANGKE #EA12",
-    "lat": -6.13375,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7908611,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.13375,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKBRU-PINKA #EA1 (Sudah dirubuhkan)",
-    "lat": -6.110606,
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7812286,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.110606,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D2",
-    "lat": -6.1099734,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7796425,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1099734,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D2A",
-    "lat": -6.1096418,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7788462,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1096418,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D2B",
-    "lat": -6.1093839,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7781622,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1093839,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D3",
-    "lat": -6.1089873,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7768485,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1089873,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D4",
-    "lat": -6.1079167,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7740833,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1079167,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D5",
-    "lat": -6.1069167,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7713889,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1069167,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D6",
-    "lat": -6.1059167,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7686944,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1059167,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D7",
-    "lat": -6.105959395,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7657611,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.105959395,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D8",
-    "lat": -6.1073611,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7631944,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1073611,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D9",
-    "lat": -6.1087222,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7608611,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1087222,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D10",
-    "lat": -6.1100556,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7584444,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1100556,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D11",
-    "lat": -6.1113889,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7560278,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1113889,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D12",
-    "lat": -6.11275,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7535,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.11275,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #AH13",
-    "lat": -6.1142778,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7508889,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1142778,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D14",
-    "lat": -6.1171944,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7511389,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1171944,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #D15",
-    "lat": -6.1200833,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7513889,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1200833,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #A16",
-    "lat": -6.1229444,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7516944,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1229444,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKBRU-PINKA #EAH16A",
-    "lat": -6.123768101,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7514769,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.123768101,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PINKA-DNMGT #EAH16B",
-    "lat": -6.1240623,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7514924,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1240623,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PINKA-DNMGT #A17",
-    "lat": -6.125761184,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7519375,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.125761184,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PINKA-DNMGT #D18",
-    "lat": -6.1285833,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7521667,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1285833,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PINKA-DNMGT #D19",
-    "lat": -6.131407344,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7524197,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.131407344,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PINKA-DNMGT #D20",
-    "lat": -6.1341389,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7519167,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1341389,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PINKA-DNMGT #D21",
-    "lat": -6.1363889,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7501667,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1363889,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PINKA-DNMGT #D22",
-    "lat": -6.13875,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7483056,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.13875,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PINKA-DNMGT #D23",
-    "lat": -6.1409444,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7465278,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1409444,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PINKA-DNMGT #D24",
-    "lat": -6.1433333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7446111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1433333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PINKA-DNMGT #D25",
-    "lat": -6.1456389,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7428056,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1456389,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PINKA-DNMGT #D26",
-    "lat": -6.1478333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7410556,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1478333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV PINKA-DNMGT #EA27A",
-    "lat": -6.150063,
+    "style": "#icon-1899-0288D1",
     "lng": 106.73927,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.150063,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DNMGT-DKSBI #EA27B",
-    "lat": -6.151023,
+    "style": "#icon-1899-0288D1",
     "lng": 106.738535,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.151023,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DNMGT-DKSBI #D28",
-    "lat": -6.1523889,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7374444,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1523889,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DNMGT-DKSBI #A28A",
-    "lat": -6.1542778,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7365278,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1542778,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DNMGT-DKSBI #A29",
-    "lat": -6.1553333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7358889,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1553333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DNMGT-DKSBI #D30",
-    "lat": -6.1575833,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7347222,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1575833,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DNMGT-DKSBI #D31",
-    "lat": -6.1603611,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7334167,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1603611,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DNMGT-DKSBI #D32",
-    "lat": -6.1628333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7321667,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1628333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DNMGT-DKSBI #D33",
-    "lat": -6.1653056,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7311111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1653056,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DNMGT-DKSBI #D34",
-    "lat": -6.1679167,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7298611,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1679167,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DNMGT-DKSBI #AH35",
-    "lat": -6.1696944,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7287778,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1696944,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DNMGT-DKSBI #EA36",
-    "lat": -6.16975,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7263611,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.16975,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKRNG-DKSBI #SP01",
-    "lat": -6.112001523,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7872788,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.112001523,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKRNG-DKSBI #SP02",
-    "lat": -6.112020077,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7870673,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.112020077,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKRNG-DKSBI #SP03",
-    "lat": -6.112050045,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7866091,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.112050045,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKRNG-DKSBI #SP04",
-    "lat": -6.112059066,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7859322,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.112059066,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKRNG-DKSBI #SP05",
-    "lat": -6.112052922,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7853079,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.112052922,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKRNG-DKSBI #AH1",
-    "lat": -6.1121111,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7845833,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1121111,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKRNG-DKSBI #AH1A",
-    "lat": -6.112145958,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7836918,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.112145958,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKRNG-DKSBI #A2",
-    "lat": -6.111365,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7823985,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.111365,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKRNG-DKSBI #D3 (Sudah dirubuhkan)",
-    "lat": -6.1102862,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7795376,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1102862,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D3A\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1099438,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D3A  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7787194,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1099438,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D3B\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1096414,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D3B  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7780565,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1096414,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D4\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1092215,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D4  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7767607,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1092215,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D5\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1082222,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D5  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7739444,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1082222,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D6\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1073611,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D6  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7713056,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1073611,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D7\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1062222,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D7  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7686667,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1062222,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D8\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1062964,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D8  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7658721,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1062964,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D9\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1076667,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D9  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7633333,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1076667,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D10\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.109,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D10  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7609722,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.109,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D11\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1103056,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D11  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7585556,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1103056,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D12\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1116389,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D12  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7561111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1116389,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D13\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1129722,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D13  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7536667,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1129722,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #AH14\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1144444,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #AH14  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7511944,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1144444,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D15\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1171944,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D15  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7514722,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1171944,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D16\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1200833,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D16  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7517222,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1200833,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D17\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1229444,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D17  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7519722,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1229444,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D18\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1257904,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D18  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7522218,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1257904,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D19\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1285893,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D19  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7524893,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1285893,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D20\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1314134,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D20  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7527373,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1314134,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D21\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1342222,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D21  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.75225,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1342222,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D22\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1365556,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D22  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7504167,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1365556,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D23\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1388889,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D23  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7486111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1388889,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D24\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1411667,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D24  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7467778,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1411667,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D25\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1435,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D25  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7449444,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1435,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D26\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1458056,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D26  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7431111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1458056,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D27\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1480556,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D27  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7413333,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1480556,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D28\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1501944,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D28  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7395556,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1501944,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #A29\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1524722,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #A29  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7378056,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1524722,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #A29A\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.15425,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #A29A  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7366389,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.15425,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #A30\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1553611,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #A30  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.736,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1553611,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D31\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1576944,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D31  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7349722,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1576944,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D32\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1605556,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D32  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7337222,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1605556,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D33\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1629444,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D33  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7324167,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1629444,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D34\u00a0 (Sudah dirubuhkan)",
-    "lat": -6.1654722,
+    "name": "TOWER SUTT 150kV MKRNG-DKSBI #D34  (Sudah dirubuhkan)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.7313333,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1654722,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKRNG-DKSBI #D35",
-    "lat": -6.1680556,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7301111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1680556,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKRNG-DKSBI #AH36",
-    "lat": -6.1699167,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7290833,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1699167,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKRNG-DKSBI #A37",
-    "lat": -6.170466551,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7284466,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.170466551,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV MKRNG-DKSBI #EAH38",
-    "lat": -6.171409713,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7264631,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.171409713,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #EA1",
-    "lat": -6.1517572,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6587826,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1517572,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A2",
-    "lat": -6.1531944,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6577778,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1531944,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A3",
-    "lat": -6.1539167,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6563056,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1539167,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D4",
-    "lat": -6.1541389,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6545556,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1541389,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D5",
-    "lat": -6.1543333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6529444,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1543333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D6",
-    "lat": -6.1545,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6512222,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1545,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A7",
-    "lat": -6.1546944,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6495278,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1546944,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A8",
-    "lat": -6.15475,
+    "style": "#icon-1899-0288D1",
     "lng": 106.648,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.15475,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D9",
-    "lat": -6.15475,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6462778,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.15475,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D10",
-    "lat": -6.1547222,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6445833,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1547222,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D11",
-    "lat": -6.1547222,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6429167,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1547222,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A12",
-    "lat": -6.1546944,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6411944,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1546944,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D13",
-    "lat": -6.155201921,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6394123,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.155201921,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D14",
-    "lat": -6.155929724,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6380149,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.155929724,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D15",
-    "lat": -6.1566389,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6366667,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1566389,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D16",
-    "lat": -6.1575556,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6354444,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1575556,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D17",
-    "lat": -6.158287014,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6338179,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.158287014,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A18",
-    "lat": -6.159486918,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6321797,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.159486918,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A19",
-    "lat": -6.1606111,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6294444,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1606111,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A20",
-    "lat": -6.161,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6278056,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.161,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A21",
-    "lat": -6.161168362,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6261629,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.161168362,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D22",
-    "lat": -6.1607778,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6243333,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1607778,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A23",
-    "lat": -6.1605278,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6226389,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1605278,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A24",
-    "lat": -6.1604722,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6208889,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1604722,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D25",
-    "lat": -6.1606389,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6191389,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1606389,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D26",
-    "lat": -6.1608056,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6173889,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1608056,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A27",
-    "lat": -6.1609722,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6156944,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1609722,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A28",
-    "lat": -6.1605,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6139722,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1605,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A29",
-    "lat": -6.1593056,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6128889,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1593056,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #D30",
-    "lat": -6.1586389,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6115278,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1586389,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A31",
-    "lat": -6.1579444,
+    "style": "#icon-1899-0288D1",
     "lng": 106.61025,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1579444,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A32",
-    "lat": -6.1569444,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6091667,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1569444,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #A33",
-    "lat": -6.1557778,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6080556,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1557778,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV CKRBR-TGBRU #EA34",
-    "lat": -6.1558333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6067778,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1558333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CGKRG #EA0",
-    "lat": -6.170263324,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7253881,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.170263324,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CGKRG #AH1",
-    "lat": -6.170890801,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7252533,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.170890801,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CGKRG #A2",
-    "lat": -6.169221411,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7222772,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.169221411,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CGKRG #D2A",
-    "lat": -6.168566259,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7201768,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.168566259,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CGKRG #D3",
-    "lat": -6.168099867,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7186068,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.168099867,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CGKRG #A4",
-    "lat": -6.167149657,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7152881,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.167149657,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #A4A",
-    "lat": -6.168213015,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7132572,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.168213015,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D5",
-    "lat": -6.169143113,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7116057,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.169143113,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D6",
-    "lat": -6.170123666,
+    "style": "#icon-1899-0288D1",
     "lng": 106.709922,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.170123666,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D7",
-    "lat": -6.171328852,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7080886,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.171328852,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D8",
-    "lat": -6.172058232,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7063629,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.172058232,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D9",
-    "lat": -6.173423555,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7045615,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.173423555,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D10",
-    "lat": -6.174501372,
+    "style": "#icon-1899-0288D1",
     "lng": 106.70279,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.174501372,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D11",
-    "lat": -6.1757778,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7008611,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1757778,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D12",
-    "lat": -6.176666507,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6990979,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.176666507,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D13",
-    "lat": -6.177748571,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6973876,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.177748571,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D14",
-    "lat": -6.179738835,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6940384,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.179738835,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D15",
-    "lat": -6.181608084,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6908631,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.181608084,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D16",
-    "lat": -6.182791738,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6889226,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.182791738,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D17",
-    "lat": -6.1841946,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6865807,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1841946,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D18",
-    "lat": -6.1863038,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6830735,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1863038,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #D19",
-    "lat": -6.1873777,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6813721,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1873777,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #A20",
-    "lat": -6.1883912,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6796097,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1883912,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #AH21",
-    "lat": -6.190028312,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6767213,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.190028312,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #A2AB",
-    "lat": -6.188935796,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6751815,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.188935796,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D3AB",
-    "lat": -6.1873061,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6743573,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1873061,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D4AB",
-    "lat": -6.185720599,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6734764,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.185720599,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D5AB",
-    "lat": -6.184119516,
+    "style": "#icon-1899-0288D1",
     "lng": 106.672609,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.184119516,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D6AB",
-    "lat": -6.1824998,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6717818,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1824998,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D7AB",
-    "lat": -6.1809307,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6709751,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1809307,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D8AB",
-    "lat": -6.1793535,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6701084,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1793535,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D9AB",
-    "lat": -6.17768239,
+    "style": "#icon-1899-0288D1",
     "lng": 106.669277,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.17768239,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D10AB",
-    "lat": -6.1760752,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6683096,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1760752,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D11AB",
-    "lat": -6.1746429,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6676107,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1746429,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D12AB",
-    "lat": -6.173096285,
+    "style": "#icon-1899-0288D1",
     "lng": 106.666731,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.173096285,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D13AB",
-    "lat": -6.1717747,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6659989,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1717747,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D14AB",
-    "lat": -6.1699829,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6651137,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1699829,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D15AB",
-    "lat": -6.1685229,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6643122,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1685229,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D16AB",
-    "lat": -6.167357,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6636986,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.167357,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #A17AB",
-    "lat": -6.165814907,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6628843,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.165814907,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #A18AB",
-    "lat": -6.164299564,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6622072,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.164299564,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #A19AB",
-    "lat": -6.16267958,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6610423,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.16267958,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #A20AB",
-    "lat": -6.160877988,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6598202,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.160877988,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D21AB",
-    "lat": -6.158788853,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6596561,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.158788853,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D22AB",
-    "lat": -6.156636958,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6595128,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.156636958,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #D23AB",
-    "lat": -6.154199769,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6593608,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.154199769,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-TGRLM+DKSBI-CKRNG #A24AB",
-    "lat": -6.152700448,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6592246,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.152700448,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DKSBI-CKRNG #EA25A",
-    "lat": -6.1515201,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6597423,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1515201,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #EA25B",
-    "lat": -6.1517137,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6592168,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1517137,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #EA1",
-    "lat": -6.20677,
+    "style": "#icon-1899-0288D1",
     "lng": 106.64161,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.20677,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #A2",
-    "lat": -6.207153374,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6425634,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.207153374,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #D3",
-    "lat": -6.2075278,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6453056,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2075278,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #AH4",
-    "lat": -6.2078611,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6491667,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2078611,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #D5",
-    "lat": -6.2058889,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6519167,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2058889,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #D6",
-    "lat": -6.2039444,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6546111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2039444,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #D7",
-    "lat": -6.2021944,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6570833,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2021944,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #D8",
-    "lat": -6.2005,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6593611,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2005,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #D9",
-    "lat": -6.1991111,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6617222,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1991111,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #D10",
-    "lat": -6.1969444,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6651667,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1969444,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #D11",
-    "lat": -6.1958333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6671667,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1958333,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #D12",
-    "lat": -6.19485169,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6688341,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.19485169,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #D13",
-    "lat": -6.19275,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6723611,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.19275,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV TGRNG-CKRNG #AH14",
-    "lat": -6.19075,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6755556,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.19075,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #EA1",
-    "lat": -6.214640078,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5832147,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.214640078,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D2",
-    "lat": -6.215678809,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5807467,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.215678809,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #AH3",
-    "lat": -6.216433853,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5783263,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.216433853,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D4",
-    "lat": -6.218569987,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5772929,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.218569987,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #AH5",
-    "lat": -6.22008873,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5764157,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.22008873,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #AH6",
-    "lat": -6.220927035,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5772603,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.220927035,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D7",
-    "lat": -6.22085702,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5792829,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.22085702,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D8",
-    "lat": -6.220956642,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5823494,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.220956642,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D9",
-    "lat": -6.220795223,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5853852,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.220795223,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D10",
-    "lat": -6.220743148,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5888111,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.220743148,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D11",
-    "lat": -6.220707709,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5922815,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.220707709,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV JTAKE-TGRNG #D12 (Sudah dibongkar)",
-    "lat": -6.2206248,
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
     "lng": 106.5950437,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2206248,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D13",
-    "lat": -6.220581961,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5977816,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.220581961,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D14",
-    "lat": -6.220378002,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6013047,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.220378002,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D15",
-    "lat": -6.220427695,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6046874,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.220427695,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D16",
-    "lat": -6.220263475,
+    "style": "#icon-1899-0288D1",
     "lng": 106.606585,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.220263475,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D17",
-    "lat": -6.220227846,
+    "style": "#icon-1899-0288D1",
     "lng": 106.608321,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.220227846,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D18",
-    "lat": -6.22038489,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6111148,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.22038489,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D19",
-    "lat": -6.220274592,
+    "style": "#icon-1899-0288D1",
     "lng": 106.613834,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.220274592,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D20",
-    "lat": -6.220125492,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6176673,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.220125492,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D21",
-    "lat": -6.22003119,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6214054,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.22003119,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D22",
-    "lat": -6.219954007,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6250051,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.219954007,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #A23",
-    "lat": -6.220042234,
+    "style": "#icon-1899-0288D1",
     "lng": 106.628795,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.220042234,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #A24",
-    "lat": -6.2190271,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6319423,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2190271,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #A25",
-    "lat": -6.218194444,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6337639,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.218194444,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #AH26",
-    "lat": -6.216600579,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6371513,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.216600579,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D27",
-    "lat": -6.214484,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6401061,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.214484,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D28",
-    "lat": -6.2123728,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6429168,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2123728,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #AH29",
-    "lat": -6.2118225,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6437006,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2118225,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #D30",
-    "lat": -6.2099634,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6431657,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2099634,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #AH31",
-    "lat": -6.207374045,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6424732,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.207374045,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV JTAKE-TGRNG #EA32",
-    "lat": -6.207055734,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6418054,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.207055734,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-CLDUG+KMBNG-CURUG #0020A (TIDAK OPERASI)",
-    "lat": -6.212146,
+    "style": "#icon-1899-0288D1",
     "lng": 106.68017,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.212146,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-CURUG+ALSTA-CKUPA #D47 (TIDAK OPERASI)",
-    "lat": -6.237919651,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6301195,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.237919651,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-CURUG+CURUG-CKUPA #EA55A (TIDAK OPERASI)",
-    "lat": -6.242376,
+    "style": "#icon-1899-0288D1",
     "lng": 106.609556,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.242376,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-CURUG+CURUG-CKUPA #AH55B (TIDAK OPERASI)",
-    "lat": -6.243914,
+    "style": "#icon-1899-0288D1",
     "lng": 106.61077,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.243914,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-CURUG+CURUG-CKUPA #A55C (TIDAK OPERASI)",
-    "lat": -6.247054,
+    "style": "#icon-1899-0288D1",
     "lng": 106.611714,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.247054,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-CURUG+ALSTA-CKUPA #EA31B (TIDAK OPERASI)",
-    "lat": -6.220039,
+    "style": "#icon-1899-0288D1",
     "lng": 106.656047,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.220039,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV KMBNG-CURUG+CLDUG-ALSTA #EA31A (TIDAK OPERASI)",
-    "lat": -6.219894,
+    "style": "#icon-1899-0288D1",
     "lng": 106.656208,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.219894,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV ALSTA-CKUPA+CURUG-CKUPA #D56 (TIDAK OPERASI)",
-    "lat": -6.247107037,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6116562,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.247107037,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "TOWER SUTT 150kV KMBNG-PTKNG TX9",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7310592,
+    "lat": -6.1922835,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "TOWER SUTT 150kV DKSBI-GRLBR+GRLBR-GRGOL #EA35A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7671516,
+    "lat": -6.1633085,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "TOWER SUTT 150kV LNTAR-SDJYA #A1",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.4644627,
+    "lat": -6.0605261,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #D2",
-    "lat": -6.0618292,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4674765,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0618292,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A3",
-    "lat": -6.0635513,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4712132,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0635513,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A4",
-    "lat": -6.0660608,
+    "style": "#icon-1899-0288D1",
     "lng": 106.47033,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0660608,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A5",
-    "lat": -6.0673211,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4701429,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0673211,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV LNTAR-SDJYA POST GANTRY 1",
-    "lat": -6.0666057,
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
     "lng": 106.4702519,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0666057,
     "type": "SUTT_150kV"
   },
   {
-    "name": "TOWER SUTT 150kV LNTAR-SDJYA POST GANTRY 2",
-    "lat": -6.0668224,
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
     "lng": 106.4702293,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0668224,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #D6",
-    "lat": -6.0697648,
+    "style": "#icon-1899-0288D1",
     "lng": 106.472507,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0697648,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #D7",
-    "lat": -6.0718274,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4745975,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0718274,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #D8",
-    "lat": -6.0739966,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4769291,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0739966,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A9",
-    "lat": -6.0749153,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4779258,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0749153,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #D10",
-    "lat": -6.0770362,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4800256,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0770362,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A11",
-    "lat": -6.0789116,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4817932,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0789116,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #D12",
-    "lat": -6.0801846,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4843274,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0801846,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A13",
-    "lat": -6.0814194,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4869036,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0814194,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A14",
-    "lat": -6.0836835,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4891822,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0836835,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #D15",
-    "lat": -6.08682,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4895175,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.08682,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A16",
-    "lat": -6.0899944,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4898225,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0899944,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A17",
-    "lat": -6.09258402198437,
+    "style": "#icon-1899-0288D1",
     "lng": 106.491258379877,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.09258402198437,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A18",
-    "lat": -6.09493902103441,
+    "style": "#icon-1899-0288D1",
     "lng": 106.493171156765,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.09493902103441,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A19",
-    "lat": -6.0978246,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4932208,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0978246,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A20",
-    "lat": -6.1007104,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4935047,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1007104,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A21",
-    "lat": -6.1034982,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4935638,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1034982,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A22",
-    "lat": -6.1063271,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4934611,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1063271,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A23",
-    "lat": -6.1093347,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4939124,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1093347,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #D24",
-    "lat": -6.1123446,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4944883,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1123446,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #D25",
-    "lat": -6.1154144,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4948996,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1154144,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A26",
-    "lat": -6.1184688,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4953234,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1184688,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A27",
-    "lat": -6.121909,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4950551,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.121909,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A28",
-    "lat": -6.1248036,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4940275,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1248036,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A29",
-    "lat": -6.1271912,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4939203,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1271912,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A30",
-    "lat": -6.1302682,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4942751,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1302682,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A31",
-    "lat": -6.1334324,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4943484,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1334324,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A32",
-    "lat": -6.1364967,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4937729,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1364967,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A33",
-    "lat": -6.1395136,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4928551,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1395136,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A34",
-    "lat": -6.1391557,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4896751,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1391557,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A35",
-    "lat": -6.1398007,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4868901,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1398007,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #D36",
-    "lat": -6.1428224,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4860351,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1428224,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A37",
-    "lat": -6.1463344,
+    "style": "#icon-1899-0288D1",
     "lng": 106.4851933,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1463344,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV LNTAR-SDJYA #A38",
-    "lat": -6.1476767,
+    "style": "#icon-1899-0288D1",
     "lng": 106.484009,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.1476767,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "TOWER SUTT 150KV LNTAR-SDJYA #0017",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.491258379876,
+    "lat": -6.09258402198436,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150KV LNTAR-SDJYA #0018",
-    "lat": -6.09493902103441,
+    "style": "#icon-1899-0288D1",
     "lng": 106.493171156765,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.09493902103441,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150KV TGRNG-JTKBR+JTKBR-JTAKE #A12A",
-    "lat": -6.2204808,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5944524,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.2204808,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "TOWER SUTT 150kV GJTGL-PSKBR+GJTGL-PSKMS #0008",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.546252053148,
+    "lat": -6.165343130013,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GJTGL-PSKBR+GJTGL-PSKMS #0009",
-    "lat": -6.16427204875394,
+    "style": "#icon-1899-0288D1",
     "lng": 106.54451414873,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.16427204875394,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GJTGL-PSKBR+GJTGL-PSKMS #0010",
-    "lat": -6.16311097487665,
+    "style": "#icon-1899-0288D1",
     "lng": 106.542622388305,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.16311097487665,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GJTGL-PSKBR+GJTGL-PSKMS #0011",
-    "lat": -6.16066432771115,
+    "style": "#icon-1899-0288D1",
     "lng": 106.541232908548,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.16066432771115,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV GJTGL-PSKBR+GJTGL-PSKMS #0007",
-    "lat": -6.16591455781439,
+    "style": "#icon-1899-0288D1",
     "lng": 106.548774598087,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.16591455781439,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "TOWER SUTT 150kV GMKRU-PINKA #EA1A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.780448,
+    "lat": -6.1103083,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0001",
-    "lat": -6.0610485,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6771796,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0610485,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0002",
-    "lat": -6.0612881,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6744221,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0612881,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0003",
-    "lat": -6.0622371,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6710732,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0622371,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0004",
-    "lat": -6.0628156,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6686017,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0628156,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0005",
-    "lat": -6.0632898,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6664949,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0632898,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0006",
-    "lat": -6.0606982,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6640307,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0606982,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0007",
-    "lat": -6.058584,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6621125,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.058584,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0008",
-    "lat": -6.0560708,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6599778,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0560708,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0009",
-    "lat": -6.0539093,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6566057,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0539093,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0010",
-    "lat": -6.0522516,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6551285,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0522516,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0011",
-    "lat": -6.0516666,
+    "style": "#icon-1899-0288D1",
     "lng": 106.652343,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0516666,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0012",
-    "lat": -6.0503527,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6502921,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0503527,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0013",
-    "lat": -6.0519513,
+    "style": "#icon-1899-0288D1",
     "lng": 106.647402,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0519513,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0014",
-    "lat": -6.0545461,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6462645,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0545461,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0015",
-    "lat": -6.0551888,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6435729,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0551888,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0016",
-    "lat": -6.0560227,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6402275,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0560227,
     "type": "SUTT_150kV"
   },
   {
     "name": "TOWER SUTT 150kV DADAP-TLKNG+DADAP-LNTAR #0017",
-    "lat": -6.0574227,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6379385,
-    "style": "#icon-1739-E65100-labelson",
+    "lat": -6.0574227,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7674049,
+    "lat": -6.2233601,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7651195,
+    "lat": -6.2203825,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7619625,
+    "lat": -6.2173223,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7213856,
+    "lat": -6.1880984,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7209676,
+    "lat": -6.1875489,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7212565,
+    "lat": -6.1879597,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7299365,
+    "lat": -6.1907604,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7844271,
+    "lat": -6.1126899,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7907285,
+    "lat": -6.1338001,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5869724,
+    "lat": -6.2106147,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7170841,
+    "lat": -6.1894165,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6983683,
+    "lat": -6.1997032,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6852884,
+    "lat": -6.2109917,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6801244,
+    "lat": -6.2135512,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6553311,
+    "lat": -6.2200892,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7820968,
+    "lat": -6.1905798,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5539449,
+    "lat": -6.180951,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5542018,
+    "lat": -6.1782457,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5516427,
+    "lat": -6.1746884,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.551724,
+    "lat": -6.1721645,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5485565,
+    "lat": -6.16728,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5489201,
+    "lat": -6.1672629,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5516878,
+    "lat": -6.1721748,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5516063,
+    "lat": -6.1746899,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5541497,
+    "lat": -6.1782471,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5539106,
+    "lat": -6.18095,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7862969,
+    "lat": -6.1674578,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7877226,
+    "lat": -6.1699758,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Unnamed",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7630091,
+    "lat": -6.2425895,
+    "type": "SUTT_150kV"
+  },
+  {
+    "name": "Point 305",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6432935,
+    "lat": -6.2121077,
     "type": "SUTT_150kV"
   }
-]
+];
 
-// 174 Tower SKTT 150kV
+// 339 Tower SKTT
 export const towerSKTT: TowerPoint[] = [
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0001",
-    "lat": -6.173981802,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7279727,
-    "style": "#icon-1739-E65100",
+    "lat": -6.173981802,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0002",
-    "lat": -6.17924422,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7285198,
-    "style": "#icon-1739-E65100",
+    "lat": -6.17924422,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0003",
-    "lat": -6.183464831,
+    "style": "#icon-1899-0288D1",
     "lng": 106.729579,
-    "style": "#icon-1739-E65100",
+    "lat": -6.183464831,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0004",
-    "lat": -6.187869479,
+    "style": "#icon-1899-0288D1",
     "lng": 106.730415,
-    "style": "#icon-1739-E65100",
+    "lat": -6.187869479,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0005",
-    "lat": -6.191129867,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7330168,
-    "style": "#icon-1739-E65100",
+    "lat": -6.191129867,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0006",
-    "lat": -6.1911808,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7371271,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1911808,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0007",
-    "lat": -6.191376121,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7410574,
-    "style": "#icon-1739-E65100",
+    "lat": -6.191376121,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0008",
-    "lat": -6.190998203,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7455545,
-    "style": "#icon-1739-E65100",
+    "lat": -6.190998203,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0008A",
-    "lat": -6.19103,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7434443,
-    "style": "#icon-1739-E65100",
+    "lat": -6.19103,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0009",
-    "lat": -6.1909203,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7511173,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1909203,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0010",
-    "lat": -6.190451882,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7555175,
-    "style": "#icon-1739-E65100",
+    "lat": -6.190451882,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0011",
-    "lat": -6.190207166,
+    "style": "#icon-1899-0288D1",
     "lng": 106.759143,
-    "style": "#icon-1739-E65100",
+    "lat": -6.190207166,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0012",
-    "lat": -6.189878052,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7636203,
-    "style": "#icon-1739-E65100",
+    "lat": -6.189878052,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0013",
-    "lat": -6.189156596,
+    "style": "#icon-1899-0288D1",
     "lng": 106.768207,
-    "style": "#icon-1739-E65100",
+    "lat": -6.189156596,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0014",
-    "lat": -6.189236059,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7714464,
-    "style": "#icon-1739-E65100",
+    "lat": -6.189236059,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0015",
-    "lat": -6.187559049,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7757233,
-    "style": "#icon-1739-E65100",
+    "lat": -6.187559049,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0016",
-    "lat": -6.185993408,
+    "style": "#icon-1899-0288D1",
     "lng": 106.780023,
-    "style": "#icon-1739-E65100",
+    "lat": -6.185993408,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0017",
-    "lat": -6.187951808,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7819547,
-    "style": "#icon-1739-E65100",
+    "lat": -6.187951808,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV DKSBI-KBJRK #0018",
-    "lat": -6.190631227,
+    "style": "#icon-1899-0288D1",
     "lng": 106.782209,
-    "style": "#icon-1739-E65100",
+    "lat": -6.190631227,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-DKSBI #0001",
-    "lat": -6.171664475,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7277327,
-    "style": "#icon-1739-E65100",
+    "lat": -6.171664475,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-DKSBI #0002",
-    "lat": -6.175182254,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7279483,
-    "style": "#icon-1739-E65100",
+    "lat": -6.175182254,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-DKSBI #0003",
-    "lat": -6.17816597,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7282659,
-    "style": "#icon-1739-E65100",
+    "lat": -6.17816597,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-DKSBI #0004",
-    "lat": -6.181522685,
+    "style": "#icon-1899-0288D1",
     "lng": 106.728885,
-    "style": "#icon-1739-E65100",
+    "lat": -6.181522685,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-DKSBI #0005",
-    "lat": -6.184816972,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7297078,
-    "style": "#icon-1739-E65100",
+    "lat": -6.184816972,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-DKSBI #0006",
-    "lat": -6.185604862,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7268604,
-    "style": "#icon-1739-E65100",
+    "lat": -6.185604862,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-DKSBI #0007",
-    "lat": -6.187218306,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7241545,
-    "style": "#icon-1739-E65100",
+    "lat": -6.187218306,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-DKSBI #0008",
-    "lat": -6.188080812,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7212383,
-    "style": "#icon-1739-E65100",
+    "lat": -6.188080812,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #001A",
-    "lat": -6.113742956,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7843234,
-    "style": "#icon-1739-E65100",
+    "lat": -6.113742956,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #0001",
-    "lat": -6.1138666,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7842594,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1138666,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #002A",
-    "lat": -6.1170958,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7838095,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1170958,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #0002",
-    "lat": -6.1171865,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7837494,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1171865,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #003A",
-    "lat": -6.120444,
+    "style": "#icon-1899-0288D1",
     "lng": 106.783358,
-    "style": "#icon-1739-E65100",
+    "lat": -6.120444,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #0003",
-    "lat": -6.1205066,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7833306,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1205066,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #004A",
-    "lat": -6.1238044,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7834256,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1238044,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #0004",
-    "lat": -6.12389,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7833875,
-    "style": "#icon-1739-E65100",
+    "lat": -6.12389,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #005A",
-    "lat": -6.1272126,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7837172,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1272126,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #0005",
-    "lat": -6.1273179,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7836901,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1273179,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #006A",
-    "lat": -6.1304076,
+    "style": "#icon-1899-0288D1",
     "lng": 106.784461,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1304076,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #0006",
-    "lat": -6.1305282,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7844445,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1305282,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #007A",
-    "lat": -6.1315176,
+    "style": "#icon-1899-0288D1",
     "lng": 106.788043,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1315176,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #0007",
-    "lat": -6.131577,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7881029,
-    "style": "#icon-1739-E65100",
+    "lat": -6.131577,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #008A",
-    "lat": -6.1318935,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7900724,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1318935,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV MKRNG-ANGKE #0008",
-    "lat": -6.1319514,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7901147,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1319514,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-PTKGN #001A",
-    "lat": -6.187582823,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7224502,
-    "style": "#icon-1739-E65100",
+    "lat": -6.187582823,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-PTKGN #001B",
-    "lat": -6.187630789,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7226349,
-    "style": "#icon-1739-E65100",
+    "lat": -6.187630789,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-PTKGN #002A",
-    "lat": -6.186596818,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7251902,
-    "style": "#icon-1739-E65100",
+    "lat": -6.186596818,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-PTKGN #002B",
-    "lat": -6.186615412,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7253364,
-    "style": "#icon-1739-E65100",
+    "lat": -6.186615412,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-PTKGN #003A",
-    "lat": -6.185564703,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7267146,
-    "style": "#icon-1739-E65100",
+    "lat": -6.185564703,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-PTKGN #003B",
-    "lat": -6.185558707,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7268494,
-    "style": "#icon-1739-E65100",
+    "lat": -6.185558707,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-PTKGN #004A",
-    "lat": -6.185753257,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7302106,
-    "style": "#icon-1739-E65100",
+    "lat": -6.185753257,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-PTKGN #004B",
-    "lat": -6.185765988,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7301557,
-    "style": "#icon-1739-E65100",
+    "lat": -6.185765988,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-PTKGN #005A",
-    "lat": -6.189565202,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7298684,
-    "style": "#icon-1739-E65100",
+    "lat": -6.189565202,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-PTKGN #005B",
-    "lat": -6.189551826,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7298209,
-    "style": "#icon-1739-E65100",
+    "lat": -6.189551826,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-NSNYN #0001",
-    "lat": -6.187229888,
+    "style": "#icon-1899-0288D1",
     "lng": 106.724243,
-    "style": "#icon-1739-E65100",
+    "lat": -6.187229888,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-NSNYN #0002",
-    "lat": -6.184641089,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7291514,
-    "style": "#icon-1739-E65100",
+    "lat": -6.184641089,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-NSNYN #0003",
-    "lat": -6.188848466,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7319207,
-    "style": "#icon-1739-E65100",
+    "lat": -6.188848466,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-NSNYN #0004",
-    "lat": -6.19192362,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7367531,
-    "style": "#icon-1739-E65100",
+    "lat": -6.19192362,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-NSNYN #0005",
-    "lat": -6.192864084,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7414413,
-    "style": "#icon-1739-E65100",
+    "lat": -6.192864084,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-NSNYN #0006",
-    "lat": -6.194687387,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7440129,
-    "style": "#icon-1739-E65100",
+    "lat": -6.194687387,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-NSNYN #0007",
-    "lat": -6.199253335,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7480545,
-    "style": "#icon-1739-E65100",
+    "lat": -6.199253335,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-NSNYN #0008",
-    "lat": -6.202470436,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7512165,
-    "style": "#icon-1739-E65100",
+    "lat": -6.202470436,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-NSNYN #0009",
-    "lat": -6.207119358,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7542387,
-    "style": "#icon-1739-E65100",
+    "lat": -6.207119358,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-NSNYN #0010",
-    "lat": -6.212503884,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7576423,
-    "style": "#icon-1739-E65100",
+    "lat": -6.212503884,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-NSNYN #0011",
-    "lat": -6.21768628,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7591973,
-    "style": "#icon-1739-E65100",
+    "lat": -6.21768628,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-NSNYN #0012",
-    "lat": -6.217934775,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7642711,
-    "style": "#icon-1739-E65100",
+    "lat": -6.217934775,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-NSNYN #0013",
-    "lat": -6.22104152,
+    "style": "#icon-1899-0288D1",
     "lng": 106.767078,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22104152,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV KBANG-NSNYN #0014",
-    "lat": -6.223914434,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7698456,
-    "style": "#icon-1739-E65100",
+    "lat": -6.223914434,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV ALSTA-CLDUG #1A",
-    "lat": -6.22095,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6588,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22095,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV ALSTA-CLDUG #2A",
-    "lat": -6.220717,
+    "style": "#icon-1899-0288D1",
     "lng": 106.662567,
-    "style": "#icon-1739-E65100",
+    "lat": -6.220717,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV ALSTA-CLDUG #3A",
-    "lat": -6.221,
+    "style": "#icon-1899-0288D1",
     "lng": 106.666433,
-    "style": "#icon-1739-E65100",
+    "lat": -6.221,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV ALSTA-CLDUG #4A",
-    "lat": -6.217937,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6693451,
-    "style": "#icon-1739-E65100",
+    "lat": -6.217937,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV ALSTA-CLDUG #5A",
-    "lat": -6.216667,
+    "style": "#icon-1899-0288D1",
     "lng": 106.672583,
-    "style": "#icon-1739-E65100",
+    "lat": -6.216667,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV ALSTA-CLDUG #6A",
-    "lat": -6.215567,
+    "style": "#icon-1899-0288D1",
     "lng": 106.67665,
-    "style": "#icon-1739-E65100",
+    "lat": -6.215567,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV ALSTA-CLDUG #7A",
-    "lat": -6.21465,
+    "style": "#icon-1899-0288D1",
     "lng": 106.679867,
-    "style": "#icon-1739-E65100",
+    "lat": -6.21465,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV JTAKE-MAXIM #0001",
-    "lat": -6.212766,
+    "style": "#icon-1899-0288D1",
     "lng": 106.585152,
-    "style": "#icon-1739-E65100",
+    "lat": -6.212766,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV JTAKE-MAXIM #0002",
-    "lat": -6.2104663,
+    "style": "#icon-1899-0288D1",
     "lng": 106.5854987,
-    "style": "#icon-1739-E65100",
+    "lat": -6.2104663,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 1B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.64060361019,
+    "lat": -6.24309871157422,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 2A",
-    "lat": -6.24109977100505,
+    "style": "#icon-1899-0288D1",
     "lng": 106.637868416659,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24109977100505,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 2B",
-    "lat": -6.24100920526198,
+    "style": "#icon-1899-0288D1",
     "lng": 106.637913317018,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24100920526198,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 3A",
-    "lat": -6.239057561308,
+    "style": "#icon-1899-0288D1",
     "lng": 106.634500565811,
-    "style": "#icon-1739-E65100",
+    "lat": -6.239057561308,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 3B",
-    "lat": -6.2389310499308,
+    "style": "#icon-1899-0288D1",
     "lng": 106.634473064808,
-    "style": "#icon-1739-E65100",
+    "lat": -6.2389310499308,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 4A",
-    "lat": -6.23764880529085,
+    "style": "#icon-1899-0288D1",
     "lng": 106.630972042465,
-    "style": "#icon-1739-E65100",
+    "lat": -6.23764880529085,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 4B",
-    "lat": -6.23759418628873,
+    "style": "#icon-1899-0288D1",
     "lng": 106.631089345631,
-    "style": "#icon-1739-E65100",
+    "lat": -6.23759418628873,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 5A",
-    "lat": -6.23359329445228,
+    "style": "#icon-1899-0288D1",
     "lng": 106.632396270569,
-    "style": "#icon-1739-E65100",
+    "lat": -6.23359329445228,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 5B",
-    "lat": -6.2335023373101,
+    "style": "#icon-1899-0288D1",
     "lng": 106.632567677736,
-    "style": "#icon-1739-E65100",
+    "lat": -6.2335023373101,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 6A",
-    "lat": -6.22956454865241,
+    "style": "#icon-1899-0288D1",
     "lng": 106.63393803675,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22956454865241,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 6B",
-    "lat": -6.2294919284155,
+    "style": "#icon-1899-0288D1",
     "lng": 106.634028173702,
-    "style": "#icon-1739-E65100",
+    "lat": -6.2294919284155,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 7A",
-    "lat": -6.22974497228756,
+    "style": "#icon-1899-0288D1",
     "lng": 106.636992815362,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22974497228756,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 7B",
-    "lat": -6.22975404285828,
+    "style": "#icon-1899-0288D1",
     "lng": 106.636983807323,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22975404285828,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 8A",
-    "lat": -6.2306590368075,
+    "style": "#icon-1899-0288D1",
     "lng": 106.63997884538,
-    "style": "#icon-1739-E65100",
+    "lat": -6.2306590368075,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 8B",
-    "lat": -6.23067781320382,
+    "style": "#icon-1899-0288D1",
     "lng": 106.639989204896,
-    "style": "#icon-1739-E65100",
+    "lat": -6.23067781320382,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 9A",
-    "lat": -6.22763916609051,
+    "style": "#icon-1899-0288D1",
     "lng": 106.639543508795,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22763916609051,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 9B",
-    "lat": -6.22764823668459,
+    "style": "#icon-1899-0288D1",
     "lng": 106.639534500838,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22764823668459,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 10A",
-    "lat": -6.22529226379197,
+    "style": "#icon-1899-0288D1",
     "lng": 106.638198890736,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22529226379197,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 10B",
-    "lat": -6.22531057318536,
+    "style": "#icon-1899-0288D1",
     "lng": 106.638126658938,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22531057318536,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 11A",
-    "lat": -6.22348884697049,
+    "style": "#icon-1899-0288D1",
     "lng": 106.642376983097,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22348884697049,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 11B",
-    "lat": -6.22347949527732,
+    "style": "#icon-1899-0288D1",
     "lng": 106.642476350239,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22347949527732,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 12A",
-    "lat": -6.22195755230888,
+    "style": "#icon-1899-0288D1",
     "lng": 106.646275771927,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22195755230888,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 12B",
-    "lat": -6.22194819997515,
+    "style": "#icon-1899-0288D1",
     "lng": 106.646375138527,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22194819997515,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 13A",
-    "lat": -6.22066173413567,
+    "style": "#icon-1899-0288D1",
     "lng": 106.650048763268,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22066173413567,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 13B",
-    "lat": -6.22066156477892,
+    "style": "#icon-1899-0288D1",
     "lng": 106.65010297835,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22066156477892,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 14A",
-    "lat": -6.22006071994366,
+    "style": "#icon-1899-0288D1",
     "lng": 106.654284732991,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22006071994366,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 14B",
-    "lat": -6.22005150771681,
+    "style": "#icon-1899-0288D1",
     "lng": 106.654338919619,
-    "style": "#icon-1739-E65100",
+    "lat": -6.22005150771681,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 1A",
-    "lat": -6.24309882423273,
+    "style": "#icon-1899-0288D1",
     "lng": 106.640567465094,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24309882423273,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "Jalur SKTT 150kV Curug - Summarecon 1B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.611803000442,
+    "lat": -6.24519500396196,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 2A",
-    "lat": -6.2431260043451,
+    "style": "#icon-1899-0288D1",
     "lng": 106.616484996476,
-    "style": "#icon-1739-E65100",
+    "lat": -6.2431260043451,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 2B",
-    "lat": -6.24325800010732,
+    "style": "#icon-1899-0288D1",
     "lng": 106.616915004093,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24325800010732,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 3A",
-    "lat": -6.2428300044245,
+    "style": "#icon-1899-0288D1",
     "lng": 106.621431998278,
-    "style": "#icon-1739-E65100",
+    "lat": -6.2428300044245,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 3B",
-    "lat": -6.24277999773474,
+    "style": "#icon-1899-0288D1",
     "lng": 106.621805004243,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24277999773474,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 4A",
-    "lat": -6.24286300056724,
+    "style": "#icon-1899-0288D1",
     "lng": 106.625613004313,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24286300056724,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 4B",
-    "lat": -6.24294599700392,
+    "style": "#icon-1899-0288D1",
     "lng": 106.625858002804,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24294599700392,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 5A",
-    "lat": -6.24350200469233,
+    "style": "#icon-1899-0288D1",
     "lng": 106.631477001384,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24350200469233,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 5B",
-    "lat": -6.24349599882291,
+    "style": "#icon-1899-0288D1",
     "lng": 106.631177001106,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24349599882291,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 6A",
-    "lat": -6.24545499989938,
+    "style": "#icon-1899-0288D1",
     "lng": 106.63493399897,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24545499989938,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 6B",
-    "lat": -6.24540600412752,
+    "style": "#icon-1899-0288D1",
     "lng": 106.634704999427,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24540600412752,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 7A",
-    "lat": -6.24318599910658,
+    "style": "#icon-1899-0288D1",
     "lng": 106.637889004172,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24318599910658,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 7B",
-    "lat": -6.24261099712891,
+    "style": "#icon-1899-0288D1",
     "lng": 106.63826699778,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24261099712891,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 8A",
-    "lat": -6.24317299789772,
+    "style": "#icon-1899-0288D1",
     "lng": 106.640725000964,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24317299789772,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 8B",
-    "lat": -6.24317299789772,
+    "style": "#icon-1899-0288D1",
     "lng": 106.640725000964,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24317299789772,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT 150kV Curug - Summarecon 1A",
-    "lat": -6.24509699618796,
+    "style": "#icon-1899-0288D1",
     "lng": 106.611612002898,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24509699618796,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "JALUR SKTT 150kV ALSTA-CLDUG #2B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.66277778,
+    "lat": -6.22072222,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV ALSTA-CLDUG #3B",
-    "lat": -6.2209235,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6664458,
-    "style": "#icon-1739-E65100",
+    "lat": -6.2209235,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV ALSTA-CLDUG #4B",
-    "lat": -6.21797222,
+    "style": "#icon-1899-0288D1",
     "lng": 106.66916667,
-    "style": "#icon-1739-E65100",
+    "lat": -6.21797222,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV ALSTA-CLDUG #5B",
-    "lat": -6.21669444,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6725,
-    "style": "#icon-1739-E65100",
+    "lat": -6.21669444,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV ALSTA-CLDUG #6B",
-    "lat": -6.2155865,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6766509,
-    "style": "#icon-1739-E65100",
+    "lat": -6.2155865,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV ALSTA-CLDUG #7B",
-    "lat": -6.2146776,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6798414,
-    "style": "#icon-1739-E65100",
+    "lat": -6.2146776,
     "type": "SKTT_150kV"
   },
   {
     "name": "JALUR SKTT 150kV ALSTA-CLDUG #1B",
-    "lat": -6.2209782,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6588307,
-    "style": "#icon-1739-E65100",
+    "lat": -6.2209782,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "Jalur SKTT Ciledug - Kembangan #1B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.68335305006,
+    "lat": -6.21154136727617,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #2A",
-    "lat": -6.21076753357875,
+    "style": "#icon-1899-0288D1",
     "lng": 106.687832251731,
-    "style": "#icon-1739-E65100",
+    "lat": -6.21076753357875,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #2B",
-    "lat": -6.2107863099616,
+    "style": "#icon-1899-0288D1",
     "lng": 106.687615457237,
-    "style": "#icon-1739-E65100",
+    "lat": -6.2107863099616,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #3A",
-    "lat": -6.20677034703747,
+    "style": "#icon-1899-0288D1",
     "lng": 106.687973126755,
-    "style": "#icon-1739-E65100",
+    "lat": -6.20677034703747,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #3B",
-    "lat": -6.20678802828201,
+    "style": "#icon-1899-0288D1",
     "lng": 106.688099680417,
-    "style": "#icon-1739-E65100",
+    "lat": -6.20678802828201,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #4A",
-    "lat": -6.2021382988333,
+    "style": "#icon-1899-0288D1",
     "lng": 106.688708327231,
-    "style": "#icon-1739-E65100",
+    "lat": -6.2021382988333,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #4B",
-    "lat": -6.20237368660942,
+    "style": "#icon-1899-0288D1",
     "lng": 106.688618721934,
-    "style": "#icon-1739-E65100",
+    "lat": -6.20237368660942,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #5A",
-    "lat": -6.1997238,
+    "style": "#icon-1899-0288D1",
     "lng": 106.692161,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1997238,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #5B",
-    "lat": -6.19987670910449,
+    "style": "#icon-1899-0288D1",
     "lng": 106.691854484589,
-    "style": "#icon-1739-E65100",
+    "lat": -6.19987670910449,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #6A",
-    "lat": -6.1994149,
+    "style": "#icon-1899-0288D1",
     "lng": 106.6963294,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1994149,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #6B",
-    "lat": -6.19940206653551,
+    "style": "#icon-1899-0288D1",
     "lng": 106.696072491077,
-    "style": "#icon-1739-E65100",
+    "lat": -6.19940206653551,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #7A",
-    "lat": -6.19731207483279,
+    "style": "#icon-1899-0288D1",
     "lng": 106.699273353177,
-    "style": "#icon-1739-E65100",
+    "lat": -6.19731207483279,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #7B",
-    "lat": -6.19764684082054,
+    "style": "#icon-1899-0288D1",
     "lng": 106.699211177264,
-    "style": "#icon-1739-E65100",
+    "lat": -6.19764684082054,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #8A",
-    "lat": -6.19507064326085,
+    "style": "#icon-1899-0288D1",
     "lng": 106.701759916006,
-    "style": "#icon-1739-E65100",
+    "lat": -6.19507064326085,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #8B",
-    "lat": -6.19507084619213,
+    "style": "#icon-1899-0288D1",
     "lng": 106.70169666981,
-    "style": "#icon-1739-E65100",
+    "lat": -6.19507084619213,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #9A",
-    "lat": -6.197765,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7045417,
-    "style": "#icon-1739-E65100",
+    "lat": -6.197765,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #9B",
-    "lat": -6.19791012420764,
+    "style": "#icon-1899-0288D1",
     "lng": 106.704515747726,
-    "style": "#icon-1739-E65100",
+    "lat": -6.19791012420764,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Metland - Kembangan 2A (Nama Proyek Joint 10A)",
-    "lat": -6.1963072,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7080886,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1963072,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Metland - Kembangan 2B (Nama Proyek Joint 10B)",
-    "lat": -6.1964516,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7081613,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1964516,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Metland - Kembangan 3A (Nama Proyek Joint 11A)",
-    "lat": -6.1924101,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7104303,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1924101,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Metland - Kembangan 3B (Nama Proyek Joint 11B)",
-    "lat": -6.1925049,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7104181,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1925049,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Metland - Kembangan 4A (Nama Proyek Joint 12A)",
-    "lat": -6.1895268,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7129097,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1895268,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Metland - Kembangan 4B (Nama Proyek Joint 12B)",
-    "lat": -6.189565,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7129673,
-    "style": "#icon-1739-E65100",
+    "lat": -6.189565,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Metland - Kembangan 5A (Nama Proyek Joint 13A)",
-    "lat": -6.1898224,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7169312,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1898224,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Metland - Kembangan 5B (Nama Proyek Joint 13B)",
-    "lat": -6.1898949,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7168953,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1898949,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Kembangan #1A",
-    "lat": -6.21145944006169,
+    "style": "#icon-1899-0288D1",
     "lng": 106.683524466657,
-    "style": "#icon-1739-E65100",
+    "lat": -6.21145944006169,
     "type": "SKTT_150kV"
   },
   {
-    "name": "JALUR SKTT JP 4B",
-    "lat": -6.1707133,
-    "lng": 106.5486879,
-    "style": "#icon-1739-E65100",
-    "type": "SKTT_150kV"
-  },
-  {
-    "name": "JALUR SKTT JP 4A",
-    "lat": -6.1705039,
-    "lng": 106.5487826,
-    "style": "#icon-1739-E65100",
-    "type": "SKTT_150kV"
-  },
-  {
-    "name": "JALUR SKTT JP 3A",
-    "lat": -6.1723297,
-    "lng": 106.551698,
-    "style": "#icon-1739-E65100",
-    "type": "SKTT_150kV"
-  },
-  {
-    "name": "JALUR SKTT JP 3B",
-    "lat": -6.1725287,
-    "lng": 106.5517187,
-    "style": "#icon-1739-E65100",
-    "type": "SKTT_150kV"
-  },
-  {
-    "name": "JALUR SKTT JP 2A",
-    "lat": -6.1768853,
-    "lng": 106.5515535,
-    "style": "#icon-1739-E65100",
-    "type": "SKTT_150kV"
-  },
-  {
-    "name": "JALUR SKTT JP 2B",
-    "lat": -6.1769798,
-    "lng": 106.55166,
-    "style": "#icon-1739-E65100",
-    "type": "SKTT_150kV"
-  },
-  {
-    "name": "JALUR SKTT JP 1A",
-    "lat": -6.1791659,
-    "lng": 106.554088,
-    "style": "#icon-1739-E65100",
-    "type": "SKTT_150kV"
-  },
-  {
-    "name": "JALUR SKTT JP 1B",
-    "lat": -6.1794943,
-    "lng": 106.5540802,
-    "style": "#icon-1739-E65100",
-    "type": "SKTT_150kV"
-  },
-  {
-    "name": "SKTT GAJAH TUNGGAL - PASAR KEMIS BARU",
-    "lat": -6.23785888445613,
+    "name": "JOINT SKTT 150kV NSYAN-ULJMI #0002",
+    "style": "#icon-1899-0288D1",
     "lng": 106.76497672749,
-    "style": "#line-E65100-4100",
+    "lat": -6.23785888445613,
     "type": "SKTT_150kV"
   },
   {
     "name": "JOINT SKTT 150kV NSYAN-ULJMI #0003",
-    "lat": -6.23806112818232,
+    "style": "#icon-1899-0288D1",
     "lng": 106.769377785936,
-    "style": "#icon-1739-E65100",
+    "lat": -6.23806112818232,
     "type": "SKTT_150kV"
   },
   {
     "name": "JOINT SKTT 150kV NSYAN-ULJMI #0004",
-    "lat": -6.23588244942946,
+    "style": "#icon-1899-0288D1",
     "lng": 106.771936600308,
-    "style": "#icon-1739-E65100",
+    "lat": -6.23588244942946,
     "type": "SKTT_150kV"
   },
   {
     "name": "JOINT SKTT 150kV NSYAN-ULJMI #0005",
-    "lat": -6.23121698677144,
+    "style": "#icon-1899-0288D1",
     "lng": 106.771875761972,
-    "style": "#icon-1739-E65100",
+    "lat": -6.23121698677144,
     "type": "SKTT_150kV"
   },
   {
     "name": "JOINT SKTT 150kV NSYAN-ULJMI #0001",
-    "lat": -6.24087695761409,
+    "style": "#icon-1899-0288D1",
     "lng": 106.762863425512,
-    "style": "#icon-1739-E65100",
+    "lat": -6.24087695761409,
     "type": "SKTT_150kV"
   },
   {
-    "name": "SKTT NEW SENAYAN-ULUJAMI",
-    "lat": -6.17170180561318,
+    "name": "JOINT SKTT 150kV GRGOL-TMANG #0002",
+    "style": "#icon-1899-0288D1",
     "lng": 106.78831858542,
-    "style": "#line-E65100-4100",
+    "lat": -6.17170180561318,
     "type": "SKTT_150kV"
   },
   {
     "name": "JOINT SKTT 150kV GRGOL-TMANG #0003",
-    "lat": -6.17370269042639,
+    "style": "#icon-1899-0288D1",
     "lng": 106.787539296369,
-    "style": "#icon-1739-E65100",
+    "lat": -6.17370269042639,
     "type": "SKTT_150kV"
   },
   {
     "name": "JOINT SKTT 150kV GRGOL-TMANG #0004",
-    "lat": -6.1743491092779,
+    "style": "#icon-1899-0288D1",
     "lng": 106.783521104721,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1743491092779,
     "type": "SKTT_150kV"
   },
   {
     "name": "JOINT SKTT 150kV GRGOL-TMANG #0005",
-    "lat": -6.1791228730432,
+    "style": "#icon-1899-0288D1",
     "lng": 106.783636466301,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1791228730432,
     "type": "SKTT_150kV"
   },
   {
     "name": "JOINT SKTT 150kV GRGOL-TMANG #0006",
-    "lat": -6.18389769691822,
+    "style": "#icon-1899-0288D1",
     "lng": 106.783435631746,
-    "style": "#icon-1739-E65100",
+    "lat": -6.18389769691822,
     "type": "SKTT_150kV"
   },
   {
     "name": "JOINT SKTT 150kV GRGOL-TMANG #0007",
-    "lat": -6.18608896578569,
+    "style": "#icon-1899-0288D1",
     "lng": 106.779811013721,
-    "style": "#icon-1739-E65100",
+    "lat": -6.18608896578569,
     "type": "SKTT_150kV"
   },
   {
     "name": "JOINT SKTT 150kV GRGOL-TMANG #0001",
-    "lat": -6.16741949564211,
+    "style": "#icon-1899-0288D1",
     "lng": 106.787256239156,
-    "style": "#icon-1739-E65100",
+    "lat": -6.16741949564211,
     "type": "SKTT_150kV"
   },
   {
-    "name": "SKTT GROGOL - TOMANG",
-    "lat": -6.197412,
+    "name": "Jalur SKTT Ciledug - Metland 10A (Nama Proyek Joint 2B)",
+    "style": "#icon-1899-0288D1",
     "lng": 106.706661,
-    "style": "#line-E65100-4100",
+    "lat": -6.197412,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Ciledug - Metland 10B (Nama Proyek Joint 1B)",
-    "lat": -6.197419,
+    "style": "#icon-1899-0288D1",
     "lng": 106.706784,
-    "style": "#icon-1739-E65100",
+    "lat": -6.197419,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Metland - Kembangan 1B (Nama Proyek Joint 1A)",
-    "lat": -6.1975095,
+    "style": "#icon-1899-0288D1",
     "lng": 106.7073759,
-    "style": "#icon-1739-E65100",
+    "lat": -6.1975095,
     "type": "SKTT_150kV"
   },
   {
     "name": "Jalur SKTT Metland - Kembangan 1A (Nama Proyek Joint 2A)",
-    "lat": -6.197452,
+    "style": "#icon-1899-0288D1",
     "lng": 106.707296,
-    "style": "#icon-1739-E65100",
+    "lat": -6.197452,
     "type": "SKTT_150kV"
   },
   {
-    "name": "SKTT Metland - Kembangan #2",
-    "lat": -6.064451,
-    "lng": 106.636328,
-    "style": "#line-E65100-4100",
+    "name": "SKTT KMBNG-NSYAN SPAN JP14-SEALING END",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7719597,
+    "lat": -6.2261522,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBNG-NSYAN SPAN JP10-JP11",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7579646,
+    "lat": -6.2156817,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBNG-NSYAN SPAN JP9-JP10",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7560606,
+    "lat": -6.2099835,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBNG-NSYAN SPAN JP8-JP9",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7527776,
+    "lat": -6.2048742,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBNG-NSYAN SPAN JP7-JP8",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7510528,
+    "lat": -6.1995106,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBNG-NSYAN SPAN JP6-JP7",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.745782,
+    "lat": -6.1974559,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBNG-NSYAN SPAN JP5-JP6",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7431067,
+    "lat": -6.1932881,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBNG-NSYAN SPAN JP3-JP4",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7338027,
+    "lat": -6.1900997,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBNG-NSYAN SPAN JP2-JP3",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7308672,
+    "lat": -6.186788,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBNG-NSYAN SPAN JP1-JP2",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7266997,
+    "lat": -6.1857295,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP17-JP18",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7829594,
+    "lat": -6.1893675,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP16-JP17",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7818047,
+    "lat": -6.1860893,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP15-JP16",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7779558,
+    "lat": -6.186742,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP14-JP15",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7735579,
+    "lat": -6.1884076,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP13-JP14",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7693382,
+    "lat": -6.1894816,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP12-JP13",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7661111,
+    "lat": -6.1897464,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP11-JP12",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.761333,
+    "lat": -6.1900456,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP10-JP11",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7567784,
+    "lat": -6.1903655,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP9-JP10",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7535633,
+    "lat": -6.1906781,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP8-JP9",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7482364,
+    "lat": -6.1909661,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP8A-JP8",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7445233,
+    "lat": -6.1910067,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP7-JP8A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7423034,
+    "lat": -6.1911932,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP6-JP7",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7390603,
+    "lat": -6.1912805,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP5-JP6",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7350328,
+    "lat": -6.1911593,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP4-JP5",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7318136,
+    "lat": -6.1896483,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP3-JP4",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7299517,
+    "lat": -6.1854355,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP2-JP3",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7288802,
+    "lat": -6.1811039,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN JP1-JP2",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7282286,
+    "lat": -6.1769485,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT DKSBI-KBJRK SPAN SEALING END-JP1",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7268163,
+    "lat": -6.1725198,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-DKSBI SPAN SEALING END-JP1",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7276576,
+    "lat": -6.1702631,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-DKSBI SPAN JP1-JP2",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7278219,
+    "lat": -6.1732176,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-DKSBI SPAN JP2-JP3",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7281274,
+    "lat": -6.1769396,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-DKSBI SPAN JP3-JP4",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7285522,
+    "lat": -6.1797687,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-DKSBI SPAN JP4-JP5",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7292777,
+    "lat": -6.183114,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-DKSBI SPAN JP5-JP6",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7282109,
+    "lat": -6.1847328,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-DKSBI SPAN JP6-JP7",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7256934,
+    "lat": -6.1863027,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-DKSBI SPAN JP7-JP8",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7234926,
+    "lat": -6.1874132,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-PTKGN SPAN JP1A-JP2A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.723788,
+    "lat": -6.1870994,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-PTKGN SPAN JP2A-JP3A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7260418,
+    "lat": -6.1860184,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-PTKGN SPAN JP3A-JP4A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7281801,
+    "lat": -6.1847193,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-PTKGN SPAN JP4A-JP5A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7304323,
+    "lat": -6.1877214,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-PTKGN SPAN JP5B-SEALING END",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7298515,
+    "lat": -6.1907481,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-PTKGN SPAN JP4B-JP5B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7303844,
+    "lat": -6.1877187,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-PTKGN SPAN JP3B-JP4B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7282122,
+    "lat": -6.1847806,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-PTKGN SPAN JP2B-JP3B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7260886,
+    "lat": -6.1860864,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-PTKGN SPAN JP1B-JP2B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7238148,
+    "lat": -6.1871827,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBGN-PTKGN SPAN SEALING END-JP1B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7212795,
+    "lat": -6.1880144,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN SEALING END-JP1A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7844816,
+    "lat": -6.112686,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP1-JP2",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7840324,
+    "lat": -6.1153307,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP1A-JP2A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.784078,
+    "lat": -6.1153294,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP2-JP3",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7835025,
+    "lat": -6.1191249,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP2A-JP3A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7835373,
+    "lat": -6.1191209,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP3-JP4",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7833568,
+    "lat": -6.1220378,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP3A-JP4A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7833889,
+    "lat": -6.1220325,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP4-JP5",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7833731,
+    "lat": -6.1255463,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP4A-JP5A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7834126,
+    "lat": -6.1255414,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP5-JP6",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7840601,
+    "lat": -6.1288927,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP5A-JP6A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7841044,
+    "lat": -6.1288727,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP6A-JP7A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7863586,
+    "lat": -6.1312891,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP6-JP7",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7864256,
+    "lat": -6.1313745,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP7-JP8",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7891119,
+    "lat": -6.1317648,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP7A-JP8A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7891426,
+    "lat": -6.1317226,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT MKRLM-ANGKE SPAN JP8A-SEALING END",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7906802,
+    "lat": -6.1337975,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT JTAKE-MAXIM SPAN SEALING END-JP1",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.5851584,
+    "lat": -6.2142582,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT JTAKE-MAXIM SPAN JP1-JP2",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.584835,
+    "lat": -6.2113681,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP13B-SEALING END",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7170908,
+    "lat": -6.1894512,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP12A-JP13A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7146051,
+    "lat": -6.1903612,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP12B-JP13B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7145944,
+    "lat": -6.1904228,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP11A-JP12A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7112007,
+    "lat": -6.1907772,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP11B-JP12B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7112436,
+    "lat": -6.1908012,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP10A-JP11A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7093986,
+    "lat": -6.1944244,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP10B-JP11B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7094778,
+    "lat": -6.1944164,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP9A-JP10A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7063993,
+    "lat": -6.197188,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP9B-JP10B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7063858,
+    "lat": -6.1972701,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP8A-JP9A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7028578,
+    "lat": -6.1969122,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP8B-JP9B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7028433,
+    "lat": -6.1969707,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP7A-JP8A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6998216,
+    "lat": -6.1955248,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP7B-JP8B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6998699,
+    "lat": -6.1955448,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP6B-JP7B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6984058,
+    "lat": -6.1997565,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP5A-JP6A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6940263,
+    "lat": -6.19865,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP5B-JP6B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.693986,
+    "lat": -6.1987366,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP4A-JP5A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6897439,
+    "lat": -6.2003402,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP4B-JP5B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6897499,
+    "lat": -6.200385,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP3B-JP4B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6881061,
+    "lat": -6.2038472,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP3A-JP4A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.688031,
+    "lat": -6.2037872,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP2A-JP3A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6881115,
+    "lat": -6.2090333,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP2B-JP3B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6881692,
+    "lat": -6.2090413,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN JP1B-JP2B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6852964,
+    "lat": -6.2110477,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN SEALING END-JP1B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6815263,
+    "lat": -6.2120289,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CLDUG-KMBGN SPAN SEALING END-JP1A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6815236,
+    "lat": -6.2119743,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN JP7B-SEALING END",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6801432,
+    "lat": -6.2135725,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN JP6A-JP7A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6783331,
+    "lat": -6.2150722,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN JP6B-JP7B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.678384,
+    "lat": -6.2150829,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN JP5A-JP6A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6746362,
+    "lat": -6.2161111,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN JP5B-JP6B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6746858,
+    "lat": -6.2161124,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN JP4A-JP5A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6711799,
+    "lat": -6.2176305,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN JP4B-JP5B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6711415,
+    "lat": -6.217641,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN JP3A-JP4A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6688973,
+    "lat": -6.2189871,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN JP3B-JP4B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.668904,
+    "lat": -6.2189217,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN JP2B-JP3B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6644724,
+    "lat": -6.2207553,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN JP2A-JP3A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6645334,
+    "lat": -6.2207461,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN JP1A-JP2A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6603731,
+    "lat": -6.2209321,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN JP1B-JP2B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6604066,
+    "lat": -6.2209588,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN SEALING END-JP1A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6574682,
+    "lat": -6.2206222,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT ALSTA-CLDUG SPAN SEALING END-JP1B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6574921,
+    "lat": -6.2206662,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP14B-SEALING END",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6553166,
+    "lat": -6.2201277,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP13A-JP14A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6524769,
+    "lat": -6.22034,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP13B-JP14B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6525118,
+    "lat": -6.220368,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP12A-JP13A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6482284,
+    "lat": -6.2217607,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP12B-JP13B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6482472,
+    "lat": -6.2217981,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP11A-JP12A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6445302,
+    "lat": -6.2226179,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP11B-JP12B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6446214,
+    "lat": -6.2226219,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP10A-JP11A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6402637,
+    "lat": -6.2244624,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP10B-JP11B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6403213,
+    "lat": -6.2244643,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP9A-JP10A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6384833,
+    "lat": -6.2264266,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP9B-JP10B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.638482,
+    "lat": -6.2264706,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP8A-JP9A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6407582,
+    "lat": -6.2293903,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP8B-JP9B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6407609,
+    "lat": -6.2294383,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP7A-JP8A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6383024,
+    "lat": -6.2309359,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP7B-JP8B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6383427,
+    "lat": -6.2310132,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP6A-JP7A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6357212,
+    "lat": -6.2289195,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP6B-JP7B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.635736,
+    "lat": -6.2289515,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP5A-JP6A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6330795,
+    "lat": -6.231795,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP5B-JP6B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.633164,
+    "lat": -6.231715,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP4A-JP5A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6317922,
+    "lat": -6.2354149,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP4B-JP5B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6318606,
+    "lat": -6.2353376,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP3A-JP4A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6323085,
+    "lat": -6.2386487,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP3B-JP4B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6323497,
+    "lat": -6.2385603,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP2A-JP3A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6368722,
+    "lat": -6.2393407,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP2B-JP3B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6370659,
+    "lat": -6.2393027,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP1A-JP2A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6381432,
+    "lat": -6.2412996,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN JP1B-JP2B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6381271,
+    "lat": -6.2411796,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN SEALING END-JP1A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6414691,
+    "lat": -6.2433581,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT SGSPG-ALSTA SPAN SEALING END-JP1B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6415241,
+    "lat": -6.2432981,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP8A-SEALING END",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6416032,
+    "lat": -6.2433184,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP8B-SEALING END",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6416649,
+    "lat": -6.2433331,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP7A-JP8A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6387594,
+    "lat": -6.2425662,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP7B-JP8B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6387031,
+    "lat": -6.2427088,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP6A-JP7A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6368606,
+    "lat": -6.244809,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP6B-JP7B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6369424,
+    "lat": -6.2447437,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP5A-JP6A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.633176,
+    "lat": -6.2443875,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP5B-JP6B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6330929,
+    "lat": -6.2443475,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP4A-JP5A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6295128,
+    "lat": -6.2434818,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP4B-JP5B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6296281,
+    "lat": -6.2435324,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP3A-JP4A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6230062,
+    "lat": -6.2424788,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP3B-JP4B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6229847,
+    "lat": -6.2425695,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP2A-JP3A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6195029,
+    "lat": -6.2432389,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP2B-JP3B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6194399,
+    "lat": -6.2433616,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP1A-JP2A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6142459,
+    "lat": -6.2439045,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN JP1B-JP2B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6143156,
+    "lat": -6.2440512,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN SEALING END-JP1A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6110608,
+    "lat": -6.2436406,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT CURUG-SGSPG SPAN SEALING END-JP1B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6110187,
+    "lat": -6.2437503,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SKTT KMBNG-NSYAN SPAN JP4-JP5",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7387455,
+    "lat": -6.1919274,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT GGGOL-TMANG #3",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7881882,
+    "lat": -6.1736906,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT GGGOL-TMANG #4",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7852747,
+    "lat": -6.1737512,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT GGGOL-TMANG #5",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7835985,
+    "lat": -6.1777468,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT GGGOL-TMANG #6",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7836045,
+    "lat": -6.1824347,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT GGGOL-TMANG #7",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7833394,
+    "lat": -6.1847259,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT GGGOL-TMANG #7-SE",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.779162,
+    "lat": -6.1863338,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT NSYAN-ULJMI #2",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7634003,
+    "lat": -6.2395174,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT NSYAN-ULJMI #3",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7688453,
+    "lat": -6.2380348,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT NSYAN-ULJMI #4",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7719917,
+    "lat": -6.2374107,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT NSYAN-ULJMI #5",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7718719,
+    "lat": -6.2328354,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT NSYAN-ULJMI #5-SE",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7719056,
+    "lat": -6.229509,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT MKBRU-MKRNG #000SE-SE",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7821455,
+    "lat": -6.110032,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT CNKNG-CKBRU #000SE-SE",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6588635,
+    "lat": -6.1502036,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT CKBRU-TGRBR #000SE-SE",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.6590592,
+    "lat": -6.1501154,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT MKBRU-GMKRU #00SE-SE",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7816639,
+    "lat": -6.1102228,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT METLAND-KEMBANGAN JP1A-2A",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.7076818,
+    "lat": -6.196876,
+    "type": "SKTT_150kV"
+  },
+  {
+    "name": "SPAN SKTT METLAND-KEMBANGAN JP1B-2B",
+    "style": "#icon-1899-0288D1",
+    "lng": 106.707773,
+    "lat": -6.196924,
     "type": "SKTT_150kV"
   }
-]
+];
 
 // 52 Jalur Transmisi
 export const jalurTransmisi: JalurTransmisi[] = [
   {
-    "name": "Jalur Transmisi UPT Durikosambi",
+    "name": "CILEDUG - ALAM SUTERA",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.6562558,
@@ -8631,7 +10157,7 @@ export const jalurTransmisi: JalurTransmisi[] = [
   {
     "name": "MUARAKARANG LAMA - ANGKE",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7878076,
@@ -8710,7 +10236,7 @@ export const jalurTransmisi: JalurTransmisi[] = [
   {
     "name": "MUARAKARANG LAMA - ANGKE",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.787727,
@@ -8781,7 +10307,7 @@ export const jalurTransmisi: JalurTransmisi[] = [
   {
     "name": "DURIKOSAMBI - KEMBANGAN",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7259424,
@@ -8856,7 +10382,7 @@ export const jalurTransmisi: JalurTransmisi[] = [
   {
     "name": "DURIKOSAMBI - KEBON JERUK",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7256616,
@@ -8991,7 +10517,7 @@ export const jalurTransmisi: JalurTransmisi[] = [
   {
     "name": "KEMBANGAN - PETUKANGAN",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7190846,
@@ -9078,7 +10604,7 @@ export const jalurTransmisi: JalurTransmisi[] = [
   {
     "name": "KEMBANGAN - PETUKANGAN",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7190846,
@@ -9161,7 +10687,7 @@ export const jalurTransmisi: JalurTransmisi[] = [
   {
     "name": "KEMBANGAN - NEW SENAYAN",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.719541,
@@ -9364,7 +10890,7 @@ export const jalurTransmisi: JalurTransmisi[] = [
   {
     "name": "JATAKE - MAXIMANGANDO",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.5834498,
@@ -9429,9 +10955,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "Jalur SKTT 150kV Summarecon - Alam Sutera 1B",
-    "type": "SUTT_150kV",
-    "color": "#0288d1",
+    "name": "Summarecon - Alam Sutera",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.6563182,
@@ -9744,9 +11270,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "Jalur SKTT 150kV Curug - Summarecon 1B",
-    "type": "SUTT_150kV",
-    "color": "#0288d1",
+    "name": "Curug - Summarecon",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.6093187,
@@ -9953,7 +11479,7 @@ export const jalurTransmisi: JalurTransmisi[] = [
   {
     "name": "Curug - Summarecon",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.6093292,
@@ -10160,7 +11686,7 @@ export const jalurTransmisi: JalurTransmisi[] = [
   {
     "name": "Jalur Summarecon - Alam Sutera #2",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.6563895,
@@ -10545,9 +12071,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "JALUR SKTT 150kV ALSTA-CLDUG #2B",
-    "type": "SUTT_150kV",
-    "color": "#0288d1",
+    "name": "Alam Sutera - Ciledug #2",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.656356,
@@ -10748,9 +12274,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "Jalur SKTT Ciledug - Kembangan #1B",
-    "type": "SKTT_150kV",
-    "color": "#7c3aed",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.5544995,
@@ -10871,9 +12397,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "SKTT GAJAH TUNGGAL - PASAR KEMIS",
-    "type": "SKTT_150kV",
-    "color": "#7c3aed",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.5545271,
@@ -11006,9 +12532,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "JOINT SKTT 150kV NSYAN-ULJMI #0002",
-    "type": "SUTT_150kV",
-    "color": "#0288d1",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7717338,
@@ -11197,9 +12723,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "JOINT SKTT 150kV GRGOL-TMANG #0002",
-    "type": "SUTT_150kV",
-    "color": "#0288d1",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7753515,
@@ -11448,9 +12974,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "Jalur SKTT Ciledug - Metland 10A (Nama Proyek Joint 2B)",
-    "type": "SKTT_150kV",
-    "color": "#7c3aed",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7073759,
@@ -11528,8 +13054,8 @@ export const jalurTransmisi: JalurTransmisi[] = [
   },
   {
     "name": "SKTT Metland - Kembangan #1",
-    "type": "SKTT_150kV",
-    "color": "#7c3aed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.707296,
@@ -11607,8 +13133,8 @@ export const jalurTransmisi: JalurTransmisi[] = [
   },
   {
     "name": "SKTT CIledug - Metland #1",
-    "type": "SKTT_150kV",
-    "color": "#7c3aed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.706661,
@@ -11682,8 +13208,8 @@ export const jalurTransmisi: JalurTransmisi[] = [
   },
   {
     "name": "SKTT CILEDUG - METLAND #2",
-    "type": "SKTT_150kV",
-    "color": "#7c3aed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.706784,
@@ -11748,9 +13274,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "SKTT METLAND - KEMBANGAN #2",
-    "type": "SKTT_150kV",
-    "color": "#7c3aed",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7073759,
@@ -12015,9 +13541,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "SKTT CILEDUG - METLAND #2",
-    "type": "SKTT_150kV",
-    "color": "#7c3aed",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.706784,
@@ -12658,9 +14184,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "SKTT METLAND -\u00a0 KEMBANGAN #1",
-    "type": "SKTT_150kV",
-    "color": "#7c3aed",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.707296,
@@ -12862,8 +14388,8 @@ export const jalurTransmisi: JalurTransmisi[] = [
   },
   {
     "name": "SKTT METLAND - KEMBANGAN #1",
-    "type": "SKTT_150kV",
-    "color": "#7c3aed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.706661,
@@ -13444,9 +14970,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "Gardu Induk",
+    "name": "Unnamed",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.5296061,
@@ -13559,9 +15085,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "LONTAR - TANGERANG BARU TOWER #001 - #030",
+    "name": "Unnamed",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.4638875,
@@ -13714,9 +15240,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "LONTAR - TANGERANG BARU TOWER #030 - #085",
+    "name": "Unnamed",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.5274612,
@@ -13953,9 +15479,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "CENGKARENG BARU - TANGERANG BARU TOWER #001 - #019",
+    "name": "Unnamed",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.658597,
@@ -14040,9 +15566,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "CENGKARENG BARU - TANGERANG BARU TOWER #019 - #034",
+    "name": "Unnamed",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.6294444,
@@ -14115,9 +15641,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "TANGERANG LAMA - CENGKARENG",
+    "name": "Unnamed",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.6411949,
@@ -14286,9 +15812,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "TANGERANG LAMA - CENGKARENG",
+    "name": "Unnamed",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.6590514,
@@ -14305,9 +15831,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "DURIKOSAMBI - CENGKARENG",
+    "name": "Unnamed",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.6597452,
@@ -14516,9 +16042,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "TOWER SUTT 150kV KMBNG-PTKNG TX9",
-    "type": "SUTT_150kV",
-    "color": "#0288d1",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7310592,
@@ -14627,9 +16153,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "DURIKOSAMBI - GROGOL BARU",
+    "name": "Unnamed",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7258798,
@@ -14792,7 +16318,7 @@ export const jalurTransmisi: JalurTransmisi[] = [
   {
     "name": "PANTAI INDAH KAPUK - DURIKOSAMBI",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7259063,
@@ -14901,9 +16427,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "MUARAKARANG BARU - PANTAI INDAH KAPUK",
+    "name": "Unnamed",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7808934,
@@ -14996,9 +16522,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "MUARAKARANG LAMA - ANGKE",
+    "name": "Unnamed",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.787529,
@@ -15083,9 +16609,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "TOWER SUTT 150kV DKSBI-GRLBR+GRLBR-GRGOL #EA35A",
-    "type": "SUTT_150kV",
-    "color": "#0288d1",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7670884,
@@ -15146,9 +16672,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "TOWER SUTT 150kV LNTAR-SDJYA #A1",
-    "type": "SUTT_150kV",
-    "color": "#0288d1",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.4644702,
@@ -15321,9 +16847,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "TOWER SUTT 150KV LNTAR-SDJYA #0017",
-    "type": "SUTT_150kV",
-    "color": "#0288d1",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.5832521,
@@ -15380,9 +16906,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "JATAKE BARU - TANGERANG LAMA",
+    "name": "Unnamed",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.5942508,
@@ -15479,9 +17005,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "TOWER SUTT 150kV GJTGL-PSKBR+GJTGL-PSKMS #0008",
-    "type": "SUTT_150kV",
-    "color": "#0288d1",
+    "name": "SUTT GAJAH TUNGGAL - PASAR KEMIS",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.5489847,
@@ -15514,9 +17040,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "TOWER SUTT 150kV GMKRU-PINKA #EA1A",
-    "type": "SUTT_150kV",
-    "color": "#0288d1",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.4641451,
@@ -15877,9 +17403,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "DADAP - TELUK NAGA",
+    "name": "Unnamed",
     "type": "other",
-    "color": "#666666",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.635792,
@@ -15976,9 +17502,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "SUTT GAJAH TUNGGAL - PASAR KEMIS BARU",
-    "type": "SUTT_150kV",
-    "color": "#0288d1",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.5489847,
@@ -16011,9 +17537,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "Jalur SUTET Balaraja - Jawa 7",
-    "type": "SUTET_500kV",
-    "color": "#e65100",
+    "name": "JAWA 7 - BALARAJA",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.422138,
@@ -16542,9 +18068,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "Span SKTT",
-    "type": "SKTT_150kV",
-    "color": "#7c3aed",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.4222398,
@@ -17173,9 +18699,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "Jalur SUTET Gandul - Kembangan",
-    "type": "SUTET_500kV",
-    "color": "#e65100",
+    "name": "Unnamed",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7873715,
@@ -17544,9 +19070,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "TOWER SUTET 500kV GNDUL-KMBNG+DKSBI #0087",
-    "type": "SUTET_500kV",
-    "color": "#e65100",
+    "name": "Jalur SUTET Muarakarang-Durikosambi",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7247231,
@@ -17711,9 +19237,9 @@ export const jalurTransmisi: JalurTransmisi[] = [
     ]
   },
   {
-    "name": "Jalur Transmisi UPT Durikosambi- Jalur SUTET Kembangan-Durikosambi.csv",
-    "type": "SUTET_500kV",
-    "color": "#e65100",
+    "name": "SUTET Durikosambi - Kembangan",
+    "type": "other",
+    "color": "#94a3b8",
     "path": [
       {
         "lng": 106.7247887,
@@ -17781,4 +19307,4 @@ export const jalurTransmisi: JalurTransmisi[] = [
       }
     ]
   }
-]
+];

@@ -7,11 +7,29 @@ import {
   Polyline, CircleMarker, useMapEvents,
 } from 'react-leaflet'
 import { useMemo, useState } from 'react'
-import { SlidersHorizontal, X, ChevronDown, ChevronUp } from 'lucide-react'
+import { SlidersHorizontal, X, ChevronDown } from 'lucide-react'
 import {
   garduInduk, towerSUTET, towerSUTT, towerSKTT,
   jalurTransmisi, JALUR_COLORS,
 } from '@/lib/geodata'
+
+// ─── Detect jalur type dari nama (geodata.ts auto-gen semua sebagai "other") ──
+function detectJalurType(jalur: { name: string; type: string }) {
+  const n = jalur.name.toUpperCase()
+  if (n.includes('SUTET') || n.includes('500KV') || n.includes('JAWA7') || n.includes('GANDUL')) {
+    return 'SUTET_500kV' as const
+  }
+  if (n.includes('SKTT') || n.includes('JOINT SKTT') || n.includes('SPAN SKTT')) {
+    return 'SKTT_150kV' as const
+  }
+  if (n.includes('SUTT') || n.includes('150KV') || n.includes('150 KV') ||
+      ['MUARAKARANG','DURIKOSAMBI','KEMBANGAN','JATAKE','LONTAR','CENGKARENG',
+       'GROGOL','PANTAI INDAH KAPUK','DADAP','TANGERANG','KEBON JERUK',
+       'PETUKANGAN','NEW SENAYAN','ANGKE','GAJAH TUNGGAL','PASAR KEMIS'].some(k => n.includes(k))) {
+    return 'SUTT_150kV' as const
+  }
+  return 'other' as const
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -134,18 +152,23 @@ function topLevel(kerawanan: KerawananItem[]) {
 }
 
 function createGarduIcon(hasKerawanan: boolean, level: string, count: number): L.DivIcon {
+  const bgColor = hasKerawanan ? (RING_COLOR[level] ?? '#ef4444') : '#076c9e'
   const badge = hasKerawanan
-    ? `<div style="position:absolute;top:-4px;right:-4px;background:${RING_COLOR[level] ?? '#ef4444'};color:white;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:1.5px solid white;">${count}</div>`
+    ? `<div style="position:absolute;top:-5px;right:-5px;background:#d92d20;color:white;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid white;">${count}</div>`
     : ''
 
+  // Antenna / gardu icon sesuai Figma
   return L.divIcon({
     className: '',
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
-    popupAnchor: [0, -22],
-    html: `<div style="width:36px;height:36px;background:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.3);position:relative;">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="white" stroke="none">
-        <path d="M3 21h18M6 21V7l6-4 6 4v14M9 21v-4h6v4"/>
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+    popupAnchor: [0, -24],
+    html: `<div style="width:40px;height:40px;background:${bgColor};border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px ${bgColor}66;position:relative;border:2px solid rgba(255,255,255,0.3);">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round">
+        <line x1="12" y1="12" x2="12" y2="22"/>
+        <path d="M8.5 15 Q12 7 15.5 15" fill="none"/>
+        <path d="M5.5 18 Q12 3 18.5 18" fill="none" stroke-opacity="0.6"/>
+        <circle cx="12" cy="22" r="1.5" fill="white"/>
       </svg>
       ${badge}
     </div>`,
@@ -184,11 +207,16 @@ function createTowerIcon(
 function createBgGarduIcon(): L.DivIcon {
   return L.divIcon({
     className: '',
-    iconSize: [26, 26],
-    iconAnchor: [13, 13],
-    popupAnchor: [0, -16],
-    html: `<div style="width:26px;height:26px;background:#1a1a1a;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.25);">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M3 21h18M6 21V7l6-4 6 4v14M9 21v-4h6v4"/></svg>
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -18],
+    html: `<div style="width:32px;height:32px;background:#076c9e;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(7,108,158,0.4);border:2px solid rgba(255,255,255,0.25);">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round">
+        <line x1="12" y1="12" x2="12" y2="22"/>
+        <path d="M8.5 15 Q12 7 15.5 15" fill="none"/>
+        <path d="M5.5 18 Q12 3 18.5 18" fill="none" stroke-opacity="0.5"/>
+        <circle cx="12" cy="22" r="1.5" fill="white"/>
+      </svg>
     </div>`,
   })
 }
@@ -378,35 +406,37 @@ export default function TowerMap({ towers, onTowerClick }: Props) {
         zoomControl={true}
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
         />
         <ZoomTracker onZoom={setZoom} />
 
-        {/* ── Jalur transmisi ── */}
-        {jalurTransmisi.map((jalur, i) => {
-          const positions = jalur.path.map((p) => [p.lat, p.lng] as [number, number])
-          const style =
-            jalur.type === 'SUTET_500kV'
-              ? { color: JALUR_COLORS.SUTET_500kV, weight: 3,   dashArray: '4 4' }
-              : jalur.type === 'SUTT_150kV'
-              ? { color: JALUR_COLORS.SUTT_150kV,  weight: 2.5, dashArray: '4 4' }
-              : jalur.type === 'SKTT_150kV'
-              ? { color: JALUR_COLORS.SKTT_150kV,  weight: 2,   dashArray: '3 3' }
-              : { color: JALUR_COLORS.other,        weight: 1.5, dashArray: '3 3' }
+        {/* ── Jalur transmisi — type dideteksi dari nama ── */}
+        {jalurTransmisi
+          .filter((jalur) => detectJalurType(jalur) !== 'other')
+          .map((jalur, i) => {
+            const type = detectJalurType(jalur)
+            const isSutet = type === 'SUTET_500kV'
+            const isSktt  = type === 'SKTT_150kV'
+            const positions = jalur.path.map((p) => [p.lat, p.lng] as [number, number])
+            const style = isSutet
+              ? { color: JALUR_COLORS.SUTET_500kV, weight: 3.5, opacity: 0.9 }
+              : isSktt
+              ? { color: JALUR_COLORS.SKTT_150kV, weight: 2.5, opacity: 0.85, dashArray: '6 6' }
+              : { color: JALUR_COLORS.SUTT_150kV, weight: 2.5, opacity: 0.85 }
+            return (
+              <Polyline key={i} positions={positions} pathOptions={style} />
+            )
+          })
+        }
 
-          return (
-            <Polyline key={i} positions={positions} pathOptions={style} />
-          )
-        })}
-
-        {/* ── Background tower dots ── */}
+        {/* ── Background tower dots (titik kecil per tiang/tower) ── */}
         {zoom >= 10 && towerSUTET.map((t, i) => (
           <CircleMarker
             key={`sutet-${i}`}
             center={[t.lat, t.lng]}
             radius={3}
-            pathOptions={{ color: JALUR_COLORS.SUTET_500kV, fillColor: JALUR_COLORS.SUTET_500kV, fillOpacity: 0.7, weight: 1 }}
+            pathOptions={{ color: '#fff', fillColor: JALUR_COLORS.SUTET_500kV, fillOpacity: 0.85, weight: 1 }}
           />
         ))}
         {zoom >= 11 && towerSUTT.map((t, i) => (
@@ -414,7 +444,7 @@ export default function TowerMap({ towers, onTowerClick }: Props) {
             key={`sutt-${i}`}
             center={[t.lat, t.lng]}
             radius={2.5}
-            pathOptions={{ color: JALUR_COLORS.SUTT_150kV, fillColor: JALUR_COLORS.SUTT_150kV, fillOpacity: 0.7, weight: 1 }}
+            pathOptions={{ color: '#fff', fillColor: JALUR_COLORS.SUTT_150kV, fillOpacity: 0.85, weight: 1 }}
           />
         ))}
         {zoom >= 12 && towerSKTT.map((t, i) => (
@@ -422,7 +452,7 @@ export default function TowerMap({ towers, onTowerClick }: Props) {
             key={`sktt-${i}`}
             center={[t.lat, t.lng]}
             radius={2}
-            pathOptions={{ color: JALUR_COLORS.SKTT_150kV, fillColor: JALUR_COLORS.SKTT_150kV, fillOpacity: 0.6, weight: 1 }}
+            pathOptions={{ color: '#fff', fillColor: JALUR_COLORS.SKTT_150kV, fillOpacity: 0.8, weight: 1 }}
           />
         ))}
 

@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import dynamic from 'next/dynamic'
-import { AlertTriangle } from 'lucide-react'
-import { laporanApi, towersApi } from '@/lib/api'
+import { AlertTriangle, UploadCloud } from 'lucide-react'
+import Swal from 'sweetalert2'
+import { laporanApi, towersApi, importApi } from '@/lib/api'
 
 const TowerMap = dynamic(() => import('@/components/map/TowerMapGoogle'), { ssr: false })
 
@@ -26,15 +27,9 @@ interface RecentRow {
 }
 
 // ── Fallback data ─────────────────────────────────────────────────────────────
-const MOCK_STATS: Stats = { ppl: 12, kebakaran: 3, layangan: 8, pencurian: 2, pemanfaatan: 5 }
+const MOCK_STATS: Stats = { ppl: 0, kebakaran: 0, layangan: 0, pencurian: 0, pemanfaatan: 0 }
 
-const MOCK_RECENT: RecentRow[] = [
-  { id: 1, tanggal: '2025-05-01', tower: 'T-001 SUTET', jenisGangguan: 'PPL',        pelapor: 'Ahmad S.',  status: 'berlangsung' },
-  { id: 2, tanggal: '2025-04-30', tower: 'T-045 SUTT',  jenisGangguan: 'Layangan',   pelapor: 'Budi R.',   status: 'ditangani' },
-  { id: 3, tanggal: '2025-04-29', tower: 'T-112 SUTT',  jenisGangguan: 'Kebakaran',  pelapor: 'Citra D.',  status: 'selesai' },
-  { id: 4, tanggal: '2025-04-28', tower: 'T-023 SKTT',  jenisGangguan: 'Pencurian',  pelapor: 'Dedi M.',   status: 'pemantauan' },
-  { id: 5, tanggal: '2025-04-27', tower: 'T-078 SUTET', jenisGangguan: 'Pemanfaatan',pelapor: 'Eka P.',   status: 'selesai' },
-]
+const MOCK_RECENT: RecentRow[] = []
 
 // ── Stat card config ───────────────────────────────────────────────────────────
 const STAT_CARDS = [
@@ -102,6 +97,44 @@ export default function DashboardPage() {
   const [recent, setRecent] = useState<RecentRow[]>(MOCK_RECENT)
   const [alertCount, setAlertCount] = useState(0)
   const [towerKerawanan, setTowerKerawanan] = useState<any[]>([])
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      const res = await importApi.import('laporan', file)
+      const total = res.data?.total ?? 0
+      
+      if (total === 0) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Tidak Ada Data',
+          text: 'Tidak ditemukan baris data laporan yang valid untuk diimport.',
+          confirmButtonColor: '#3085d6'
+        })
+      } else {
+        await Swal.fire({
+          icon: 'success',
+          title: 'Berhasil',
+          text: `Berhasil import ${total} riwayat gangguan dari Excel!`,
+          confirmButtonColor: '#3085d6'
+        })
+        window.location.reload()
+      }
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal Import',
+        text: err.response?.data?.message || err.message,
+        confirmButtonColor: '#d33'
+      })
+    }
+    // reset input
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
 
   useEffect(() => {
     laporanApi.getStats()
@@ -187,7 +220,26 @@ export default function DashboardPage() {
           className="flex items-center justify-between px-6 py-4"
           style={{ borderBottom: '1px solid #E8EDF2' }}
         >
-          <h2 className="text-[14px] font-semibold text-app-text">Riwayat Gangguan Terbaru</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-[14px] font-semibold text-app-text">Riwayat Gangguan Terbaru</h2>
+            
+            {/* Import Button */}
+            <input 
+              type="file" 
+              accept=".xlsx, .xls" 
+              className="hidden" 
+              ref={fileInputRef} 
+              onChange={handleImport} 
+            />
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-2 px-3 py-1.5 text-[12px] font-medium bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#334155] rounded-md transition-colors"
+            >
+              <UploadCloud size={14} />
+              Import Data Excel
+            </button>
+          </div>
+
           <a href="/laporan/gangguan" className="text-[12px] font-medium" style={{ color: '#076C9E' }}>
             Lihat Semua Riwayat Gangguan →
           </a>

@@ -56,24 +56,89 @@ function getTopLevel(kerawanan: KerawananItem[]): string {
   )
 }
 
-// ─── SVG icon data URIs for google.maps.Marker ───────────────────────────────
+// ─── SVG icon data URIs sesuai desain Figma ──────────────────────────────────
+//
+//  Gardu Induk  → lingkaran HITAM + icon bangunan gardu, selalu hitam
+//  Tower normal → lingkaran BIRU  + icon tiang/pylon (kecil)
+//  Tower gangguan → lingkaran MERAH + icon tiang/pylon + pill badge merah
 
-function makeGarduSvg(color: string) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="32" viewBox="0 0 28 32">
-    <rect x="1" y="1" width="26" height="24" rx="5" fill="${color}" stroke="white" stroke-width="2"/>
-    <path d="M14 4L8 13h5l-1 7 7-10h-5l1-7z" fill="white"/>
-    <polygon points="14,28 9,24 19,24" fill="${color}"/>
+/** Gardu Induk: lingkaran hitam + building icon, badge merah jika ada gangguan */
+function makeGarduSvg(count: number) {
+  const hasCount = count > 0
+  const W = hasCount ? 72 : 44
+  const H = 44
+  const cx = 22
+  const cy = 22
+  const r  = 18
+
+  const badge = hasCount ? `
+    <rect x="${cx + r - 3}" y="4" width="24" height="16" rx="8" fill="#D32F2F"/>
+    <text x="${cx + r + 9}" y="16" text-anchor="middle"
+      font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="#fff">${count}</text>
+  ` : ''
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <defs>
+      <filter id="gs${count}" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.4"/>
+      </filter>
+    </defs>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="#1A1A1A" filter="url(#gs${count})"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.2"/>
+    <!-- Gardu (Substation Building) Icon -->
+    <path d="M12 28v-11l10-6.5 10 6.5v11h-20zm2-1h16v-9.3l-8-5.2-8 5.2v9.3zm6-5h4v6h-4v-6z" fill="#FFFFFF"/>
+    ${badge}
   </svg>`
   return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg)
 }
 
-function makeTowerSvg(color: string, size: number) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 20 20">
-    <circle cx="10" cy="10" r="9" fill="${color}" stroke="white" stroke-width="1.5"/>
-    <path d="M6 4h8M7 4l3 12M13 4l-3 12M8 8h4M8.5 11h3" stroke="white" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+/** Tower/Tiang: Titik kecil di sepanjang jalur (normal) atau MERAH besar + pill badge (gangguan) */
+function makeTowerSvg(hasGangguan: boolean, count: number, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu') {
+  let baseColor = '#0288D1' // SUTT
+  if (tipe === 'SUTET') baseColor = '#e65100'
+  if (tipe === 'SKTT') baseColor = '#7c3aed'
+
+  if (!hasGangguan) {
+    // Titik kecil / simpul di sepanjang jalur (Figma / My Maps style)
+    const W = 16, H = 16, cx = 8, cy = 8, r = 3.5
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="${baseColor}" stroke="#FFFFFF" stroke-width="1.5" />
+    </svg>`
+    return {
+      url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
+      size: [W, H],
+      anchor: [cx, cy],
+    }
+  }
+
+  // Jika ada gangguan, ubah jadi merah besar dengan badge
+  baseColor = '#D32F2F'
+  const W = 70, H = 36, cx = 18, cy = 18, r = 14
+
+  const badge = `
+    <rect x="${cx + r - 3}" y="3" width="20" height="14" rx="7" fill="#D32F2F" stroke="#FFFFFF" stroke-width="1.5"/>
+    <text x="${cx + r + 7}" y="13" text-anchor="middle"
+      font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="#fff">${count}</text>
+  `
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <defs>
+      <filter id="ts${count}${hasGangguan}" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="${baseColor}" flood-opacity="0.5"/>
+      </filter>
+    </defs>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="${baseColor}" filter="url(#ts${count}${hasGangguan})"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.25"/>
+    <path d="M17.5 9l-2 4h-3v1h2.7l-1.8 9h-2.9v1h11v-1h-2.9l-1.8-9h2.7v-1h-3l-2-4h-1zm-1.4 5h3.7l1.3 6.5h-6.3l1.3-6.5zm-2.2 7.5h8.2l.8 4h-9.8l.8-4z" fill="#FFFFFF"/>
+    ${badge}
   </svg>`
-  return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg)
+  return {
+    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
+    size: [W, H],
+    anchor: [cx, cy],
+  }
 }
+
 
 // ─── Build default towers from geodata ────────────────────────────────────────
 
@@ -88,24 +153,111 @@ function buildDefaultTowers(): FeaturedTower[] {
 
 // ─── Transmission line polylines ──────────────────────────────────────────────
 
+/**
+ * geodata.ts di-generate otomatis dari KML dan semua jalur bertipe "other".
+ * Derive tipe sebenarnya dari nama jalur untuk mendapat warna & style yang benar.
+ */
+function detectJalurType(jalur: { name: string; type: string; color: string }) {
+  const n = jalur.name.toUpperCase()
+  if (n.includes('SUTET') || n.includes('500KV') || n.includes('JAWA7') || n.includes('GANDUL')) {
+    return 'SUTET_500kV' as const
+  }
+  if (n.includes('SKTT') || n.includes('JOINT SKTT') || n.includes('SPAN SKTT')) {
+    return 'SKTT_150kV' as const
+  }
+  if (n.includes('SUTT') || n.includes('150KV') || n.includes('150 KV') ||
+      ['MUARAKARANG', 'DURIKOSAMBI', 'KEMBANGAN', 'JATAKE', 'LONTAR', 'CENGKARENG',
+       'GROGOL', 'PANTAI INDAH KAPUK', 'DADAP', 'TANGERANG', 'KEBON JERUK',
+       'PETUKANGAN', 'NEW SENAYAN', 'ANGKE', 'GAJAH TUNGGAL', 'PASAR KEMIS'].some(k => n.includes(k))) {
+    return 'SUTT_150kV' as const
+  }
+  return 'other' as const
+}
+
 function TransmissionLines() {
   const map = useMap()
   useEffect(() => {
     if (!map || !window.google) return
-    const lines = jalurTransmisi.map((jalur) => {
-      const color = JALUR_COLORS[jalur.type] ?? JALUR_COLORS.other
-      const isSktt = jalur.type === 'SKTT_150kV'
-      return new window.google.maps.Polyline({
-        path: jalur.path.map((p) => ({ lat: p.lat, lng: p.lng })),
-        strokeColor: color,
-        strokeOpacity: isSktt ? 0 : 0.85,
-        strokeWeight: jalur.type === 'SUTET_500kV' ? 2.5 : 2,
-        icons: isSktt ? [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3, strokeColor: color }, offset: '0', repeat: '12px' }] : undefined,
-        map,
+
+    const lines = jalurTransmisi
+      .flatMap((jalur, index) => {
+        // Skip entry pertama jika itu adalah polygon bounding box (area UPT)
+        if (index === 0 && jalur.name.includes('UPT Durikosambi')) return []
+
+        const type = detectJalurType(jalur)
+        const isSktt  = type === 'SKTT_150kV'
+        const isSutet = type === 'SUTET_500kV'
+        const isSutt  = type === 'SUTT_150kV'
+
+        // Gunakan warna JALUR_COLORS untuk tipe yang dideteksi, 
+        // fallback ke warna asli KML (jalur.color) jika tipe = 'other'
+        const color = (type !== 'other' ? JALUR_COLORS[type] : jalur.color) || JALUR_COLORS.other
+
+        // SUTET: solid tebal, SUTT: solid medium, SKTT: dotted, other: solid tipis
+        const strokeWeight = isSutet ? 4 : isSutt ? 3 : 2
+        const strokeOpacity = isSktt ? 0 : 0.95
+        const zIndexBase = isSutet ? 30 : isSktt ? 10 : 20
+        const path = jalur.path.map((p) => ({ lat: p.lat, lng: p.lng }))
+
+        // SKTT: pola dash-gap yang lebih rapi seperti kabel bawah tanah
+        const icons: google.maps.PolylineOptions['icons'] = isSktt
+          ? [{
+              icon: {
+                path: 'M 0,-1 0,1',
+                strokeOpacity: 1,
+                scale: 3,
+                strokeColor: color,
+              },
+              offset: '0',
+              repeat: '12px',
+            }]
+          : undefined
+
+        const mainLine = new window.google.maps.Polyline({
+          path,
+          strokeColor: color,
+          strokeOpacity,
+          strokeWeight,
+          icons,
+          zIndex: zIndexBase,
+          map,
+        })
+
+        if (isSktt) return [mainLine]
+
+        // Efek Glow / Outline putih untuk jalur solid agar kontras dan elegan
+        const outlineLine = new window.google.maps.Polyline({
+          path,
+          strokeColor: '#FFFFFF',
+          strokeOpacity: 0.5,
+          strokeWeight: strokeWeight + 4,
+          zIndex: zIndexBase - 1,
+          map,
+        })
+
+        return [outlineLine, mainLine]
       })
-    })
+      .filter(Boolean) as google.maps.Polyline[]
+
     return () => lines.forEach((l) => l.setMap(null))
   }, [map])
+  return null
+}
+
+
+function ZoomWatcher({ onZoomChange }: { onZoomChange: (zoom: number) => void }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (!map) return
+
+    const syncZoom = () => onZoomChange(map.getZoom() ?? 10)
+
+    syncZoom()
+    const listener = map.addListener('zoom_changed', syncZoom)
+    return () => listener.remove()
+  }, [map, onZoomChange])
+
   return null
 }
 
@@ -129,27 +281,46 @@ function TowerMarkers({
     markersRef.current = []
 
     const created = towers.map((tower) => {
-      const level = getTopLevel(tower.kerawanan)
-      const color = LEVEL_COLOR[level]
-      const isGardu = tower.tipe === 'gardu'
-      const size = isGardu ? 28 : (tower.tipe === 'SUTET' ? 16 : 13)
-      const iconUrl = isGardu ? makeGarduSvg(color) : makeTowerSvg(color, size)
+      const count    = tower.kerawanan?.length ?? 0
+      const isGardu  = tower.tipe === 'gardu'
+      const hasGangguan = count > 0
 
-      const marker = new window.google.maps.Marker({
-        position: { lat: tower.lat, lng: tower.lng },
-        map,
-        title: tower.nama,
-        icon: {
-          url: iconUrl,
-          scaledSize: new window.google.maps.Size(size, isGardu ? size + 4 : size),
-          anchor: new window.google.maps.Point(size / 2, isGardu ? size + 4 : size / 2),
-        },
-        zIndex: isGardu ? 10 : (tower.tipe === 'SUTET' ? 5 : 3),
-      })
-
-      marker.addListener('click', () => onSelect(tower))
-      return marker
-    })
+      if (isGardu) {
+        // Gardu Induk → lingkaran HITAM + building icon (selalu hitam sesuai Figma)
+        const iconUrl = makeGarduSvg(count)
+        const W = count > 0 ? 72 : 44
+        const H = 44
+        const marker = new window.google.maps.Marker({
+          position: { lat: tower.lat, lng: tower.lng },
+          map,
+          title: tower.nama,
+          icon: {
+            url: iconUrl,
+            scaledSize: new window.google.maps.Size(W, H),
+            anchor: new window.google.maps.Point(22, 22),
+          },
+          zIndex: hasGangguan ? 40 : 20,
+        })
+        marker.addListener('click', () => onSelect(tower))
+        return marker
+      } else {
+        // Tower/Tiang → Titik kecil (normal) atau MERAH besar (gangguan)
+        const iconData = makeTowerSvg(hasGangguan, count, tower.tipe)
+        const marker = new window.google.maps.Marker({
+          position: { lat: tower.lat, lng: tower.lng },
+          map,
+          title: tower.nama,
+          icon: {
+            url: iconData.url,
+            scaledSize: new window.google.maps.Size(iconData.size[0], iconData.size[1]),
+            anchor: new window.google.maps.Point(iconData.anchor[0], iconData.anchor[1]),
+          },
+          zIndex: hasGangguan ? 40 : 10,
+        })
+        marker.addListener('click', () => onSelect(tower))
+        return marker
+      }
+    }).filter(Boolean) as google.maps.Marker[]
 
     markersRef.current = created
 
@@ -169,29 +340,32 @@ function TowerPopup({ tower, onClose }: { tower: FeaturedTower; onClose: () => v
   const levelColor = LEVEL_COLOR[level]
   return (
     <InfoWindow position={{ lat: tower.lat, lng: tower.lng }} onCloseClick={onClose}>
-      <div style={{ minWidth: 210, fontFamily: 'Inter, sans-serif', fontSize: 13, padding: 2 }}>
-        <div style={{ fontWeight: 700, fontSize: 13.5, color: '#0f172a', marginBottom: 3, paddingBottom: 6, borderBottom: '1px solid #e2e8f0' }}>
-          {tower.nama}
+      <div style={{ minWidth: 240, fontFamily: 'Inter, sans-serif', fontSize: 12, padding: 4 }}>
+        <div style={{ fontWeight: 700, fontSize: 12, color: '#1c1c1c', marginBottom: 8 }}>
+          Informasi Tower
         </div>
-        <div style={{ color: '#64748b', fontSize: 11.5, marginBottom: 8 }}>
+        <div style={{ color: '#1c1c1c', fontWeight: 600, marginBottom: 3 }}>{tower.nama}</div>
+        <div style={{ color: '#97aab3', fontSize: 11, marginBottom: 10 }}>
           {tower.tipe}{tower.tegangan ? ` · ${tower.tegangan}` : ''}
         </div>
         {tower.kerawanan.length > 0 ? (
-          <>
-            <p style={{ fontWeight: 600, color: '#374151', marginBottom: 4, fontSize: 11.5 }}>Kerawanan Aktif</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div style={{ color: '#1c1c1c', fontWeight: 600 }}>Gangguan</div>
             {tower.kerawanan.map((k, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '2px 0' }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ width: 7, height: 7, borderRadius: '50%', background: LEVEL_COLOR[k.level] ?? '#94a3b8', flexShrink: 0 }} />
-                <span style={{ color: '#1e293b', fontSize: 12 }}>{KATEGORI_LABEL[k.kategori] ?? k.kategori}</span>
-                <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', color: LEVEL_COLOR[k.level] }}>{k.level}</span>
+                <span style={{ color: '#5f737f', fontSize: 11 }}>{KATEGORI_LABEL[k.kategori] ?? k.kategori}</span>
               </div>
             ))}
-          </>
+          </div>
         ) : (
-          <p style={{ color: '#22c55e', fontWeight: 600, fontSize: 12 }}>✓ Tidak ada kerawanan aktif</p>
+          <div style={{ color: '#5f737f', fontSize: 11 }}>Tidak ada gangguan aktif</div>
         )}
+        <div style={{ marginTop: 10, color: '#97aab3', fontSize: 10 }}>
+          Terakhir update: {tower.updatedAt ? new Date(tower.updatedAt).toLocaleString('id-ID') : '—'}
+        </div>
         {level !== 'normal' && (
-          <div style={{ marginTop: 8, padding: '3px 8px', background: levelColor + '20', borderRadius: 4, textAlign: 'center', fontSize: 10, fontWeight: 700, color: levelColor, textTransform: 'uppercase' }}>
+          <div style={{ marginTop: 8, padding: '3px 8px', background: levelColor + '20', borderRadius: 999, display: 'inline-block', fontSize: 10, fontWeight: 700, color: levelColor, textTransform: 'uppercase' }}>
             Risiko {level}
           </div>
         )}
@@ -210,31 +384,43 @@ function Legend() {
       boxShadow: '0 2px 8px rgba(0,0,0,0.15)', padding: '10px 14px', fontSize: 11, lineHeight: 1.9,
     }}>
       <p style={{ fontWeight: 700, fontSize: 11.5, marginBottom: 4, color: '#0f172a' }}>Jalur Transmisi</p>
-      {[
-        { color: JALUR_COLORS.SUTET_500kV, label: 'SUTET 500kV' },
-        { color: JALUR_COLORS.SUTT_150kV,  label: 'SUTT 150kV' },
-        { color: JALUR_COLORS.SKTT_150kV,  label: 'SKTT 150kV' },
-      ].map(({ color, label }) => (
-        <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 22, height: 3, background: color, borderRadius: 2 }} />
-          <span style={{ color: '#374151' }}>{label}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 24, height: 4, background: JALUR_COLORS.SUTET_500kV, borderRadius: 2 }} />
+        <span style={{ color: '#374151' }}>SUTET 500kV</span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 24, height: 3, background: JALUR_COLORS.SUTT_150kV, borderRadius: 2 }} />
+        <span style={{ color: '#374151' }}>SUTT 150kV</span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 24, height: 3, borderTop: `3px dashed ${JALUR_COLORS.SKTT_150kV}` }} />
+        <span style={{ color: '#374151' }}>SKTT 150kV</span>
+      </div>
+
+      <p style={{ fontWeight: 700, fontSize: 11.5, margin: '8px 0 4px', color: '#0f172a' }}>Marker</p>
+      {/* Gardu Induk */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+            <path d="M3 21h18M6 21V7l6-4 6 4v14"/><rect x="9" y="15" width="6" height="6"/>
+          </svg>
         </div>
-      ))}
-      <p style={{ fontWeight: 700, fontSize: 11.5, margin: '6px 0 4px', color: '#0f172a' }}>Kerawanan</p>
-      {[
-        { color: LEVEL_COLOR.tinggi, label: 'Risiko Tinggi' },
-        { color: LEVEL_COLOR.sedang, label: 'Risiko Sedang' },
-        { color: LEVEL_COLOR.rendah, label: 'Risiko Rendah' },
-        { color: LEVEL_COLOR.normal, label: 'Normal' },
-      ].map(({ color, label }) => (
-        <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 10, height: 10, borderRadius: '50%', background: color }} />
-          <span style={{ color: '#374151' }}>{label}</span>
-        </div>
-      ))}
+        <span style={{ color: '#374151' }}>Gardu Induk</span>
+      </div>
+      {/* Tower Normal */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 14, height: 14, borderRadius: '50%', background: '#0288D1', flexShrink: 0 }} />
+        <span style={{ color: '#374151' }}>Tower (Normal)</span>
+      </div>
+      {/* Tower Gangguan */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 14, height: 14, borderRadius: '50%', background: '#D32F2F', flexShrink: 0 }} />
+        <span style={{ color: '#374151' }}>Tower (Gangguan)</span>
+      </div>
     </div>
   )
 }
+
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
@@ -245,8 +431,12 @@ export default function TowerMapGoogle({ towers, onTowerClick }: Props) {
   const [selected, setSelected] = useState<FeaturedTower | null>(null)
 
   const displayTowers = useMemo<FeaturedTower[]>(() => {
-    if (towers && towers.length > 0) return towers
-    return buildDefaultTowers()
+    const baseTowers = buildDefaultTowers()
+    if (!towers || towers.length === 0) return baseTowers
+    
+    // Gabungkan tower default (semua titik jalur) dengan tower dari prop (yang punya gangguan)
+    // Di aplikasi nyata, ini di-merge by ID. Di sini kita append agar keduanya tampil.
+    return [...baseTowers, ...towers]
   }, [towers])
 
   const handleSelect = useMemo(() => (t: FeaturedTower) => {

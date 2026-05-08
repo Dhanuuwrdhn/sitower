@@ -352,12 +352,14 @@ const EMPTY_FORM = {
 function LaporanDrawer({
   open,
   initial,
+  readOnly = false,
   towerOptions,
   onClose,
   onSaved,
 }: {
   open: boolean
   initial: any | null
+  readOnly?: boolean
   towerOptions: TowerOption[]
   onClose: () => void
   onSaved: () => void
@@ -365,6 +367,7 @@ function LaporanDrawer({
   const user = getUser()
   const [form, setForm] = useState(EMPTY_FORM)
   const [fotos, setFotos] = useState<File[]>([])
+  const [fotoUrls, setFotoUrls] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -388,9 +391,11 @@ function LaporanDrawer({
           penyebab: initial.penyebab ?? '',
           durasi: initial.durasi ?? '',
         })
+        setFotoUrls(initial.foto ?? [])
       } else {
         setForm(EMPTY_FORM)
         setFotos([])
+        setFotoUrls([])
       }
     }
   }, [open, initial])
@@ -399,15 +404,16 @@ function LaporanDrawer({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (readOnly) { onClose(); return }
     if (!form.towerId) { toast.error('Pilih tower terlebih dahulu'); return }
     if (!form.jenisGangguan) { toast.error('Pilih kategori gangguan'); return }
 
     setSaving(true)
     try {
-      let fotoUrls: string[] = []
+      let uploadedUrls: string[] = []
       if (fotos.length > 0) {
         const up = await laporanApi.uploadFoto(fotos)
-        fotoUrls = up.data.urls ?? []
+        uploadedUrls = up.data.urls ?? []
       }
 
       const payload = {
@@ -419,7 +425,7 @@ function LaporanDrawer({
         lokasiDetail: form.lokasiDetail,
         deskripsi: form.deskripsi,
         keterangan: form.keterangan,
-        foto: fotoUrls,
+        foto: [...fotoUrls, ...uploadedUrls],
         ...((['cui', 'cleanup'].includes(form.jenisGangguan)) && {
           teknisi: form.teknisi,
           noSpk: form.noSpk,
@@ -454,52 +460,42 @@ function LaporanDrawer({
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-200 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={onClose}
       />
 
-      {/* Drawer */}
       <div
         className={`fixed top-0 right-0 bottom-0 z-50 flex flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out ${open ? 'translate-x-0' : 'translate-x-full'}`}
         style={{ width: 560 }}
       >
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-app-border shrink-0">
           <h2 className="text-[15px] font-bold text-app-text">
-            {initial ? 'Edit Laporan' : 'Tambah Laporan Baru'}
+            {readOnly ? 'Detail Laporan' : initial ? 'Edit Laporan' : 'Tambah Laporan Baru'}
           </h2>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted transition-colors">
             <X size={18} />
           </button>
         </div>
 
-        {/* Body */}
         <form id="laporan-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
 
-          {/* 1. Tower */}
           <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">
-              Pilih Tower <span className="text-red-500">*</span>
-            </label>
-            <TowerDropdown
-              options={towerOptions}
-              value={form.towerId}
-              onChange={(id, label) => setForm((f) => ({ ...f, towerId: id, towerLabel: label }))}
-            />
+            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tower</label>
+            {readOnly ? (
+              <input type="text" readOnly className="form-input bg-app-bg text-app-muted" value={form.towerId} />
+            ) : (
+              <TowerDropdown
+                options={towerOptions}
+                value={form.towerId}
+                onChange={(id, label) => setForm((f) => ({ ...f, towerId: id, towerLabel: label }))}
+              />
+            )}
           </div>
 
-          {/* 2. Kategori */}
           <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">
-              Kategori Gangguan <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={form.jenisGangguan}
-              onChange={(e) => set('jenisGangguan', e.target.value)}
-              className="form-input"
-            >
+            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Kategori Gangguan</label>
+            <select disabled={readOnly} value={form.jenisGangguan} onChange={(e) => set('jenisGangguan', e.target.value)} className="form-input">
               <option value="">Pilih kategori...</option>
               {JENIS_OPTIONS.filter((o) => o.value).map((o) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -507,18 +503,11 @@ function LaporanDrawer({
             </select>
           </div>
 
-          {/* 3. Tanggal & Waktu */}
           <div>
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tanggal & Waktu</label>
-            <input
-              type="datetime-local"
-              value={form.tanggalWaktu}
-              onChange={(e) => set('tanggalWaktu', e.target.value)}
-              className="form-input"
-            />
+            <input disabled={readOnly} type="datetime-local" value={form.tanggalWaktu} onChange={(e) => set('tanggalWaktu', e.target.value)} className="form-input" />
           </div>
 
-          {/* 4. Level Risiko */}
           <div>
             <label className="block text-[12px] font-semibold text-app-text mb-2">Level Risiko</label>
             <div className="grid grid-cols-3 gap-2">
@@ -526,6 +515,7 @@ function LaporanDrawer({
                 <button
                   key={l.value}
                   type="button"
+                  disabled={readOnly}
                   onClick={() => set('levelRisiko', l.value)}
                   className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all text-[13px] font-semibold ${
                     form.levelRisiko === l.value ? `${l.bg} ${l.color} border-current` : 'border-app-border text-app-muted hover:border-gray-300'
@@ -538,15 +528,10 @@ function LaporanDrawer({
             </div>
           </div>
 
-          {/* 5. Status */}
           <div>
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">Status</label>
             <div className="flex items-center gap-3">
-              <select
-                value={form.status}
-                onChange={(e) => set('status', e.target.value)}
-                className="form-input"
-              >
+              <select disabled={readOnly} value={form.status} onChange={(e) => set('status', e.target.value)} className="form-input">
                 {STATUS_OPTIONS.map((s) => (
                   <option key={s.value} value={s.value}>{s.label}</option>
                 ))}
@@ -555,62 +540,37 @@ function LaporanDrawer({
             </div>
           </div>
 
-          {/* 6. Lokasi Detail */}
           <div>
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">Lokasi Detail</label>
-            <input
-              type="text"
-              value={form.lokasiDetail}
-              onChange={(e) => set('lokasiDetail', e.target.value)}
-              placeholder="Contoh: Km 12 Jalan Raya Serang"
-              className="form-input"
-            />
+            <input disabled={readOnly} type="text" value={form.lokasiDetail} onChange={(e) => set('lokasiDetail', e.target.value)} className="form-input" />
           </div>
 
-          {/* 7. Deskripsi */}
           <div>
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">Deskripsi</label>
-            <textarea
-              rows={4}
-              value={form.deskripsi}
-              onChange={(e) => set('deskripsi', e.target.value)}
-              placeholder="Jelaskan kondisi gangguan secara rinci..."
-              className="form-input resize-none"
-            />
+            <textarea disabled={readOnly} rows={4} value={form.deskripsi} onChange={(e) => set('deskripsi', e.target.value)} className="form-input resize-none" />
           </div>
 
-          {/* 8. Upload Foto */}
           <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">
-              Foto Dokumentasi
-            </label>
-            <FotoUpload fotos={fotos} onChange={setFotos} />
+            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Foto Dokumentasi</label>
+            {fotoUrls.length > 0 && (
+              <div className="grid grid-cols-5 gap-2 mb-3">
+                {fotoUrls.map((url, i) => (
+                  <img key={i} src={url} alt="Foto Gangguan" className="w-full aspect-square object-cover rounded-lg" />
+                ))}
+              </div>
+            )}
+            {!readOnly && <FotoUpload fotos={fotos} onChange={setFotos} />}
           </div>
 
-          {/* 9. Conditional fields */}
           {(isCUI || isCleanup) && (
             <div className="space-y-4 p-4 bg-app-bg rounded-xl border border-app-border">
-              <p className="text-[11px] font-bold text-app-muted uppercase tracking-wider">
-                {isCUI ? 'Detail CUI' : 'Detail Cleanup'}
-              </p>
-              <div>
-                <label className="block text-[12px] font-semibold text-app-text mb-1.5">Teknisi</label>
-                <input type="text" value={form.teknisi} onChange={(e) => set('teknisi', e.target.value)} className="form-input" placeholder="Nama teknisi pelaksana" />
-              </div>
-              <div>
-                <label className="block text-[12px] font-semibold text-app-text mb-1.5">No. SPK</label>
-                <input type="text" value={form.noSpk} onChange={(e) => set('noSpk', e.target.value)} className="form-input" placeholder="Nomor surat perintah kerja" />
-              </div>
+              <p className="text-[11px] font-bold text-app-muted uppercase tracking-wider">{isCUI ? 'Detail CUI' : 'Detail Cleanup'}</p>
+              <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Teknisi</label><input disabled={readOnly} type="text" value={form.teknisi} onChange={(e) => set('teknisi', e.target.value)} className="form-input" /></div>
+              <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">No. SPK</label><input disabled={readOnly} type="text" value={form.noSpk} onChange={(e) => set('noSpk', e.target.value)} className="form-input" /></div>
               {isCUI && (
                 <>
-                  <div>
-                    <label className="block text-[12px] font-semibold text-app-text mb-1.5">Temuan</label>
-                    <textarea rows={3} value={form.temuan} onChange={(e) => set('temuan', e.target.value)} className="form-input resize-none" placeholder="Temuan selama inspeksi" />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] font-semibold text-app-text mb-1.5">Hasil Inspeksi</label>
-                    <textarea rows={3} value={form.hasil} onChange={(e) => set('hasil', e.target.value)} className="form-input resize-none" placeholder="Kesimpulan dan rekomendasi" />
-                  </div>
+                  <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Temuan</label><textarea disabled={readOnly} rows={3} value={form.temuan} onChange={(e) => set('temuan', e.target.value)} className="form-input resize-none" /></div>
+                  <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Hasil Inspeksi</label><textarea disabled={readOnly} rows={3} value={form.hasil} onChange={(e) => set('hasil', e.target.value)} className="form-input resize-none" /></div>
                 </>
               )}
             </div>
@@ -619,50 +579,31 @@ function LaporanDrawer({
           {isGangg && (
             <div className="space-y-4 p-4 bg-app-bg rounded-xl border border-app-border">
               <p className="text-[11px] font-bold text-app-muted uppercase tracking-wider">Detail Gangguan Teknis</p>
-              <div>
-                <label className="block text-[12px] font-semibold text-app-text mb-1.5">Penyebab</label>
-                <input type="text" value={form.penyebab} onChange={(e) => set('penyebab', e.target.value)} className="form-input" placeholder="Penyebab gangguan teknis" />
-              </div>
-              <div>
-                <label className="block text-[12px] font-semibold text-app-text mb-1.5">Durasi (jam)</label>
-                <input type="number" min="0" step="0.5" value={form.durasi} onChange={(e) => set('durasi', e.target.value)} className="form-input" placeholder="Durasi gangguan dalam jam" />
-              </div>
+              <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Penyebab</label><input disabled={readOnly} type="text" value={form.penyebab} onChange={(e) => set('penyebab', e.target.value)} className="form-input" /></div>
+              <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Durasi (jam)</label><input disabled={readOnly} type="number" value={form.durasi} onChange={(e) => set('durasi', e.target.value)} className="form-input" /></div>
             </div>
           )}
 
-          {/* 10. Keterangan */}
           <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">
-              Keterangan <span className="text-app-muted font-normal">(opsional)</span>
-            </label>
-            <textarea
-              rows={3}
-              value={form.keterangan}
-              onChange={(e) => set('keterangan', e.target.value)}
-              className="form-input resize-none"
-            />
+            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Keterangan</label>
+            <textarea disabled={readOnly} rows={3} value={form.keterangan} onChange={(e) => set('keterangan', e.target.value)} className="form-input resize-none" />
           </div>
 
-          {/* 11. Pelapor */}
           <div>
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">Pelapor</label>
-            <input
-              type="text"
-              value={user?.nama ?? '—'}
-              readOnly
-              className="form-input bg-app-bg text-app-muted cursor-not-allowed"
-            />
+            <input type="text" value={initial?.pelapor?.nama ?? user?.nama ?? '—'} readOnly className="form-input bg-app-bg text-app-muted cursor-not-allowed" />
           </div>
         </form>
 
-        {/* Footer */}
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border shrink-0 bg-white">
           <button type="button" onClick={onClose} className="btn-outline">
-            Batal
+            {readOnly ? 'Tutup' : 'Batal'}
           </button>
-          <button type="submit" form="laporan-form" disabled={saving} className="btn-primary">
-            {saving ? 'Menyimpan...' : 'Simpan Laporan'}
-          </button>
+          {!readOnly && (
+            <button type="submit" form="laporan-form" disabled={saving} className="btn-primary">
+              {saving ? 'Menyimpan...' : 'Simpan Laporan'}
+            </button>
+          )}
         </div>
       </div>
     </>
@@ -745,6 +686,7 @@ export default function GangguanPage() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [editRow, setEditRow] = useState<any | null>(null)
   const [deleteRow, setDeleteRow] = useState<any | null>(null)
+  const [viewMode, setViewMode] = useState<'edit' | 'detail' | null>(null)
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
   const hasActiveFilters = Boolean(search.trim() || jenis || tglMulai || tglAkhir)
@@ -792,8 +734,9 @@ export default function GangguanPage() {
     setPage(1)
   }
 
-  function openAdd() { setEditRow(null); setDrawerOpen(true) }
-  function openEdit(row: any) { setEditRow(row); setDrawerOpen(true) }
+  function openAdd() { setEditRow(null); setViewMode('edit'); setDrawerOpen(true) }
+  function openEdit(row: any) { setEditRow(row); setViewMode('edit'); setDrawerOpen(true) }
+  function openDetail(row: any) { setEditRow(row); setViewMode('detail'); setDrawerOpen(true) }
 
   const from = total === 0 ? 0 : (page - 1) * pageSize + 1
   const to   = Math.min(page * pageSize, total)
@@ -925,6 +868,7 @@ export default function GangguanPage() {
                     <td className="text-right pr-4">
                       <RowActions
                         row={row}
+                        onDetail={openDetail}
                         onEdit={openEdit}
                         onDelete={setDeleteRow}
                         showDelete={isAdmin()}
@@ -992,6 +936,7 @@ export default function GangguanPage() {
       <LaporanDrawer
         open={drawerOpen}
         initial={editRow}
+        readOnly={viewMode === 'detail'}
         towerOptions={towerOptions}
         onClose={() => setDrawerOpen(false)}
         onSaved={fetchData}

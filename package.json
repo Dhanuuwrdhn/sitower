@@ -21,6 +21,7 @@
     "react-dom": "^18",
     "react-hot-toast": "^2.6.0",
     "react-leaflet": "^4.2.1",
+    "sweetalert2": "^11.26.24",
     "tailwind-merge": "^2.5.2",
     "yet-another-react-lightbox": "^3.32.0"
   },

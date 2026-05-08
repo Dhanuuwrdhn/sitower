@@ -1,8 +1,8 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { getUser } from '@/lib/auth'
-import { logout } from '@/lib/auth'
+import { useEffect, useState } from 'react'
+import { getUser, logout } from '@/lib/auth'
 
 const PAGE_TITLES: Record<string, string> = {
   '/laporan/gangguan': 'Riwayat Gangguan',
@@ -28,8 +28,13 @@ function getPageTitle(pathname: string) {
 
 export default function Topbar() {
   const pathname = usePathname()
-  const user = getUser()
+  const [user, setUser] = useState<ReturnType<typeof getUser>>(null)
   const title = getPageTitle(pathname)
+
+  // Read cookie only on client to avoid SSR hydration mismatch
+  useEffect(() => {
+    setUser(getUser())
+  }, [])
 
   return (
     <header

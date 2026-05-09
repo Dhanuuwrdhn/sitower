@@ -204,7 +204,7 @@ export default function Sidebar() {
       </div>
 
       {/* Nav — unified list, no section labels */}
-      <nav style={{ flex: 1, padding: '8px 0', overflowY: 'auto', overflowX: 'hidden' }}>
+      <nav style={{ flex: 1, paddingTop: 32, paddingBottom: 8, overflowY: 'auto', overflowX: 'hidden' }}>
         {navItems.map(({ label, icon: Icon, href }) => (
           <NavLink
             key={href}

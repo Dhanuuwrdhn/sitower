@@ -379,3 +379,454 @@
     max-width: 360px;
   }
 }
+
+/* =============================================
+   DASHBOARD PAGE — matches Figma node 82:4976
+   ============================================= */
+
+.dash-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Alert banner ── */
+.dash-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #FEF3F2;
+  border: 1px solid #D92D20;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+  color: #D92D20;
+}
+
+/* ── Title ── */
+.dash-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 36px;
+  color: #1C1C1C;
+}
+
+/* ── Stat cards row ── */
+.dash-stat-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+@media (max-width: 1024px) {
+  .dash-stat-row { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 640px) {
+  .dash-stat-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+.dash-stat-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E1E8EC;
+  border-radius: 8px;
+  transition: box-shadow 0.2s;
+}
+.dash-stat-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.dash-stat-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dash-stat-emoji {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.dash-stat-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: #5F737F;
+}
+
+.dash-stat-number {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1;
+}
+
+/* ── Middle row: Aset + Map ── */
+.dash-mid-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+}
+@media (max-width: 900px) {
+  .dash-mid-row { grid-template-columns: 1fr; }
+}
+
+/* ── Shared section head ── */
+.dash-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+}
+.dash-section-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 28px;
+  color: #1C1C1C;
+}
+.dash-aset-divider {
+  height: 1px;
+  background: #E1E8EC;
+}
+
+/* ── Total Aset Transmisi card ── */
+.dash-aset-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: #FFFFFF;
+  border: 1px solid #E1E8EC;
+  border-radius: 8px;
+}
+
+.dash-aset-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.dash-aset-total {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.dash-aset-total-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: #5F737F;
+}
+.dash-aset-total-num {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 50px;
+  color: #076C9E;
+}
+
+/* ── Legend ── */
+.dash-aset-legend {
+  display: flex;
+  gap: 32px;
+}
+
+.dash-aset-legend-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 120px;
+}
+
+.dash-legend-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dash-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dash-legend-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: #5F737F;
+}
+
+.dash-legend-values {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.dash-legend-num {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 30px;
+  color: #1C1C1C;
+}
+
+.dash-legend-pct {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 25px;
+  color: #5F737F;
+}
+
+/* ── Peta Jalur card ── */
+.dash-map-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 24px 24px;
+  background: #FFFFFF;
+  border: 1px solid #E1E8EC;
+  border-radius: 8px;
+}
+
+.dash-map-container {
+  width: 100%;
+  height: 400px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #E1E8EC;
+}
+
+/* ── Riwayat Gangguan Terbaru ── */
+.dash-riwayat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  background: #FFFFFF;
+  border: 1px solid #E1E8EC;
+  border-radius: 8px;
+}
+
+.dash-riwayat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dash-riwayat-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dash-import-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  color: #334155;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.dash-import-btn:hover {
+  background: #e2e8f0;
+}
+
+.dash-see-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  color: #076C9E;
+  border: 1px solid #076C9E;
+  border-radius: 100px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.dash-see-all-btn:hover {
+  background: rgba(7, 108, 158, 0.05);
+}
+
+/* ── Table ── */
+.dash-table-wrap {
+  overflow-x: auto;
+  display: block;
+}
+@media (max-width: 768px) {
+  .dash-table-wrap { display: none; }
+}
+
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #E1E8EC;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dash-table th {
+  padding: 16px;
+  text-align: left;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  color: #1C1C1C;
+  background: #F6F9FC;
+  border-bottom: 1px solid #E1E8EC;
+}
+
+.dash-table td {
+  padding: 16px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: #5F737F;
+  border-bottom: 1px solid #E1E8EC;
+}
+
+.dash-table tr:last-child td {
+  border-bottom: none;
+}
+
+.dash-table tr:hover td {
+  background: #FAFBFC;
+}
+
+/* ── Status pills — Figma tokens ── */
+.dash-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.dash-status-berlangsung {
+  background: #FEE4E2;
+  color: #D92D20;
+}
+
+.dash-status-selesai {
+  background: #ECFDF3;
+  color: #039855;
+}
+
+.dash-status-default {
+  background: #F6F9FC;
+  color: #5F737F;
+}
+
+/* ── Action dots ── */
+.dash-action-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+.dash-action-dots:hover {
+  background: #F6F9FC;
+}
+
+/* ── Mobile cards ── */
+.dash-mobile-cards {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+}
+@media (max-width: 768px) {
+  .dash-mobile-cards { display: flex; }
+}
+
+.dash-mobile-card {
+  padding: 14px;
+  background: #F6F9FC;
+  border: 1px solid #E1E8EC;
+  border-radius: 10px;
+}
+
+.dash-mobile-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.dash-mobile-tower {
+  font-weight: 700;
+  font-size: 13px;
+  color: #1C1C1C;
+}
+
+.dash-mobile-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #5F737F;
+  margin-top: 2px;
+}
+
+.dash-mobile-jenis {
+  font-weight: 500;
+  font-size: 12.5px;
+  color: #1C1C1C;
+  margin-bottom: 4px;
+}
+
+.dash-mobile-pelapor {
+  font-size: 11px;
+  color: #94a3b8;
+}
+.dash-mobile-pelapor span {
+  color: #5F737F;
+}
+
+.dash-mobile-see-all {
+  display: block;
+  text-align: center;
+  padding: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #076C9E;
+  text-decoration: none;
+  margin-top: 8px;
+}

@@ -122,6 +122,10 @@ export default function LoginPage() {
               ) : 'Masuk'}
             </button>
           </form>
+
+          <p className="mt-8 text-center text-xs text-gray-400">
+            Powered by <span className="font-semibold text-gray-500">Born2Works</span>
+          </p>
         </div>
       </div>
     </div>

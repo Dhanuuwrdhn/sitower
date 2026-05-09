@@ -42,17 +42,28 @@ const STAT_CARDS = [
 
 // ── Status pill ───────────────────────────────────────────────────────────────
 const STATUS_CLASS: Record<string, string> = {
-  berlangsung: 'badge-berlangsung badge-blink',
-  ditangani:   'badge-ditangani',
-  selesai:     'badge-selesai',
-  pemantauan:  'badge-pemantauan',
-  eskalasi:    'badge-eskalasi',
-  menunggu:    'badge-menunggu',
+  berlangsung:         'badge-berlangsung badge-blink',
+  selesai:             'badge-selesai',
+  tidak_ada_aktifitas: 'badge-menunggu',
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  berlangsung:         'Sedang Berlangsung',
+  selesai:             'Selesai',
+  tidak_ada_aktifitas: 'Tidak Ada Aktifitas',
+}
+
+const JENIS_LABEL: Record<string, string> = {
+  pekerjaan_pihak_lain: 'Pekerjaan Pihak Lain',
+  kebakaran:            'Kebakaran',
+  layangan:             'Layangan',
+  pencurian:            'Pencurian',
+  pemanfaatan_lahan:    'Pemanfaatan Lahan',
 }
 
 function StatusPill({ status }: { status: string }) {
   const cls = STATUS_CLASS[status] ?? 'badge-menunggu'
-  return <span className={cls}>{status}</span>
+  return <span className={cls}>{STATUS_LABEL[status] ?? status}</span>
 }
 
 // ── Stat card ─────────────────────────────────────────────────────────────────
@@ -147,7 +158,7 @@ export default function DashboardPage() {
           id: r.id,
           tanggal: r.tanggal?.slice(0, 10) ?? '—',
           tower: r.tower?.id ?? r.tower?.nama ?? '—',
-          jenisGangguan: r.jenisGangguan ?? '—',
+          jenisGangguan: JENIS_LABEL[r.jenisGangguan] ?? r.jenisGangguan ?? '—',
           pelapor: r.pelapor?.nama ?? r.pegawai?.nama ?? '—',
           status: r.status?.toLowerCase() ?? '—',
         })))

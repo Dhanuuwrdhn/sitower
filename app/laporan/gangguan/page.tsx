@@ -49,6 +49,13 @@ const LEVEL_OPTIONS = [
   { value: 'rendah',  label: 'Rendah',  color: 'text-green-600',  bg: 'bg-green-50 border-green-300',  dot: 'bg-green-500' },
 ]
 
+const STATUS_FILTER_OPTIONS = [
+  { value: '', label: 'Semua' },
+  { value: 'berlangsung',         label: 'Sedang Berlangsung' },
+  { value: 'selesai',             label: 'Selesai' },
+  { value: 'tidak_ada_aktifitas', label: 'Tidak Ada Aktifitas' },
+]
+
 const STATUS_CLASS: Record<string, string> = {
   berlangsung:         'badge-berlangsung badge-blink',
   selesai:             'badge-selesai',
@@ -98,7 +105,7 @@ function RowActions({
   }, [])
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative inline-flex mx-auto" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
         className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted hover:text-app-text transition-colors"
@@ -749,6 +756,7 @@ export default function GangguanPage() {
   // Filters
   const [search, setSearch] = useState('')
   const [jenis, setJenis] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
   const [tglMulai, setTglMulai] = useState('')
   const [tglAkhir, setTglAkhir] = useState('')
 
@@ -767,7 +775,7 @@ export default function GangguanPage() {
   const [viewMode, setViewMode] = useState<'edit' | 'detail' | null>(null)
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
-  const hasActiveFilters = Boolean(search.trim() || jenis || tglMulai || tglAkhir)
+  const hasActiveFilters = Boolean(search.trim() || jenis || statusFilter || tglMulai || tglAkhir)
   const { isMobile } = useSidebar()
 
   const fetchData = useCallback(async () => {
@@ -778,6 +786,7 @@ export default function GangguanPage() {
         limit: pageSize,
         search: search.trim() || undefined,
         jenisGangguan: jenis || undefined,
+        status: statusFilter || undefined,
         tglMulai: tglMulai || undefined,
         tglAkhir: tglAkhir || undefined,
       })
@@ -795,7 +804,7 @@ export default function GangguanPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize, search, jenis, tglMulai, tglAkhir])
+  }, [page, pageSize, search, jenis, statusFilter, tglMulai, tglAkhir])
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -811,6 +820,7 @@ export default function GangguanPage() {
   function resetFilters() {
     setSearch('')
     setJenis('')
+    setStatusFilter('')
     setTglMulai('')
     setTglAkhir('')
     setPage(1)
@@ -882,6 +892,21 @@ export default function GangguanPage() {
                 className="form-input h-11 rounded-lg border-[#e1e8ec] pr-8 text-[14px]"
               >
                 {JENIS_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="w-full max-w-[200px]">
+              <label className="mb-1 block text-[14px] font-bold text-app-text">
+                Status
+              </label>
+              <select
+                value={statusFilter}
+                onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }}
+                className="form-input h-11 rounded-lg border-[#e1e8ec] pr-8 text-[14px]"
+              >
+                {STATUS_FILTER_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>{o.label}</option>
                 ))}
               </select>
@@ -969,7 +994,7 @@ export default function GangguanPage() {
                     <td className="text-[14px] text-[#5f737f]">{JENIS_LABEL[row.jenisGangguan] ?? row.jenisGangguan ?? '—'}</td>
                     <td className="text-[14px] text-[#5f737f]">{row.teknisi ?? row.pelapor?.nama ?? row.pegawai?.nama ?? '—'}</td>
                     <td><StatusPill status={row.status?.toLowerCase()} /></td>
-                    <td className="text-right pr-4">
+                    <td className="text-center">
                       <RowActions
                         row={row}
                         onDetail={openDetail}

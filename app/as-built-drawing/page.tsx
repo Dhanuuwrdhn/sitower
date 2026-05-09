@@ -113,6 +113,8 @@ export default function AsBuiltDrawingPage() {
   const [tambahOpen, setTambahOpen] = useState(false)
   const [deleteId, setDeleteId]     = useState<string | null>(null)
   const [deleting, setDeleting]     = useState(false)
+  const [isAdminUser, setIsAdminUser] = useState(false)
+  useEffect(() => { setIsAdminUser(isAdmin()) }, [])
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [q, setQ] = useState('')
@@ -155,7 +157,7 @@ export default function AsBuiltDrawingPage() {
     <>
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-2xl font-bold text-app-text">As Built Drawing</h1>
-        {isAdmin() && (
+        {isAdminUser && (
           <button onClick={() => setTambahOpen(true)} className="btn-primary">
             <Plus size={16} /> Tambah Dokumen
           </button>
@@ -216,7 +218,7 @@ export default function AsBuiltDrawingPage() {
                             }
                           },
                         },
-                        ...(isAdmin() ? [{
+                        ...(isAdminUser ? [{
                           label: 'Hapus',
                           icon: <span className="text-red-400">✕</span>,
                           onClick: () => setDeleteId(row.id),

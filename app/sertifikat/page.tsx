@@ -93,7 +93,7 @@ function TambahModal({ open, onClose, onSaved }: { open: boolean; onClose: () =>
 
 // ── Sertifikat card ───────────────────────────────────────────────────────────
 
-function SertifikatCard({ item, onDelete }: { item: any; onDelete: (id: string) => void }) {
+function SertifikatCard({ item, onDelete, showAdmin }: { item: any; onDelete: (id: string) => void; showAdmin: boolean }) {
   const expired = item.status?.toLowerCase() === 'expired' ||
     (item.berlakuHingga && new Date(item.berlakuHingga) < new Date())
   const berlakuFmt = item.berlakuHingga
@@ -128,7 +128,7 @@ function SertifikatCard({ item, onDelete }: { item: any; onDelete: (id: string) 
           ) : (
             <span className="text-[12px] text-app-subtle">Tidak ada file</span>
           )}
-          {isAdmin() && (
+          {showAdmin && (
             <button onClick={() => onDelete(item.id)} className="ml-auto text-[12px] text-red-500 hover:underline">
               Hapus
             </button>
@@ -149,6 +149,8 @@ export default function SertifikatPage() {
   const [tambahOpen, setTambahOpen] = useState(false)
   const [deleteId, setDeleteId]     = useState<string | null>(null)
   const [deleting, setDeleting]     = useState(false)
+  const [isAdminUser, setIsAdminUser] = useState(false)
+  useEffect(() => { setIsAdminUser(isAdmin()) }, [])
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -177,7 +179,7 @@ export default function SertifikatPage() {
     <>
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-2xl font-bold text-app-text">Sertifikat</h1>
-        {isAdmin() && (
+        {isAdminUser && (
           <button onClick={() => setTambahOpen(true)} className="btn-primary">
             <Plus size={16} /> Tambah Sertifikat
           </button>
@@ -232,7 +234,7 @@ export default function SertifikatPage() {
       ) : (
         <div className="grid grid-cols-3 gap-4">
           {items.map((item) => (
-            <SertifikatCard key={item.id} item={item} onDelete={setDeleteId} />
+            <SertifikatCard key={item.id} item={item} onDelete={setDeleteId} showAdmin={isAdminUser} />
           ))}
         </div>
       )}

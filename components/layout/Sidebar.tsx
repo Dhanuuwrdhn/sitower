@@ -164,24 +164,6 @@ export default function Sidebar() {
             transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
           }}
         >
-          {/* Decorative ellipse — yellow, top-right (Figma Ellipse 38 #f9ef77) */}
-          <div className="absolute pointer-events-none" style={{
-            width: 360, height: 360,
-            borderRadius: '50%',
-            background: '#f9ef77',
-            opacity: 0.18,
-            top: -120, right: -80,
-          }} />
-
-          {/* Decorative ellipse — teal, bottom-right (Figma Ellipse 37 #2aa3b2) */}
-          <div className="absolute pointer-events-none" style={{
-            width: 380, height: 380,
-            borderRadius: '50%',
-            background: '#2aa3b2',
-            opacity: 0.22,
-            bottom: -120, right: -80,
-          }} />
-
           {/* Header — ⚡SPEKTRA + close button */}
           <div style={{
             height: 64,

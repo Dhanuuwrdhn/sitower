@@ -334,37 +334,6 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {/* User info */}
-      {user && (
-        <div style={{
-          padding: isCollapsed ? '12px 0' : '12px 16px',
-          borderBottom: '1px solid rgba(255,255,255,0.1)',
-          display: 'flex', alignItems: 'center', gap: 10,
-          justifyContent: isCollapsed ? 'center' : 'flex-start', flexShrink: 0,
-        }}>
-          <div style={{
-            width: 40, height: 40, borderRadius: '50%',
-            background: 'rgba(255,255,255,0.2)', border: '2px solid rgba(255,255,255,0.35)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0, userSelect: 'none',
-          }}>
-            {getInitials(user.nama)}
-          </div>
-          {!isCollapsed && (
-            <div style={{ overflow: 'hidden' }}>
-              <p style={{
-                color: '#fff', fontWeight: 700, fontSize: 14, lineHeight: '22px',
-                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-              }}>{user.nama}</p>
-              <p style={{
-                color: 'rgba(255,255,255,0.65)', fontSize: 12, lineHeight: '18px',
-                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-              }}>{user.jabatan ?? user.unit ?? 'PLN'}</p>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Nav */}
       <nav style={{ flex: 1, paddingTop: 32, paddingBottom: 8, overflowY: 'auto', overflowX: 'hidden' }}>
         {navItems.map(({ label, icon: Icon, href }) => (

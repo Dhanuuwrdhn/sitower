@@ -88,11 +88,13 @@ function StatusPill({ status }: { status: string }) {
 
 function RowActions({
   row,
+  onDetail,
   onEdit,
   onDelete,
   showDelete,
 }: {
   row: any
+  onDetail: (row: any) => void
   onEdit: (row: any) => void
   onDelete: (row: any) => void
   showDelete: boolean
@@ -123,7 +125,7 @@ function RowActions({
           className="absolute right-0 top-8 z-50 bg-white border border-app-border rounded-xl shadow-dropdown w-48 py-1 overflow-hidden"
         >
           <button
-            onClick={() => { setOpen(false); toast(`Detail: ${row.id}`, { icon: '👁' }) }}
+            onClick={() => { setOpen(false); onDetail(row) }}
             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-app-text hover:bg-app-bg transition-colors text-left"
           >
             <Eye size={14} className="text-blue-500" />

@@ -467,13 +467,46 @@
   to { transform: rotate(360deg); }
 }
 
-/* --- Mobile responsive --- */
+/* Mobile footer text */
+.login-footer-text {
+  margin-top: auto;
+  padding-top: 24px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #97AAB3;
+  text-align: center;
+}
+
+/* --- Mobile PWA: show bg image behind the form card (matches Figma 122:2344) --- */
 @media (max-width: 1023px) {
+  .login-page {
+    background: #076c9e;
+  }
+  .login-panel-left {
+    display: block;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    z-index: 0;
+  }
   .login-panel-right {
+    position: relative;
+    z-index: 1;
     min-height: 100vh;
+    padding: 2rem 1.5rem 2rem;
+    justify-content: center;
   }
   .login-form-wrapper {
-    max-width: 360px;
+    max-width: 376px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 28px 24px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.28);
+  }
+  .login-footer-text {
+    color: rgba(255, 255, 255, 0.7);
+    padding-top: 16px;
   }
 }
 

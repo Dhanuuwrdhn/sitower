@@ -31,7 +31,7 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
-      {/* Left panel — tower image with blue overlay */}
+      {/* Background image — visible on all screen sizes */}
       <div className="login-panel-left">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -39,11 +39,10 @@ export default function LoginPage() {
           alt="Tower transmisi PLN"
           className="login-bg-img"
         />
-        {/* Blue tint overlay matching Figma rgba(7, 108, 158, 0.4) */}
         <div className="login-overlay" />
       </div>
 
-      {/* Right panel — login form */}
+      {/* Form panel */}
       <div className="login-panel-right">
         <div className="login-form-wrapper">
           {/* Logo block */}
@@ -122,11 +121,10 @@ export default function LoginPage() {
               ) : 'Masuk'}
             </button>
           </form>
-
-          <p className="mt-8 text-center text-xs text-gray-400">
-            Powered by <span className="font-semibold text-gray-500">Born2Works</span>
-          </p>
         </div>
+
+        {/* Footer */}
+        <p className="login-footer-text">© 2026. PT PLN (Persero).</p>
       </div>
     </div>
   )

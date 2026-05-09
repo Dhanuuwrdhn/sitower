@@ -6,8 +6,14 @@ import {
   IconDashboard, IconRiwayat, IconAset, IconSertifikat,
   IconAsBuilt, IconClimb, IconCleanup, IconUsers, IconToggle,
 } from '@/components/icons/SpektraIcons'
-import { getUser } from '@/lib/auth'
+import { getUser, logout } from '@/lib/auth'
 import { useSidebar } from './SidebarContext'
+
+function getInitials(nama: string) {
+  const parts = nama.trim().split(' ')
+  if (parts.length === 1) return parts[0][0].toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -95,9 +101,11 @@ export default function Sidebar() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, isMobile])
 
+  const [user, setUser] = useState<ReturnType<typeof getUser>>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   useEffect(() => {
     const u = getUser()
+    setUser(u)
     setIsAdmin(u?.role === 'admin')
   }, [])
 
@@ -203,6 +211,62 @@ export default function Sidebar() {
         </button>
       </div>
 
+      {/* User info — Figma node 74:3616 */}
+      {user && (
+        <div style={{
+          padding: isCollapsed ? '12px 0' : '12px 16px',
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          justifyContent: isCollapsed ? 'center' : 'flex-start',
+          flexShrink: 0,
+        }}>
+          <div style={{
+            width: 40,
+            height: 40,
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,0.2)',
+            border: '2px solid rgba(255,255,255,0.35)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            fontWeight: 700,
+            fontSize: 13,
+            flexShrink: 0,
+            userSelect: 'none',
+          }}>
+            {getInitials(user.nama)}
+          </div>
+          {!isCollapsed && (
+            <div style={{ overflow: 'hidden' }}>
+              <p style={{
+                color: '#fff',
+                fontWeight: 700,
+                fontSize: 14,
+                lineHeight: '22px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}>
+                {user.nama}
+              </p>
+              <p style={{
+                color: 'rgba(255,255,255,0.65)',
+                fontSize: 12,
+                lineHeight: '18px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}>
+                {user.jabatan ?? user.unit ?? 'PLN'}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Nav — unified list, no section labels */}
       <nav style={{ flex: 1, paddingTop: 32, paddingBottom: 8, overflowY: 'auto', overflowX: 'hidden' }}>
         {navItems.map(({ label, icon: Icon, href }) => (
@@ -232,17 +296,46 @@ export default function Sidebar() {
         padding: isCollapsed ? '12px 0' : '10px 16px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: isCollapsed ? 'center' : 'flex-start',
+        justifyContent: isCollapsed ? 'center' : 'space-between',
         flexShrink: 0,
         position: 'relative',
+        gap: 8,
       }}>
         {isCollapsed ? (
-          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.28)', fontWeight: 700 }}>B2W</span>
+          <button
+            onClick={logout}
+            title="Logout"
+            style={{
+              background: 'transparent', border: 'none',
+              color: 'rgba(255,255,255,0.45)', cursor: 'pointer',
+              fontSize: 9, fontWeight: 700,
+            }}
+          >
+            B2W
+          </button>
         ) : (
-          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.03em' }}>
-            Powered by{' '}
-            <span style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 600 }}>Born2Works</span>
-          </p>
+          <>
+            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.03em' }}>
+              © 2026. PT PLN (Persero).
+            </p>
+            <button
+              onClick={logout}
+              title="Logout"
+              style={{
+                background: 'rgba(255,255,255,0.12)',
+                border: 'none',
+                borderRadius: 6,
+                color: 'rgba(255,255,255,0.7)',
+                fontSize: 11,
+                fontWeight: 600,
+                padding: '4px 10px',
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+            >
+              Keluar
+            </button>
+          </>
         )}
       </div>
     </aside>

@@ -258,7 +258,8 @@ Project ini sudah dilengkapi skill context untuk Claude Code. Setelah masuk ke f
 1. Pastikan [Claude Code](https://claude.ai/code) sudah terinstal
 2. Buka terminal di folder `frontend-sitower/`
 3. Jalankan:
-   ```bash
+   ```
+   bash
    claude
    ```
 4. Di dalam Claude, panggil context skill:

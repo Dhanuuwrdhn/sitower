@@ -116,31 +116,100 @@ function RowActions({
 
       {open && (
         <div
-          className="absolute right-0 top-8 z-50 bg-white border border-app-border rounded-xl shadow-dropdown w-48 py-1 overflow-hidden"
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 32,
+            zIndex: 50,
+            background: '#FFFFFF',
+            borderRadius: 4,
+            boxShadow: '0px 4px 8px 0px rgba(28, 28, 28, 0.15)',
+            padding: '8px 0',
+            minWidth: 200,
+          }}
         >
           <button
             onClick={() => { setOpen(false); onDetail(row) }}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-app-text hover:bg-app-bg transition-colors text-left"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '8px 8px',
+              width: '100%',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: 14,
+              fontWeight: 500,
+              fontFamily: 'Inter, sans-serif',
+              color: '#5F737F',
+              lineHeight: '20px',
+              textAlign: 'left' as const,
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = '#F6F9FC')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
           >
-            <Eye size={14} className="text-blue-500" />
+            <Eye size={16} />
             Lihat Detail Laporan
           </button>
+
+          {/* Divider */}
+          <div style={{ height: 1, background: '#E1E8EC', margin: '0' }} />
+
           <button
             onClick={() => { setOpen(false); onEdit(row) }}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-app-text hover:bg-app-bg transition-colors text-left"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '8px 8px',
+              width: '100%',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: 14,
+              fontWeight: 500,
+              fontFamily: 'Inter, sans-serif',
+              color: '#5F737F',
+              lineHeight: '20px',
+              textAlign: 'left' as const,
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = '#F6F9FC')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
           >
-            <Pencil size={14} className="text-app-muted" />
+            <Pencil size={16} />
             Edit Laporan
           </button>
+
           {showDelete && (
             <>
-              <div className="mx-3 my-1 border-t border-app-border" />
+              <div style={{ height: 1, background: '#E1E8EC', margin: '0' }} />
               <button
                 onClick={() => { setOpen(false); onDelete(row) }}
-                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-red-500 hover:bg-red-50 transition-colors text-left"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '8px 8px',
+                  width: '100%',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: 14,
+                  fontWeight: 500,
+                  fontFamily: 'Inter, sans-serif',
+                  color: '#D92D20',
+                  lineHeight: '20px',
+                  textAlign: 'left' as const,
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#FEF3F2')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
-                <Trash2 size={14} />
-                Hapus
+                <Trash2 size={16} />
+                Hapus Laporan
               </button>
             </>
           )}
@@ -957,14 +1026,14 @@ export default function GangguanPage() {
 
         <div className="overflow-x-auto">
           <table className="data-table">
-            <thead>
+             <thead>
               <tr>
-                <th className="bg-[#f6f9fc]">Tanggal</th>
-                <th className="bg-[#f6f9fc]">Tower</th>
-                <th className="bg-[#f6f9fc]">Jenis Gangguan</th>
-                <th className="bg-[#f6f9fc]">Teknisi</th>
-                <th className="bg-[#f6f9fc]">Status</th>
-                <th className="bg-[#f6f9fc] text-right pr-5">Aksi</th>
+                <th>Tanggal</th>
+                <th>Tower</th>
+                <th>Jenis Gangguan</th>
+                <th>Teknisi</th>
+                <th>Status</th>
+                <th style={{ textAlign: 'center' }}>Aksi</th>
               </tr>
             </thead>
             <tbody>

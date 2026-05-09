@@ -523,8 +523,8 @@
   text-align: center;
 }
 
-/* --- Mobile PWA: bg image + card (matches Figma 122:2344) --- */
-@media (max-width: 1023px) {
+/* --- Mobile PWA only (<768px): bg image + floating card (Figma 122:2344) --- */
+@media (max-width: 767px) {
   .login-page {
     background: #076c9e;
     position: relative;
@@ -554,7 +554,7 @@
     gap: 14px;
   }
   .login-footer-bar {
-    display: flex;               /* visible on mobile */
+    display: flex;
   }
 }
 

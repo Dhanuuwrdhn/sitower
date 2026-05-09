@@ -14,7 +14,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    if (err.response?.status === 401 || err.response?.status === 403) {
       // Only redirect to login if not already on login page
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
         Cookies.remove('sitower_token')

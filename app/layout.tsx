@@ -13,6 +13,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'SPEKTRA – Sistem Pemantauan Kerawanan Transmisi',
   description: 'PLN UIW Banten',
+  manifest: '/manifest.json',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

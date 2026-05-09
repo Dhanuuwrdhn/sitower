@@ -4,6 +4,9 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { getUser, logout } from '@/lib/auth'
 
+import { Menu } from 'lucide-react'
+import { useSidebar } from './SidebarContext'
+
 const PAGE_TITLES: Record<string, string> = {
   '/laporan/gangguan': 'Riwayat Gangguan',
   '/aset':             'Data Aset Transmisi',
@@ -30,6 +33,7 @@ export default function Topbar() {
   const pathname = usePathname()
   const [user, setUser] = useState<ReturnType<typeof getUser>>(null)
   const title = getPageTitle(pathname)
+  const { isMobile, setMobileOpen } = useSidebar()
 
   // Read cookie only on client to avoid SSR hydration mismatch
   useEffect(() => {
@@ -38,15 +42,25 @@ export default function Topbar() {
 
   return (
     <header
-      className="sticky top-0 z-40 flex items-center justify-between bg-white px-7"
+      className="sticky top-0 z-30 flex items-center justify-between bg-white px-4 sm:px-7 shadow-sm"
       style={{ height: 64, borderBottom: '1px solid #e8edf2' }}
     >
-      {/* Page title — hidden on dashboard */}
-      {title ? (
-        <h1 className="text-[15px] font-semibold text-app-text">{title}</h1>
-      ) : (
-        <div />
-      )}
+      <div className="flex items-center gap-3">
+        {isMobile && (
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="p-1.5 -ml-1.5 text-app-text hover:bg-app-bg rounded-md transition-colors"
+          >
+            <Menu size={22} />
+          </button>
+        )}
+        {/* Page title — hidden on dashboard */}
+        {title ? (
+          <h1 className="text-[15px] font-semibold text-app-text hidden sm:block">{title}</h1>
+        ) : (
+          <div />
+        )}
+      </div>
 
       {/* User info + logout */}
       <div className="flex items-center gap-3">

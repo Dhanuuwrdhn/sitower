@@ -5,52 +5,42 @@ import toast from 'react-hot-toast'
 import {
   Search, Plus, Calendar, RefreshCw,
   Trash2, X, Upload, ChevronLeft, ChevronRight,
-  ChevronDown, MoreHorizontal, Eye, Pencil,
+  ChevronDown, MoreHorizontal, Eye, Pencil, MapPin,
 } from 'lucide-react'
 import { laporanApi, towersApi } from '@/lib/api'
 import { getUser, isAdmin } from '@/lib/auth'
+import { getDistance } from '@/lib/geo'
+import { useSidebar } from '@/components/layout/SidebarContext'
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const JENIS_OPTIONS = [
   { value: '', label: 'Semua' },
-  { value: 'pekerjaan_pihak_lain', label: 'Pekerjaan Pihak Lain (PPL)' },
+  { value: 'pekerjaan_pihak_lain', label: 'Pekerjaan Pihak Lain' },
   { value: 'kebakaran',            label: 'Kebakaran' },
-  { value: 'layangan',             label: 'Layang-layang' },
+  { value: 'layangan',             label: 'Layangan' },
   { value: 'pencurian',            label: 'Pencurian' },
-  { value: 'pemanfaatan',          label: 'Pemanfaatan Pihak Lain' },
-  { value: 'gangguan',             label: 'Gangguan Teknis' },
-  { value: 'cui',                  label: 'Climb Up Inspection' },
-  { value: 'cleanup',              label: 'Clean Up Isolator' },
+  { value: 'pemanfaatan_lahan',    label: 'Pemanfaatan Lahan' },
 ]
 
 const JENIS_LABEL: Record<string, string> = {
-  pekerjaan_pihak_lain: 'Pekerjaan Pihak Lain (PPL)',
+  pekerjaan_pihak_lain: 'Pekerjaan Pihak Lain',
   kebakaran:            'Kebakaran',
-  layangan:             'Layang-layang',
+  layangan:             'Layangan',
   pencurian:            'Pencurian',
-  pemanfaatan:          'Pemanfaatan Pihak Lain',
-  gangguan:             'Gangguan Teknis',
-  cui:                  'Climb Up Inspection',
-  cleanup:              'Clean Up Isolator',
+  pemanfaatan_lahan:    'Pemanfaatan Lahan',
 }
 
 const STATUS_OPTIONS = [
-  { value: 'berlangsung', label: 'Berlangsung' },
-  { value: 'ditangani',   label: 'Ditangani' },
-  { value: 'pemantauan',  label: 'Pemantauan' },
-  { value: 'eskalasi',    label: 'Eskalasi' },
-  { value: 'menunggu',    label: 'Menunggu' },
-  { value: 'selesai',     label: 'Sudah Selesai' },
+  { value: 'berlangsung',         label: 'Sedang Berlangsung' },
+  { value: 'selesai',             label: 'Selesai' },
+  { value: 'tidak_ada_aktifitas', label: 'Tidak Ada Aktifitas' },
 ]
 
 const STATUS_LABEL: Record<string, string> = {
-  berlangsung: 'Berlangsung',
-  ditangani:   'Ditangani',
-  pemantauan:  'Pemantauan',
-  eskalasi:    'Eskalasi',
-  menunggu:    'Menunggu',
-  selesai:     'Sudah Selesai',
+  berlangsung:         'Sedang Berlangsung',
+  selesai:             'Selesai',
+  tidak_ada_aktifitas: 'Tidak Ada Aktifitas',
 }
 
 const LEVEL_OPTIONS = [
@@ -60,12 +50,9 @@ const LEVEL_OPTIONS = [
 ]
 
 const STATUS_CLASS: Record<string, string> = {
-  berlangsung: 'badge-berlangsung badge-blink',
-  ditangani:   'badge-ditangani',
-  selesai:     'badge-selesai',
-  pemantauan:  'badge-pemantauan',
-  eskalasi:    'badge-eskalasi',
-  menunggu:    'badge-menunggu',
+  berlangsung:         'badge-berlangsung badge-blink',
+  selesai:             'badge-selesai',
+  tidak_ada_aktifitas: 'badge-menunggu',
 }
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
@@ -163,6 +150,8 @@ interface TowerOption {
   nomorTower: string
   garduInduk: string
   tipe: string
+  lat?: number
+  lng?: number
 }
 
 function TowerDropdown({
@@ -263,9 +252,11 @@ function TowerDropdown({
 function FotoUpload({
   fotos,
   onChange,
+  onPhotoAdded,
 }: {
   fotos: File[]
   onChange: (files: File[]) => void
+  onPhotoAdded?: () => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
@@ -277,6 +268,7 @@ function FotoUpload({
     )
     const next = [...fotos, ...valid].slice(0, 10)
     onChange(next)
+    if (valid.length > 0 && onPhotoAdded) onPhotoAdded()
   }
 
   return (
@@ -356,11 +348,13 @@ function LaporanDrawer({
   initial,
   readOnly = false,
   towerOptions,
+  initialFotos,
   onClose,
   onSaved,
 }: {
   open: boolean
   initial: any | null
+  initialFotos?: File[]
   readOnly?: boolean
   towerOptions: TowerOption[]
   onClose: () => void
@@ -371,6 +365,8 @@ function LaporanDrawer({
   const [fotos, setFotos] = useState<File[]>([])
   const [fotoUrls, setFotoUrls] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
+  const [locating, setLocating] = useState(false)
+  const [detectedMsg, setDetectedMsg] = useState('')
 
   useEffect(() => {
     if (open) {
@@ -396,13 +392,71 @@ function LaporanDrawer({
         setFotoUrls(initial.foto ?? [])
       } else {
         setForm(EMPTY_FORM)
-        setFotos([])
+        setFotos(initialFotos || [])
         setFotoUrls([])
+        setDetectedMsg('')
+        if (initialFotos && initialFotos.length > 0) {
+          setTimeout(() => {
+            document.getElementById('btn-detect-location')?.click()
+          }, 100)
+        }
       }
     }
-  }, [open, initial])
+  }, [open, initial, initialFotos])
 
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }))
+
+  const handleDetectLocation = () => {
+    if (readOnly || locating) return
+    if (!navigator.geolocation) {
+      toast.error('Browser tidak mendukung deteksi lokasi')
+      return
+    }
+    setLocating(true)
+    setDetectedMsg('Mendeteksi lokasi Anda...')
+    
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const userLat = pos.coords.latitude
+        const userLng = pos.coords.longitude
+        let minDistance = Infinity
+        let nearest: TowerOption | null = null
+
+        for (const t of towerOptions) {
+          if (t.lat && t.lng) {
+            const d = getDistance(userLat, userLng, t.lat, t.lng)
+            if (d < minDistance) {
+              minDistance = d
+              nearest = t
+            }
+          }
+        }
+
+        if (nearest && minDistance <= 500) {
+          setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: nearest!.nomorTower }))
+          setDetectedMsg(`📍 Berada di dekat Tower ${nearest.nomorTower} (${Math.round(minDistance)}m)`)
+          toast.success('Tower terdekat otomatis dipilih!')
+        } else if (nearest) {
+          setDetectedMsg(`⚠️ Tower terdekat (${nearest.nomorTower}) berjarak ${Math.round(minDistance)}m (di atas 500m)`)
+          toast.error('Lokasi Anda terlalu jauh dari tower terdekat.')
+        } else {
+          setDetectedMsg('')
+        }
+        setLocating(false)
+      },
+      (err) => {
+        setDetectedMsg('')
+        if (err.code === 1) {
+          // Permission denied — likely HTTP or user denied
+          toast.error('Izin lokasi ditolak. Silakan pilih tower secara manual.')
+        } else {
+          toast.error('Gagal mendapatkan lokasi. Silakan pilih tower manual.')
+        }
+        setLocating(false)
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    )
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -468,8 +522,7 @@ function LaporanDrawer({
       />
 
       <div
-        className={`fixed top-0 right-0 bottom-0 z-50 flex flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out ${open ? 'translate-x-0' : 'translate-x-full'}`}
-        style={{ width: 560 }}
+        className={`fixed top-0 right-0 bottom-0 z-50 flex flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out w-full sm:w-[560px] ${open ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-app-border shrink-0">
           <h2 className="text-[15px] font-bold text-app-text">
@@ -487,11 +540,32 @@ function LaporanDrawer({
             {readOnly ? (
               <input type="text" readOnly className="form-input bg-app-bg text-app-muted" value={form.towerId} />
             ) : (
-              <TowerDropdown
-                options={towerOptions}
-                value={form.towerId}
-                onChange={(id, label) => setForm((f) => ({ ...f, towerId: id, towerLabel: label }))}
-              />
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <TowerDropdown
+                      options={towerOptions}
+                      value={form.towerId}
+                      onChange={(id, label) => setForm((f) => ({ ...f, towerId: id, towerLabel: label }))}
+                    />
+                  </div>
+                  <button
+                    id="btn-detect-location"
+                    type="button"
+                    onClick={handleDetectLocation}
+                    disabled={locating}
+                    className="p-3 bg-app-bg border border-app-border rounded-xl text-app-muted hover:text-blue-600 hover:bg-blue-50 transition-colors shrink-0 disabled:opacity-50"
+                    title="Deteksi Tower Terdekat via GPS"
+                  >
+                    <MapPin size={18} className={locating ? 'animate-pulse text-blue-500' : ''} />
+                  </button>
+                </div>
+                {detectedMsg && (
+                  <p className={`text-[12px] font-medium ${detectedMsg.includes('⚠️') ? 'text-orange-600' : 'text-green-600'}`}>
+                    {detectedMsg}
+                  </p>
+                )}
+              </div>
             )}
           </div>
 
@@ -561,7 +635,7 @@ function LaporanDrawer({
                 ))}
               </div>
             )}
-            {!readOnly && <FotoUpload fotos={fotos} onChange={setFotos} />}
+            {!readOnly && <FotoUpload fotos={fotos} onChange={setFotos} onPhotoAdded={handleDetectLocation} />}
           </div>
 
           {(isCUI || isCleanup) && (
@@ -670,6 +744,7 @@ export default function GangguanPage() {
   const [rows, setRows] = useState<any[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [isAdminUser, setIsAdminUser] = useState(false)
 
   // Filters
   const [search, setSearch] = useState('')
@@ -686,12 +761,14 @@ export default function GangguanPage() {
 
   // Drawer / modal state
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [pendingFotos, setPendingFotos] = useState<File[]>([])
   const [editRow, setEditRow] = useState<any | null>(null)
   const [deleteRow, setDeleteRow] = useState<any | null>(null)
   const [viewMode, setViewMode] = useState<'edit' | 'detail' | null>(null)
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
   const hasActiveFilters = Boolean(search.trim() || jenis || tglMulai || tglAkhir)
+  const { isMobile } = useSidebar()
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -722,6 +799,9 @@ export default function GangguanPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
+  // Set role setelah mount agar tidak mismatch SSR/CSR
+  useEffect(() => { setIsAdminUser(isAdmin()) }, [])
+
   useEffect(() => {
     towersApi.getDropdown()
       .then((res) => setTowerOptions(res.data ?? []))
@@ -736,7 +816,7 @@ export default function GangguanPage() {
     setPage(1)
   }
 
-  function openAdd() { setEditRow(null); setViewMode('edit'); setDrawerOpen(true) }
+  function openAdd() { setEditRow(null); setViewMode('edit'); setPendingFotos([]); setDrawerOpen(true) }
   function openEdit(row: any) { setEditRow(row); setViewMode('edit'); setDrawerOpen(true) }
   function openDetail(row: any) { setEditRow(row); setViewMode('detail'); setDrawerOpen(true) }
 
@@ -748,9 +828,31 @@ export default function GangguanPage() {
       {/* Header + action */}
       <div className="mb-6 flex items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-app-text">Riwayat Gangguan</h1>
-        <button onClick={openAdd} className="btn-primary">
-          <Plus size={16} /> Tambah Laporan Baru
-        </button>
+        {isMobile ? (
+          <label className="btn-primary cursor-pointer flex items-center gap-2 m-0">
+            <Plus size={16} /> Tambah Laporan Baru
+            <input 
+              type="file" 
+              accept="image/*" 
+              capture="environment" 
+              className="hidden" 
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  const valid = Array.from(e.target.files).filter(f => f.size <= 5 * 1024 * 1024 && /\.(jpe?g|png|webp)$/i.test(f.name))
+                  setPendingFotos(valid)
+                  setEditRow(null)
+                  setViewMode('edit')
+                  setDrawerOpen(true)
+                }
+                e.target.value = ''
+              }}
+            />
+          </label>
+        ) : (
+          <button className="btn-primary flex items-center gap-2" onClick={openAdd}>
+            <Plus size={16} /> Tambah Laporan Baru
+          </button>
+        )}
       </div>
 
       <div className="mb-4 flex items-center justify-between gap-4">
@@ -873,7 +975,7 @@ export default function GangguanPage() {
                         onDetail={openDetail}
                         onEdit={openEdit}
                         onDelete={setDeleteRow}
-                        showDelete={isAdmin()}
+                        showDelete={isAdminUser}
                       />
                     </td>
                   </tr>
@@ -938,6 +1040,7 @@ export default function GangguanPage() {
       <LaporanDrawer
         open={drawerOpen}
         initial={editRow}
+        initialFotos={pendingFotos}
         readOnly={viewMode === 'detail'}
         towerOptions={towerOptions}
         onClose={() => setDrawerOpen(false)}

@@ -69,10 +69,7 @@ const KATEGORI_LABEL: Record<string, string> = {
   kebakaran: 'Kebakaran',
   layangan: 'Layangan',
   pencurian: 'Pencurian',
-  pemanfaatan: 'Pemanfaatan ROW',
-  gangguan: 'Gangguan',
-  cui: 'Climb Up Inspection',
-  cleanup: 'Clean Up Isolator',
+  pemanfaatan_lahan: 'Pemanfaatan Lahan',
 }
 
 const KATEGORI_EMOJI: Record<string, string> = {
@@ -80,10 +77,7 @@ const KATEGORI_EMOJI: Record<string, string> = {
   kebakaran: '🔥',
   layangan: '🪁',
   pencurian: '🥷',
-  pemanfaatan: '🏚️',
-  gangguan: '⚡',
-  cui: '🔍',
-  cleanup: '🧹',
+  pemanfaatan_lahan: '🏚️',
 }
 
 // Mock seed data – replaced by props when API data is available
@@ -137,7 +131,7 @@ const MOCK_TOWERS: FeaturedTower[] = [
   {
     id: 'SK-001', nama: 'SKTT METLAND - KEMBANGAN #1',
     lat: -6.1885, lng: 106.7402, tipe: 'SKTT', tegangan: '150 kV',
-    kerawanan: [{ kategori: 'pemanfaatan', level: 'sedang', status: 'menunggu' }],
+    kerawanan: [{ kategori: 'pemanfaatan_lahan', level: 'sedang', status: 'menunggu' }],
     updatedAt: '2025-04-22T09:00:00',
   },
 ]
@@ -340,7 +334,7 @@ function FilterPanel({
 
       {select('Kategori', 'kategori', [
         'pekerjaan_pihak_lain', 'kebakaran', 'layangan',
-        'pencurian', 'pemanfaatan', 'gangguan', 'cui', 'cleanup',
+        'pencurian', 'pemanfaatan_lahan',
       ])}
       {select('Level', 'level', ['tinggi', 'sedang', 'rendah'])}
       {select('Tipe Tower', 'tipe', ['gardu', 'SUTET', 'SUTT', 'SKTT'])}

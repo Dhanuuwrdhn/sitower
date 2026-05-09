@@ -42,10 +42,7 @@ const KATEGORI_LABEL: Record<string, string> = {
   kebakaran:   'Kebakaran',
   layangan:    'Layangan',
   pencurian:   'Pencurian',
-  pemanfaatan: 'Pemanfaatan ROW',
-  gangguan:    'Gangguan',
-  cui:         'Climb Up Inspection',
-  cleanup:     'Clean Up Isolator',
+  pemanfaatan_lahan: 'Pemanfaatan Lahan',
 }
 
 function getTopLevel(kerawanan: KerawananItem[]): string {

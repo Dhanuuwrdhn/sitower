@@ -1067,6 +1067,188 @@
   font-weight: 600;
 }
 
+/* =============================================
+   SERTIFIKAT — Folder & Dokumen Cards
+   ============================================= */
+
+.sert-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+@media (max-width: 1280px) { .sert-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 1024px) { .sert-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 640px)  { .sert-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* Folder card */
+.sert-folder-card {
+  background: #ffffff;
+  border: 1px solid #E1E8EC;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.sert-folder-card:hover {
+  box-shadow: 0 4px 16px rgba(7, 108, 158, 0.14);
+  transform: translateY(-1px);
+}
+
+.sert-folder-head {
+  background: #076c9e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+}
+
+/* File card — same shape, teal head */
+.sert-file-card {
+  background: #ffffff;
+  border: 1px solid #E1E8EC;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.sert-file-card:hover {
+  box-shadow: 0 4px 16px rgba(7, 108, 158, 0.14);
+  transform: translateY(-1px);
+}
+
+.sert-file-head {
+  background: #0e8db6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+}
+
+/* Shared card body */
+.sert-folder-body {
+  padding: 10px 12px 12px;
+}
+
+.sert-folder-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.sert-folder-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1b1b1b;
+  line-height: 1.4;
+  flex: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.sert-folder-meta {
+  font-size: 11px;
+  color: #5F737F;
+  margin-top: 4px;
+}
+
+/* Dots menu */
+.sert-dots-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #5F737F;
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.sert-dots-btn:hover { background: #F6F9FC; }
+
+.sert-dots-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  background: #ffffff;
+  border: 1px solid #E1E8EC;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  min-width: 150px;
+  z-index: 20;
+  overflow: hidden;
+}
+
+.sert-dots-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+  color: #1b1b1b;
+}
+.sert-dots-item:hover { background: #F6F9FC; }
+.sert-dots-item--danger { color: #d92c20; }
+.sert-dots-item--danger:hover { background: #FEF2F2; }
+
+/* Search */
+.sert-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.sert-search-icon {
+  position: absolute;
+  left: 12px;
+  color: #97AAB3;
+  pointer-events: none;
+}
+.sert-search-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px 0 36px;
+  border: 1px solid #E1E8EC;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #1b1b1b;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.sert-search-input:focus { border-color: #076c9e; }
+.sert-search-input::placeholder { color: #97AAB3; }
+
+/* Filter button */
+.sert-filter-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #E1E8EC;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #5F737F;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.sert-filter-btn:hover { border-color: #076c9e; color: #076c9e; }
+.sert-filter-btn--active { border-color: #076c9e; color: #076c9e; background: #EBF5FB; }
+
 @media (max-width: 767px) {
   .login-powered {
     display: flex;

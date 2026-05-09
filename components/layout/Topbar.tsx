@@ -5,7 +5,6 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { getUser, logout } from '@/lib/auth'
 import { authApi } from '@/lib/api'
 import toast from 'react-hot-toast'
-
 import { KeyRound, LogOut, Menu } from 'lucide-react'
 import { useSidebar } from './SidebarContext'
 
@@ -122,7 +121,6 @@ export default function Topbar() {
     setUser(getUser())
   }, [])
 
-  // Close dropdown on outside click
   useEffect(() => {
     if (!dropdownOpen) return
     function handleClick(e: MouseEvent) {
@@ -134,31 +132,43 @@ export default function Topbar() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [dropdownOpen])
 
-  // Close dropdown on navigation
   useEffect(() => {
     setDropdownOpen(false)
   }, [pathname])
 
+  /* ── Mobile PWA topbar — Figma 48:13809 "Header Mobile" ── */
+  if (isMobile) {
+    return (
+      <header
+        className="pwa-topbar"
+        style={{ background: '#076c9e', height: 64 }}
+      >
+        <span className="pwa-topbar-logo">⚡SPEKTRA</span>
+        <button
+          className="pwa-topbar-hamburger"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Buka menu"
+        >
+          <Menu size={24} color="#ffffff" />
+        </button>
+      </header>
+    )
+  }
+
+  /* ── Desktop topbar — floating rounded card with dropdown ── */
   return (
     <>
-      {/* Sticky wrapper with bg-app-bg so rounded card floats above page */}
       <div className="sticky top-0 z-30 bg-app-bg px-4 pt-4 pb-0 sm:px-6">
         <header
           className="flex items-center justify-between bg-white px-4 sm:px-6 rounded-2xl shadow-sm"
           style={{ height: 60, border: '1px solid #e8edf2' }}
         >
           <div className="flex items-center gap-3">
-            {isMobile && (
-              <button
-                onClick={() => setMobileOpen(true)}
-                className="p-1.5 -ml-1.5 text-app-text hover:bg-app-bg rounded-md transition-colors"
-              >
-                <Menu size={22} />
-              </button>
-            )}
+            <p className="text-[15px] font-semibold text-app-text">
+              {getPageTitle(pathname)}
+            </p>
           </div>
 
-          {/* User info + avatar (triggers dropdown) */}
           <div className="flex items-center gap-3">
             <div className="text-right">
               <p className="text-[13px] font-semibold text-app-text leading-tight">
@@ -169,7 +179,6 @@ export default function Topbar() {
               </p>
             </div>
 
-            {/* Avatar + dropdown wrapper */}
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={() => setDropdownOpen((v) => !v)}
@@ -179,13 +188,11 @@ export default function Topbar() {
                 {user?.nama ? getInitials(user.nama) : '?'}
               </button>
 
-              {/* Dropdown */}
               {dropdownOpen && (
                 <div
                   className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
                   style={{ top: '100%' }}
                 >
-                  {/* Section 1 — user identity */}
                   <div className="flex items-center gap-3 px-4 py-3.5">
                     <div
                       className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
@@ -205,7 +212,6 @@ export default function Topbar() {
 
                   <div className="border-t border-gray-100" />
 
-                  {/* Section 2 — ganti password */}
                   <button
                     onClick={() => { setDropdownOpen(false); setShowChangePassword(true) }}
                     className="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-app-text hover:bg-gray-50 transition-colors"
@@ -216,7 +222,6 @@ export default function Topbar() {
 
                   <div className="border-t border-gray-100" />
 
-                  {/* Section 3 — logout */}
                   <button
                     onClick={logout}
                     className="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-red-600 hover:bg-red-50 transition-colors"

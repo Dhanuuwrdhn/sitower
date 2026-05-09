@@ -165,11 +165,21 @@
   .login-panel-left { display: flex; }
 }
 
+.login-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
 .login-overlay {
   position: absolute;
   inset: 0;
   background: rgba(7, 108, 158, 0.4);   /* Figma fill_2XIKL3 */
   z-index: 1;
+  pointer-events: none;
 }
 
 /* --- Right panel: form area --- */

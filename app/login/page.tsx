@@ -34,12 +34,11 @@ export default function LoginPage() {
     <div className="login-page">
       {/* Left panel — tower image with blue overlay */}
       <div className="login-panel-left">
-        <Image
-          src="/images/login-bg.png"
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/login-bg.jpg"
           alt="Tower transmisi PLN"
-          fill
-          className="object-cover"
-          priority
+          className="login-bg-img"
         />
         {/* Blue tint overlay matching Figma rgba(7, 108, 158, 0.4) */}
         <div className="login-overlay" />

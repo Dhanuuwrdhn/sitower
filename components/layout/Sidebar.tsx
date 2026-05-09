@@ -1,7 +1,8 @@
 'use client'
 
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import {
   IconDashboard, IconRiwayat, IconAset, IconSertifikat,
   IconAsBuilt, IconClimb, IconCleanup, IconUsers, IconToggle,
@@ -47,7 +48,7 @@ function NavLink({
   collapsed: boolean
 }) {
   return (
-    <a
+    <Link
       href={href}
       title={collapsed ? label : undefined}
       style={{
@@ -84,7 +85,7 @@ function NavLink({
     >
       <Icon size={20} className="shrink-0" />
       {!collapsed && <span style={{ letterSpacing: '-0.01em' }}>{label}</span>}
-    </a>
+    </Link>
   )
 }
 
@@ -103,7 +104,7 @@ export default function Sidebar() {
 
   const [user, setUser] = useState<ReturnType<typeof getUser>>(null)
   const [isAdmin, setIsAdmin] = useState(false)
-  useEffect(() => {
+  useLayoutEffect(() => {
     const u = getUser()
     setUser(u)
     setIsAdmin(u?.role === 'admin')

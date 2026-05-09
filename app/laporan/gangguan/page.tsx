@@ -6,6 +6,7 @@ import {
   Search, Plus, Calendar, RefreshCw, SlidersHorizontal,
   Trash2, X, Upload, ChevronLeft, ChevronRight,
   ChevronDown, MoreHorizontal, Eye, Pencil, MapPin,
+  ArrowLeft, AlertTriangle,
 } from 'lucide-react'
 import { laporanApi, towersApi } from '@/lib/api'
 import { getUser, isAdmin } from '@/lib/auth'
@@ -402,13 +403,16 @@ function FotoUpload({
 const EMPTY_FORM = {
   towerId: '',
   towerLabel: '',
+  towerIdEnd: '',       // span end tower (pekerjaan_pihak_lain)
+  towerLabelEnd: '',
   jenisGangguan: '',
   tanggalWaktu: new Date().toISOString().slice(0, 16),
   levelRisiko: 'sedang',
   status: 'berlangsung',
-  lokasiDetail: '',
-  deskripsi: '',
-  keterangan: '',
+  lokasiDetail: '',     // stores span "T-x s/d T-y" for ppl
+  deskripsi: '',        // Uraian Pekerjaan
+  keterangan: '',       // Upaya Pengendalian (ppl) / notes
+  pihakLain: '',        // company name for pekerjaan_pihak_lain (stored in teknisi)
   // CUI / Cleanup
   teknisi: '',
   noSpk: '',
@@ -437,33 +441,41 @@ function LaporanDrawer({
   onSaved: () => void
 }) {
   const user = getUser()
+  const { isMobile } = useSidebar()
   const [form, setForm] = useState(EMPTY_FORM)
   const [fotos, setFotos] = useState<File[]>([])
   const [fotoUrls, setFotoUrls] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
   const [locating, setLocating] = useState(false)
+  const [useGPS, setUseGPS] = useState(false)
   const [detectedMsg, setDetectedMsg] = useState('')
+  const [alertVisible, setAlertVisible] = useState(true)
 
   useEffect(() => {
     if (open) {
+      setAlertVisible(true)
       if (initial) {
+        const isPPL = initial.jenisGangguan === 'pekerjaan_pihak_lain'
         setForm({
           ...EMPTY_FORM,
-          towerId: initial.towerId ?? '',
-          towerLabel: initial.tower?.nomorTower ?? '',
+          towerId:      initial.towerId ?? '',
+          towerLabel:   initial.tower?.nomorTower ?? '',
           jenisGangguan: initial.jenisGangguan ?? '',
           tanggalWaktu: initial.tanggal?.slice(0, 16) ?? new Date().toISOString().slice(0, 16),
-          levelRisiko: initial.levelRisiko ?? 'sedang',
-          status: initial.status ?? 'berlangsung',
-          lokasiDetail: initial.lokasiDetail ?? '',
-          deskripsi: initial.deskripsi ?? '',
-          keterangan: initial.keterangan ?? '',
-          teknisi: initial.teknisi ?? '',
-          noSpk: initial.noSpk ?? '',
-          temuan: initial.temuan ?? '',
-          hasil: initial.hasil ?? '',
-          penyebab: initial.penyebab ?? '',
-          durasi: initial.durasi ?? '',
+          levelRisiko:  initial.levelRisiko ?? 'sedang',
+          status:       initial.status ?? 'berlangsung',
+          lokasiDetail: isPPL ? '' : (initial.lokasiDetail ?? ''),
+          deskripsi:    initial.deskripsi ?? '',
+          keterangan:   initial.keterangan ?? '',
+          pihakLain:    isPPL ? (initial.teknisi ?? '') : '',
+          teknisi:      isPPL ? '' : (initial.teknisi ?? ''),
+          noSpk:        initial.noSpk ?? '',
+          temuan:       initial.temuan ?? '',
+          hasil:        initial.hasil ?? '',
+          penyebab:     initial.penyebab ?? '',
+          durasi:       initial.durasi ?? '',
+          towerIdEnd:   '',
+          towerLabelEnd: '',
         })
         setFotoUrls(initial.foto ?? [])
       } else {
@@ -471,10 +483,9 @@ function LaporanDrawer({
         setFotos(initialFotos || [])
         setFotoUrls([])
         setDetectedMsg('')
+        setUseGPS(false)
         if (initialFotos && initialFotos.length > 0) {
-          setTimeout(() => {
-            document.getElementById('btn-detect-location')?.click()
-          }, 100)
+          setTimeout(() => { document.getElementById('btn-detect-location')?.click() }, 100)
         }
       }
     }
@@ -484,62 +495,44 @@ function LaporanDrawer({
 
   const handleDetectLocation = () => {
     if (readOnly || locating) return
-    if (!navigator.geolocation) {
-      toast.error('Browser tidak mendukung deteksi lokasi')
-      return
-    }
+    if (!navigator.geolocation) { toast.error('Browser tidak mendukung deteksi lokasi'); return }
     setLocating(true)
     setDetectedMsg('Mendeteksi lokasi Anda...')
-    
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const userLat = pos.coords.latitude
-        const userLng = pos.coords.longitude
-        let minDistance = Infinity
-        let nearest: TowerOption | null = null
-
+        const { latitude: lat, longitude: lng } = pos.coords
+        let min = Infinity; let nearest: TowerOption | null = null
         for (const t of towerOptions) {
-          if (t.lat && t.lng) {
-            const d = getDistance(userLat, userLng, t.lat, t.lng)
-            if (d < minDistance) {
-              minDistance = d
-              nearest = t
-            }
-          }
+          if (t.lat && t.lng) { const d = getDistance(lat, lng, t.lat, t.lng); if (d < min) { min = d; nearest = t } }
         }
-
-        if (nearest && minDistance <= 500) {
+        if (nearest && min <= 500) {
           setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: nearest!.nomorTower }))
-          setDetectedMsg(`📍 Berada di dekat Tower ${nearest.nomorTower} (${Math.round(minDistance)}m)`)
-          toast.success('Tower terdekat otomatis dipilih!')
+          setDetectedMsg(`📍 Tower ${nearest.nomorTower} (${Math.round(min)}m)`)
+          toast.success('Tower terdekat dipilih!')
         } else if (nearest) {
-          setDetectedMsg(`⚠️ Tower terdekat (${nearest.nomorTower}) berjarak ${Math.round(minDistance)}m (di atas 500m)`)
-          toast.error('Lokasi Anda terlalu jauh dari tower terdekat.')
-        } else {
-          setDetectedMsg('')
+          setDetectedMsg(`⚠️ Tower terdekat (${nearest.nomorTower}) ${Math.round(min)}m — terlalu jauh`)
         }
         setLocating(false)
       },
       (err) => {
         setDetectedMsg('')
-        if (err.code === 1) {
-          // Permission denied — likely HTTP or user denied
-          toast.error('Izin lokasi ditolak. Silakan pilih tower secara manual.')
-        } else {
-          toast.error('Gagal mendapatkan lokasi. Silakan pilih tower manual.')
-        }
+        toast.error(err.code === 1 ? 'Izin lokasi ditolak.' : 'Gagal mendapatkan lokasi.')
         setLocating(false)
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 10000 },
     )
   }
+
+  useEffect(() => {
+    if (useGPS && !readOnly) handleDetectLocation()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [useGPS])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (readOnly) { onClose(); return }
     if (!form.towerId) { toast.error('Pilih tower terlebih dahulu'); return }
     if (!form.jenisGangguan) { toast.error('Pilih kategori gangguan'); return }
-
     setSaving(true)
     try {
       let uploadedUrls: string[] = []
@@ -548,26 +541,29 @@ function LaporanDrawer({
         uploadedUrls = up.data.urls ?? []
       }
 
+      const isPPL = form.jenisGangguan === 'pekerjaan_pihak_lain'
+      const spanLabel = isPPL && form.towerIdEnd
+        ? `${form.towerLabel} s/d ${form.towerLabelEnd}`
+        : form.lokasiDetail
+
       const payload = {
-        towerId: form.towerId,
+        towerId:      form.towerId,
         jenisGangguan: form.jenisGangguan,
-        tanggal: form.tanggalWaktu,
-        levelRisiko: form.levelRisiko,
-        status: form.status,
-        lokasiDetail: form.lokasiDetail,
-        deskripsi: form.deskripsi,
-        keterangan: form.keterangan,
-        foto: [...fotoUrls, ...uploadedUrls],
-        ...((['cui', 'cleanup'].includes(form.jenisGangguan)) && {
+        tanggal:      form.tanggalWaktu,
+        levelRisiko:  form.levelRisiko,
+        status:       form.status,
+        lokasiDetail: spanLabel,
+        deskripsi:    form.deskripsi,
+        keterangan:   form.keterangan,
+        foto:         [...fotoUrls, ...uploadedUrls],
+        ...(isPPL && { teknisi: form.pihakLain }),
+        ...(!isPPL && ['cui', 'cleanup'].includes(form.jenisGangguan) && {
           teknisi: form.teknisi,
-          noSpk: form.noSpk,
-          temuan: form.jenisGangguan === 'cui' ? form.temuan : undefined,
-          hasil: form.jenisGangguan === 'cui' ? form.hasil : undefined,
+          noSpk:   form.noSpk,
+          temuan:  form.jenisGangguan === 'cui' ? form.temuan : undefined,
+          hasil:   form.jenisGangguan === 'cui' ? form.hasil  : undefined,
         }),
-        ...(form.jenisGangguan === 'gangguan' && {
-          penyebab: form.penyebab,
-          durasi: form.durasi,
-        }),
+        ...(form.jenisGangguan === 'gangguan' && { penyebab: form.penyebab, durasi: form.durasi }),
       }
 
       if (initial?.id) {
@@ -575,10 +571,9 @@ function LaporanDrawer({
         toast.success('Laporan berhasil diperbarui')
       } else {
         await laporanApi.create(payload)
-        toast.success('Laporan berhasil ditambahkan')
+        toast.success('Laporan berhasil dibuat!')
       }
-      onSaved()
-      onClose()
+      onSaved(); onClose()
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? 'Gagal menyimpan laporan')
     } finally {
@@ -586,166 +581,298 @@ function LaporanDrawer({
     }
   }
 
+  const isPPL     = form.jenisGangguan === 'pekerjaan_pihak_lain'
   const isCUI     = form.jenisGangguan === 'cui'
   const isCleanup = form.jenisGangguan === 'cleanup'
   const isGangg   = form.jenisGangguan === 'gangguan'
+  const title     = readOnly ? 'Detail Laporan' : initial ? 'Edit Laporan' : 'Buat Laporan Gangguan'
 
+  // ── Shared form body ─────────────────────────────────────────────────────────
+  const formBody = (
+    <form id="laporan-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+
+      {/* GPS alert */}
+      {!readOnly && alertVisible && (
+        <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+          <AlertTriangle size={16} className="text-amber-500 shrink-0 mt-0.5" />
+          <p className="text-[12px] text-amber-700 leading-relaxed flex-1">
+            Perhatian: Jika anda memilih opsi "Gunakan lokasi saat ini". Pastikan anda sudah menghidupkan akses lokasi di handphone anda.
+          </p>
+          <button type="button" onClick={() => setAlertVisible(false)} className="text-amber-400 hover:text-amber-600 shrink-0">
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
+      {/* Foto bukti */}
+      <div>
+        <label className="block text-[12px] font-semibold text-app-text mb-1.5">Foto Bukti Terjadinya Gangguan</label>
+        {fotoUrls.length > 0 && (
+          <div className="grid grid-cols-4 gap-2 mb-2">
+            {fotoUrls.map((url, i) => (
+              <img key={i} src={url} alt="" className="w-full aspect-square object-cover rounded-lg" />
+            ))}
+          </div>
+        )}
+        {!readOnly && <FotoUpload fotos={fotos} onChange={setFotos} onPhotoAdded={handleDetectLocation} />}
+      </div>
+
+      {/* Tower terdampak — start (always) */}
+      <div>
+        <label className="block text-[12px] font-semibold text-app-text mb-1.5">
+          {isPPL ? 'Tower Terdampak (Start)' : 'Tower Terganggu'}
+        </label>
+        {readOnly ? (
+          <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
+        ) : (
+          <TowerDropdown
+            options={towerOptions}
+            value={form.towerId}
+            onChange={(id, label) => setForm(f => ({ ...f, towerId: id, towerLabel: label }))}
+          />
+        )}
+      </div>
+
+      {/* GPS checkbox */}
+      {!readOnly && (
+        <div className="flex items-center gap-2.5">
+          <div
+            onClick={() => setUseGPS(v => !v)}
+            className={`w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors shrink-0 ${useGPS ? 'bg-blue-600 border-blue-600' : 'border-app-border bg-white'}`}
+          >
+            {useGPS && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+          </div>
+          <button
+            id="btn-detect-location"
+            type="button"
+            onClick={() => { setUseGPS(true); if (!locating) handleDetectLocation() }}
+            className="text-[13px] text-app-text"
+          >
+            Gunakan lokasi anda saat ini.
+          </button>
+          {locating && <span className="text-[11px] text-blue-500 animate-pulse">Mendeteksi...</span>}
+        </div>
+      )}
+      {detectedMsg && (
+        <p className={`text-[12px] font-medium -mt-2 ${detectedMsg.includes('⚠️') ? 'text-orange-600' : 'text-green-600'}`}>{detectedMsg}</p>
+      )}
+
+      {/* Tower end (span) — only for pekerjaan_pihak_lain */}
+      {isPPL && !readOnly && (
+        <div>
+          <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tower Terdampak (End)</label>
+          <TowerDropdown
+            options={towerOptions}
+            value={form.towerIdEnd}
+            onChange={(id, label) => setForm(f => ({ ...f, towerIdEnd: id, towerLabelEnd: label }))}
+          />
+        </div>
+      )}
+
+      {/* Klasifikasi kerawanan */}
+      <div>
+        <label className="block text-[12px] font-semibold text-app-text mb-1.5">Klasifikasi Kerawanan</label>
+        <select
+          disabled={readOnly}
+          value={form.jenisGangguan}
+          onChange={(e) => set('jenisGangguan', e.target.value)}
+          className="form-input"
+        >
+          <option value="">Pilih kategori...</option>
+          {JENIS_OPTIONS.filter(o => o.value).map(o => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Uraian Pekerjaan / Deskripsi */}
+      <div>
+        <label className="block text-[12px] font-semibold text-app-text mb-1.5">
+          {isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'}
+        </label>
+        <textarea
+          disabled={readOnly}
+          rows={4}
+          value={form.deskripsi}
+          onChange={(e) => set('deskripsi', e.target.value)}
+          className="form-input resize-none"
+          placeholder={isPPL ? 'Uraikan pekerjaan pihak lain...' : 'Deskripsi gangguan...'}
+        />
+      </div>
+
+      {/* Pekerjaan Pihak Lain section */}
+      {isPPL && (
+        <>
+          <div className="flex items-center gap-3 py-1">
+            <hr className="flex-1 border-app-border" />
+            <span className="text-[11px] font-bold text-app-muted uppercase tracking-wider">Informasi Pihak Lain</span>
+            <hr className="flex-1 border-app-border" />
+          </div>
+          <div>
+            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Pihak Lain</label>
+            <input
+              disabled={readOnly}
+              type="text"
+              value={form.pihakLain}
+              onChange={(e) => set('pihakLain', e.target.value)}
+              className="form-input"
+              placeholder="Nama perusahaan / pihak lain..."
+            />
+          </div>
+          <div>
+            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Upaya Pengendalian</label>
+            <textarea
+              disabled={readOnly}
+              rows={4}
+              value={form.keterangan}
+              onChange={(e) => set('keterangan', e.target.value)}
+              className="form-input resize-none"
+              placeholder="Tindakan pengendalian yang sudah dilakukan..."
+            />
+          </div>
+        </>
+      )}
+
+      {/* CUI / Cleanup extra fields */}
+      {(isCUI || isCleanup) && (
+        <div className="space-y-4 p-4 bg-app-bg rounded-xl border border-app-border">
+          <p className="text-[11px] font-bold text-app-muted uppercase tracking-wider">{isCUI ? 'Detail CUI' : 'Detail Cleanup'}</p>
+          <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Teknisi</label><input disabled={readOnly} type="text" value={form.teknisi} onChange={(e) => set('teknisi', e.target.value)} className="form-input" /></div>
+          <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">No. SPK</label><input disabled={readOnly} type="text" value={form.noSpk} onChange={(e) => set('noSpk', e.target.value)} className="form-input" /></div>
+          {isCUI && (
+            <>
+              <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Temuan</label><textarea disabled={readOnly} rows={3} value={form.temuan} onChange={(e) => set('temuan', e.target.value)} className="form-input resize-none" /></div>
+              <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Hasil Inspeksi</label><textarea disabled={readOnly} rows={3} value={form.hasil} onChange={(e) => set('hasil', e.target.value)} className="form-input resize-none" /></div>
+            </>
+          )}
+        </div>
+      )}
+
+      {isGangg && (
+        <div className="space-y-4 p-4 bg-app-bg rounded-xl border border-app-border">
+          <p className="text-[11px] font-bold text-app-muted uppercase tracking-wider">Detail Gangguan Teknis</p>
+          <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Penyebab</label><input disabled={readOnly} type="text" value={form.penyebab} onChange={(e) => set('penyebab', e.target.value)} className="form-input" /></div>
+          <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Durasi (jam)</label><input disabled={readOnly} type="number" value={form.durasi} onChange={(e) => set('durasi', e.target.value)} className="form-input" /></div>
+        </div>
+      )}
+
+      {/* Non-PPL keterangan */}
+      {!isPPL && (
+        <div>
+          <label className="block text-[12px] font-semibold text-app-text mb-1.5">Keterangan</label>
+          <textarea disabled={readOnly} rows={3} value={form.keterangan} onChange={(e) => set('keterangan', e.target.value)} className="form-input resize-none" />
+        </div>
+      )}
+
+      {/* Common fields */}
+      <div>
+        <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tanggal & Waktu</label>
+        <input disabled={readOnly} type="datetime-local" value={form.tanggalWaktu} onChange={(e) => set('tanggalWaktu', e.target.value)} className="form-input" />
+      </div>
+
+      <div>
+        <label className="block text-[12px] font-semibold text-app-text mb-2">Level Risiko</label>
+        <div className="grid grid-cols-3 gap-2">
+          {LEVEL_OPTIONS.map((l) => (
+            <button
+              key={l.value} type="button" disabled={readOnly}
+              onClick={() => set('levelRisiko', l.value)}
+              className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all text-[13px] font-semibold ${
+                form.levelRisiko === l.value ? `${l.bg} ${l.color} border-current` : 'border-app-border text-app-muted hover:border-gray-300'
+              }`}
+            >
+              <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${l.dot}`} />
+              {l.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-[12px] font-semibold text-app-text mb-1.5">Status</label>
+        <div className="flex items-center gap-3">
+          <select disabled={readOnly} value={form.status} onChange={(e) => set('status', e.target.value)} className="form-input">
+            {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+          </select>
+          <StatusPill status={form.status} />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-[12px] font-semibold text-app-text mb-1.5">Pelapor</label>
+        <input readOnly className="form-input bg-app-bg text-app-muted cursor-not-allowed"
+          value={initial?.pelapor?.nama ?? user?.nama ?? '—'} />
+      </div>
+    </form>
+  )
+
+  // ── Mobile PWA: full-screen bottom-to-top ────────────────────────────────────
+  if (isMobile) {
+    return (
+      <>
+        <div
+          className={`fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          onClick={onClose}
+        />
+        <div
+          className={`fixed inset-0 z-50 flex flex-col bg-white transition-transform duration-300 ease-in-out ${open ? 'translate-y-0' : 'translate-y-full'}`}
+        >
+          {/* PWA Header */}
+          <div
+            className="flex items-center gap-3 px-4 shrink-0"
+            style={{ height: 64, background: '#076c9e' }}
+          >
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <ArrowLeft size={22} />
+            </button>
+            <div>
+              <p className="text-white font-bold text-[16px] leading-tight">{title}</p>
+            </div>
+          </div>
+
+          {formBody}
+
+          {/* Bottom CTA */}
+          <div className="px-5 py-4 border-t border-app-border shrink-0 bg-white">
+            {readOnly ? (
+              <button onClick={onClose} className="btn-outline w-full justify-center">Tutup</button>
+            ) : (
+              <button
+                type="submit"
+                form="laporan-form"
+                disabled={saving}
+                className="btn-primary w-full justify-center"
+              >
+                {saving ? 'Menyimpan...' : 'Buat Laporan'}
+              </button>
+            )}
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  // ── Desktop: right-side drawer ───────────────────────────────────────────────
   return (
     <>
       <div
         className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-200 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={onClose}
       />
-
       <div
         className={`fixed top-0 right-0 bottom-0 z-50 flex flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out w-full sm:w-[560px] ${open ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-app-border shrink-0">
-          <h2 className="text-[15px] font-bold text-app-text">
-            {readOnly ? 'Detail Laporan' : initial ? 'Edit Laporan' : 'Tambah Laporan Baru'}
-          </h2>
+          <h2 className="text-[15px] font-bold text-app-text">{title}</h2>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted transition-colors">
             <X size={18} />
           </button>
         </div>
 
-        <form id="laporan-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
-
-          <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tower</label>
-            {readOnly ? (
-              <input type="text" readOnly className="form-input bg-app-bg text-app-muted" value={form.towerId} />
-            ) : (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="flex-1">
-                    <TowerDropdown
-                      options={towerOptions}
-                      value={form.towerId}
-                      onChange={(id, label) => setForm((f) => ({ ...f, towerId: id, towerLabel: label }))}
-                    />
-                  </div>
-                  <button
-                    id="btn-detect-location"
-                    type="button"
-                    onClick={handleDetectLocation}
-                    disabled={locating}
-                    className="p-3 bg-app-bg border border-app-border rounded-xl text-app-muted hover:text-blue-600 hover:bg-blue-50 transition-colors shrink-0 disabled:opacity-50"
-                    title="Deteksi Tower Terdekat via GPS"
-                  >
-                    <MapPin size={18} className={locating ? 'animate-pulse text-blue-500' : ''} />
-                  </button>
-                </div>
-                {detectedMsg && (
-                  <p className={`text-[12px] font-medium ${detectedMsg.includes('⚠️') ? 'text-orange-600' : 'text-green-600'}`}>
-                    {detectedMsg}
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Kategori Gangguan</label>
-            <select disabled={readOnly} value={form.jenisGangguan} onChange={(e) => set('jenisGangguan', e.target.value)} className="form-input">
-              <option value="">Pilih kategori...</option>
-              {JENIS_OPTIONS.filter((o) => o.value).map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tanggal & Waktu</label>
-            <input disabled={readOnly} type="datetime-local" value={form.tanggalWaktu} onChange={(e) => set('tanggalWaktu', e.target.value)} className="form-input" />
-          </div>
-
-          <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-2">Level Risiko</label>
-            <div className="grid grid-cols-3 gap-2">
-              {LEVEL_OPTIONS.map((l) => (
-                <button
-                  key={l.value}
-                  type="button"
-                  disabled={readOnly}
-                  onClick={() => set('levelRisiko', l.value)}
-                  className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all text-[13px] font-semibold ${
-                    form.levelRisiko === l.value ? `${l.bg} ${l.color} border-current` : 'border-app-border text-app-muted hover:border-gray-300'
-                  }`}
-                >
-                  <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${l.dot}`} />
-                  {l.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Status</label>
-            <div className="flex items-center gap-3">
-              <select disabled={readOnly} value={form.status} onChange={(e) => set('status', e.target.value)} className="form-input">
-                {STATUS_OPTIONS.map((s) => (
-                  <option key={s.value} value={s.value}>{s.label}</option>
-                ))}
-              </select>
-              <StatusPill status={form.status} />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Lokasi Detail</label>
-            <input disabled={readOnly} type="text" value={form.lokasiDetail} onChange={(e) => set('lokasiDetail', e.target.value)} className="form-input" />
-          </div>
-
-          <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Deskripsi</label>
-            <textarea disabled={readOnly} rows={4} value={form.deskripsi} onChange={(e) => set('deskripsi', e.target.value)} className="form-input resize-none" />
-          </div>
-
-          <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Foto Dokumentasi</label>
-            {fotoUrls.length > 0 && (
-              <div className="grid grid-cols-5 gap-2 mb-3">
-                {fotoUrls.map((url, i) => (
-                  <img key={i} src={url} alt="Foto Gangguan" className="w-full aspect-square object-cover rounded-lg" />
-                ))}
-              </div>
-            )}
-            {!readOnly && <FotoUpload fotos={fotos} onChange={setFotos} onPhotoAdded={handleDetectLocation} />}
-          </div>
-
-          {(isCUI || isCleanup) && (
-            <div className="space-y-4 p-4 bg-app-bg rounded-xl border border-app-border">
-              <p className="text-[11px] font-bold text-app-muted uppercase tracking-wider">{isCUI ? 'Detail CUI' : 'Detail Cleanup'}</p>
-              <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Teknisi</label><input disabled={readOnly} type="text" value={form.teknisi} onChange={(e) => set('teknisi', e.target.value)} className="form-input" /></div>
-              <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">No. SPK</label><input disabled={readOnly} type="text" value={form.noSpk} onChange={(e) => set('noSpk', e.target.value)} className="form-input" /></div>
-              {isCUI && (
-                <>
-                  <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Temuan</label><textarea disabled={readOnly} rows={3} value={form.temuan} onChange={(e) => set('temuan', e.target.value)} className="form-input resize-none" /></div>
-                  <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Hasil Inspeksi</label><textarea disabled={readOnly} rows={3} value={form.hasil} onChange={(e) => set('hasil', e.target.value)} className="form-input resize-none" /></div>
-                </>
-              )}
-            </div>
-          )}
-
-          {isGangg && (
-            <div className="space-y-4 p-4 bg-app-bg rounded-xl border border-app-border">
-              <p className="text-[11px] font-bold text-app-muted uppercase tracking-wider">Detail Gangguan Teknis</p>
-              <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Penyebab</label><input disabled={readOnly} type="text" value={form.penyebab} onChange={(e) => set('penyebab', e.target.value)} className="form-input" /></div>
-              <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Durasi (jam)</label><input disabled={readOnly} type="number" value={form.durasi} onChange={(e) => set('durasi', e.target.value)} className="form-input" /></div>
-            </div>
-          )}
-
-          <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Keterangan</label>
-            <textarea disabled={readOnly} rows={3} value={form.keterangan} onChange={(e) => set('keterangan', e.target.value)} className="form-input resize-none" />
-          </div>
-
-          <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Pelapor</label>
-            <input type="text" value={initial?.pelapor?.nama ?? user?.nama ?? '—'} readOnly className="form-input bg-app-bg text-app-muted cursor-not-allowed" />
-          </div>
-        </form>
+        {formBody}
 
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border shrink-0 bg-white">
           <button type="button" onClick={onClose} className="btn-outline">
@@ -753,7 +880,7 @@ function LaporanDrawer({
           </button>
           {!readOnly && (
             <button type="submit" form="laporan-form" disabled={saving} className="btn-primary">
-              {saving ? 'Menyimpan...' : 'Simpan Laporan'}
+              {saving ? 'Menyimpan...' : 'Buat Laporan'}
             </button>
           )}
         </div>

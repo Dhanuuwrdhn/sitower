@@ -1008,3 +1008,67 @@
   text-decoration: none;
   margin-top: 8px;
 }
+
+/* =============================================
+   PWA TOPBAR — Figma 48:13809 "Header Mobile"
+   ============================================= */
+.pwa-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.pwa-topbar-logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.pwa-topbar-hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.pwa-topbar-hamburger:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* =============================================
+   LOGIN — "Powered by Born2Works" badge
+   ============================================= */
+.login-powered {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 12px;
+}
+
+.login-powered strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .login-powered {
+    display: flex;
+  }
+}

@@ -109,6 +109,11 @@ export default function LoginPage() {
             ) : 'Masuk'}
           </button>
         </form>
+
+        {/* Powered by Born2Works — mobile only */}
+        <p className="login-powered">
+          Powered by <strong>Born2Works</strong>
+        </p>
       </div>
 
       {/* Footer bar — Figma: Menu - Current 430×40 */}

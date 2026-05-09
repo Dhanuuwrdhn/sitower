@@ -12,7 +12,10 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'SPEKTRA – Sistem Pemantauan Kerawanan Transmisi',
-  description: 'PLN UIW Banten',
+  description: 'Sistem Pemantauan Kerawanan Transmisi Tower PLN UIW Banten. Built by Born2Works.',
+  keywords: ['SPEKTRA', 'PLN', 'tower transmisi', 'kerawanan', 'monitoring', 'Born2Works'],
+  authors: [{ name: 'Born2Works' }],
+  creator: 'Born2Works',
   manifest: '/manifest.json',
 }
 

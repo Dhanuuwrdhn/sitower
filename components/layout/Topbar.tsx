@@ -54,12 +54,6 @@ export default function Topbar() {
             <Menu size={22} />
           </button>
         )}
-        {/* Page title — hidden on dashboard */}
-        {title ? (
-          <h1 className="text-[15px] font-semibold text-app-text hidden sm:block">{title}</h1>
-        ) : (
-          <div />
-        )}
       </div>
 
       {/* User info + logout */}

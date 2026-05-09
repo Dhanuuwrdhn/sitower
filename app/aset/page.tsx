@@ -25,6 +25,9 @@ export default function AsetPage() {
   const [page, setPage]       = useState(1)
   const [limit, setLimit]     = useState(10)
 
+  const [isAdminUser, setIsAdminUser] = useState(false)
+  useEffect(() => { setIsAdminUser(isAdmin()) }, [])
+
   const importRef = useRef<HTMLInputElement>(null)
   const [importing, setImporting] = useState(false)
 
@@ -77,7 +80,7 @@ export default function AsetPage() {
     <>
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-2xl font-bold text-app-text">Data Aset Transmisi</h1>
-        {isAdmin() && (
+        {isAdminUser && (
           <>
             <button
               onClick={() => importRef.current?.click()}
@@ -155,7 +158,7 @@ export default function AsetPage() {
                     <td className="text-right pr-4">
                       <ActionMenu items={[
                         { label: 'Lihat Detail', icon: <Eye size={14} />, onClick: () => toast(`Detail: ${row.nomorTower}`, { icon: '👁' }) },
-                        ...(isAdmin() ? [{ label: 'Edit', icon: <Pencil size={14} />, onClick: () => toast('Edit: ' + row.id) }] : []),
+                        ...(isAdminUser ? [{ label: 'Edit', icon: <Pencil size={14} />, onClick: () => toast('Edit: ' + row.id) }] : []),
                       ]} />
                     </td>
                   </tr>

@@ -291,11 +291,11 @@
 
 .login-form-wrapper {
   width: 100%;
-  max-width: 328px;      /* Figma field width */
+  max-width: 328px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 32px;             /* Figma gap between Fields + Button */
+  gap: 16px;             /* Figma: Fields→Text-Register→Button ~14-16px gap */
 }
 
 /* --- Logo block --- */
@@ -385,22 +385,24 @@
   padding-right: 0;
 }
 
-/* Eye toggle button */
+/* Eye toggle button — Figma: Prefix 44x44 fill=#f6f9fc */
 .login-eye-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
-  background: transparent;
+  width: 44px;
+  height: 44px;
+  background: #f6f9fc;
   border: none;
   border-left: 1px solid #E1E8EC;
-  color: #97AAB3;
+  color: #5F737F;
   cursor: pointer;
-  transition: color 0.15s;
+  transition: background 0.15s, color 0.15s;
   flex-shrink: 0;
 }
 .login-eye-btn:hover {
-  color: #5F737F;
+  background: #edf3f7;
+  color: #076C9E;
 }
 
 /* --- Error banner --- */
@@ -430,7 +432,7 @@
   background: #076C9E;       /* Figma fill_ULLV5D */
   color: #FFFFFF;
   font-family: 'Inter', sans-serif;
-  font-weight: 500;
+  font-weight: 600;          /* Figma: 600 */
   font-size: 14px;
   line-height: 20px;
   cursor: pointer;
@@ -467,21 +469,65 @@
   to { transform: rotate(360deg); }
 }
 
-/* Mobile footer text */
-.login-footer-text {
-  margin-top: auto;
-  padding-top: 24px;
+/* --- Text-Register row — Figma: "Don't have an account?" + "Sign up" 14px --- */
+.login-register-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  justify-content: center;
+}
+.login-register-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: #1B1B1B;
+}
+.login-register-link {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: #076C9E;
+  cursor: pointer;
+}
+.login-register-link:hover {
+  text-decoration: underline;
+}
+
+/* --- Footer bar — Figma: Menu - Current 430x40, white text 12px/500 --- */
+.login-footer-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  z-index: 10;
+  align-items: center;
+  justify-content: center;
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 500;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(4px);
+}
+
+/* Desktop footer (inside right panel) */
+.login-panel-right .login-footer-bar-desktop {
+  margin-top: 32px;
+  font-size: 11px;
   color: #97AAB3;
   text-align: center;
 }
 
-/* --- Mobile PWA: show bg image behind the form card (matches Figma 122:2344) --- */
+/* --- Mobile PWA: bg image + card (matches Figma 122:2344) --- */
 @media (max-width: 1023px) {
   .login-page {
     background: #076c9e;
+    position: relative;
   }
   .login-panel-left {
     display: block;
@@ -494,19 +540,21 @@
     position: relative;
     z-index: 1;
     min-height: 100vh;
-    padding: 2rem 1.5rem 2rem;
+    padding: 40px 1.5rem 60px;
     justify-content: center;
+    align-items: center;
   }
   .login-form-wrapper {
+    width: 100%;
     max-width: 376px;
     background: #ffffff;
     border-radius: 16px;
-    padding: 28px 24px;
+    padding: 24px 24px 24px;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.28);
+    gap: 14px;
   }
-  .login-footer-text {
-    color: rgba(255, 255, 255, 0.7);
-    padding-top: 16px;
+  .login-footer-bar {
+    display: flex;               /* visible on mobile */
   }
 }
 

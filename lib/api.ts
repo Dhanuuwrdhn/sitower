@@ -59,14 +59,32 @@ export const laporanApi = {
 }
 
 export const sertifikatApi = {
-  getAll: (params?: any) => api.get('/sertifikat', { params }),
-  create: (data: any) => api.post('/sertifikat', data),
-  uploadFile: (id: string, file: File) => {
+  // Folders
+  getFolders:   (params?: any) => api.get('/sertifikat', { params }),
+  createFolder: (data: any)    => api.post('/sertifikat', data),
+  updateFolder: (id: string, data: any) => api.put(`/sertifikat/${id}`, data),
+  deleteFolder: (id: string)   => api.delete(`/sertifikat/${id}`),
+  getFolder:    (id: string)   => api.get(`/sertifikat/${id}`),
+  // Dokumen
+  getDokumen:    (folderId: string) => api.get(`/sertifikat/${folderId}/dokumen`),
+  uploadDokumen: (folderId: string, file: File) => {
     const form = new FormData()
     form.append('file', file)
-    return api.post(`/sertifikat/${id}/upload`, form, {
+    return api.post(`/sertifikat/${folderId}/dokumen`, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
+  },
+  getDokumenById: (id: string) => api.get(`/sertifikat/dokumen/${id}`),
+  deleteDokumen:  (id: string) => api.delete(`/sertifikat/dokumen/${id}`),
+  previewDokumen: async (id: string): Promise<string> => {
+    const token = Cookies.get('sitower_token')
+    const base  = process.env.NEXT_PUBLIC_API_URL ?? ''
+    const res   = await fetch(`${base}/sertifikat/dokumen/${id}/preview`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) throw new Error('File tidak ditemukan')
+    const blob = await res.blob()
+    return URL.createObjectURL(blob)
   },
 }
 

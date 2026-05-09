@@ -34,7 +34,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
         style={{ marginLeft: sidebarWidth }}
       >
         <Topbar />
-        <main className="flex-1 bg-app-bg" style={{ padding: '24px 28px' }}>
+        <main className="flex-1 bg-app-bg p-4 sm:p-6 md:px-7">
           {children}
         </main>
       </div>

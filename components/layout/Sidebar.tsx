@@ -86,7 +86,14 @@ function NavLink({
 
 export default function Sidebar() {
   const pathname = usePathname()
-  const { collapsed, setCollapsed } = useSidebar()
+  const { collapsed, setCollapsed, isMobile, mobileOpen, setMobileOpen } = useSidebar()
+
+  useEffect(() => {
+    if (isMobile && mobileOpen) {
+      setMobileOpen(false)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, isMobile])
 
   const [isAdmin, setIsAdmin] = useState(false)
   useEffect(() => {
@@ -101,14 +108,31 @@ export default function Sidebar() {
     return pathname.startsWith(href)
   }
 
+  const isCollapsed = !isMobile && collapsed
+  const transform = isMobile ? (mobileOpen ? 'translateX(0)' : 'translateX(-100%)') : 'translateX(0)'
+  const width = isMobile ? 280 : (collapsed ? 68 : 260)
+
   return (
-    <aside
-      className="fixed left-0 top-0 bottom-0 flex flex-col z-50 transition-all duration-300 overflow-hidden"
-      style={{
-        width: collapsed ? 68 : 260,
-        background: 'linear-gradient(160deg, #085f8e 0%, #0a7ab5 55%, #0d8fd4 100%)',
-      }}
-    >
+    <>
+      {/* Mobile backdrop */}
+      {isMobile && (
+        <div
+          className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
+            mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+      <aside
+        className={`fixed left-0 top-0 bottom-0 flex flex-col z-50 transition-transform duration-300 overflow-hidden ${
+          isMobile && mobileOpen ? 'shadow-2xl' : ''
+        }`}
+        style={{
+          width,
+          transform,
+          background: 'linear-gradient(160deg, #085f8e 0%, #0a7ab5 55%, #0d8fd4 100%)',
+        }}
+      >
       {/* Top-right cyan glow */}
       <div
         className="absolute top-0 right-0 pointer-events-none"
@@ -125,14 +149,14 @@ export default function Sidebar() {
           height: 64,
           display: 'flex',
           alignItems: 'center',
-          padding: collapsed ? '0 14px' : '0 16px',
-          justifyContent: collapsed ? 'center' : 'space-between',
+          padding: isCollapsed ? '0 14px' : '0 16px',
+          justifyContent: isCollapsed ? 'center' : 'space-between',
           borderBottom: '1px solid rgba(255,255,255,0.1)',
           flexShrink: 0,
           position: 'relative',
         }}
       >
-        {!collapsed && (
+        {!isCollapsed && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, userSelect: 'none' }}>
             {/* Lightning bolt — just the emoji, matching Figma */}
             <span style={{ fontSize: 22, lineHeight: 1 }}>⚡</span>
@@ -150,7 +174,7 @@ export default function Sidebar() {
 
         {/* Toggle button — grid icon like Figma */}
         <button
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={() => isMobile ? setMobileOpen(false) : setCollapsed(!collapsed)}
           style={{
             width: 32, height: 32,
             borderRadius: 6,
@@ -172,7 +196,7 @@ export default function Sidebar() {
             el.style.color = 'rgba(255,255,255,0.6)'
             el.style.background = 'transparent'
           }}
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          title={isMobile ? 'Close sidebar' : (isCollapsed ? 'Expand sidebar' : 'Collapse sidebar')}
         >
           {/* Grid/layout toggle icon matching Figma */}
           <IconToggle size={18} />
@@ -188,7 +212,7 @@ export default function Sidebar() {
             label={label}
             Icon={Icon}
             active={isActive(href)}
-            collapsed={collapsed}
+            collapsed={isCollapsed}
           />
         ))}
       </nav>
@@ -205,23 +229,23 @@ export default function Sidebar() {
       {/* Footer */}
       <div style={{
         borderTop: '1px solid rgba(255,255,255,0.1)',
-        padding: collapsed ? '12px 0' : '10px 16px',
+        padding: isCollapsed ? '12px 0' : '10px 16px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: collapsed ? 'center' : 'flex-start',
+        justifyContent: isCollapsed ? 'center' : 'flex-start',
         flexShrink: 0,
         position: 'relative',
       }}>
-        {!collapsed && (
+        {isCollapsed ? (
+          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.28)', fontWeight: 700 }}>B2W</span>
+        ) : (
           <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.03em' }}>
             Powered by{' '}
             <span style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 600 }}>Born2Works</span>
           </p>
         )}
-        {collapsed && (
-          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.28)', fontWeight: 700 }}>B2W</span>
-        )}
       </div>
     </aside>
+    </>
   )
 }

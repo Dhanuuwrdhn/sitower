@@ -14,7 +14,7 @@ interface Stats {
   kebakaran: number
   layangan: number
   pencurian: number
-  pemanfaatan: number
+  pemanfaatan_lahan: number
 }
 
 interface RecentRow {
@@ -27,7 +27,7 @@ interface RecentRow {
 }
 
 // ── Fallback data ─────────────────────────────────────────────────────────────
-const MOCK_STATS: Stats = { ppl: 0, kebakaran: 0, layangan: 0, pencurian: 0, pemanfaatan: 0 }
+const MOCK_STATS: Stats = { ppl: 0, kebakaran: 0, layangan: 0, pencurian: 0, pemanfaatan_lahan: 0 }
 
 const MOCK_RECENT: RecentRow[] = []
 
@@ -37,7 +37,7 @@ const STAT_CARDS = [
   { key: 'kebakaran',   label: 'Kebakaran',                emoji: '🔥', numColor: '#FD2D03' },
   { key: 'layangan',    label: 'Layangan',                 emoji: '🪁', numColor: '#3B84CE' },
   { key: 'pencurian',   label: 'Pencurian',                emoji: '🥷', numColor: '#1B1B1B' },
-  { key: 'pemanfaatan', label: 'Pemanfaatan Pihak Lain',  emoji: '🏡', numColor: '#059669' },
+  { key: 'pemanfaatan_lahan', label: 'Pemanfaatan Lahan',  emoji: '🏡', numColor: '#059669' },
 ] as const
 
 // ── Status pill ───────────────────────────────────────────────────────────────
@@ -75,8 +75,7 @@ function StatCard({
         display: 'flex',
         flexDirection: 'column',
         gap: 6,
-        flex: 1,
-        minWidth: 0,
+        width: '100%',
       }}
     >
       {/* Emoji icon */}
@@ -170,7 +169,7 @@ export default function DashboardPage() {
     kebakaran: stats.kebakaran,
     layangan: stats.layangan,
     pencurian: stats.pencurian,
-    pemanfaatan: stats.pemanfaatan,
+    pemanfaatan_lahan: stats.pemanfaatan_lahan,
   }
 
   return (
@@ -186,7 +185,7 @@ export default function DashboardPage() {
       )}
 
       {/* Stat cards */}
-      <div className="flex gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         {STAT_CARDS.map((card) => (
           <StatCard
             key={card.key}
@@ -206,7 +205,7 @@ export default function DashboardPage() {
         >
           <h2 className="text-[14px] font-semibold text-app-text">Peta Jalur</h2>
         </div>
-        <div style={{ height: 480, borderRadius: '0 0 8px 8px', overflow: 'hidden' }}>
+        <div className="h-[50vh] md:h-[480px] w-full rounded-b-lg overflow-hidden">
           <TowerMap towers={towerKerawanan.length > 0 ? towerKerawanan : undefined} />
         </div>
       </div>
@@ -240,11 +239,13 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          <a href="/laporan/gangguan" className="text-[12px] font-medium" style={{ color: '#076C9E' }}>
-            Lihat Semua Riwayat Gangguan →
+          <a href="/laporan/gangguan" className="hidden sm:block text-[12px] font-medium text-[#076C9E]">
+            Lihat Semua →
           </a>
         </div>
-        <div className="overflow-x-auto">
+        
+        {/* Desktop Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="data-table">
             <thead>
               <tr>
@@ -267,6 +268,26 @@ export default function DashboardPage() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Card List */}
+        <div className="block md:hidden p-4 space-y-3 bg-[#f8fafc]">
+          {recent.map((row) => (
+            <div key={row.id} className="p-3.5 bg-white border border-[#e1e8ec] rounded-xl shadow-sm">
+              <div className="flex justify-between items-start mb-2.5 gap-2">
+                <div>
+                  <p className="font-bold text-[13px] text-app-text">{row.tower}</p>
+                  <p className="font-mono text-[11px] text-app-muted mt-0.5">{row.tanggal}</p>
+                </div>
+                <StatusPill status={row.status} />
+              </div>
+              <p className="text-[12.5px] font-medium text-app-text mb-1">{row.jenisGangguan}</p>
+              <p className="text-[11px] text-app-subtle">Dilaporkan oleh: <span className="text-app-muted">{row.pelapor}</span></p>
+            </div>
+          ))}
+          <a href="/laporan/gangguan" className="block w-full text-center py-2 text-[13px] font-semibold text-[#076C9E] mt-2">
+            Lihat Semua Riwayat
+          </a>
         </div>
       </div>
     </div>

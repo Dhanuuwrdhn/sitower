@@ -1,12 +1,9 @@
 export const KATEGORI_LABEL: Record<string, string> = {
-  pekerjaan_pihak_lain: 'Pekerjaan Pihak Lain (PPL)',
+  pekerjaan_pihak_lain: 'Pekerjaan Pihak Lain',
   kebakaran: 'Kebakaran',
-  layangan: 'Layang-layang',
+  layangan: 'Layangan',
   pencurian: 'Pencurian',
-  pemanfaatan: 'Pemanfaatan Pihak Lain',
-  gangguan: 'Gangguan Teknis',
-  cui: 'Climb Up Inspection',
-  cleanup: 'Clean Up Isolator',
+  pemanfaatan_lahan: 'Pemanfaatan Lahan',
 }
 
 export const KATEGORI_ICON: Record<string, string> = {
@@ -14,10 +11,7 @@ export const KATEGORI_ICON: Record<string, string> = {
   kebakaran: '🔥',
   layangan: '🪁',
   pencurian: '🥷',
-  pemanfaatan: '🏚',
-  gangguan: '⚡',
-  cui: '🔍',
-  cleanup: '🔧',
+  pemanfaatan_lahan: '🏚',
 }
 
 export const KATEGORI_COLOR: Record<string, string> = {
@@ -25,17 +19,11 @@ export const KATEGORI_COLOR: Record<string, string> = {
   kebakaran: '#ef4444',
   layangan: '#d97706',
   pencurian: '#ea580c',
-  pemanfaatan: '#16a34a',
-  gangguan: '#7c3aed',
-  cui: '#0891b2',
-  cleanup: '#0d9488',
+  pemanfaatan_lahan: '#16a34a',
 }
 
 export const STATUS_LABEL: Record<string, string> = {
   berlangsung: 'Sedang Berlangsung',
-  ditangani: 'Sedang Ditangani',
-  menunggu: 'Menunggu Tindak Lanjut',
-  pemantauan: 'Dalam Pemantauan',
-  eskalasi: 'Eskalasi',
-  selesai: 'Sudah Selesai',
+  selesai: 'Selesai',
+  tidak_ada_aktifitas: 'Tidak Ada Aktifitas',
 }

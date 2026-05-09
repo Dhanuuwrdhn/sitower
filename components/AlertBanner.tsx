@@ -4,7 +4,7 @@ interface AlertBannerProps {
   message: string;
   tower: string;
 }
-
+//test
 export default function AlertBanner({ message, tower }: AlertBannerProps) {
   return (
     <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6">

@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { authApi } from '@/lib/api'
 import { saveAuth } from '@/lib/auth'
-import Image from 'next/image'
 
 export default function LoginPage() {
   const router = useRouter()

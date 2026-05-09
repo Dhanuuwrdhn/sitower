@@ -31,32 +31,26 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
-      {/* Background image — visible on all screen sizes */}
+      {/* Background image */}
       <div className="login-panel-left">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/login-bg.jpg"
-          alt="Tower transmisi PLN"
-          className="login-bg-img"
-        />
+        <img src="/images/login-bg.jpg" alt="Tower transmisi PLN" className="login-bg-img" />
         <div className="login-overlay" />
       </div>
 
       {/* Form panel */}
       <div className="login-panel-right">
-        <div className="login-form-wrapper">
-          {/* Logo block */}
+        <form onSubmit={handleSubmit} className="login-form-wrapper">
+          {/* Logo */}
           <div className="login-logo">
             <h1 className="login-logo-title">⚡SPEKTRA</h1>
             <p className="login-logo-subtitle">Sistem Pemantauan Kabel dan Tower Transmisi</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="login-fields">
-            {/* NIK field */}
+          {/* Fields */}
+          <div className="login-fields">
             <div className="login-field-group">
-              <label className="login-label" htmlFor="login-nik">
-                NIK/NPWP/NIP
-              </label>
+              <label className="login-label" htmlFor="login-nik">NIK/NPWP/NIP</label>
               <div className="login-input-container">
                 <input
                   id="login-nik"
@@ -70,11 +64,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Password field */}
             <div className="login-field-group">
-              <label className="login-label" htmlFor="login-password">
-                Password
-              </label>
+              <label className="login-label" htmlFor="login-password">Password</label>
               <div className="login-input-container login-input-container--with-icon">
                 <input
                   id="login-password"
@@ -91,40 +82,38 @@ export default function LoginPage() {
                   className="login-eye-btn"
                   aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
                 >
-                  {showPassword
-                    ? <EyeOff className="w-5 h-5" />
-                    : <Eye className="w-5 h-5" />
-                  }
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
-            {/* Error message */}
             {error && (
               <div className="login-error">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <p>{error}</p>
               </div>
             )}
+          </div>
 
-            {/* Submit button */}
-            <button
-              type="submit"
-              disabled={loading || !nik || !password}
-              className="login-submit-btn"
-            >
-              {loading ? (
-                <>
-                  <span className="login-spinner" />
-                  Memverifikasi...
-                </>
-              ) : 'Masuk'}
-            </button>
-          </form>
-        </div>
+          {/* Button — Figma: 328×44 fill=#076c9e "Masuk" 14px/600 */}
+          <button
+            type="submit"
+            disabled={loading || !nik || !password}
+            className="login-submit-btn"
+          >
+            {loading ? (
+              <>
+                <span className="login-spinner" />
+                Memverifikasi...
+              </>
+            ) : 'Masuk'}
+          </button>
+        </form>
+      </div>
 
-        {/* Footer */}
-        <p className="login-footer-text">© 2026. PT PLN (Persero).</p>
+      {/* Footer bar — Figma: Menu - Current 430×40 */}
+      <div className="login-footer-bar">
+        <span>© 2026. PT PLN (Persero).</span>
       </div>
     </div>
   )

@@ -246,3 +246,37 @@ Ada komponen Leaflet yang di-render di server. Pindahkan ke dynamic import denga
 **Port sudah dipakai**
 Next.js otomatis mencari port berikutnya (3001, 3002, dst).
 Atau set manual: `next dev -p 3003`.
+
+---
+
+## Menggunakan Claude
+
+Project ini sudah dilengkapi skill context untuk Claude Code. Setelah masuk ke folder ini, kamu bisa langsung minta bantuan Claude dengan konteks penuh soal frontend SPEKTRA.
+
+### Cara pakai
+
+1. Pastikan [Claude Code](https://claude.ai/code) sudah terinstal
+2. Buka terminal di folder `frontend-sitower/`
+3. Jalankan:
+   ```bash
+   claude
+   ```
+4. Di dalam Claude, panggil context skill:
+   ```
+   load sitower-workspace-context
+   ```
+5. Setelah itu Claude sudah paham stack, struktur direktori, design system, auth flow, dan konvensi project ini
+
+### Contoh prompt yang bisa langsung dipakai
+
+```
+Tambahkan halaman baru /history/petir dengan tabel dan pagination
+```
+```
+Komponen SearchInput tidak muncul di halaman sertifikat, bantu debug
+```
+```
+Buat API function di lib/api.ts untuk endpoint kerawanan baru
+```
+
+> Skill ini mencakup: Next.js App Router structure, Tailwind design system SPEKTRA, Leaflet SSR workaround, auth cookie flow, dan pattern response `rows/total` dari API.

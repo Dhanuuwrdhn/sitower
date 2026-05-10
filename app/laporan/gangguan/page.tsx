@@ -52,6 +52,14 @@ const LEVEL_OPTIONS = [
   { value: 'aman',   label: 'Aman',   color: 'text-green-600',  bg: 'bg-green-50 border-green-300',   dot: 'bg-green-500' },
 ]
 
+const JENIS_ITEMS = [
+  { value: 'pekerjaan_pihak_lain', label: 'Pekerjaan Pihak Lain', emoji: '🚜' },
+  { value: 'kebakaran',            label: 'Kebakaran',             emoji: '🔥' },
+  { value: 'layangan',             label: 'Layangan',              emoji: '🪁' },
+  { value: 'pencurian',            label: 'Pencurian',             emoji: '🥷' },
+  { value: 'pemanfaatan_lahan',    label: 'Pemanfaatan Lahan',    emoji: '🏡' },
+]
+
 const STATUS_FILTER_OPTIONS = [
   { value: '', label: 'Semua' },
   { value: 'berlangsung',         label: 'Sedang Berlangsung' },
@@ -294,18 +302,19 @@ function TowerDropdown({
   const grouped: Record<string, TowerOption[]> = { garduInduk: [], SUTET: [], SUTT: [], SKTT: [], other: [] }
 
   const q = search.toLowerCase()
-  options
-    .filter((t) => {
-      if (!q) return true
-      return (
-        t.id.toLowerCase().includes(q) ||
-        (t.nama ?? '').toLowerCase().includes(q)
-      )
-    })
-    .forEach((t) => {
-      const g = resolveGroup(t)
-      grouped[g].push(t)
-    })
+  const allFiltered = options.filter((t) => {
+    if (!q) return true
+    return (
+      t.id.toLowerCase().includes(q) ||
+      (t.nama ?? '').toLowerCase().includes(q)
+    )
+  })
+  // Show top 5 by default; show all when searching
+  const limited = !q ? allFiltered.slice(0, 5) : allFiltered
+  limited.forEach((t) => {
+    const g = resolveGroup(t)
+    grouped[g].push(t)
+  })
 
   const selectedTower = value ? options.find((o) => o.id === value) : null
   const selectedLabel = selectedTower ? parseTowerDisplay(selectedTower).label : ''
@@ -324,7 +333,7 @@ function TowerDropdown({
       </button>
 
       {open && (
-        <div className="absolute z-50 left-0 top-[42px] w-full bg-white border border-app-border rounded-xl shadow-dropdown max-h-72 flex flex-col">
+        <div className="absolute z-50 left-0 top-[42px] w-full bg-white border border-app-border rounded-xl shadow-dropdown flex flex-col" style={{ maxHeight: 340 }}>
           <div className="p-2 border-b border-app-border">
             <input
               autoFocus
@@ -334,7 +343,7 @@ function TowerDropdown({
               className="form-input text-[12px]"
             />
           </div>
-          <div className="overflow-y-auto">
+          <div className="overflow-y-auto" style={{ maxHeight: 280 }}>
             {groupOrder.map((g) =>
               grouped[g].length > 0 ? (
                 <div key={g}>
@@ -442,6 +451,249 @@ function FotoUpload({
   )
 }
 
+// ── Shared bottom-sheet shell ─────────────────────────────────────────────────
+
+function BottomSheet({
+  open, onClose, children, height,
+}: {
+  open: boolean; onClose: () => void; children: React.ReactNode; height?: number
+}) {
+  return (
+    <>
+      <div
+        style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+          zIndex: 65, transition: 'opacity 0.3s',
+          opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none',
+        }}
+        onClick={onClose}
+      />
+      <div
+        style={{
+          position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 70,
+          background: '#FFFFFF', borderRadius: '16px 16px 0 0',
+          transform: open ? 'translateY(0)' : 'translateY(100%)',
+          transition: 'transform 0.3s ease-in-out',
+          ...(height ? { height } : {}),
+        }}
+      >
+        {/* Drag handle */}
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 12, paddingBottom: 8 }}>
+          <div style={{ width: 40, height: 4, borderRadius: 3, background: '#E1E8EC' }} />
+        </div>
+        {children}
+      </div>
+    </>
+  )
+}
+
+// ── Jenis Kerawanan bottom sheet ──────────────────────────────────────────────
+
+function JenisKerawananSheet({
+  open, value, onSelect, onClose,
+}: {
+  open: boolean; value: string; onSelect: (v: string) => void; onClose: () => void
+}) {
+  return (
+    <BottomSheet open={open} onClose={onClose} height={356}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 48, position: 'relative' }}>
+        <button
+          onClick={onClose}
+          style={{ position: 'absolute', left: 16, background: 'none', border: 'none', padding: 4, cursor: 'pointer', display: 'flex' }}
+        >
+          <X size={15} style={{ color: '#97AAB3' }} />
+        </button>
+        <span style={{ flex: 1, textAlign: 'center', fontWeight: 700, fontSize: 16, color: '#1B1B1B' }}>
+          Pilih Jenis Kerawanan
+        </span>
+      </div>
+      {/* Items */}
+      {JENIS_ITEMS.map((item, idx) => {
+        const isSelected = value === item.value
+        return (
+          <button
+            key={item.value}
+            onClick={() => { onSelect(item.value); onClose() }}
+            style={{
+              width: '100%', height: 56, display: 'flex', alignItems: 'center',
+              padding: '0 20px', background: isSelected ? '#F6F9FC' : '#FFFFFF',
+              border: 'none', borderBottom: idx < JENIS_ITEMS.length - 1 ? '1px solid #F0F4F6' : 'none',
+              cursor: 'pointer', textAlign: 'left',
+            }}
+          >
+            <span style={{ fontSize: 20, marginRight: 14 }}>{item.emoji}</span>
+            <span style={{ flex: 1, fontWeight: 500, fontSize: 14, color: '#1B1B1B' }}>{item.label}</span>
+            {isSelected && (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M4 10L8 14L16 6" stroke="#076C9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+          </button>
+        )
+      })}
+    </BottomSheet>
+  )
+}
+
+// ── Ambil Foto bottom sheet ───────────────────────────────────────────────────
+
+function AmbilFotoSheet({
+  open, onClose, onFile,
+}: {
+  open: boolean; onClose: () => void; onFile: (files: FileList) => void
+}) {
+  const cameraRef = useRef<HTMLInputElement>(null)
+  const galleryRef = useRef<HTMLInputElement>(null)
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files?.length) { onFile(e.target.files); onClose() }
+    e.target.value = ''
+  }
+
+  return (
+    <BottomSheet open={open} onClose={onClose} height={140}>
+      <button
+        onClick={() => cameraRef.current?.click()}
+        style={{
+          width: '100%', height: 56, display: 'flex', alignItems: 'center',
+          padding: '0 20px', background: '#FFFFFF',
+          border: 'none', borderBottom: '1px solid #F0F4F6', cursor: 'pointer',
+        }}
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ marginRight: 14, flexShrink: 0 }}>
+          <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#076C9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <circle cx="12" cy="13" r="4" stroke="#076C9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <span style={{ fontWeight: 500, fontSize: 14, color: '#1B1B1B' }}>Ambil Foto</span>
+      </button>
+      <button
+        onClick={() => galleryRef.current?.click()}
+        style={{
+          width: '100%', height: 56, display: 'flex', alignItems: 'center',
+          padding: '0 20px', background: '#FFFFFF',
+          border: 'none', cursor: 'pointer',
+        }}
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ marginRight: 14, flexShrink: 0 }}>
+          <rect x="3" y="3" width="18" height="18" rx="2" stroke="#076C9E" strokeWidth="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5" stroke="#076C9E" strokeWidth="2"/>
+          <polyline points="21 15 16 10 5 21" stroke="#076C9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <span style={{ fontWeight: 500, fontSize: 14, color: '#1B1B1B' }}>Pilih dari Galeri</span>
+      </button>
+      <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleChange} />
+      <input ref={galleryRef} type="file" accept="image/*" multiple className="hidden" onChange={handleChange} />
+    </BottomSheet>
+  )
+}
+
+// ── Pilih Tower bottom sheet ──────────────────────────────────────────────────
+
+function PilihTowerSheet({
+  open, options, value, onSelect, onClose,
+}: {
+  open: boolean; options: TowerOption[]; value: string;
+  onSelect: (id: string, label: string) => void; onClose: () => void
+}) {
+  const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    if (!open) setSearch('')
+  }, [open])
+
+  const allFiltered = options.filter((t) => {
+    if (!search) return true
+    const q = search.toLowerCase()
+    return t.id.toLowerCase().includes(q) || (t.nama ?? '').toLowerCase().includes(q)
+  })
+  const displayed = search ? allFiltered : allFiltered.slice(0, 5)
+
+  return (
+    <BottomSheet open={open} onClose={onClose} height={424}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 48, position: 'relative' }}>
+        <button
+          onClick={onClose}
+          style={{ position: 'absolute', left: 16, background: 'none', border: 'none', padding: 4, cursor: 'pointer', display: 'flex' }}
+        >
+          <X size={15} style={{ color: '#97AAB3' }} />
+        </button>
+        <span style={{ flex: 1, textAlign: 'center', fontWeight: 700, fontSize: 16, color: '#1B1B1B' }}>
+          Pilih Tower
+        </span>
+      </div>
+      {/* Search bar */}
+      <div style={{ padding: '12px 16px' }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8,
+          padding: '0 12px', height: 44,
+        }}>
+          <Search size={16} style={{ color: '#566B75', flexShrink: 0 }} />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari tower berdasarkan nama"
+            style={{
+              border: 'none', outline: 'none', width: '100%',
+              fontSize: 14, fontWeight: 500, color: '#1B1B1B', background: 'transparent',
+            }}
+          />
+          {search && (
+            <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex' }}>
+              <X size={14} style={{ color: '#97AAB3' }} />
+            </button>
+          )}
+        </div>
+      </div>
+      {/* Tower list — fixed 280px, scrollable */}
+      <div style={{ height: 280, overflowY: 'auto' }}>
+        {displayed.map((t) => {
+          const { label, sub } = parseTowerDisplay(t)
+          const isSelected = value === t.id
+          return (
+            <button
+              key={t.id}
+              onClick={() => { onSelect(t.id, label); onClose() }}
+              style={{
+                width: '100%', height: 56, display: 'flex', alignItems: 'center',
+                padding: '0 16px', background: isSelected ? '#F6F9FC' : '#FFFFFF',
+                border: 'none', borderBottom: '1px solid #F0F4F6',
+                cursor: 'pointer', textAlign: 'left',
+              }}
+            >
+              <div style={{ flex: 1, overflow: 'hidden' }}>
+                <p style={{
+                  fontFamily: 'monospace', fontWeight: 600, fontSize: 13,
+                  color: isSelected ? '#076C9E' : '#1B1B1B',
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}>{label}</p>
+                {sub && (
+                  <p style={{
+                    fontSize: 11, color: '#5F737F', marginTop: 1,
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>{sub}</p>
+                )}
+              </div>
+              {isSelected && (
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0, marginLeft: 8 }}>
+                  <path d="M4 10L8 14L16 6" stroke="#076C9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+            </button>
+          )
+        })}
+        {displayed.length === 0 && (
+          <p style={{ textAlign: 'center', color: '#97AAB3', padding: '32px 16px', fontSize: 13 }}>
+            Tower tidak ditemukan
+          </p>
+        )}
+      </div>
+    </BottomSheet>
+  )
+}
+
 // ── Form drawer ───────────────────────────────────────────────────────────────
 
 const EMPTY_FORM = {
@@ -494,6 +746,11 @@ function LaporanDrawer({
   const [useGPS, setUseGPS] = useState(false)
   const [detectedMsg, setDetectedMsg] = useState('')
   const [alertVisible, setAlertVisible] = useState(true)
+
+  // Mobile bottom-sheet state
+  const [jenisSheetOpen, setJenisSheetOpen] = useState(false)
+  const [towerSheetOpen, setTowerSheetOpen] = useState(false)
+  const [fotoSheetOpen, setFotoSheetOpen] = useState(false)
 
   useEffect(() => {
     if (open) {
@@ -679,7 +936,7 @@ function LaporanDrawer({
 
       {/* Foto bukti */}
       <div>
-        <label className="block text-[12px] font-semibold text-app-text mb-1.5">Foto Bukti Terjadinya Gangguan</label>
+        <label className="block text-[12px] font-semibold text-app-text mb-1.5">Foto Bukti Terjadinya Kerawanan</label>
         {fotoUrls.length > 0 && (
           <div className="grid grid-cols-4 gap-2 mb-2">
             {fotoUrls.map((url, i) => (
@@ -687,7 +944,46 @@ function LaporanDrawer({
             ))}
           </div>
         )}
-        {!readOnly && <FotoUpload fotos={fotos} onChange={setFotos} onPhotoAdded={handleDetectLocation} />}
+        {/* Mobile foto preview */}
+        {isMobile && fotos.length > 0 && (
+          <div className="grid grid-cols-5 gap-2 mb-2">
+            {fotos.map((f, i) => (
+              <div key={i} className="relative group rounded-lg overflow-hidden bg-app-bg aspect-square">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={URL.createObjectURL(f)} alt={f.name} className="w-full h-full object-cover" />
+                {!readOnly && (
+                  <button
+                    type="button"
+                    onClick={() => setFotos(fotos.filter((_, j) => j !== i))}
+                    className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X size={10} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        {!readOnly && (
+          isMobile ? (
+            <button
+              type="button"
+              onClick={() => setFotoSheetOpen(true)}
+              style={{
+                width: '100%', padding: '14px 16px', border: '2px dashed #E1E8EC',
+                borderRadius: 12, background: '#F6F9FC', display: 'flex',
+                alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer',
+              }}
+            >
+              <Upload size={18} style={{ color: '#5F737F' }} />
+              <span style={{ fontSize: 13, color: '#5F737F' }}>
+                {fotos.length > 0 ? `${fotos.length} foto — tambah lagi` : 'Tambah Foto Bukti'}
+              </span>
+            </button>
+          ) : (
+            <FotoUpload fotos={fotos} onChange={setFotos} onPhotoAdded={handleDetectLocation} />
+          )
+        )}
       </div>
 
       {/* Tower terdampak — start (always) */}
@@ -697,6 +993,21 @@ function LaporanDrawer({
         </label>
         {readOnly ? (
           <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
+        ) : isMobile ? (
+          <button
+            type="button"
+            onClick={() => setTowerSheetOpen(true)}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              width: '100%', padding: '10px 14px', background: '#FFFFFF',
+              border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+            }}
+          >
+            <span style={{ fontSize: 14, color: form.towerId ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
+              {form.towerLabel || 'Pilih tower...'}
+            </span>
+            <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+          </button>
         ) : (
           <TowerDropdown
             options={towerOptions}
@@ -745,17 +1056,34 @@ function LaporanDrawer({
       {/* Klasifikasi kerawanan */}
       <div>
         <label className="block text-[12px] font-semibold text-app-text mb-1.5">Klasifikasi Kerawanan</label>
-        <select
-          disabled={readOnly}
-          value={form.jenisGangguan}
-          onChange={(e) => set('jenisGangguan', e.target.value)}
-          className="form-input"
-        >
-          <option value="">Pilih kategori...</option>
-          {JENIS_OPTIONS.filter(o => o.value).map(o => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
+        {isMobile && !readOnly ? (
+          <button
+            type="button"
+            onClick={() => setJenisSheetOpen(true)}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              width: '100%', padding: '10px 14px', background: '#FFFFFF',
+              border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+            }}
+          >
+            <span style={{ fontSize: 14, color: form.jenisGangguan ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
+              {JENIS_LABEL[form.jenisGangguan] || 'Pilih kategori...'}
+            </span>
+            <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+          </button>
+        ) : (
+          <select
+            disabled={readOnly}
+            value={form.jenisGangguan}
+            onChange={(e) => set('jenisGangguan', e.target.value)}
+            className="form-input"
+          >
+            <option value="">Pilih kategori...</option>
+            {JENIS_OPTIONS.filter(o => o.value).map(o => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Uraian Pekerjaan / Deskripsi */}
@@ -879,85 +1207,90 @@ function LaporanDrawer({
     </form>
   )
 
-  // ── Mobile PWA: full-screen bottom-to-top ────────────────────────────────────
-  if (isMobile) {
-    return (
-      <>
-        <div
-          className={`fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-          onClick={onClose}
-        />
+  return (
+    <>
+      {/* ── Mobile Bottom Sheets ─────────────────────────────────────────── */}
+      <JenisKerawananSheet
+        open={jenisSheetOpen}
+        value={form.jenisGangguan}
+        onSelect={(v) => set('jenisGangguan', v)}
+        onClose={() => setJenisSheetOpen(false)}
+      />
+      <PilihTowerSheet
+        open={towerSheetOpen}
+        options={towerOptions}
+        value={form.towerId}
+        onSelect={(id, label) => setForm(f => ({ ...f, towerId: id, towerLabel: label }))}
+        onClose={() => setTowerSheetOpen(false)}
+      />
+      <AmbilFotoSheet
+        open={fotoSheetOpen}
+        onClose={() => setFotoSheetOpen(false)}
+        onFile={(files) => {
+          const valid = Array.from(files).filter(
+            (f) => f.size <= 5 * 1024 * 1024 && /\.(jpe?g|png|webp)$/i.test(f.name)
+          )
+          const next = [...fotos, ...valid].slice(0, 10)
+          setFotos(next)
+          if (valid.length > 0) handleDetectLocation()
+        }}
+      />
+
+      {/* ── Backdrop ─────────────────────────────────────────────────────── */}
+      <div
+        className={`fixed inset-0 z-40 transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        style={{ background: isMobile ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.3)' }}
+        onClick={onClose}
+      />
+
+      {/* ── Mobile: full-screen ───────────────────────────────────────────── */}
+      {isMobile && (
         <div
           className={`fixed inset-0 z-50 flex flex-col bg-white transition-transform duration-300 ease-in-out ${open ? 'translate-y-0' : 'translate-y-full'}`}
         >
-          {/* PWA Header */}
-          <div
-            className="flex items-center gap-3 px-4 shrink-0"
-            style={{ height: 64, background: '#076c9e' }}
-          >
-            <button
-              onClick={onClose}
-              className="p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-            >
+          <div className="flex items-center gap-3 px-4 shrink-0" style={{ height: 64, background: '#076c9e' }}>
+            <button onClick={onClose} className="p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors">
               <ArrowLeft size={22} />
             </button>
-            <div>
-              <p className="text-white font-bold text-[16px] leading-tight">{title}</p>
-            </div>
+            <p className="text-white font-bold text-[16px] leading-tight">{title}</p>
           </div>
-
           {formBody}
-
-          {/* Bottom CTA */}
           <div className="px-5 py-4 border-t border-app-border shrink-0 bg-white">
             {readOnly ? (
               <button onClick={onClose} className="btn-outline w-full justify-center">Tutup</button>
             ) : (
-              <button
-                type="submit"
-                form="laporan-form"
-                disabled={saving}
-                className="btn-primary w-full justify-center"
-              >
+              <button type="submit" form="laporan-form" disabled={saving} className="btn-primary w-full justify-center">
                 {saving ? 'Menyimpan...' : 'Buat Laporan'}
               </button>
             )}
           </div>
         </div>
-      </>
-    )
-  }
+      )}
 
-  // ── Desktop: right-side drawer ───────────────────────────────────────────────
-  return (
-    <>
-      <div
-        className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-200 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        onClick={onClose}
-      />
-      <div
-        className={`fixed top-0 right-0 bottom-0 z-50 flex flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out w-full sm:w-[560px] ${open ? 'translate-x-0' : 'translate-x-full'}`}
-      >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-app-border shrink-0">
-          <h2 className="text-[15px] font-bold text-app-text">{title}</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted transition-colors">
-            <X size={18} />
-          </button>
-        </div>
-
-        {formBody}
-
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border shrink-0 bg-white">
-          <button type="button" onClick={onClose} className="btn-outline">
-            {readOnly ? 'Tutup' : 'Batal'}
-          </button>
-          {!readOnly && (
-            <button type="submit" form="laporan-form" disabled={saving} className="btn-primary">
-              {saving ? 'Menyimpan...' : 'Buat Laporan'}
+      {/* ── Desktop: right-side drawer ────────────────────────────────────── */}
+      {!isMobile && (
+        <div
+          className={`fixed top-0 right-0 bottom-0 z-50 flex flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out w-full sm:w-[560px] ${open ? 'translate-x-0' : 'translate-x-full'}`}
+        >
+          <div className="flex items-center justify-between px-6 py-4 border-b border-app-border shrink-0">
+            <h2 className="text-[15px] font-bold text-app-text">{title}</h2>
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted transition-colors">
+              <X size={18} />
             </button>
-          )}
+          </div>
+          {formBody}
+          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border shrink-0 bg-white">
+            <button type="button" onClick={onClose} className="btn-outline">
+              {readOnly ? 'Tutup' : 'Batal'}
+            </button>
+            {!readOnly && (
+              <button type="submit" form="laporan-form" disabled={saving} className="btn-primary">
+                {saving ? 'Menyimpan...' : 'Buat Laporan'}
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </>
   )
 }

@@ -94,14 +94,27 @@ export const sertifikatApi = {
 }
 
 export const asBuiltApi = {
-  getAll: (params?: any) => api.get('/as-built-drawing', { params }),
-  create: (data: any) => api.post('/as-built-drawing', data),
+  getAll:      (params?: any) => api.get('/as-built-drawing', { params }),
+  getFolder:   (id: string)   => api.get(`/as-built-drawing/${id}`),
+  create:      (data: any)    => api.post('/as-built-drawing', data),
+  deleteFolder:(id: string)   => api.delete(`/as-built-drawing/${id}`),
   uploadFile: (id: string, file: File) => {
     const form = new FormData()
     form.append('file', file)
-    return api.post(`/as-built-drawing/${id}/upload`, form, {
+    return api.post(`/as-built-drawing/${id}/dokumen`, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
+  },
+  deleteDokumen: (id: string) => api.delete(`/as-built-drawing/dokumen/${id}`),
+  previewDokumen: async (id: string): Promise<string> => {
+    const token = Cookies.get('sitower_token')
+    const base  = process.env.NEXT_PUBLIC_API_URL ?? ''
+    const res   = await fetch(`${base}/as-built-drawing/dokumen/${id}/preview`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) throw new Error('File tidak ditemukan')
+    const blob = await res.blob()
+    return URL.createObjectURL(blob)
   },
 }
 

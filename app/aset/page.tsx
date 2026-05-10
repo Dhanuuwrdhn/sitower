@@ -140,7 +140,7 @@ export default function AsetPage() {
               {loading ? (
                 <SkeletonRow cols={8} rows={limit} />
               ) : rows.length === 0 ? (
-                <tr><td colSpan={8}><EmptyState /></td></tr>
+                <tr><td colSpan={8}><EmptyState title="Belum ada data Aset Transmisi." /></td></tr>
               ) : (
                 rows.map((row, i) => (
                   <tr key={row.id}>

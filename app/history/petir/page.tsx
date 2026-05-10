@@ -20,8 +20,8 @@ export default function PetirPage() {
           <p className="text-xs text-slate-500 mt-0.5">Total Sambaran</p>
         </div>
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-amber-700">{petirHistory.filter((p) => p.intensitas === "tinggi").length}</p>
-          <p className="text-xs text-amber-600 mt-0.5">Intensitas Tinggi</p>
+          <p className="text-2xl font-bold text-amber-700">{petirHistory.filter((p) => p.intensitas === "kritis").length}</p>
+          <p className="text-xs text-amber-600 mt-0.5">Intensitas Kritis</p>
         </div>
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
           <p className="text-2xl font-bold text-blue-700">{totalKA}</p>

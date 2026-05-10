@@ -7,7 +7,7 @@ import PageHeader from "@/components/PageHeader";
 import StatusBadge from "@/components/StatusBadge";
 import { Filter } from "lucide-react";
 
-type Level = "semua" | "rendah" | "sedang" | "tinggi";
+type Level = "semua" | "aman" | "sedang" | "kritis";
 
 export default function KerawananPage() {
   const [filter, setFilter] = useState<Level>("semua");
@@ -15,9 +15,9 @@ export default function KerawananPage() {
   const filtered = filter === "semua" ? towers : towers.filter((t) => t.kerawanan === filter);
 
   const counts = {
-    rendah: towers.filter((t) => t.kerawanan === "rendah").length,
+    aman:   towers.filter((t) => t.kerawanan === "aman").length,
     sedang: towers.filter((t) => t.kerawanan === "sedang").length,
-    tinggi: towers.filter((t) => t.kerawanan === "tinggi").length,
+    kritis: towers.filter((t) => t.kerawanan === "kritis").length,
   };
 
   return (
@@ -27,16 +27,16 @@ export default function KerawananPage() {
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-green-700">{counts.rendah}</p>
-          <p className="text-xs text-green-600 mt-0.5 font-medium">Kerawanan Rendah</p>
+          <p className="text-2xl font-bold text-green-700">{counts.aman}</p>
+          <p className="text-xs text-green-600 mt-0.5 font-medium">Kerawanan Aman</p>
         </div>
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
           <p className="text-2xl font-bold text-amber-700">{counts.sedang}</p>
           <p className="text-xs text-amber-600 mt-0.5 font-medium">Kerawanan Sedang</p>
         </div>
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-red-700">{counts.tinggi}</p>
-          <p className="text-xs text-red-600 mt-0.5 font-medium">Kerawanan Tinggi</p>
+          <p className="text-2xl font-bold text-red-700">{counts.kritis}</p>
+          <p className="text-xs text-red-600 mt-0.5 font-medium">Kerawanan Kritis</p>
         </div>
       </div>
 
@@ -47,7 +47,7 @@ export default function KerawananPage() {
           <div className="flex items-center gap-2">
             <Filter size={14} className="text-slate-400" />
             <div className="flex gap-1">
-              {(["semua", "rendah", "sedang", "tinggi"] as Level[]).map((l) => (
+              {(["semua", "aman", "sedang", "kritis"] as Level[]).map((l) => (
                 <button
                   key={l}
                   onClick={() => setFilter(l)}

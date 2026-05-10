@@ -47,9 +47,9 @@ const STATUS_LABEL: Record<string, string> = {
 }
 
 const LEVEL_OPTIONS = [
-  { value: 'tinggi',  label: 'Tinggi',  color: 'text-red-600',    bg: 'bg-red-50 border-red-300',   dot: 'bg-red-500' },
-  { value: 'sedang',  label: 'Sedang',  color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-300', dot: 'bg-yellow-500' },
-  { value: 'rendah',  label: 'Rendah',  color: 'text-green-600',  bg: 'bg-green-50 border-green-300',  dot: 'bg-green-500' },
+  { value: 'kritis', label: 'Kritis', color: 'text-red-600',    bg: 'bg-red-50 border-red-300',       dot: 'bg-red-500' },
+  { value: 'sedang', label: 'Sedang', color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-300', dot: 'bg-yellow-500' },
+  { value: 'aman',   label: 'Aman',   color: 'text-green-600',  bg: 'bg-green-50 border-green-300',   dot: 'bg-green-500' },
 ]
 
 const STATUS_FILTER_OPTIONS = [
@@ -1118,7 +1118,7 @@ export default function GangguanPage() {
   return (
     <>
       {/* Title */}
-      <h1 style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 24, lineHeight: '36px', color: '#1C1C1C', marginBottom: 24 }}>Riwayat Gangguan</h1>
+      <h1 style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 24, lineHeight: '36px', color: '#1C1C1C', marginBottom: 24 }}>Riwayat Kerawanan Transmisi</h1>
 
       {/* Top bar — mobile: 2 rows; desktop: 1 row */}
       {isMobile ? (
@@ -1268,7 +1268,7 @@ export default function GangguanPage() {
                 ))
               ) : rows.length === 0 ? (
                 <tr>
-                  <td colSpan={6}><EmptyState title="Belum ada data Riwayat Gangguan." /></td>
+                  <td colSpan={6}><EmptyState title="Belum ada data Riwayat Kerawanan Transmisi." /></td>
                 </tr>
               ) : (
                 rows.map((row) => (

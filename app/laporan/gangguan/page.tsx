@@ -12,6 +12,7 @@ import { laporanApi, towersApi } from '@/lib/api'
 import { getUser, isAdmin } from '@/lib/auth'
 import { getDistance } from '@/lib/geo'
 import { useSidebar } from '@/components/layout/SidebarContext'
+import CalendarPickerSheet from '@/components/ui/CalendarPickerSheet'
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -1001,6 +1002,8 @@ export default function GangguanPage() {
   const [viewMode, setViewMode] = useState<'edit' | 'detail' | null>(null)
   const [filterOpen, setFilterOpen] = useState(false)
   const filterRef = useRef<HTMLDivElement>(null)
+  const [calendarOpen, setCalendarOpen] = useState(false)
+  const [calendarFor, setCalendarFor] = useState<'from' | 'to'>('from')
 
   // Close filter popup on outside click
   useEffect(() => {
@@ -1300,6 +1303,14 @@ export default function GangguanPage() {
         />
       )}
 
+      {/* Mobile calendar picker */}
+      <CalendarPickerSheet
+        open={calendarOpen}
+        value={calendarFor === 'from' ? tglMulai : tglAkhir}
+        onConfirm={d => { if (calendarFor === 'from') { setTglMulai(d); setPage(1) } else { setTglAkhir(d); setPage(1) } }}
+        onClose={() => setCalendarOpen(false)}
+      />
+
       {/* Mobile filter bottom sheet */}
       <>
         <div
@@ -1347,13 +1358,27 @@ export default function GangguanPage() {
             <div className="flex flex-col gap-3">
               <div>
                 <p className="text-[12px] font-semibold text-[#1C1C1C] mb-1.5">Dari Tanggal</p>
-                <input type="date" value={tglMulai} onChange={e => { setTglMulai(e.target.value); setPage(1) }}
-                  className="w-full border border-[#E1E8EC] rounded-lg px-3 py-2.5 text-sm text-[#1C1C1C] outline-none" />
+                <button
+                  onClick={() => { setCalendarFor('from'); setCalendarOpen(true) }}
+                  className="w-full border border-[#E1E8EC] rounded-lg px-3 py-2.5 text-sm text-left cursor-pointer bg-white flex items-center justify-between"
+                >
+                  <span className={tglMulai ? 'text-[#1C1C1C]' : 'text-[#97AAB3]'}>
+                    {tglMulai ? new Date(tglMulai + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Pilih tanggal...'}
+                  </span>
+                  <Calendar size={14} className="text-[#5F737F] shrink-0" />
+                </button>
               </div>
               <div>
                 <p className="text-[12px] font-semibold text-[#1C1C1C] mb-1.5">Sampai Tanggal</p>
-                <input type="date" value={tglAkhir} onChange={e => { setTglAkhir(e.target.value); setPage(1) }}
-                  className="w-full border border-[#E1E8EC] rounded-lg px-3 py-2.5 text-sm text-[#1C1C1C] outline-none" />
+                <button
+                  onClick={() => { setCalendarFor('to'); setCalendarOpen(true) }}
+                  className="w-full border border-[#E1E8EC] rounded-lg px-3 py-2.5 text-sm text-left cursor-pointer bg-white flex items-center justify-between"
+                >
+                  <span className={tglAkhir ? 'text-[#1C1C1C]' : 'text-[#97AAB3]'}>
+                    {tglAkhir ? new Date(tglAkhir + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Pilih tanggal...'}
+                  </span>
+                  <Calendar size={14} className="text-[#5F737F] shrink-0" />
+                </button>
               </div>
             </div>
             <div className="h-2" />

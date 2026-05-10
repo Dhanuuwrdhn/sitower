@@ -229,9 +229,44 @@ interface TowerOption {
   nomorTower: string
   garduInduk: string
   tipe: string
+  nama?: string
   lat?: number
   lng?: number
   radius?: number
+}
+
+// Parse display label and subtitle from tower nama
+function parseTowerDisplay(t: TowerOption): { label: string; sub: string } {
+  const nama = t.nama ?? t.nomorTower
+  // "Tower/Span T6 - T7 (SUTET 500KV DURIKOSAMBI - KEMBANGAN)" → label="T6 - T7", sub="SUTET 500KV · DURIKOSAMBI–KEMBANGAN"
+  const spanMatch = nama.match(/Tower\/Span\s+(.+?)\s+\((.+)\)/)
+  if (spanMatch) {
+    const span = spanMatch[1].trim()
+    const detail = spanMatch[2].trim()
+    return { label: span, sub: detail }
+  }
+  // "TOWER SUTET KMBGN-DKSBI 500kV #P1A" → label=id, sub=nama
+  if (nama !== t.id) return { label: t.id, sub: nama }
+  return { label: t.id, sub: '' }
+}
+
+function resolveGroup(t: TowerOption): string {
+  if (t.tipe === 'garduInduk' || t.tipe === 'gardu') return 'garduInduk'
+  if (t.tipe === 'SUTET' || t.tipe === 'SUTT' || t.tipe === 'SKTT') return t.tipe
+  // Auto-detect for 'other' from nama
+  const nama = t.nama ?? ''
+  if (nama.includes('SUTET')) return 'SUTET'
+  if (nama.includes('SUTT')) return 'SUTT'
+  if (nama.includes('SKTT')) return 'SKTT'
+  return 'other'
+}
+
+const GROUP_LABELS: Record<string, string> = {
+  garduInduk: 'Gardu Induk',
+  SUTET: 'SUTET',
+  SUTT: 'SUTT',
+  SKTT: 'SKTT',
+  other: 'Lainnya',
 }
 
 function TowerDropdown({
@@ -255,20 +290,25 @@ function TowerDropdown({
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  const groups = ['garduInduk', 'SUTET', 'SUTT', 'SKTT'] as const
-  const grouped: Record<string, TowerOption[]> = { garduInduk: [], SUTET: [], SUTT: [], SKTT: [] }
+  const groupOrder = ['garduInduk', 'SUTET', 'SUTT', 'SKTT', 'other']
+  const grouped: Record<string, TowerOption[]> = { garduInduk: [], SUTET: [], SUTT: [], SKTT: [], other: [] }
+
+  const q = search.toLowerCase()
   options
-    .filter((t) =>
-      !search || t.nomorTower.toLowerCase().includes(search.toLowerCase()) ||
-      t.garduInduk.toLowerCase().includes(search.toLowerCase())
-    )
+    .filter((t) => {
+      if (!q) return true
+      return (
+        t.id.toLowerCase().includes(q) ||
+        (t.nama ?? '').toLowerCase().includes(q)
+      )
+    })
     .forEach((t) => {
-      if (grouped[t.tipe]) grouped[t.tipe].push(t)
+      const g = resolveGroup(t)
+      grouped[g].push(t)
     })
 
-  const selectedLabel = value
-    ? options.find((o) => o.id === value)?.nomorTower ?? value
-    : ''
+  const selectedTower = value ? options.find((o) => o.id === value) : null
+  const selectedLabel = selectedTower ? parseTowerDisplay(selectedTower).label : ''
 
   return (
     <div className="relative" ref={ref}>
@@ -290,34 +330,35 @@ function TowerDropdown({
               autoFocus
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari nomor tower..."
+              placeholder="Cari nomor tower atau jalur..."
               className="form-input text-[12px]"
             />
           </div>
           <div className="overflow-y-auto">
-            {groups.map((g) =>
+            {groupOrder.map((g) =>
               grouped[g].length > 0 ? (
                 <div key={g}>
-                  <p className="px-3 py-1.5 text-[10px] font-bold text-app-muted uppercase tracking-wider bg-app-bg">
-                    {g === 'garduInduk' ? 'Gardu Induk' : g}
+                  <p className="px-3 py-1.5 text-[10px] font-bold text-app-muted uppercase tracking-wider bg-app-bg sticky top-0">
+                    {GROUP_LABELS[g]}
                   </p>
-                  {grouped[g].map((t) => (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => { onChange(t.id, t.nomorTower); setOpen(false); setSearch('') }}
-                      className={`w-full text-left px-3 py-2 text-[13px] hover:bg-app-bg transition-colors ${value === t.id ? 'text-blue-600 font-semibold' : 'text-app-text'}`}
-                    >
-                      <span className="font-mono">{t.nomorTower}</span>
-                      {t.garduInduk && (
-                        <span className="ml-2 text-[11px] text-app-muted">{t.garduInduk}</span>
-                      )}
-                    </button>
-                  ))}
+                  {grouped[g].map((t) => {
+                    const { label, sub } = parseTowerDisplay(t)
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => { onChange(t.id, label); setOpen(false); setSearch('') }}
+                        className={`w-full text-left px-3 py-2 hover:bg-app-bg transition-colors ${value === t.id ? 'bg-blue-50' : ''}`}
+                      >
+                        <p className={`font-mono text-[13px] font-semibold ${value === t.id ? 'text-blue-600' : 'text-app-text'}`}>{label}</p>
+                        {sub && <p className="text-[11px] text-app-muted leading-tight mt-0.5">{sub}</p>}
+                      </button>
+                    )
+                  })}
                 </div>
               ) : null
             )}
-            {groups.every((g) => grouped[g].length === 0) && (
+            {groupOrder.every((g) => grouped[g].length === 0) && (
               <p className="text-center text-[13px] text-app-muted py-6">Tower tidak ditemukan</p>
             )}
           </div>

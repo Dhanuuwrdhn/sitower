@@ -11,7 +11,7 @@ import {
 
 interface KerawananItem {
   kategori: string
-  level: 'tinggi' | 'sedang' | 'rendah'
+  level: 'kritis' | 'sedang' | 'aman'
   status: string
 }
 
@@ -33,9 +33,9 @@ interface Props {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const LEVEL_PRIORITY: Record<string, number> = { tinggi: 3, sedang: 2, rendah: 1 }
+const LEVEL_PRIORITY: Record<string, number> = { kritis: 3, sedang: 2, aman: 1 }
 const LEVEL_COLOR: Record<string, string> = {
-  tinggi: '#ef4444', sedang: '#f59e0b', rendah: '#22c55e', normal: '#3b82f6',
+  kritis: '#ef4444', sedang: '#f59e0b', aman: '#22c55e', normal: '#3b82f6',
 }
 const KATEGORI_LABEL: Record<string, string> = {
   pekerjaan_pihak_lain: 'Pekerjaan Pihak Lain',
@@ -49,7 +49,7 @@ function getTopLevel(kerawanan: KerawananItem[]): string {
   if (!kerawanan.length) return 'normal'
   return kerawanan.reduce((top, k) =>
     (LEVEL_PRIORITY[k.level] ?? 0) > (LEVEL_PRIORITY[top] ?? 0) ? k.level : top,
-    'rendah'
+    'aman'
   )
 }
 

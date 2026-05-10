@@ -26,7 +26,7 @@ type NavItem = {
 
 const ALL_NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard',           icon: IconDashboard,  href: '/dashboard' },
-  { label: 'Riwayat Gangguan',    icon: IconRiwayat,    href: '/laporan/gangguan' },
+  { label: 'Riwayat Kerawanan Transmisi', icon: IconRiwayat, href: '/laporan/gangguan' },
   { label: 'Data Aset Transmisi', icon: IconAset,       href: '/aset' },
   { label: 'Sertifikat',          icon: IconSertifikat, href: '/sertifikat' },
   { label: 'As Built Drawing',    icon: IconAsBuilt,    href: '/as-built-drawing' },

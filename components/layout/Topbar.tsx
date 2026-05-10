@@ -9,7 +9,7 @@ import { KeyRound, LogOut, Menu } from 'lucide-react'
 import { useSidebar } from './SidebarContext'
 
 const PAGE_TITLES: Record<string, string> = {
-  '/laporan/gangguan': 'Riwayat Gangguan',
+  '/laporan/gangguan': 'Riwayat Kerawanan Transmisi',
   '/aset':             'Data Aset Transmisi',
   '/sertifikat':       'Sertifikat',
   '/as-built-drawing': 'As Built Drawing',

@@ -24,11 +24,14 @@ export interface FeaturedTower {
   tegangan?: string
   kerawanan: KerawananItem[]
   updatedAt?: string
+  jalur?: string | null
+  nomorUrut?: number | null
 }
 
 interface Props {
   towers?: FeaturedTower[]
   onTowerClick?: (tower: FeaturedTower) => void
+  dbTowers?: FeaturedTower[]
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -242,6 +245,98 @@ function TransmissionLines() {
 }
 
 
+// ─── DB Tower polylines (grouped by jalur, sorted by nomorUrut) ───────────────
+
+const DB_JALUR_COLORS: Record<string, string> = {
+  SUTET: '#e65100',   // orange — same as SUTET_500kV
+  SUTT:  '#0288D1',   // blue   — same as SUTT_150kV
+  SKTT:  '#7c3aed',   // purple — same as SKTT_150kV
+}
+
+function detectDbJalurType(jalurName: string): 'SUTET' | 'SUTT' | 'SKTT' | 'other' {
+  const n = jalurName.toUpperCase()
+  if (n.includes('SUTET') || n.includes('500KV')) return 'SUTET'
+  if (n.includes('SKTT'))                          return 'SKTT'
+  if (n.includes('SUTT') || n.includes('150KV'))   return 'SUTT'
+  return 'other'
+}
+
+function DbTransmissionLines({ dbTowers }: { dbTowers: FeaturedTower[] }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (!map || !window.google || !dbTowers.length) return
+
+    // Group towers by jalur name (ignore towers without jalur or valid coords)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const groups: Record<string, FeaturedTower[]> = {}
+    for (const t of dbTowers) {
+      if (!t.jalur || !t.lat || !t.lng) continue
+      if (!groups[t.jalur]) groups[t.jalur] = []
+      groups[t.jalur].push(t)
+    }
+
+    const lines: google.maps.Polyline[] = []
+
+    for (const [jalurName, members] of Object.entries(groups)) {
+      // Need at least 2 towers to draw a line
+      if (members.length < 2) continue
+
+      // Sort by nomorUrut (nulls last, then ascending)
+      const sorted = [...members].sort((a, b) => {
+        if (a.nomorUrut == null && b.nomorUrut == null) return 0
+        if (a.nomorUrut == null) return 1
+        if (b.nomorUrut == null) return -1
+        return a.nomorUrut - b.nomorUrut
+      })
+
+      const path = sorted.map((t) => ({ lat: t.lat, lng: t.lng }))
+      const jalurType = detectDbJalurType(jalurName)
+      const color = DB_JALUR_COLORS[jalurType] ?? '#6B7280'
+      const isSktt  = jalurType === 'SKTT'
+      const isSutet = jalurType === 'SUTET'
+      const strokeWeight = isSutet ? 4 : 3
+      const strokeOpacity = isSktt ? 0 : 0.85
+      const zIndex = isSutet ? 35 : isSktt ? 15 : 25
+
+      const icons: google.maps.PolylineOptions['icons'] = isSktt
+        ? [{
+            icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3, strokeColor: color },
+            offset: '0',
+            repeat: '12px',
+          }]
+        : undefined
+
+      // Glow / outline for solid lines
+      if (!isSktt) {
+        lines.push(new window.google.maps.Polyline({
+          path,
+          strokeColor: '#FFFFFF',
+          strokeOpacity: 0.45,
+          strokeWeight: strokeWeight + 4,
+          zIndex: zIndex - 1,
+          map,
+        }))
+      }
+
+      lines.push(new window.google.maps.Polyline({
+        path,
+        strokeColor: color,
+        strokeOpacity,
+        strokeWeight,
+        icons,
+        zIndex,
+        map,
+      }))
+    }
+
+    return () => lines.forEach((l) => l.setMap(null))
+  }, [map, dbTowers])
+
+  return null
+}
+
+
 function ZoomWatcher({ onZoomChange }: { onZoomChange: (zoom: number) => void }) {
   const map = useMap()
 
@@ -424,17 +519,22 @@ function Legend() {
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''
 const CENTER  = { lat: -6.18, lng: 106.50 }
 
-export default function TowerMapGoogle({ towers, onTowerClick }: Props) {
+export default function TowerMapGoogle({ towers, onTowerClick, dbTowers }: Props) {
   const [selected, setSelected] = useState<FeaturedTower | null>(null)
 
   const displayTowers = useMemo<FeaturedTower[]>(() => {
     const baseTowers = buildDefaultTowers()
     if (!towers || towers.length === 0) return baseTowers
-    
+
     // Gabungkan tower default (semua titik jalur) dengan tower dari prop (yang punya gangguan)
     // Di aplikasi nyata, ini di-merge by ID. Di sini kita append agar keduanya tampil.
     return [...baseTowers, ...towers]
   }, [towers])
+
+  // DB towers that have jalur data — used for dynamic polylines
+  const jalurTowers = useMemo<FeaturedTower[]>(() => {
+    return (dbTowers ?? []).filter((t) => t.jalur && t.lat && t.lng)
+  }, [dbTowers])
 
   const handleSelect = useMemo(() => (t: FeaturedTower) => {
     setSelected(t)
@@ -464,6 +564,7 @@ export default function TowerMapGoogle({ towers, onTowerClick }: Props) {
           fullscreenControl={false}
         >
           <TransmissionLines />
+          {jalurTowers.length > 0 && <DbTransmissionLines dbTowers={jalurTowers} />}
           <TowerMarkers towers={displayTowers} onSelect={handleSelect} />
           {selected && <TowerPopup tower={selected} onClose={() => setSelected(null)} />}
         </Map>

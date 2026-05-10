@@ -297,7 +297,10 @@ export default function DashboardPage() {
           </div>
           <div className="dash-aset-divider" />
           <div className="dash-map-container">
-            <TowerMap towers={towerKerawanan.length > 0 ? towerKerawanan : undefined} />
+            <TowerMap
+              towers={towerKerawanan.length > 0 ? towerKerawanan : undefined}
+              dbTowers={towerKerawanan.length > 0 ? towerKerawanan : undefined}
+            />
           </div>
         </div>
       </div>

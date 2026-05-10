@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { FileUp, Eye, Pencil } from 'lucide-react'
-import { towersApi, importApi } from '@/lib/api'
+import { FileUp, Eye, Pencil, Download, X, MapPin, Zap, Activity } from 'lucide-react'
+import { towersApi, importApi, api } from '@/lib/api'
 import { isAdmin } from '@/lib/auth'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { ActionMenu } from '@/components/ui/ActionMenu'
@@ -14,6 +14,395 @@ import { SkeletonRow } from '@/components/ui/SkeletonRow'
 
 const TIPE_OPTIONS = ['Semua', 'SUTET', 'SUTT', 'SKTT', 'Gardu Induk']
 const KONDISI_OPTIONS = ['Semua', 'normal', 'waspada', 'gangguan', 'maintenance']
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function formatTanggal(iso: string) {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+function LabelValue({ label, value }: { label: string; value?: string | number | null }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-[11px] text-app-muted font-medium uppercase tracking-wide">{label}</span>
+      <span className="text-[13px] text-app-text font-semibold">{value ?? '—'}</span>
+    </div>
+  )
+}
+
+// ── Detail Drawer ─────────────────────────────────────────────────────────────
+
+function AsetDetailDrawer({
+  towerId,
+  open,
+  onClose,
+}: {
+  towerId: string | null
+  open: boolean
+  onClose: () => void
+}) {
+  const [tower, setTower] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!open || !towerId) { setTower(null); return }
+    setLoading(true)
+    towersApi.getById(towerId)
+      .then((res) => setTower(res.data))
+      .catch(() => toast.error('Gagal memuat detail tower'))
+      .finally(() => setLoading(false))
+  }, [open, towerId])
+
+  if (!open) return null
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/30 z-40"
+        onClick={onClose}
+      />
+      {/* Drawer */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          maxWidth: 480,
+          zIndex: 50,
+          background: '#FFFFFF',
+          boxShadow: '-4px 0 24px rgba(0,0,0,0.12)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Header */}
+        <div style={{ padding: '18px 20px', borderBottom: '1px solid #E1E8EC', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <h2 style={{ fontWeight: 700, fontSize: 15, color: '#1c1c1c', margin: 0 }}>Detail Aset Transmisi</h2>
+            {tower && (
+              <p style={{ fontSize: 12, color: '#97AAB3', margin: '2px 0 0' }}>
+                {tower.id}
+              </p>
+            )}
+          </div>
+          <button
+            onClick={onClose}
+            style={{ padding: 6, borderRadius: 6, border: 'none', background: '#F6F9FC', cursor: 'pointer', color: '#5F737F', display: 'flex', alignItems: 'center' }}
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {[...Array(6)].map((_, i) => (
+                <div key={i} style={{ height: 40, background: '#F6F9FC', borderRadius: 6, animation: 'pulse 1.5s infinite' }} />
+              ))}
+            </div>
+          ) : !tower ? (
+            <p style={{ color: '#97AAB3', textAlign: 'center', marginTop: 40 }}>Data tidak tersedia</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {/* Info Utama */}
+              <div style={{ background: '#F6F9FC', borderRadius: 10, padding: '16px' }}>
+                <p style={{ fontWeight: 700, fontSize: 12, color: '#0F172A', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Informasi Tower</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
+                  <LabelValue label="ID Tower" value={tower.id} />
+                  <LabelValue label="Nama" value={tower.nama} />
+                  <LabelValue label="Tipe" value={tower.tipe} />
+                  <LabelValue label="Tegangan" value={tower.tegangan} />
+                  <LabelValue label="Kondisi" value={tower.kondisi} />
+                  <LabelValue label="Radius" value={tower.radius ? `${tower.radius} m` : undefined} />
+                </div>
+              </div>
+
+              {/* Lokasi */}
+              <div style={{ background: '#F6F9FC', borderRadius: 10, padding: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                  <MapPin size={13} color="#5F737F" />
+                  <p style={{ fontWeight: 700, fontSize: 12, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>Lokasi & Koordinat</p>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
+                  <LabelValue label="Latitude" value={tower.lat} />
+                  <LabelValue label="Longitude" value={tower.lng} />
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <LabelValue label="Lokasi" value={tower.lokasi} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Jalur */}
+              {(tower.jalur || tower.nomorUrut) && (
+                <div style={{ background: '#F6F9FC', borderRadius: 10, padding: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                    <Zap size={13} color="#5F737F" />
+                    <p style={{ fontWeight: 700, fontSize: 12, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>Jalur Transmisi</p>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <LabelValue label="Nama Jalur" value={tower.jalur} />
+                    </div>
+                    <LabelValue label="Nomor Urut" value={tower.nomorUrut} />
+                  </div>
+                </div>
+              )}
+
+              {/* Laporan Recent */}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                  <Activity size={13} color="#5F737F" />
+                  <p style={{ fontWeight: 700, fontSize: 12, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>
+                    Laporan Terkini ({(tower.laporan ?? []).length})
+                  </p>
+                </div>
+                {(tower.laporan ?? []).length === 0 ? (
+                  <div style={{ background: '#F6F9FC', borderRadius: 10, padding: '24px 16px', textAlign: 'center', color: '#97AAB3', fontSize: 13 }}>
+                    Tidak ada laporan
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {(tower.laporan ?? []).slice(0, 5).map((lap: any) => (
+                      <div
+                        key={lap.id}
+                        style={{
+                          background: '#F6F9FC',
+                          borderRadius: 10,
+                          padding: '12px 14px',
+                          borderLeft: `3px solid ${lap.levelRisiko === 'kritis' ? '#ef4444' : lap.levelRisiko === 'sedang' ? '#f59e0b' : '#22c55e'}`,
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+                          <span style={{ fontWeight: 600, fontSize: 12, color: '#1c1c1c', textTransform: 'capitalize' }}>
+                            {lap.jenisGangguan?.replace(/_/g, ' ') ?? '—'}
+                          </span>
+                          <span style={{
+                            fontSize: 10, fontWeight: 600,
+                            padding: '2px 8px', borderRadius: 999,
+                            background: lap.status === 'berlangsung' ? '#FEE2E2' : lap.status === 'selesai' ? '#DCFCE7' : '#F1F5F9',
+                            color: lap.status === 'berlangsung' ? '#DC2626' : lap.status === 'selesai' ? '#16A34A' : '#64748B',
+                          }}>
+                            {lap.status?.replace(/_/g, ' ') ?? '—'}
+                          </span>
+                        </div>
+                        <p style={{ fontSize: 11, color: '#5F737F', margin: '0 0 4px' }}>{lap.deskripsi ?? '—'}</p>
+                        <span style={{ fontSize: 10, color: '#97AAB3' }}>{formatTanggal(lap.tanggal)}</span>
+                        {lap.pelapor && (
+                          <span style={{ fontSize: 10, color: '#97AAB3', marginLeft: 8 }}>· {lap.pelapor.nama}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  )
+}
+
+// ── Edit Drawer ───────────────────────────────────────────────────────────────
+
+const KONDISI_EDIT_OPTIONS = ['normal', 'waspada', 'gangguan', 'maintenance']
+const TIPE_EDIT_OPTIONS    = ['SUTET', 'SUTT', 'SKTT', 'garduInduk']
+
+function AsetEditDrawer({
+  tower,
+  open,
+  onClose,
+  onSaved,
+}: {
+  tower: any | null
+  open: boolean
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const [form, setForm] = useState<any>({})
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    if (open && tower) {
+      setForm({
+        nama:      tower.nama     ?? '',
+        tegangan:  tower.tegangan ?? '',
+        tipe:      tower.tipe     ?? '',
+        kondisi:   tower.kondisi  ?? 'normal',
+        lokasi:    tower.lokasi   ?? '',
+        lat:       tower.lat      ?? '',
+        lng:       tower.lng      ?? '',
+        radius:    tower.radius   ?? 100,
+        jalur:     tower.jalur    ?? '',
+        nomorUrut: tower.nomorUrut ?? '',
+      })
+    }
+  }, [open, tower])
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!tower?.id) return
+    setSaving(true)
+    try {
+      await towersApi.update(tower.id, {
+        nama:      form.nama,
+        tegangan:  form.tegangan,
+        tipe:      form.tipe,
+        kondisi:   form.kondisi,
+        lokasi:    form.lokasi || null,
+        lat:       Number(form.lat),
+        lng:       Number(form.lng),
+        radius:    Number(form.radius),
+        jalur:     form.jalur || null,
+        nomorUrut: form.nomorUrut ? Number(form.nomorUrut) : null,
+      })
+      toast.success('Data tower berhasil diperbarui')
+      onSaved()
+      onClose()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'Gagal menyimpan perubahan')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (!open) return null
+
+  const set = (k: string, v: string) => setForm((f: any) => ({ ...f, [k]: v }))
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          maxWidth: 480,
+          zIndex: 50,
+          background: '#FFFFFF',
+          boxShadow: '-4px 0 24px rgba(0,0,0,0.12)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Header */}
+        <div style={{ padding: '18px 20px', borderBottom: '1px solid #E1E8EC', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <h2 style={{ fontWeight: 700, fontSize: 15, color: '#1c1c1c', margin: 0 }}>Edit Aset Tower</h2>
+            {tower && <p style={{ fontSize: 12, color: '#97AAB3', margin: '2px 0 0' }}>{tower.id}</p>}
+          </div>
+          <button
+            onClick={onClose}
+            style={{ padding: 6, borderRadius: 6, border: 'none', background: '#F6F9FC', cursor: 'pointer', color: '#5F737F', display: 'flex', alignItems: 'center' }}
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* Nama */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-app-muted">Nama Tower <span className="text-red-500">*</span></label>
+            <input
+              className="form-input"
+              value={form.nama ?? ''}
+              onChange={(e) => set('nama', e.target.value)}
+              required
+              placeholder="Nama tower"
+            />
+          </div>
+
+          {/* Tipe + Tegangan */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="flex flex-col gap-1">
+              <label className="text-[12px] font-semibold text-app-muted">Tipe</label>
+              <select className="form-input" value={form.tipe ?? ''} onChange={(e) => set('tipe', e.target.value)}>
+                {TIPE_EDIT_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[12px] font-semibold text-app-muted">Tegangan</label>
+              <input className="form-input" value={form.tegangan ?? ''} onChange={(e) => set('tegangan', e.target.value)} placeholder="500kV" />
+            </div>
+          </div>
+
+          {/* Kondisi */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-app-muted">Kondisi</label>
+            <select className="form-input" value={form.kondisi ?? 'normal'} onChange={(e) => set('kondisi', e.target.value)}>
+              {KONDISI_EDIT_OPTIONS.map((k) => <option key={k} value={k}>{k}</option>)}
+            </select>
+          </div>
+
+          {/* Lat + Lng */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="flex flex-col gap-1">
+              <label className="text-[12px] font-semibold text-app-muted">Latitude</label>
+              <input className="form-input" type="number" step="any" value={form.lat ?? ''} onChange={(e) => set('lat', e.target.value)} placeholder="-6.1234" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[12px] font-semibold text-app-muted">Longitude</label>
+              <input className="form-input" type="number" step="any" value={form.lng ?? ''} onChange={(e) => set('lng', e.target.value)} placeholder="106.7654" />
+            </div>
+          </div>
+
+          {/* Lokasi */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-app-muted">Lokasi</label>
+            <input className="form-input" value={form.lokasi ?? ''} onChange={(e) => set('lokasi', e.target.value)} placeholder="Kel. Rawa Buaya, Cengkareng" />
+          </div>
+
+          {/* Radius */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-app-muted">Radius Deteksi (m)</label>
+            <input className="form-input" type="number" value={form.radius ?? 100} onChange={(e) => set('radius', e.target.value)} placeholder="100" />
+          </div>
+
+          {/* Jalur + Nomor Urut */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-app-muted">Jalur Transmisi</label>
+            <input className="form-input" value={form.jalur ?? ''} onChange={(e) => set('jalur', e.target.value)} placeholder="SUTET 500kV DURIKOSAMBI-KEMBANGAN" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-app-muted">Nomor Urut dalam Jalur</label>
+            <input className="form-input" type="number" value={form.nomorUrut ?? ''} onChange={(e) => set('nomorUrut', e.target.value)} placeholder="1" />
+          </div>
+
+          {/* Actions */}
+          <div style={{ display: 'flex', gap: 10, paddingTop: 8, marginTop: 4, borderTop: '1px solid #E1E8EC' }}>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{ flex: 1, padding: '10px 0', border: '1px solid #E1E8EC', borderRadius: 8, background: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: 13, color: '#5F737F' }}
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              style={{ flex: 2, padding: '10px 0', border: 'none', borderRadius: 8, background: '#076C9E', cursor: 'pointer', fontWeight: 600, fontSize: 13, color: '#fff', opacity: saving ? 0.7 : 1 }}
+            >
+              {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
+  )
+}
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function AsetPage() {
   const [rows, setRows]       = useState<any[]>([])
@@ -30,6 +419,15 @@ export default function AsetPage() {
 
   const importRef = useRef<HTMLInputElement>(null)
   const [importing, setImporting] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+
+  // Detail drawer
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [detailRow, setDetailRow]   = useState<any>(null)
+
+  // Edit drawer
+  const [editOpen, setEditOpen]   = useState(false)
+  const [editRow, setEditRow]     = useState<any>(null)
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [q, setQ] = useState('')
@@ -75,13 +473,38 @@ export default function AsetPage() {
       if (importRef.current) importRef.current.value = ''
     }
   }
-//test
+
+  async function handleDownloadTemplate() {
+    setDownloading(true)
+    try {
+      const res = await api.get('/import/template/towers', { responseType: 'blob' })
+      const url = URL.createObjectURL(res.data)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'template-import-tower.xlsx'
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      toast.error('Gagal mengunduh template')
+    } finally {
+      setDownloading(false)
+    }
+  }
+
   return (
     <>
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-2xl font-bold text-app-text">Data Aset Transmisi</h1>
         {isAdminUser && (
-          <>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleDownloadTemplate}
+              disabled={downloading}
+              className="btn-outline"
+            >
+              <Download size={15} />
+              {downloading ? 'Mengunduh...' : 'Download Template'}
+            </button>
             <button
               onClick={() => importRef.current?.click()}
               disabled={importing}
@@ -91,7 +514,7 @@ export default function AsetPage() {
               {importing ? 'Mengimpor...' : 'Import Excel'}
             </button>
             <input ref={importRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImport} />
-          </>
+          </div>
         )}
       </div>
 
@@ -150,15 +573,23 @@ export default function AsetPage() {
                         {row.nomorTower ?? row.id}
                       </span>
                     </td>
-                    <td className="font-semibold text-app-text">{row.namaTower ?? '—'}</td>
+                    <td className="font-semibold text-app-text">{row.namaTower ?? row.nama ?? '—'}</td>
                     <td className="text-app-muted">{row.tipe ?? '—'}</td>
                     <td className="font-mono text-[12px]">{row.tegangan ?? '—'}</td>
                     <td><StatusBadge status={row.kondisi ?? 'normal'} /></td>
                     <td className="text-app-muted text-[12px] max-w-[200px] truncate">{row.lokasi ?? '—'}</td>
                     <td className="text-right pr-4">
                       <ActionMenu items={[
-                        { label: 'Lihat Detail', icon: <Eye size={14} />, onClick: () => toast(`Detail: ${row.nomorTower}`, { icon: '👁' }) },
-                        ...(isAdminUser ? [{ label: 'Edit', icon: <Pencil size={14} />, onClick: () => toast('Edit: ' + row.id) }] : []),
+                        {
+                          label: 'Lihat Detail',
+                          icon: <Eye size={14} />,
+                          onClick: () => { setDetailRow(row); setDetailOpen(true) },
+                        },
+                        ...(isAdminUser ? [{
+                          label: 'Edit',
+                          icon: <Pencil size={14} />,
+                          onClick: () => { setEditRow(row); setEditOpen(true) },
+                        }] : []),
                       ]} />
                     </td>
                   </tr>
@@ -169,6 +600,21 @@ export default function AsetPage() {
         </div>
         <Pagination total={total} page={page} limit={limit} onChange={setPage} onLimitChange={setLimit} />
       </div>
+
+      {/* Detail Drawer */}
+      <AsetDetailDrawer
+        towerId={detailRow?.id ?? null}
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+      />
+
+      {/* Edit Drawer */}
+      <AsetEditDrawer
+        tower={editRow}
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        onSaved={fetchData}
+      />
     </>
   )
 }

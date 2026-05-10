@@ -13,6 +13,7 @@ import { laporanApi, towersApi } from '@/lib/api'
 import { getUser, isAdmin } from '@/lib/auth'
 import { getDistance } from '@/lib/geo'
 import { useSidebar } from '@/components/layout/SidebarContext'
+import CalendarPickerSheet from '@/components/ui/CalendarPickerSheet'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -948,6 +949,9 @@ function FilterBottomSheet({
   onApply: () => void
   onReset: () => void
 }) {
+  const [calendarOpen, setCalendarOpen] = useState(false)
+  const [calendarFor, setCalendarFor] = useState<'from' | 'to'>('from')
+
   return (
     <>
       <div
@@ -1009,16 +1013,38 @@ function FilterBottomSheet({
             <div className="flex flex-col gap-3">
               <div>
                 <p className="text-[12px] font-semibold text-[#1C1C1C] mb-1.5">Dari Tanggal</p>
-                <input type="date" value={dateFrom} onChange={e => onDateFrom(e.target.value)}
-                  className="w-full border border-[#E1E8EC] rounded-lg px-3 py-2.5 text-sm text-[#1C1C1C] outline-none" />
+                <button
+                  onClick={() => { setCalendarFor('from'); setCalendarOpen(true) }}
+                  className="w-full border border-[#E1E8EC] rounded-lg px-3 py-2.5 text-sm text-left cursor-pointer bg-white flex items-center justify-between"
+                >
+                  <span className={dateFrom ? 'text-[#1C1C1C]' : 'text-[#97AAB3]'}>
+                    {dateFrom ? new Date(dateFrom + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Pilih tanggal...'}
+                  </span>
+                  <Calendar size={14} className="text-[#5F737F] shrink-0" />
+                </button>
               </div>
               <div>
                 <p className="text-[12px] font-semibold text-[#1C1C1C] mb-1.5">Sampai Tanggal</p>
-                <input type="date" value={dateTo} onChange={e => onDateTo(e.target.value)}
-                  className="w-full border border-[#E1E8EC] rounded-lg px-3 py-2.5 text-sm text-[#1C1C1C] outline-none" />
+                <button
+                  onClick={() => { setCalendarFor('to'); setCalendarOpen(true) }}
+                  className="w-full border border-[#E1E8EC] rounded-lg px-3 py-2.5 text-sm text-left cursor-pointer bg-white flex items-center justify-between"
+                >
+                  <span className={dateTo ? 'text-[#1C1C1C]' : 'text-[#97AAB3]'}>
+                    {dateTo ? new Date(dateTo + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Pilih tanggal...'}
+                  </span>
+                  <Calendar size={14} className="text-[#5F737F] shrink-0" />
+                </button>
               </div>
             </div>
           )}
+
+          {/* Calendar picker (rendered inside sheet, above the backdrop) */}
+          <CalendarPickerSheet
+            open={calendarOpen}
+            value={calendarFor === 'from' ? dateFrom : dateTo}
+            onConfirm={d => { if (calendarFor === 'from') onDateFrom(d); else onDateTo(d) }}
+            onClose={() => setCalendarOpen(false)}
+          />
 
           {/* Month picker */}
           {periodMode === 'month' && (

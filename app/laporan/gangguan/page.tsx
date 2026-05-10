@@ -1202,65 +1202,6 @@ export default function GangguanPage() {
       {/* Table card — Figma 11:260 */}
       <div style={{ background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
 
-        {/* Inline filter row — desktop only, Figma Div 749x68 */}
-        {!isMobile && (
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, padding: '12px 16px', borderBottom: '1px solid #E1E8EC', flexWrap: 'wrap' }}>
-            {/* Jenis Gangguan */}
-            <div>
-              <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C', marginBottom: 4 }}>Jenis Gangguan</p>
-              <select
-                value={jenis}
-                onChange={(e) => { setJenis(e.target.value); setPage(1) }}
-                style={{ width: 200, height: 44, border: '1px solid #E1E8EC', borderRadius: 8, padding: '0 12px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#5F737F', background: '#FFFFFF', cursor: 'pointer', outline: 'none' }}
-              >
-                {JENIS_OPTIONS.map(o => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-            </div>
-            {/* Tanggal Mulai */}
-            <div>
-              <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C', marginBottom: 4 }}>Tanggal Mulai</p>
-              <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden', width: 184, height: 44 }}>
-                <input type="date" value={tglMulai} onChange={(e) => { setTglMulai(e.target.value); setPage(1) }}
-                  style={{ flex: 1, border: 'none', outline: 'none', padding: '0 12px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#5F737F', height: '100%' }} />
-                <div style={{ width: 44, height: 44, background: '#F6F9FC', borderLeft: '1px solid #E1E8EC', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Calendar size={16} style={{ color: '#5F737F' }} />
-                </div>
-              </div>
-            </div>
-            {/* Tanggal Berakhir */}
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Tanggal Berakhir</p>
-                <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 450, fontSize: 14, color: '#97AAB3' }}>(Opsional)</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden', width: 184, height: 44 }}>
-                <input type="date" value={tglAkhir} onChange={(e) => { setTglAkhir(e.target.value); setPage(1) }}
-                  style={{ flex: 1, border: 'none', outline: 'none', padding: '0 12px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#5F737F', height: '100%' }} />
-                <div style={{ width: 44, height: 44, background: '#F6F9FC', borderLeft: '1px solid #E1E8EC', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Calendar size={16} style={{ color: '#5F737F' }} />
-                </div>
-              </div>
-            </div>
-            {/* Hapus Filter — disabled style when no active filters */}
-            <button
-              onClick={resetFilters}
-              disabled={!hasActiveFilters}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 16px',
-                borderRadius: 8, border: 'none', cursor: hasActiveFilters ? 'pointer' : 'not-allowed',
-                background: '#F6F9FC',
-                color: hasActiveFilters ? '#5F737F' : '#E1E8EC',
-                fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14,
-                transition: 'color 0.15s',
-              }}
-            >
-              <RotateCcw size={18} style={{ color: hasActiveFilters ? '#5F737F' : '#E1E8EC' }} />
-              Hapus Filter
-            </button>
-          </div>
-        )}
 
         <div className="overflow-x-auto">
           <table className="data-table">

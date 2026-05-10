@@ -229,6 +229,7 @@ interface TowerOption {
   tipe: string
   lat?: number
   lng?: number
+  radius?: number
 }
 
 function TowerDropdown({
@@ -459,7 +460,7 @@ function LaporanDrawer({
         setForm({
           ...EMPTY_FORM,
           towerId:      initial.towerId ?? '',
-          towerLabel:   initial.tower?.nomorTower ?? '',
+          towerLabel:   initial.tower?.nomorTower ?? initial.tower?.id ?? '',
           jenisGangguan: initial.jenisGangguan ?? '',
           tanggalWaktu: initial.tanggal?.slice(0, 16) ?? new Date().toISOString().slice(0, 16),
           levelRisiko:  initial.levelRisiko ?? 'sedang',
@@ -505,12 +506,13 @@ function LaporanDrawer({
         for (const t of towerOptions) {
           if (t.lat && t.lng) { const d = getDistance(lat, lng, t.lat, t.lng); if (d < min) { min = d; nearest = t } }
         }
-        if (nearest && min <= 500) {
+        const towerRadius = nearest?.radius ?? 100
+        if (nearest && min <= towerRadius) {
           setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: nearest!.nomorTower }))
           setDetectedMsg(`📍 Tower ${nearest.nomorTower} (${Math.round(min)}m)`)
           toast.success('Tower terdekat dipilih!')
         } else if (nearest) {
-          setDetectedMsg(`⚠️ Tower terdekat (${nearest.nomorTower}) ${Math.round(min)}m — terlalu jauh`)
+          setDetectedMsg(`⚠️ Tower terdekat (${nearest.nomorTower}) ${Math.round(min)}m — di luar radius ${towerRadius}m`)
         }
         setLocating(false)
       },

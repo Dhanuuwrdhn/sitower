@@ -28,10 +28,19 @@ export interface FeaturedTower {
   nomorUrut?: number | null
 }
 
+export interface JalurKmlItem {
+  id: number
+  nama: string
+  tipe: string   // SUTET | SUTT | SKTT
+  warna: string | null
+  path: Array<{ lat: number; lng: number }>
+}
+
 interface Props {
   towers?: FeaturedTower[]
   onTowerClick?: (tower: FeaturedTower) => void
   dbTowers?: FeaturedTower[]
+  jalurKml?: JalurKmlItem[]
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -337,6 +346,69 @@ function DbTransmissionLines({ dbTowers }: { dbTowers: FeaturedTower[] }) {
 }
 
 
+// ─── KML Jalur polylines ───────────────────────────────────────────────────────
+
+const KML_JALUR_COLORS: Record<string, string> = {
+  SUTET: '#e65100',   // orange
+  SUTT:  '#0288D1',   // blue
+  SKTT:  '#7c3aed',   // purple
+}
+
+function JalurKmlLines({ jalurKml }: { jalurKml: JalurKmlItem[] }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (!map || !window.google || !jalurKml.length) return
+
+    const lines: google.maps.Polyline[] = []
+
+    for (const jalur of jalurKml) {
+      if (!jalur.path || jalur.path.length < 2) continue
+
+      const path = jalur.path.map((p) => ({ lat: p.lat, lng: p.lng }))
+      const isSktt  = jalur.tipe === 'SKTT'
+      const isSutet = jalur.tipe === 'SUTET'
+
+      // Use jalur.warna if provided, otherwise fall back to tipe color
+      const color = jalur.warna ?? KML_JALUR_COLORS[jalur.tipe] ?? '#6B7280'
+      const strokeWeight  = isSutet ? 4 : 3
+      const strokeOpacity = isSktt ? 0 : 0.85
+      const zIndex = isSutet ? 36 : isSktt ? 16 : 26
+
+      const icons: google.maps.PolylineOptions['icons'] = isSktt
+        ? [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3, strokeColor: color }, offset: '0', repeat: '12px' }]
+        : undefined
+
+      // Glow/outline for solid lines
+      if (!isSktt) {
+        lines.push(new window.google.maps.Polyline({
+          path,
+          strokeColor: '#FFFFFF',
+          strokeOpacity: 0.45,
+          strokeWeight: strokeWeight + 4,
+          zIndex: zIndex - 1,
+          map,
+        }))
+      }
+
+      lines.push(new window.google.maps.Polyline({
+        path,
+        strokeColor: color,
+        strokeOpacity,
+        strokeWeight,
+        icons,
+        zIndex,
+        map,
+      }))
+    }
+
+    return () => lines.forEach((l) => l.setMap(null))
+  }, [map, jalurKml])
+
+  return null
+}
+
+
 function ZoomWatcher({ onZoomChange }: { onZoomChange: (zoom: number) => void }) {
   const map = useMap()
 
@@ -519,7 +591,7 @@ function Legend() {
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''
 const CENTER  = { lat: -6.18, lng: 106.50 }
 
-export default function TowerMapGoogle({ towers, onTowerClick, dbTowers }: Props) {
+export default function TowerMapGoogle({ towers, onTowerClick, dbTowers, jalurKml }: Props) {
   const [selected, setSelected] = useState<FeaturedTower | null>(null)
 
   const displayTowers = useMemo<FeaturedTower[]>(() => {
@@ -565,6 +637,7 @@ export default function TowerMapGoogle({ towers, onTowerClick, dbTowers }: Props
         >
           <TransmissionLines />
           {jalurTowers.length > 0 && <DbTransmissionLines dbTowers={jalurTowers} />}
+          {jalurKml && jalurKml.length > 0 && <JalurKmlLines jalurKml={jalurKml} />}
           <TowerMarkers towers={displayTowers} onSelect={handleSelect} />
           {selected && <TowerPopup tower={selected} onClose={() => setSelected(null)} />}
         </Map>

@@ -155,13 +155,14 @@ export default function Sidebar() {
           onClick={() => setMobileOpen(false)}
         />
 
-        {/* Sidebar panel — full-screen */}
+        {/* Sidebar panel — full-screen, z-[60] agar di atas topbar (z-50) */}
         <aside
-          className="fixed left-0 top-0 bottom-0 z-50 flex flex-col overflow-hidden transition-transform duration-300"
+          className="fixed left-0 top-0 bottom-0 flex flex-col overflow-hidden transition-transform duration-300"
           style={{
             width: '100vw',
             background: '#076c9e',
             transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
+            zIndex: 60,
           }}
         >
           {/* Header — ⚡SPEKTRA + close button */}

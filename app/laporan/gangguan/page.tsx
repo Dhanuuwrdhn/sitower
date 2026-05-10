@@ -1078,101 +1078,128 @@ export default function GangguanPage() {
       {/* Title */}
       <h1 style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 24, lineHeight: '36px', color: '#1C1C1C', marginBottom: 24 }}>Riwayat Gangguan</h1>
 
-      {/* Top bar: search + filter | button */}
-      <div style={{ display: 'flex', alignItems: 'stretch', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
-        {/* Search field */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, flex: 1, minWidth: 0 }}>
-          <Search size={16} style={{ color: '#5F737F', flexShrink: 0 }} />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-            placeholder="Cari berdasarkan nama tower"
-            style={{ border: 'none', outline: 'none', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, lineHeight: '20px', color: '#1C1C1C', background: 'transparent', width: '100%', minWidth: 0 }}
-          />
-        </div>
-        {/* Filter button */}
-        <div style={{ position: 'relative' }} ref={filterRef}>
-          <button
-            onClick={() => setFilterOpen(v => !v)}
-            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer', height: '100%' }}
-          >
-            <SlidersHorizontal size={16} style={{ color: '#5F737F' }} />
-            {hasActiveFilters && <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#D92D20', flexShrink: 0 }} />}
-          </button>
-
-          {/* Desktop filter popup */}
-          {!isMobile && filterOpen && (
-            <div style={{ position: 'absolute', left: 0, top: '100%', marginTop: 8, zIndex: 50, width: 401, maxWidth: '95vw', background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, boxShadow: '0px 4px 8px 0px rgba(28,28,28,0.15)', padding: '8px 0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px' }}>
-                <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Filter</span>
-                <button onClick={() => setFilterOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
-                  <X size={16} style={{ color: '#5F737F' }} />
-                </button>
-              </div>
-              <div style={{ height: 1, background: '#E1E8EC' }} />
-              <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Kategori</span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {JENIS_OPTIONS.filter(o => o.value).map(o => (
-                    <button key={o.value} onClick={() => { setJenis(jenis === o.value ? '' : o.value); setPage(1) }}
-                      style={{ padding: '4px 12px', borderRadius: 18, border: '1px solid', borderColor: jenis === o.value ? '#076C9E' : '#E1E8EC', background: jenis === o.value ? '#076C9E' : 'transparent', color: jenis === o.value ? '#FFFFFF' : '#5F737F', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
-                    >{o.label}</button>
-                  ))}
-                </div>
-              </div>
-              <div style={{ height: 1, background: '#E1E8EC' }} />
-              <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Status</span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {STATUS_FILTER_OPTIONS.filter(o => o.value).map(o => (
-                    <button key={o.value} onClick={() => { setStatusFilter(statusFilter === o.value ? '' : o.value); setPage(1) }}
-                      style={{ padding: '4px 12px', borderRadius: 18, border: '1px solid', borderColor: statusFilter === o.value ? '#076C9E' : '#E1E8EC', background: statusFilter === o.value ? '#076C9E' : 'transparent', color: statusFilter === o.value ? '#FFFFFF' : '#5F737F', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
-                    >{o.label}</button>
-                  ))}
-                </div>
-              </div>
-              <div style={{ height: 1, background: '#E1E8EC' }} />
-              <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Rentang Waktu</span>
-                <div style={{ display: 'flex', gap: 16 }}>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#1C1C1C', marginBottom: 4 }}>Period From</p>
-                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
-                      <input type="date" value={tglMulai} onChange={(e) => { setTglMulai(e.target.value); setPage(1) }} style={{ flex: 1, border: 'none', outline: 'none', padding: '8px 16px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#5F737F' }} />
-                      <div style={{ padding: 12, background: '#F6F9FC', borderLeft: '1px solid #E1E8EC', display: 'flex', alignItems: 'center' }}><Calendar size={16} style={{ color: '#5F737F' }} /></div>
-                    </div>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#1C1C1C', marginBottom: 4 }}>Period To</p>
-                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
-                      <input type="date" value={tglAkhir} onChange={(e) => { setTglAkhir(e.target.value); setPage(1) }} style={{ flex: 1, border: 'none', outline: 'none', padding: '8px 16px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#5F737F' }} />
-                      <div style={{ padding: 12, background: '#F6F9FC', borderLeft: '1px solid #E1E8EC', display: 'flex', alignItems: 'center' }}><Calendar size={16} style={{ color: '#5F737F' }} /></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div style={{ height: 1, background: '#E1E8EC' }} />
-              <div style={{ padding: '8px 16px', display: 'flex', gap: 8 }}>
-                <button onClick={() => setFilterOpen(false)} className="btn-primary" style={{ flex: 1 }}>Terapkan Filter</button>
-                <button onClick={() => { resetFilters(); setFilterOpen(false) }} style={{ flex: 1, padding: '12px 20px', borderRadius: 22, border: '1px solid #D92D20', background: '#FFFFFF', color: '#D92D20', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, cursor: 'pointer' }}>Hapus Filter</button>
-              </div>
+      {/* Top bar — mobile: 2 rows; desktop: 1 row */}
+      {isMobile ? (
+        <div className="flex flex-col gap-3 mb-6">
+          {/* Row 1: Search + Filter */}
+          <div className="flex items-center gap-2">
+            {/* Search */}
+            <div className="flex items-center gap-3 px-4 py-[11px] bg-white border border-[#E1E8EC] rounded-lg flex-1 min-w-0">
+              <Search size={16} className="text-[#5F737F] shrink-0" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+                placeholder="Cari berdasarkan nama tower"
+                className="border-none outline-none font-medium text-[14px] text-[#1C1C1C] bg-transparent w-full min-w-0 placeholder:text-[#97AAB3]"
+              />
             </div>
-          )}
+            {/* Filter button */}
+            <button
+              onClick={() => setFilterOpen(v => !v)}
+              className="relative w-11 h-11 bg-white border border-[#E1E8EC] rounded-lg flex items-center justify-center cursor-pointer shrink-0"
+            >
+              <SlidersHorizontal size={18} className="text-[#5F737F]" />
+              {hasActiveFilters && <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#D92D20]" />}
+            </button>
+          </div>
+          {/* Row 2: Tambah Laporan Baru */}
+          <button
+            onClick={openAdd}
+            className="w-full h-11 rounded-[22px] bg-[#076c9e] text-white font-semibold text-[14px] border-none cursor-pointer flex items-center justify-center gap-2"
+          >
+            <Plus size={16} /> Tambah Laporan Baru
+          </button>
         </div>
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'stretch', gap: 10, marginBottom: 24 }}>
+          {/* Search field */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, flex: 1, minWidth: 0 }}>
+            <Search size={16} style={{ color: '#5F737F', flexShrink: 0 }} />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+              placeholder="Cari berdasarkan nama tower"
+              style={{ border: 'none', outline: 'none', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, lineHeight: '20px', color: '#1C1C1C', background: 'transparent', width: '100%', minWidth: 0 }}
+            />
+          </div>
+          {/* Filter button */}
+          <div style={{ position: 'relative' }} ref={filterRef}>
+            <button
+              onClick={() => setFilterOpen(v => !v)}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer', height: '100%' }}
+            >
+              <SlidersHorizontal size={16} style={{ color: '#5F737F' }} />
+              {hasActiveFilters && <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#D92D20', flexShrink: 0 }} />}
+            </button>
 
-        {/* Add button */}
-        {isMobile ? (
-          <label className="btn-primary" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, margin: 0, whiteSpace: 'nowrap' }}>
-            <Plus size={16} /> Tambah
-            <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => { if (e.target.files && e.target.files.length > 0) { const valid = Array.from(e.target.files).filter(f => f.size <= 5 * 1024 * 1024 && /\.(jpe?g|png|webp)$/i.test(f.name)); setPendingFotos(valid); setEditRow(null); setViewMode('edit'); setDrawerOpen(true) } e.target.value = '' }} />
-          </label>
-        ) : (
+            {/* Desktop filter popup */}
+            {filterOpen && (
+              <div style={{ position: 'absolute', left: 0, top: '100%', marginTop: 8, zIndex: 50, width: 401, maxWidth: '95vw', background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, boxShadow: '0px 4px 8px 0px rgba(28,28,28,0.15)', padding: '8px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px' }}>
+                  <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Filter</span>
+                  <button onClick={() => setFilterOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
+                    <X size={16} style={{ color: '#5F737F' }} />
+                  </button>
+                </div>
+                <div style={{ height: 1, background: '#E1E8EC' }} />
+                <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Kategori</span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {JENIS_OPTIONS.filter(o => o.value).map(o => (
+                      <button key={o.value} onClick={() => { setJenis(jenis === o.value ? '' : o.value); setPage(1) }}
+                        style={{ padding: '4px 12px', borderRadius: 18, border: '1px solid', borderColor: jenis === o.value ? '#076C9E' : '#E1E8EC', background: jenis === o.value ? '#076C9E' : 'transparent', color: jenis === o.value ? '#FFFFFF' : '#5F737F', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
+                      >{o.label}</button>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ height: 1, background: '#E1E8EC' }} />
+                <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Status</span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {STATUS_FILTER_OPTIONS.filter(o => o.value).map(o => (
+                      <button key={o.value} onClick={() => { setStatusFilter(statusFilter === o.value ? '' : o.value); setPage(1) }}
+                        style={{ padding: '4px 12px', borderRadius: 18, border: '1px solid', borderColor: statusFilter === o.value ? '#076C9E' : '#E1E8EC', background: statusFilter === o.value ? '#076C9E' : 'transparent', color: statusFilter === o.value ? '#FFFFFF' : '#5F737F', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
+                      >{o.label}</button>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ height: 1, background: '#E1E8EC' }} />
+                <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Rentang Waktu</span>
+                  <div style={{ display: 'flex', gap: 16 }}>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#1C1C1C', marginBottom: 4 }}>Period From</p>
+                      <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
+                        <input type="date" value={tglMulai} onChange={(e) => { setTglMulai(e.target.value); setPage(1) }} style={{ flex: 1, border: 'none', outline: 'none', padding: '8px 16px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#5F737F' }} />
+                        <div style={{ padding: 12, background: '#F6F9FC', borderLeft: '1px solid #E1E8EC', display: 'flex', alignItems: 'center' }}><Calendar size={16} style={{ color: '#5F737F' }} /></div>
+                      </div>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#1C1C1C', marginBottom: 4 }}>Period To</p>
+                      <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
+                        <input type="date" value={tglAkhir} onChange={(e) => { setTglAkhir(e.target.value); setPage(1) }} style={{ flex: 1, border: 'none', outline: 'none', padding: '8px 16px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#5F737F' }} />
+                        <div style={{ padding: 12, background: '#F6F9FC', borderLeft: '1px solid #E1E8EC', display: 'flex', alignItems: 'center' }}><Calendar size={16} style={{ color: '#5F737F' }} /></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ height: 1, background: '#E1E8EC' }} />
+                <div style={{ padding: '8px 16px', display: 'flex', gap: 8 }}>
+                  <button onClick={() => setFilterOpen(false)} className="btn-primary" style={{ flex: 1 }}>Terapkan Filter</button>
+                  <button onClick={() => { resetFilters(); setFilterOpen(false) }} style={{ flex: 1, padding: '12px 20px', borderRadius: 22, border: '1px solid #D92D20', background: '#FFFFFF', color: '#D92D20', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, cursor: 'pointer' }}>Hapus Filter</button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Add button */}
           <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }} onClick={openAdd}>
             <Plus size={16} /> Tambah Laporan Baru
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Table card — Figma node 14:434 */}
       <div style={{ background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>

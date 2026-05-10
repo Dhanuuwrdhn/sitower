@@ -1,15 +1,7 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import ClientLayout from '@/components/layout/ClientLayout'
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-inter',
-  display: 'swap',
-})
 
 export const metadata: Metadata = {
   title: 'SPEKTRA – Sistem Pemantauan Kerawanan Transmisi',
@@ -35,7 +27,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={inter.variable}>
+    <html lang="id">
       <body className="antialiased">
         <ClientLayout>{children}</ClientLayout>
         <Script id="sw-register" strategy="afterInteractive">

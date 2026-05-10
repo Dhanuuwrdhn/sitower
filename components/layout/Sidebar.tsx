@@ -249,13 +249,16 @@ export default function Sidebar() {
 
           {/* Footer */}
           <div style={{
-            borderTop: '1px solid rgba(255,255,255,0.12)',
-            padding: '12px 16px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            borderTop: '1px solid rgba(255,255,255,0.10)',
+            padding: '14px 16px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
             flexShrink: 0, position: 'relative',
           }}>
-            <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.04em' }}>
-              born2works
+            <p style={{ fontSize: 9, fontWeight: 500, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              Powered by
+            </p>
+            <p style={{ fontSize: 13, fontWeight: 800, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.06em' }}>
+              Born2Works
             </p>
           </div>
         </aside>
@@ -342,13 +345,18 @@ export default function Sidebar() {
       {/* Footer */}
       <div style={{
         borderTop: '1px solid rgba(255,255,255,0.1)',
-        padding: '10px 0',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: isCollapsed ? '10px 0' : '12px 16px',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
         flexShrink: 0, position: 'relative',
       }}>
-        <p style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.04em' }}>
-          {isCollapsed ? 'b2w' : 'born2works'}
-        </p>
+        {isCollapsed ? (
+          <p style={{ fontSize: 8, fontWeight: 800, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.06em' }}>B2W</p>
+        ) : (
+          <>
+            <p style={{ fontSize: 8.5, fontWeight: 500, color: 'rgba(255,255,255,0.28)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Powered by</p>
+            <p style={{ fontSize: 12, fontWeight: 800, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.06em' }}>Born2Works</p>
+          </>
+        )}
       </div>
     </aside>
   )

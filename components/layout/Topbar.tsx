@@ -182,26 +182,29 @@ export default function Topbar() {
     )
   }
 
-  /* ── Desktop topbar — floating rounded card with dropdown ── */
+  /* ── Desktop topbar — Figma 20:2425 flat header ── */
   return (
     <>
-      <div className="sticky top-0 z-30 bg-app-bg px-4 pt-4 pb-0 sm:px-6">
-        <header
-          className="flex items-center justify-between bg-white px-4 sm:px-6 rounded-2xl shadow-sm"
-          style={{ height: 60, border: '1px solid #e8edf2' }}
-        >
+      <div
+        className="sticky top-0 z-30 bg-white flex items-center justify-between px-8"
+        style={{
+          height: 82,
+          borderBottom: '1px solid #E1E8EC',
+          boxShadow: '0 1px 2px rgba(16,24,40,0.06), 0 1px 3px rgba(16,24,40,0.10)',
+        }}
+      >
           <div className="flex items-center gap-3">
             <p className="text-[15px] font-semibold text-app-text">
               {getPageTitle(pathname)}
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <div className="text-right">
-              <p className="text-[13px] font-semibold text-app-text leading-tight">
+              <p className="text-[18px] font-bold text-app-text leading-tight">
                 {user?.nama ?? '—'}
               </p>
-              <p className="text-[11px] text-app-subtle leading-tight mt-0.5">
+              <p className="text-[14px] font-medium leading-tight mt-0.5" style={{ color: '#5F7380' }}>
                 {user?.jabatan} · {user?.unit}
               </p>
             </div>
@@ -209,7 +212,7 @@ export default function Topbar() {
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={() => setDropdownOpen((v) => !v)}
-                className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 hover:opacity-80 transition-opacity"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 hover:opacity-80 transition-opacity"
                 style={{ background: 'linear-gradient(135deg, #2563eb, #0891b2)' }}
               >
                 {user?.nama ? getInitials(user.nama) : '?'}
@@ -260,7 +263,6 @@ export default function Topbar() {
               )}
             </div>
           </div>
-        </header>
       </div>
 
       {showChangePassword && (

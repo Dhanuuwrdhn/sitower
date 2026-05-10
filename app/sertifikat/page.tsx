@@ -6,6 +6,7 @@ import { FolderOpen, Plus, Search, SlidersHorizontal, MoreHorizontal, X, Chevron
 import toast from 'react-hot-toast'
 import { sertifikatApi } from '@/lib/api'
 import { isAdmin } from '@/lib/auth'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 const KATEGORI_OPTIONS = ['Kelayakan', 'Grounding', 'Konstruksi', 'K3', 'Lingkungan']
 const STATUS_OPTIONS    = ['berlaku', 'expired']
@@ -330,9 +331,7 @@ export default function SertifikatPage() {
           ))}
         </div>
       ) : folders.length === 0 ? (
-        <div className="card p-10 text-center text-app-muted text-[13px]">
-          Belum ada folder sertifikat{activeFilter ? ' yang sesuai filter' : ''}.
-        </div>
+        <div className="card"><EmptyState title="Belum ada data Sertifikat." /></div>
       ) : (
         <div className="sert-grid">
           {folders.map((folder) => (

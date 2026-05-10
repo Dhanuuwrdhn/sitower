@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { Plus, Pencil, Trash2, X, Power, Check, XCircle, KeyRound, RefreshCw } from 'lucide-react'
+import { Plus, Pencil, Trash2, X, Power, Check, CircleX, KeyRound, RefreshCw } from 'lucide-react'
 import { pegawaiApi, authApi } from '@/lib/api'
 import { isAdmin } from '@/lib/auth'
 import { ActionMenu } from '@/components/ui/ActionMenu'
@@ -433,7 +433,7 @@ export default function UsersPage() {
                                 title="Tolak"
                                 className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 border border-red-200 text-red-600 text-[12px] font-semibold hover:bg-red-100 transition disabled:opacity-50 cursor-pointer"
                               >
-                                <XCircle size={13} /> Tolak
+                                <CircleX size={13} /> Tolak
                               </button>
                             </div>
                           ) : (

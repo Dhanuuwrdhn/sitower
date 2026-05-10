@@ -186,19 +186,13 @@ export default function Topbar() {
   return (
     <>
       <div
-        className="sticky top-0 z-30 bg-white flex items-center justify-between px-8"
+        className="sticky top-0 z-30 bg-white flex items-center justify-end px-8"
         style={{
           height: 82,
           borderBottom: '1px solid #E1E8EC',
           boxShadow: '0 1px 2px rgba(16,24,40,0.06), 0 1px 3px rgba(16,24,40,0.10)',
         }}
       >
-          <div className="flex items-center gap-3">
-            <p className="text-[15px] font-semibold text-app-text">
-              {getPageTitle(pathname)}
-            </p>
-          </div>
-
           <div className="flex items-center gap-4">
             <div className="text-right">
               <p className="text-[18px] font-bold text-app-text leading-tight">

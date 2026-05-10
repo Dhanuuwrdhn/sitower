@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import dynamic from 'next/dynamic'
-import { UploadCloud } from 'lucide-react'
+import { CloudUpload } from 'lucide-react'
 import Swal from 'sweetalert2'
 import { laporanApi, towersApi, importApi } from '@/lib/api'
 import B2WLoader from '@/components/ui/B2WLoader'
@@ -319,7 +319,7 @@ export default function DashboardPage() {
               onClick={() => fileInputRef.current?.click()}
               className="dash-import-btn"
             >
-              <UploadCloud size={14} />
+              <CloudUpload size={14} />
               Import Data Excel
             </button>
             <a href="/laporan/gangguan" className="dash-see-all-btn">

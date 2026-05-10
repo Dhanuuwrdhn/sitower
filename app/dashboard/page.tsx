@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import { UploadCloud } from 'lucide-react'
 import Swal from 'sweetalert2'
 import { laporanApi, towersApi, importApi } from '@/lib/api'
+import B2WLoader from '@/components/ui/B2WLoader'
 
 const TowerMap = dynamic(() => import('@/components/map/TowerMapGoogle'), { ssr: false })
 
@@ -126,6 +127,7 @@ export default function DashboardPage() {
   const [totalTower, setTotalTower] = useState(0)
   const [normalTower, setNormalTower] = useState(0)
   const [gangguanTower, setGangguanTower] = useState(0)
+  const [loading, setLoading] = useState(true)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -166,36 +168,38 @@ export default function DashboardPage() {
   }
 
   useEffect(() => {
-    laporanApi.getStats()
-      .then((res) => setStats(res.data))
-      .catch(() => {})
+    Promise.allSettled([
+      laporanApi.getStats()
+        .then((res) => setStats(res.data))
+        .catch(() => {}),
 
-    laporanApi.getAll({ limit: 5 })
-      .then((res) => {
-        const rows = (res.data.data ?? res.data) as any[]
-        setRecent(rows.slice(0, 5).map((r: any) => ({
-          id: r.id,
-          tanggal: r.tanggal?.slice(0, 10) ?? '—',
-          tower: r.tower?.id ?? r.tower?.nama ?? '—',
-          jenisGangguan: JENIS_LABEL[r.jenisGangguan] ?? r.jenisGangguan ?? '—',
-          pelapor: r.pelapor?.nama ?? r.pegawai?.nama ?? '—',
-          status: r.status?.toLowerCase() ?? '—',
-        })))
-      })
-      .catch(() => {})
+      laporanApi.getAll({ limit: 5 })
+        .then((res) => {
+          const rows = (res.data.data ?? res.data) as any[]
+          setRecent(rows.slice(0, 5).map((r: any) => ({
+            id: r.id,
+            tanggal: r.tanggal?.slice(0, 10) ?? '—',
+            tower: r.tower?.id ?? r.tower?.nama ?? '—',
+            jenisGangguan: JENIS_LABEL[r.jenisGangguan] ?? r.jenisGangguan ?? '—',
+            pelapor: r.pelapor?.nama ?? r.pegawai?.nama ?? '—',
+            status: r.status?.toLowerCase() ?? '—',
+          })))
+        })
+        .catch(() => {}),
 
-    // Pakai endpoint /towers/map untuk data kerawanan di peta
-    towersApi.getMap()
-      .then((res) => {
-        const data = Array.isArray(res.data) ? res.data : []
-        const gangguanCount = data.filter((t: any) => t.kerawanan?.length > 0).length
-        setAlertCount(gangguanCount)
-        setTowerKerawanan(data)
-        setTotalTower(data.length)
-        setNormalTower(data.length - gangguanCount)
-        setGangguanTower(gangguanCount)
-      })
-      .catch(() => {})
+      // Pakai endpoint /towers/map untuk data kerawanan di peta
+      towersApi.getMap()
+        .then((res) => {
+          const data = Array.isArray(res.data) ? res.data : []
+          const gangguanCount = data.filter((t: any) => t.kerawanan?.length > 0).length
+          setAlertCount(gangguanCount)
+          setTowerKerawanan(data)
+          setTotalTower(data.length)
+          setNormalTower(data.length - gangguanCount)
+          setGangguanTower(gangguanCount)
+        })
+        .catch(() => {}),
+    ]).finally(() => setLoading(false))
   }, [])
 
   const statValues: Record<string, number> = {
@@ -208,6 +212,8 @@ export default function DashboardPage() {
 
   const normalPct = totalTower > 0 ? Math.round((normalTower / totalTower) * 100) : 0
   const gangguanPct = totalTower > 0 ? Math.round((gangguanTower / totalTower) * 100) : 0
+
+  if (loading) return <B2WLoader label="Memuat dashboard..." />
 
   return (
     <div className="dash-container">

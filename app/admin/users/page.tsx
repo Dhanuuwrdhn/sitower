@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { Plus, Pencil, Trash2, X, Power } from 'lucide-react'
-import { pegawaiApi } from '@/lib/api'
+import { Plus, Pencil, Trash2, X, Power, Check, XCircle, KeyRound, RefreshCw } from 'lucide-react'
+import { pegawaiApi, authApi } from '@/lib/api'
 import { isAdmin } from '@/lib/auth'
 import { ActionMenu } from '@/components/ui/ActionMenu'
 import { SearchInput } from '@/components/ui/SearchInput'
@@ -175,6 +175,11 @@ export default function UsersPage() {
   const [deleting, setDeleting]     = useState(false)
   const [toggling, setToggling]     = useState<string | null>(null)
 
+  // Password change requests
+  const [pwRequests, setPwRequests]   = useState<any[]>([])
+  const [pwLoading, setPwLoading]     = useState(true)
+  const [pwProcessing, setPwProcessing] = useState<string | null>(null)
+
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
@@ -187,7 +192,24 @@ export default function UsersPage() {
     }
   }, [])
 
-  useEffect(() => { if (ready) fetchData() }, [ready, fetchData])
+  const fetchPwRequests = useCallback(async () => {
+    setPwLoading(true)
+    try {
+      const res = await authApi.listPasswordChangeRequests()
+      setPwRequests(Array.isArray(res.data) ? res.data : [])
+    } catch {
+      setPwRequests([])
+    } finally {
+      setPwLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (ready) {
+      fetchData()
+      fetchPwRequests()
+    }
+  }, [ready, fetchData, fetchPwRequests])
 
   const filtered = rows.filter((r) => {
     if (!search) return true
@@ -210,6 +232,32 @@ export default function UsersPage() {
       toast.error('Gagal mengubah status')
     } finally {
       setToggling(null)
+    }
+  }
+
+  async function handleApprove(id: string) {
+    setPwProcessing(id)
+    try {
+      await authApi.approvePasswordChangeRequest(id)
+      toast.success('Password berhasil disetujui dan diperbarui')
+      fetchPwRequests()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'Gagal menyetujui')
+    } finally {
+      setPwProcessing(null)
+    }
+  }
+
+  async function handleReject(id: string) {
+    setPwProcessing(id)
+    try {
+      await authApi.rejectPasswordChangeRequest(id)
+      toast.success('Permintaan ditolak')
+      fetchPwRequests()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'Gagal menolak')
+    } finally {
+      setPwProcessing(null)
     }
   }
 
@@ -294,6 +342,111 @@ export default function UsersPage() {
         {/* Simple footer count */}
         <div className="px-5 py-3.5 border-t border-app-border text-[12px] text-app-muted bg-white">
           {filtered.length} dari {rows.length} user
+        </div>
+      </div>
+
+      {/* ── Password Change Requests ─────────────────────────────────────── */}
+      <div className="mt-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <KeyRound size={18} className="text-[#076c9e]" />
+            <h2 className="text-lg font-bold text-app-text">Permintaan Ganti Password</h2>
+            {pwRequests.filter(r => r.status === 'pending').length > 0 && (
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#D92D20] text-white text-[11px] font-bold">
+                {pwRequests.filter(r => r.status === 'pending').length}
+              </span>
+            )}
+          </div>
+          <button onClick={fetchPwRequests} className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted transition-colors" title="Refresh">
+            <RefreshCw size={15} />
+          </button>
+        </div>
+
+        <div className="card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Jabatan / Unit</th>
+                  <th>Waktu Request</th>
+                  <th>Kedaluwarsa</th>
+                  <th>Status</th>
+                  <th>Direview oleh</th>
+                  <th className="text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pwLoading ? (
+                  <SkeletonRow cols={7} rows={3} />
+                ) : pwRequests.length === 0 ? (
+                  <tr><td colSpan={7}><EmptyState title="Tidak ada permintaan ganti password" /></td></tr>
+                ) : (
+                  pwRequests.map((req) => {
+                    const isPending = req.status === 'pending'
+                    const isExpired = req.status === 'expired'
+                    const processing = pwProcessing === req.id
+                    return (
+                      <tr key={req.id}>
+                        <td>
+                          <p className="font-semibold text-app-text text-[13px]">{req.pegawai?.nama ?? '—'}</p>
+                          <p className="font-mono text-[11px] text-blue-600">{req.pegawai?.nik ?? '—'}</p>
+                        </td>
+                        <td className="text-app-muted text-[12px]">
+                          <p>{req.pegawai?.jabatan ?? '—'}</p>
+                          <p>{req.pegawai?.unit ?? '—'}</p>
+                        </td>
+                        <td className="text-[13px] text-app-muted">
+                          {req.requestedAt ? new Date(req.requestedAt).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+                        </td>
+                        <td className="text-[13px] text-app-muted">
+                          {req.expiredAt ? new Date(req.expiredAt).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+                        </td>
+                        <td>
+                          {req.status === 'pending'  && <span className="badge-berlangsung">Menunggu</span>}
+                          {req.status === 'approved' && <span className="badge-selesai">Disetujui</span>}
+                          {req.status === 'rejected' && <span className="badge-menunggu">Ditolak</span>}
+                          {req.status === 'expired'  && <span className="badge-menunggu opacity-60">Kedaluwarsa</span>}
+                        </td>
+                        <td className="text-[12px] text-app-muted">
+                          {req.reviewedBy?.nama ?? (isPending || isExpired ? '—' : '—')}
+                          {req.reviewedAt && (
+                            <p className="text-[11px]">
+                              {new Date(req.reviewedAt).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          )}
+                        </td>
+                        <td className="text-center">
+                          {isPending ? (
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                onClick={() => handleApprove(req.id)}
+                                disabled={processing}
+                                title="Setujui"
+                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 border border-green-200 text-green-700 text-[12px] font-semibold hover:bg-green-100 transition disabled:opacity-50 cursor-pointer"
+                              >
+                                <Check size={13} /> Setujui
+                              </button>
+                              <button
+                                onClick={() => handleReject(req.id)}
+                                disabled={processing}
+                                title="Tolak"
+                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 border border-red-200 text-red-600 text-[12px] font-semibold hover:bg-red-100 transition disabled:opacity-50 cursor-pointer"
+                              >
+                                <XCircle size={13} /> Tolak
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-[12px] text-app-subtle">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 

@@ -57,9 +57,9 @@ const STATUS_CLASS: Record<string, string> = {
 }
 
 const LEVEL_OPTIONS = [
-  { value: 'tinggi', label: 'Tinggi', color: 'text-red-600',    bg: 'bg-red-50 border-red-300',       dot: 'bg-red-500' },
+  { value: 'kritis', label: 'Kritis', color: 'text-red-600',    bg: 'bg-red-50 border-red-300',       dot: 'bg-red-500' },
   { value: 'sedang', label: 'Sedang', color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-300', dot: 'bg-yellow-500' },
-  { value: 'rendah', label: 'Rendah', color: 'text-green-600',  bg: 'bg-green-50 border-green-300',   dot: 'bg-green-500' },
+  { value: 'aman',   label: 'Aman',   color: 'text-green-600',  bg: 'bg-green-50 border-green-300',   dot: 'bg-green-500' },
 ]
 
 const STATUS_OPTIONS = [
@@ -920,7 +920,7 @@ const JENIS_CHIPS = [
   { value: 'pekerjaan_pihak_lain', label: 'PPL' },
   { value: 'kebakaran',            label: 'Kebakaran' },
   { value: 'layangan',             label: 'Layang-layang' },
-  { value: 'pemanfaatan_lahan',    label: 'Pemanfaatan Pihak Lain' },
+  { value: 'pemanfaatan_lahan',    label: 'Pemanfaatan Lahan' },
   { value: 'pencurian',            label: 'Pencurian' },
 ]
 
@@ -1293,7 +1293,7 @@ export default function HistoryGangguanPage() {
     <>
       {/* Title */}
       <h1 style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, fontSize: 24, lineHeight: '36px', color: '#1C1C1C', marginBottom: 24 }}>
-        Riwayat Gangguan
+        Riwayat Kerawanan Transmisi
       </h1>
 
       {/* Top bar */}

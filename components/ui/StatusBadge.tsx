@@ -12,6 +12,9 @@ const MAP: Record<string, string> = {
   waspada:     'badge-ditangani',
   gangguan:    'badge-berlangsung badge-blink',
   maintenance: 'badge-pemantauan',
+  // Kerawanan level
+  kritis:      'badge-berlangsung badge-blink',
+  aman:        'badge-selesai',
   // Sertifikat
   valid:       'badge-selesai',
   expired:     'badge-berlangsung',

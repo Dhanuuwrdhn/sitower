@@ -35,9 +35,9 @@ export function statusColor(kondisi: string) {
 
 export function kerawananColor(level: string) {
   switch (level) {
-    case 'rendah': return 'text-green-700 bg-green-50 border-green-200'
+    case 'aman':   return 'text-green-700 bg-green-50 border-green-200'
     case 'sedang': return 'text-amber-700 bg-amber-50 border-amber-200'
-    case 'tinggi': return 'text-red-700 bg-red-50 border-red-200'
+    case 'kritis': return 'text-red-700 bg-red-50 border-red-200'
     default:       return 'text-slate-600 bg-slate-50 border-slate-200'
   }
 }

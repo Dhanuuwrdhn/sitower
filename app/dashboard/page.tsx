@@ -38,7 +38,7 @@ const STAT_CARDS = [
   { key: 'kebakaran',   label: 'Kebakaran',                emoji: '🔥', numColor: '#FD2D03' },
   { key: 'layangan',    label: 'Layangan',                 emoji: '🪁', numColor: '#3B84CE' },
   { key: 'pencurian',   label: 'Pencurian',                emoji: '🥷', numColor: '#1B1B1B' },
-  { key: 'pemanfaatan_lahan', label: 'Pemanfaatan Pihak Lain',  emoji: '🏡', numColor: '#059669' },
+  { key: 'pemanfaatan_lahan', label: 'Pemanfaatan Lahan', emoji: '🏡', numColor: '#059669' },
 ] as const
 
 // ── Status config — Figma tokens ──────────────────────────────────────────────
@@ -53,7 +53,7 @@ const JENIS_LABEL: Record<string, string> = {
   kebakaran:            'Kebakaran',
   layangan:             'Layang-layang',
   pencurian:            'Pencurian',
-  pemanfaatan_lahan:    'Pemanfaatan Pihak Lain',
+  pemanfaatan_lahan:    'Pemanfaatan Lahan',
 }
 
 // ── Donut Chart ───────────────────────────────────────────────────────────────
@@ -305,7 +305,7 @@ export default function DashboardPage() {
       {/* Riwayat Gangguan Terbaru */}
       <div className="dash-riwayat-card">
         <div className="dash-riwayat-head">
-          <h2 className="dash-section-title">Riwayat Gangguan Terbaru</h2>
+          <h2 className="dash-section-title">Riwayat Kerawanan Transmisi Terbaru</h2>
           <div className="dash-riwayat-actions">
             {/* Import Button */}
             <input 
@@ -323,7 +323,7 @@ export default function DashboardPage() {
               Import Data Excel
             </button>
             <a href="/laporan/gangguan" className="dash-see-all-btn">
-              Lihat Semua Riwayat Gangguan
+              Lihat Semua Riwayat Kerawanan Transmisi
             </a>
           </div>
         </div>
@@ -364,7 +364,7 @@ export default function DashboardPage() {
               {recent.length === 0 && (
                 <tr>
                   <td colSpan={6} style={{ textAlign: 'center', color: '#5F737F', padding: '32px 16px' }}>
-                    Belum ada data riwayat gangguan
+                    Belum ada data riwayat kerawanan transmisi
                   </td>
                 </tr>
               )}

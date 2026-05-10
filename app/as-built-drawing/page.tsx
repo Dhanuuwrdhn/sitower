@@ -188,7 +188,7 @@ export default function AsBuiltDrawingPage() {
               {loading ? (
                 <SkeletonRow cols={6} rows={limit} />
               ) : rows.length === 0 ? (
-                <tr><td colSpan={6}><EmptyState /></td></tr>
+                <tr><td colSpan={6}><EmptyState title="Belum ada data As Built Drawing." /></td></tr>
               ) : (
                 rows.map((row) => (
                   <tr key={row.id}>

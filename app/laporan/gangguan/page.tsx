@@ -13,6 +13,7 @@ import { getUser, isAdmin } from '@/lib/auth'
 import { getDistance } from '@/lib/geo'
 import { useSidebar } from '@/components/layout/SidebarContext'
 import CalendarPickerSheet from '@/components/ui/CalendarPickerSheet'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -1226,9 +1227,7 @@ export default function GangguanPage() {
                 ))
               ) : rows.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center text-app-muted py-12 text-[13px]">
-                    Tidak ada data laporan yang sesuai filter
-                  </td>
+                  <td colSpan={6}><EmptyState title="Belum ada data Riwayat Gangguan." /></td>
                 </tr>
               ) : (
                 rows.map((row) => (

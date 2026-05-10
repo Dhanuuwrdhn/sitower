@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
-  Search, Plus, Calendar, SlidersHorizontal,
+  Search, Plus, Calendar, SlidersHorizontal, RotateCcw,
   Trash2, X, Upload, ChevronLeft, ChevronRight,
   ChevronDown, MoreHorizontal, Eye, Pencil,
   ArrowLeft, AlertTriangle,
@@ -1329,70 +1329,75 @@ export default function GangguanPage() {
               <X size={16} />
             </button>
           </div>
-          {/* Body */}
-          <div className="flex-1 overflow-y-auto px-4 pt-5 pb-2">
-            {/* Kategori */}
-            <p className="font-bold text-[11px] text-[#97AAB3] uppercase tracking-[0.06em] mb-3">Kategori</p>
-            <div className="flex flex-wrap gap-2 mb-6">
+          {/* Body — Figma 74:2192 */}
+          <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2">
+
+            {/* Kategori — 16px bold, chips h=36 r=18 */}
+            <p className="font-bold text-base text-[#1C1C1C] mb-3">Kategori</p>
+            <div className="flex flex-wrap gap-2 mb-5">
               {JENIS_OPTIONS.filter(o => o.value).map(o => (
-                <button key={o.value} onClick={() => { setJenis(jenis === o.value ? '' : o.value); setPage(1) }}
-                  className={`px-3.5 py-2 rounded-full border-2 cursor-pointer font-medium text-[13px] transition-all ${
-                    jenis === o.value ? 'border-[#076c9e] bg-[#EBF5FF] text-[#076c9e]' : 'border-[#E1E8EC] bg-white text-[#5F737F]'
+                <button key={o.value}
+                  onClick={() => { setJenis(jenis === o.value ? '' : o.value); setPage(1) }}
+                  className={`h-9 px-3 rounded-[18px] border cursor-pointer font-medium text-[12px] transition-all ${
+                    jenis === o.value
+                      ? 'bg-[#076c9e] border-[#076c9e] text-white'
+                      : 'bg-transparent border-[#E1E8EC] text-[#5F737F]'
                   }`}
                 >{o.label}</button>
               ))}
             </div>
-            {/* Status */}
-            <p className="font-bold text-[11px] text-[#97AAB3] uppercase tracking-[0.06em] mb-3">Status</p>
-            <div className="flex flex-wrap gap-2 mb-6">
-              {STATUS_FILTER_OPTIONS.filter(o => o.value).map(o => (
-                <button key={o.value} onClick={() => { setStatusFilter(statusFilter === o.value ? '' : o.value); setPage(1) }}
-                  className={`px-3.5 py-2 rounded-full border-2 cursor-pointer font-medium text-[13px] transition-all ${
-                    statusFilter === o.value ? 'border-[#076c9e] bg-[#EBF5FF] text-[#076c9e]' : 'border-[#E1E8EC] bg-white text-[#5F737F]'
-                  }`}
-                >{o.label}</button>
-              ))}
-            </div>
-            {/* Rentang Waktu */}
-            <p className="font-bold text-[11px] text-[#97AAB3] uppercase tracking-[0.06em] mb-3">Rentang Waktu</p>
-            <div className="flex flex-col gap-3">
-              <div>
-                <p className="text-[12px] font-semibold text-[#1C1C1C] mb-1.5">Dari Tanggal</p>
+
+            {/* Periode — side-by-side date pickers, Figma: 191x44 each */}
+            <p className="font-bold text-base text-[#1C1C1C] mb-3">Periode</p>
+            <div className="flex gap-3">
+              {/* Period From */}
+              <div className="flex-1">
+                <p className="text-[14px] font-bold text-[#1C1C1C] mb-1.5">Period From</p>
                 <button
                   onClick={() => { setCalendarFor('from'); setCalendarOpen(true) }}
-                  className="w-full border border-[#E1E8EC] rounded-lg px-3 py-2.5 text-sm text-left cursor-pointer bg-white flex items-center justify-between"
+                  className="w-full h-11 border border-[#E1E8EC] rounded-lg flex items-center cursor-pointer bg-white overflow-hidden"
                 >
-                  <span className={tglMulai ? 'text-[#1C1C1C]' : 'text-[#97AAB3]'}>
-                    {tglMulai ? new Date(tglMulai + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Pilih tanggal...'}
+                  <span className={`flex-1 text-left px-3 text-[14px] font-medium truncate ${tglMulai ? 'text-[#1C1C1C]' : 'text-[#97AAB3]'}`}>
+                    {tglMulai ? new Date(tglMulai + 'T00:00:00').toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'dd/mm/yyyy'}
                   </span>
-                  <Calendar size={14} className="text-[#5F737F] shrink-0" />
+                  <div className="w-11 h-11 bg-[#F6F9FC] border-l border-[#E1E8EC] flex items-center justify-center shrink-0">
+                    <Calendar size={16} className="text-[#5F737F]" />
+                  </div>
                 </button>
               </div>
-              <div>
-                <p className="text-[12px] font-semibold text-[#1C1C1C] mb-1.5">Sampai Tanggal</p>
+              {/* Period To */}
+              <div className="flex-1">
+                <p className="text-[14px] font-bold text-[#1C1C1C] mb-1.5">Period To</p>
                 <button
                   onClick={() => { setCalendarFor('to'); setCalendarOpen(true) }}
-                  className="w-full border border-[#E1E8EC] rounded-lg px-3 py-2.5 text-sm text-left cursor-pointer bg-white flex items-center justify-between"
+                  className="w-full h-11 border border-[#E1E8EC] rounded-lg flex items-center cursor-pointer bg-white overflow-hidden"
                 >
-                  <span className={tglAkhir ? 'text-[#1C1C1C]' : 'text-[#97AAB3]'}>
-                    {tglAkhir ? new Date(tglAkhir + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Pilih tanggal...'}
+                  <span className={`flex-1 text-left px-3 text-[14px] font-medium truncate ${tglAkhir ? 'text-[#1C1C1C]' : 'text-[#97AAB3]'}`}>
+                    {tglAkhir ? new Date(tglAkhir + 'T00:00:00').toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'dd/mm/yyyy'}
                   </span>
-                  <Calendar size={14} className="text-[#5F737F] shrink-0" />
+                  <div className="w-11 h-11 bg-[#F6F9FC] border-l border-[#E1E8EC] flex items-center justify-center shrink-0">
+                    <Calendar size={16} className="text-[#5F737F]" />
+                  </div>
                 </button>
               </div>
             </div>
             <div className="h-2" />
           </div>
-          {/* CTAs */}
-          <div className="px-4 pt-3 pb-6 border-t border-[#E1E8EC] flex gap-3 shrink-0">
-            <button onClick={() => { resetFilters(); setFilterOpen(false) }}
-              className="w-11 h-11 rounded-[10px] border border-[#E1E8EC] bg-white flex items-center justify-center cursor-pointer text-[#5F737F] shrink-0"
-              title="Reset filter">
-              <X size={18} />
-            </button>
-            <button onClick={() => setFilterOpen(false)}
-              className="flex-1 h-11 rounded-full border-none bg-[#076c9e] text-white font-bold text-[15px] cursor-pointer">
+
+          {/* CTA — Figma: Terapkan (338px) + Reset circle (44px) */}
+          <div className="px-4 pt-3 pb-6 border-t border-[#E1E8EC] flex items-center gap-3 shrink-0">
+            <button
+              onClick={() => setFilterOpen(false)}
+              className="flex-1 h-11 rounded-[22px] border-none bg-[#076c9e] text-white font-semibold text-[14px] cursor-pointer"
+            >
               Terapkan
+            </button>
+            <button
+              onClick={() => { resetFilters(); setFilterOpen(false) }}
+              title="Reset filter"
+              className="w-11 h-11 rounded-full border border-[#D92D20] bg-white flex items-center justify-center cursor-pointer shrink-0"
+            >
+              <RotateCcw size={18} className="text-[#D92D20]" />
             </button>
           </div>
         </div>

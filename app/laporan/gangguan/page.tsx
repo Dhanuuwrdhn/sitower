@@ -11,6 +11,7 @@ import {
 import { laporanApi, towersApi } from '@/lib/api'
 import { getUser, isAdmin } from '@/lib/auth'
 import { getDistance } from '@/lib/geo'
+import { resolveMediaUrl } from '@/lib/utils'
 import { useSidebar } from '@/components/layout/SidebarContext'
 import CalendarPickerSheet from '@/components/ui/CalendarPickerSheet'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -940,7 +941,8 @@ function LaporanDrawer({
         {fotoUrls.length > 0 && (
           <div className="grid grid-cols-4 gap-2 mb-2">
             {fotoUrls.map((url, i) => (
-              <img key={i} src={url} alt="" className="w-full aspect-square object-cover rounded-lg" />
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={i} src={resolveMediaUrl(url)} alt="" className="w-full aspect-square object-cover rounded-lg" />
             ))}
           </div>
         )}
@@ -1165,11 +1167,19 @@ function LaporanDrawer({
         </div>
       )}
 
-      {/* Common fields */}
-      <div>
-        <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tanggal & Waktu</label>
-        <input disabled={readOnly} type="datetime-local" value={form.tanggalWaktu} onChange={(e) => set('tanggalWaktu', e.target.value)} className="form-input" />
-      </div>
+      {/* Tanggal & Waktu — hidden on create (auto = now), editable on edit, disabled on detail */}
+      {(readOnly || !!initial) && (
+        <div>
+          <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tanggal & Waktu</label>
+          <input
+            disabled={readOnly}
+            type="datetime-local"
+            value={form.tanggalWaktu}
+            onChange={(e) => set('tanggalWaktu', e.target.value)}
+            className={`form-input ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
+          />
+        </div>
+      )}
 
       <div>
         <label className="block text-[12px] font-semibold text-app-text mb-2">Level Risiko</label>

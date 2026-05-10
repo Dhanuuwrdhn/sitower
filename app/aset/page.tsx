@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { FileUp, Eye, Pencil, Download, X, MapPin, Zap, Activity } from 'lucide-react'
-import { towersApi, importApi, api } from '@/lib/api'
+import { FileUp, Eye, Pencil, Download, X, MapPin, Zap, Activity, Map, Trash2 } from 'lucide-react'
+import { towersApi, importApi, api, jalurKmlApi } from '@/lib/api'
 import { isAdmin } from '@/lib/auth'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { ActionMenu } from '@/components/ui/ActionMenu'
@@ -429,6 +429,26 @@ export default function AsetPage() {
   const [editOpen, setEditOpen]   = useState(false)
   const [editRow, setEditRow]     = useState<any>(null)
 
+  // Jalur KML
+  const kmlRef = useRef<HTMLInputElement>(null)
+  const [uploadingKml, setUploadingKml] = useState(false)
+  const [jalurKmlList, setJalurKmlList] = useState<any[]>([])
+  const [loadingKml, setLoadingKml] = useState(true)
+
+  const fetchJalurKml = useCallback(async () => {
+    setLoadingKml(true)
+    try {
+      const res = await jalurKmlApi.getAll()
+      setJalurKmlList(res.data?.data ?? [])
+    } catch {
+      setJalurKmlList([])
+    } finally {
+      setLoadingKml(false)
+    }
+  }, [])
+
+  useEffect(() => { fetchJalurKml() }, [fetchJalurKml])
+
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [q, setQ] = useState('')
   useEffect(() => {
@@ -491,6 +511,36 @@ export default function AsetPage() {
     }
   }
 
+  async function handleUploadKml(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingKml(true)
+    try {
+      const res = await jalurKmlApi.upload(file)
+      const { total, jalur } = res.data?.data ?? {}
+      toast.success(`${total} jalur berhasil diimport dari KML`)
+      if (jalur?.length) {
+        toast.success(`Jalur: ${(jalur as string[]).slice(0, 3).join(', ')}${jalur.length > 3 ? ` +${jalur.length - 3} lagi` : ''}`, { duration: 5000 })
+      }
+      fetchJalurKml()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'Upload KML gagal')
+    } finally {
+      setUploadingKml(false)
+      if (kmlRef.current) kmlRef.current.value = ''
+    }
+  }
+
+  async function handleDeleteKml(id: number) {
+    try {
+      await jalurKmlApi.remove(id)
+      toast.success('Jalur berhasil dihapus')
+      fetchJalurKml()
+    } catch {
+      toast.error('Gagal menghapus jalur')
+    }
+  }
+
   return (
     <>
       <div className="flex items-center justify-between mb-5">
@@ -514,6 +564,15 @@ export default function AsetPage() {
               {importing ? 'Mengimpor...' : 'Import Excel'}
             </button>
             <input ref={importRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImport} />
+            <button
+              onClick={() => kmlRef.current?.click()}
+              disabled={uploadingKml}
+              className="btn-outline"
+            >
+              <Map size={15} />
+              {uploadingKml ? 'Mengupload...' : 'Upload KML'}
+            </button>
+            <input ref={kmlRef} type="file" accept=".kml" className="hidden" onChange={handleUploadKml} />
           </div>
         )}
       </div>
@@ -615,6 +674,95 @@ export default function AsetPage() {
         onClose={() => setEditOpen(false)}
         onSaved={fetchData}
       />
+
+      {/* Jalur KML Section */}
+      <div className="card overflow-hidden mt-6">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-app-border">
+          <div className="flex items-center gap-2">
+            <Map size={16} className="text-app-muted" />
+            <h2 className="text-[14px] font-bold text-app-text">Jalur KML</h2>
+            <span className="text-[11px] text-app-muted bg-app-surface px-2 py-0.5 rounded-full">
+              {jalurKmlList.length} jalur
+            </span>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th className="w-10">No</th>
+                <th>Nama Jalur</th>
+                <th>Tipe</th>
+                <th>Warna</th>
+                <th>Titik Koordinat</th>
+                <th>Ditambahkan</th>
+                {isAdminUser && <th className="text-right pr-5">Aksi</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {loadingKml ? (
+                <SkeletonRow cols={isAdminUser ? 7 : 6} rows={3} />
+              ) : jalurKmlList.length === 0 ? (
+                <tr>
+                  <td colSpan={isAdminUser ? 7 : 6}>
+                    <EmptyState title="Belum ada jalur KML. Upload file .kml untuk menampilkan jalur transmisi di peta." />
+                  </td>
+                </tr>
+              ) : (
+                jalurKmlList.map((jalur: any, i: number) => (
+                  <tr key={jalur.id}>
+                    <td className="text-app-muted text-[12px]">{i + 1}</td>
+                    <td className="font-semibold text-app-text">{jalur.nama}</td>
+                    <td>
+                      <span style={{
+                        fontSize: 11, fontWeight: 600,
+                        padding: '2px 8px', borderRadius: 999,
+                        background: jalur.tipe === 'SUTET' ? '#FEF3C7' : jalur.tipe === 'SKTT' ? '#EDE9FE' : '#DBEAFE',
+                        color: jalur.tipe === 'SUTET' ? '#92400E' : jalur.tipe === 'SKTT' ? '#5B21B6' : '#1E40AF',
+                      }}>
+                        {jalur.tipe}
+                      </span>
+                    </td>
+                    <td>
+                      {jalur.warna ? (
+                        <div className="flex items-center gap-2">
+                          <div style={{ width: 14, height: 14, borderRadius: 3, background: jalur.warna, border: '1px solid #E1E8EC' }} />
+                          <span className="font-mono text-[11px] text-app-muted">{jalur.warna}</span>
+                        </div>
+                      ) : (
+                        <span className="text-app-muted text-[12px]">—</span>
+                      )}
+                    </td>
+                    <td className="text-app-muted text-[12px]">
+                      {Array.isArray(jalur.path) ? `${jalur.path.length} titik` : '—'}
+                    </td>
+                    <td className="text-app-muted text-[12px]">
+                      {jalur.createdAt
+                        ? new Date(jalur.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+                        : '—'}
+                    </td>
+                    {isAdminUser && (
+                      <td className="text-right pr-4">
+                        <button
+                          onClick={() => handleDeleteKml(jalur.id)}
+                          style={{
+                            padding: '5px 10px', borderRadius: 6, border: '1px solid #FCA5A5',
+                            background: '#FFF', cursor: 'pointer', color: '#DC2626',
+                            display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600,
+                          }}
+                        >
+                          <Trash2 size={13} />
+                          Hapus
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </>
   )
 }

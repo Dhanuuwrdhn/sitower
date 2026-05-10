@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import { CloudUpload } from 'lucide-react'
 import Swal from 'sweetalert2'
-import { laporanApi, towersApi, importApi } from '@/lib/api'
+import { laporanApi, towersApi, importApi, jalurKmlApi } from '@/lib/api'
 import B2WLoader from '@/components/ui/B2WLoader'
 
 const TowerMap = dynamic(() => import('@/components/map/TowerMapGoogle'), { ssr: false })
@@ -128,6 +128,7 @@ export default function DashboardPage() {
   const [normalTower, setNormalTower] = useState(0)
   const [gangguanTower, setGangguanTower] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [jalurKmlData, setJalurKmlData] = useState<any[]>([])
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -198,6 +199,11 @@ export default function DashboardPage() {
           setNormalTower(data.length - gangguanCount)
           setGangguanTower(gangguanCount)
         })
+        .catch(() => {}),
+
+      // Fetch jalur KML untuk ditampilkan di peta
+      jalurKmlApi.getAll()
+        .then((res) => setJalurKmlData(res.data?.data ?? []))
         .catch(() => {}),
     ]).finally(() => setLoading(false))
   }, [])
@@ -300,6 +306,7 @@ export default function DashboardPage() {
             <TowerMap
               towers={towerKerawanan.length > 0 ? towerKerawanan : undefined}
               dbTowers={towerKerawanan.length > 0 ? towerKerawanan : undefined}
+              jalurKml={jalurKmlData.length > 0 ? jalurKmlData : undefined}
             />
           </div>
         </div>

@@ -954,59 +954,51 @@ function FilterBottomSheet({
         className={`fixed inset-0 bg-black/40 transition-opacity duration-300 ${open ? 'opacity-100 z-[65] pointer-events-auto' : 'opacity-0 z-[-1] pointer-events-none'}`}
         onClick={onClose}
       />
-      <div
-        className={`fixed left-0 right-0 bottom-0 z-[70] bg-white rounded-t-2xl transition-transform duration-300 flex flex-col ${open ? 'translate-y-0' : 'translate-y-full'}`}
-        style={{ maxHeight: '88vh' }}
-      >
+      <div className={`fixed left-0 right-0 bottom-0 z-[70] max-h-[88vh] bg-white rounded-t-2xl transition-transform duration-300 flex flex-col ${open ? 'translate-y-0' : 'translate-y-full'}`}>
+
         {/* Drag handle */}
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 8px', flexShrink: 0 }}>
-          <div style={{ width: 40, height: 4, borderRadius: 2, background: '#D1D9E0' }} />
+        <div className="flex justify-center pt-3 pb-2 shrink-0">
+          <div className="w-10 h-1 rounded-sm bg-[#D1D9E0]" />
         </div>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 14px', borderBottom: '1px solid #E1E8EC', flexShrink: 0 }}>
-          <span style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, fontSize: 16, color: '#1C1C1C' }}>Filter</span>
-          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: 'none', background: '#F6F9FC', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#5F737F' }}>
+        <div className="flex items-center justify-between px-4 pb-3.5 border-b border-[#E1E8EC] shrink-0">
+          <span className="font-bold text-base text-[#1C1C1C]">Filter</span>
+          <button onClick={onClose} className="w-8 h-8 rounded-lg border-none bg-[#F6F9FC] flex items-center justify-center cursor-pointer text-[#5F737F]">
             <X size={16} />
           </button>
         </div>
 
         {/* Scrollable body */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 16px 8px' }}>
+        <div className="flex-1 overflow-y-auto px-4 pt-5 pb-2">
+
           {/* Kategori */}
-          <p style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, fontSize: 11, color: '#97AAB3', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Kategori</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+          <p className="font-bold text-[11px] text-[#97AAB3] uppercase tracking-[0.06em] mb-3">Kategori</p>
+          <div className="flex flex-wrap gap-2 mb-6">
             {JENIS_CHIPS.map(chip => {
               const active = selectedJenis.includes(chip.value)
               return (
                 <button key={chip.value} onClick={() => onToggleJenis(chip.value)}
-                  style={{
-                    padding: '8px 14px', borderRadius: 20, border: '1.5px solid', cursor: 'pointer',
-                    fontFamily: 'Inter,sans-serif', fontWeight: 500, fontSize: 13, transition: 'all 0.15s',
-                    borderColor: active ? '#076c9e' : '#E1E8EC',
-                    background: active ? '#EBF5FF' : '#FFF',
-                    color: active ? '#076c9e' : '#5F737F',
-                  }}
+                  className={`px-3.5 py-2 rounded-full border-2 cursor-pointer font-medium text-[13px] transition-all ${
+                    active
+                      ? 'border-[#076c9e] bg-[#EBF5FF] text-[#076c9e]'
+                      : 'border-[#E1E8EC] bg-white text-[#5F737F]'
+                  }`}
                 >{chip.label}</button>
               )
             })}
           </div>
 
           {/* Periode */}
-          <p style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, fontSize: 11, color: '#97AAB3', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Periode</p>
+          <p className="font-bold text-[11px] text-[#97AAB3] uppercase tracking-[0.06em] mb-3">Periode</p>
 
           {/* Mode tabs */}
-          <div style={{ display: 'flex', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden', marginBottom: 16 }}>
-            {(['date', 'month', 'year'] as const).map((mode, i) => (
+          <div className="flex border border-[#E1E8EC] rounded-lg overflow-hidden mb-4 divide-x divide-[#E1E8EC]">
+            {(['date', 'month', 'year'] as const).map(mode => (
               <button key={mode} onClick={() => onPeriodMode(mode)}
-                style={{
-                  flex: 1, padding: '10px 0', border: 'none', cursor: 'pointer',
-                  fontFamily: 'Inter,sans-serif', fontWeight: 600, fontSize: 13,
-                  borderRight: i < 2 ? '1px solid #E1E8EC' : 'none',
-                  background: periodMode === mode ? '#076c9e' : '#FFF',
-                  color: periodMode === mode ? '#FFF' : '#5F737F',
-                  transition: 'all 0.15s',
-                }}>
+                className={`flex-1 py-2.5 border-none cursor-pointer font-semibold text-[13px] transition-all ${
+                  periodMode === mode ? 'bg-[#076c9e] text-white' : 'bg-white text-[#5F737F]'
+                }`}>
                 {mode === 'date' ? 'Tanggal' : mode === 'month' ? 'Bulan' : 'Tahun'}
               </button>
             ))}
@@ -1014,16 +1006,16 @@ function FilterBottomSheet({
 
           {/* Date range */}
           {periodMode === 'date' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div className="flex flex-col gap-3">
               <div>
-                <p style={{ fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 600, color: '#1C1C1C', marginBottom: 6 }}>Dari Tanggal</p>
+                <p className="text-[12px] font-semibold text-[#1C1C1C] mb-1.5">Dari Tanggal</p>
                 <input type="date" value={dateFrom} onChange={e => onDateFrom(e.target.value)}
-                  style={{ width: '100%', border: '1px solid #E1E8EC', borderRadius: 8, padding: '10px 12px', fontFamily: 'Inter,sans-serif', fontSize: 14, color: '#1C1C1C', outline: 'none', boxSizing: 'border-box' }} />
+                  className="w-full border border-[#E1E8EC] rounded-lg px-3 py-2.5 text-sm text-[#1C1C1C] outline-none" />
               </div>
               <div>
-                <p style={{ fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 600, color: '#1C1C1C', marginBottom: 6 }}>Sampai Tanggal</p>
+                <p className="text-[12px] font-semibold text-[#1C1C1C] mb-1.5">Sampai Tanggal</p>
                 <input type="date" value={dateTo} onChange={e => onDateTo(e.target.value)}
-                  style={{ width: '100%', border: '1px solid #E1E8EC', borderRadius: 8, padding: '10px 12px', fontFamily: 'Inter,sans-serif', fontSize: 14, color: '#1C1C1C', outline: 'none', boxSizing: 'border-box' }} />
+                  className="w-full border border-[#E1E8EC] rounded-lg px-3 py-2.5 text-sm text-[#1C1C1C] outline-none" />
               </div>
             </div>
           )}
@@ -1031,25 +1023,23 @@ function FilterBottomSheet({
           {/* Month picker */}
           {periodMode === 'month' && (
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 16 }}>
-                <button onClick={() => onYear(filterYear - 1)} style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #E1E8EC', background: '#FFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#5F737F' }}>
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <button onClick={() => onYear(filterYear - 1)} className="w-8 h-8 rounded-lg border border-[#E1E8EC] bg-white cursor-pointer flex items-center justify-center text-[#5F737F]">
                   <ChevronLeft size={14} />
                 </button>
-                <span style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, fontSize: 16, color: '#076c9e' }}>{filterYear}</span>
-                <button onClick={() => onYear(Math.min(CURRENT_YEAR + 1, filterYear + 1))} style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #E1E8EC', background: '#FFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#5F737F' }}>
+                <span className="font-bold text-base text-[#076c9e]">{filterYear}</span>
+                <button onClick={() => onYear(Math.min(CURRENT_YEAR + 1, filterYear + 1))} className="w-8 h-8 rounded-lg border border-[#E1E8EC] bg-white cursor-pointer flex items-center justify-center text-[#5F737F]">
                   <ChevronRight size={14} />
                 </button>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+              <div className="grid grid-cols-3 gap-2">
                 {MONTHS.map((m, i) => (
                   <button key={i} onClick={() => onMonth(i + 1)}
-                    style={{
-                      padding: '12px 8px', borderRadius: 10, border: '1.5px solid', cursor: 'pointer',
-                      fontFamily: 'Inter,sans-serif', fontWeight: 500, fontSize: 13, transition: 'all 0.15s',
-                      borderColor: filterMonth === i + 1 ? '#076c9e' : '#E1E8EC',
-                      background: filterMonth === i + 1 ? '#076c9e' : '#FFF',
-                      color: filterMonth === i + 1 ? '#FFF' : '#5F737F',
-                    }}
+                    className={`py-3 px-2 rounded-[10px] border-2 cursor-pointer font-medium text-[13px] transition-all ${
+                      filterMonth === i + 1
+                        ? 'border-[#076c9e] bg-[#076c9e] text-white'
+                        : 'border-[#E1E8EC] bg-white text-[#5F737F]'
+                    }`}
                   >{m}</button>
                 ))}
               </div>
@@ -1058,32 +1048,30 @@ function FilterBottomSheet({
 
           {/* Year picker */}
           {periodMode === 'year' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+            <div className="grid grid-cols-4 gap-2">
               {YEARS.map(y => (
                 <button key={y} onClick={() => onYear(y)}
-                  style={{
-                    padding: '10px 4px', borderRadius: 10, border: '1.5px solid', cursor: 'pointer',
-                    fontFamily: 'Inter,sans-serif', fontWeight: filterYear === y ? 700 : 500, fontSize: 13, transition: 'all 0.15s',
-                    borderColor: filterYear === y ? '#076c9e' : '#E1E8EC',
-                    background: filterYear === y ? '#076c9e' : '#FFF',
-                    color: filterYear === y ? '#FFF' : '#5F737F',
-                  }}
+                  className={`py-2.5 px-1 rounded-[10px] border-2 cursor-pointer text-[13px] transition-all ${
+                    filterYear === y
+                      ? 'border-[#076c9e] bg-[#076c9e] text-white font-bold'
+                      : 'border-[#E1E8EC] bg-white text-[#5F737F] font-medium'
+                  }`}
                 >{y}</button>
               ))}
             </div>
           )}
 
-          <div style={{ height: 8 }} />
+          <div className="h-2" />
         </div>
 
         {/* CTAs */}
-        <div style={{ padding: '12px 16px 24px', borderTop: '1px solid #E1E8EC', display: 'flex', gap: 12, flexShrink: 0 }}>
+        <div className="px-4 pt-3 pb-6 border-t border-[#E1E8EC] flex gap-3 shrink-0">
           <button onClick={onReset} title="Reset filter"
-            style={{ width: 44, height: 44, borderRadius: 10, border: '1px solid #E1E8EC', background: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#5F737F', flexShrink: 0 }}>
+            className="w-11 h-11 rounded-[10px] border border-[#E1E8EC] bg-white flex items-center justify-center cursor-pointer text-[#5F737F] shrink-0">
             <RotateCcw size={18} />
           </button>
           <button onClick={onApply}
-            style={{ flex: 1, height: 44, borderRadius: 22, border: 'none', background: '#076c9e', color: '#FFF', fontFamily: 'Inter,sans-serif', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
+            className="flex-1 h-11 rounded-full border-none bg-[#076c9e] text-white font-bold text-[15px] cursor-pointer">
             Terapkan
           </button>
         </div>
@@ -1177,7 +1165,7 @@ export default function HistoryGangguanPage() {
         search: search.trim() || undefined,
         tglMulai: apiTglMulai || undefined,
         tglAkhir: apiTglAkhir || undefined,
-        jenis: appliedJenis.length ? appliedJenis.join(',') : undefined,
+        jenisGangguan: appliedJenis.length ? appliedJenis.join(',') : undefined,
       })
       const payload = res.data
       if (Array.isArray(payload)) { setRows(payload); setTotal(payload.length) }

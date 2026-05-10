@@ -4,7 +4,7 @@ import PageHeader from "@/components/PageHeader";
 import StatusBadge from "@/components/StatusBadge";
 import BarChart from "@/components/BarChart";
 
-const intensitasLabel = { rendah: "Rendah", sedang: "Sedang", tinggi: "Tinggi" };
+const intensitasLabel = { aman: "Aman", sedang: "Sedang", kritis: "Kritis" };
 
 export default function PetirPage() {
   const barData = petirPerZona.map((z) => ({ label: z.zona.replace("Zona ", ""), value: z.count }));

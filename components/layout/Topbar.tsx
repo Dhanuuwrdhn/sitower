@@ -30,11 +30,12 @@ function getPageTitle(pathname: string) {
   return prefix ? PAGE_TITLES[prefix] : ''
 }
 
-// ─── Change Password Modal ─────────────────────────────────────────────────────
+// ─── Request Change Password Modal ────────────────────────────────────────────
 
 function ChangePasswordModal({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' })
   const [loading, setLoading] = useState(false)
+  const [sent, setSent] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -48,14 +49,14 @@ function ChangePasswordModal({ onClose }: { onClose: () => void }) {
     }
     setLoading(true)
     try {
-      await authApi.changePassword({
-        oldPassword: form.oldPassword,
-        newPassword: form.newPassword,
+      await authApi.requestChangePassword({
+        passwordLama: form.oldPassword,
+        passwordBaru: form.newPassword,
+        konfirmasiPasswordBaru: form.confirmPassword,
       })
-      toast.success('Password berhasil diubah')
-      onClose()
+      setSent(true)
     } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Gagal mengubah password')
+      toast.error(err?.response?.data?.message ?? 'Gagal mengirim permintaan')
     } finally {
       setLoading(false)
     }
@@ -67,41 +68,67 @@ function ChangePasswordModal({ onClose }: { onClose: () => void }) {
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6">
-        <h2 className="text-base font-semibold text-app-text mb-4">Ganti Password</h2>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          {[
-            { key: 'oldPassword',      label: 'Password Lama' },
-            { key: 'newPassword',      label: 'Password Baru' },
-            { key: 'confirmPassword',  label: 'Konfirmasi Password Baru' },
-          ].map(({ key, label }) => (
-            <div key={key}>
-              <label className="block text-xs font-medium text-app-subtle mb-1">{label}</label>
-              <input
-                type="password"
-                required
-                value={form[key as keyof typeof form]}
-                onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition"
-              />
+        {sent ? (
+          /* Success state */
+          <div className="flex flex-col items-center gap-3 py-2 text-center">
+            <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M5 13l4 4L19 7" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </div>
-          ))}
-          <div className="flex gap-2 pt-1">
+            <h2 className="text-base font-semibold text-app-text">Permintaan Terkirim</h2>
+            <p className="text-sm text-app-muted leading-relaxed">
+              Permintaan ganti password kamu sudah dikirim ke admin.<br/>
+              Password akan diubah setelah admin menyetujui.
+            </p>
             <button
-              type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-app-subtle hover:bg-gray-50 transition"
+              className="mt-1 w-full px-4 py-2 rounded-lg bg-[#076c9e] text-white text-sm font-medium transition hover:bg-[#065a84]"
             >
-              Batal
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition disabled:opacity-60"
-            >
-              {loading ? 'Menyimpan…' : 'Simpan'}
+              Tutup
             </button>
           </div>
-        </form>
+        ) : (
+          /* Form state */
+          <>
+            <h2 className="text-base font-semibold text-app-text mb-1">Request Ganti Password</h2>
+            <p className="text-xs text-app-muted mb-4">Permintaan akan dikirim ke admin untuk disetujui terlebih dahulu.</p>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+              {[
+                { key: 'oldPassword',     label: 'Password Lama' },
+                { key: 'newPassword',     label: 'Password Baru' },
+                { key: 'confirmPassword', label: 'Konfirmasi Password Baru' },
+              ].map(({ key, label }) => (
+                <div key={key}>
+                  <label className="block text-xs font-medium text-app-subtle mb-1">{label}</label>
+                  <input
+                    type="password"
+                    required
+                    value={form[key as keyof typeof form]}
+                    onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition"
+                  />
+                </div>
+              ))}
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-app-subtle hover:bg-gray-50 transition"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 px-4 py-2 rounded-lg bg-[#076c9e] text-white text-sm font-medium hover:bg-[#065a84] transition disabled:opacity-60"
+                >
+                  {loading ? 'Mengirim…' : 'Kirim Request'}
+                </button>
+              </div>
+            </form>
+          </>
+        )}
       </div>
     </div>
   )

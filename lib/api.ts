@@ -134,4 +134,6 @@ export const importApi = {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
   },
+  downloadTemplate: (type: string) =>
+    api.get(`/import/template/${type}`, { responseType: 'blob' }),
 }

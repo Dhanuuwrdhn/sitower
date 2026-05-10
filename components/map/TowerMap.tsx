@@ -35,7 +35,7 @@ function detectJalurType(jalur: { name: string; type: string }) {
 
 interface KerawananItem {
   kategori: string
-  level: 'tinggi' | 'sedang' | 'rendah'
+  level: 'kritis' | 'sedang' | 'aman'
   status: string
 }
 
@@ -57,11 +57,11 @@ interface Props {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const LEVEL_PRIORITY: Record<string, number> = { tinggi: 3, sedang: 2, rendah: 1 }
+const LEVEL_PRIORITY: Record<string, number> = { kritis: 3, sedang: 2, aman: 1 }
 const RING_COLOR: Record<string, string> = {
-  tinggi: '#ef4444',
+  kritis: '#ef4444',
   sedang: '#d97706',
-  rendah: '#16a34a',
+  aman: '#16a34a',
 }
 
 const KATEGORI_LABEL: Record<string, string> = {
@@ -86,9 +86,9 @@ const MOCK_TOWERS: FeaturedTower[] = [
     id: 'ST-003', nama: 'TOWER SUTET BLRJA-JAWA7 500kV #001',
     lat: -6.1823, lng: 106.5102, tipe: 'SUTET', tegangan: '500 kV',
     kerawanan: [
-      { kategori: 'pekerjaan_pihak_lain', level: 'tinggi', status: 'berlangsung' },
-      { kategori: 'pencurian',            level: 'tinggi', status: 'eskalasi' },
-      { kategori: 'gangguan',             level: 'tinggi', status: 'berlangsung' },
+      { kategori: 'pekerjaan_pihak_lain', level: 'kritis', status: 'berlangsung' },
+      { kategori: 'pencurian',            level: 'kritis', status: 'eskalasi' },
+      { kategori: 'gangguan',             level: 'kritis', status: 'berlangsung' },
     ],
     updatedAt: '2025-05-01T09:00:00',
   },
@@ -96,7 +96,7 @@ const MOCK_TOWERS: FeaturedTower[] = [
     id: 'ST-002', nama: 'TOWER SUTET KMBGN-DKSBI 500kV #P3',
     lat: -6.1908, lng: 106.7311, tipe: 'SUTET', tegangan: '500 kV',
     kerawanan: [
-      { kategori: 'kebakaran', level: 'tinggi', status: 'berlangsung' },
+      { kategori: 'kebakaran', level: 'kritis', status: 'berlangsung' },
       { kategori: 'gangguan',  level: 'sedang', status: 'selesai' },
     ],
     updatedAt: '2025-05-01T14:30:00',
@@ -119,13 +119,13 @@ const MOCK_TOWERS: FeaturedTower[] = [
   {
     id: 'TT-003', nama: 'TOWER SUTT 150kV GMKRU-PINKA #EA1A',
     lat: -6.1123, lng: 106.7789, tipe: 'SUTT', tegangan: '150 kV',
-    kerawanan: [{ kategori: 'cleanup', level: 'rendah', status: 'selesai' }],
+    kerawanan: [{ kategori: 'cleanup', level: 'aman', status: 'selesai' }],
     updatedAt: '2025-04-20T09:00:00',
   },
   {
     id: 'GI-004', nama: 'GI Durikosambi',
     lat: -6.17097, lng: 106.72594, tipe: 'gardu', tegangan: '150 kV',
-    kerawanan: [{ kategori: 'pemanfaatan', level: 'rendah', status: 'pemantauan' }],
+    kerawanan: [{ kategori: 'pemanfaatan', level: 'aman', status: 'pemantauan' }],
     updatedAt: '2025-04-24T10:00:00',
   },
   {
@@ -141,7 +141,7 @@ const MOCK_TOWERS: FeaturedTower[] = [
 function topLevel(kerawanan: KerawananItem[]) {
   return kerawanan.reduce((best, k) =>
     LEVEL_PRIORITY[k.level] > LEVEL_PRIORITY[best] ? k.level : best,
-    'rendah' as string,
+    'aman' as string,
   )
 }
 
@@ -176,7 +176,7 @@ function createTowerIcon(
   count: number,
 ): L.DivIcon {
   const ring = hasKerawanan ? RING_COLOR[level] ?? '#ef4444' : '#1a1a1a'
-  const pulse = hasKerawanan && level === 'tinggi'
+  const pulse = hasKerawanan && level === 'kritis'
     ? 'animation:pulse-ring 2s infinite;'
     : ''
   const badge = hasKerawanan
@@ -255,8 +255,8 @@ function TowerPopup({ tower }: { tower: FeaturedTower }) {
                 <span style={{ fontSize: 12, flex: 1 }}>{KATEGORI_LABEL[k.kategori] ?? k.kategori}</span>
                 <span style={{
                   fontSize: 10, fontWeight: 600, padding: '1px 7px', borderRadius: 20,
-                  background: k.level === 'tinggi' ? '#fef2f2' : k.level === 'sedang' ? '#fffbeb' : '#f0fdf4',
-                  color: k.level === 'tinggi' ? '#ef4444' : k.level === 'sedang' ? '#d97706' : '#16a34a',
+                  background: k.level === 'kritis' ? '#fef2f2' : k.level === 'sedang' ? '#fffbeb' : '#f0fdf4',
+                  color: k.level === 'kritis' ? '#ef4444' : k.level === 'sedang' ? '#d97706' : '#16a34a',
                 }}>
                   {k.level}
                 </span>
@@ -336,7 +336,7 @@ function FilterPanel({
         'pekerjaan_pihak_lain', 'kebakaran', 'layangan',
         'pencurian', 'pemanfaatan_lahan',
       ])}
-      {select('Level', 'level', ['tinggi', 'sedang', 'rendah'])}
+      {select('Level', 'level', ['kritis', 'sedang', 'aman'])}
       {select('Tipe Tower', 'tipe', ['gardu', 'SUTET', 'SUTT', 'SKTT'])}
 
       {/* Legend */}
@@ -465,7 +465,7 @@ export default function TowerMap({ towers, onTowerClick }: Props) {
         {/* ── Featured towers ── */}
         {filtered.map((tower) => {
           const hasK = (tower.kerawanan?.length ?? 0) > 0
-          const level = hasK ? topLevel(tower.kerawanan) : 'rendah'
+          const level = hasK ? topLevel(tower.kerawanan) : 'aman'
           const count = tower.kerawanan?.length ?? 0
           const icon =
             tower.tipe === 'gardu'

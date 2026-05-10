@@ -7,7 +7,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown,
   MoreHorizontal, Eye, Pencil, ArrowLeft,
   AlertTriangle, Flame, Zap, FileText,
-  GitBranch, Calendar, Check,
+  GitBranch, Calendar, Check, RotateCcw, SlidersHorizontal,
 } from 'lucide-react'
 import { laporanApi, towersApi } from '@/lib/api'
 import { getUser, isAdmin } from '@/lib/auth'
@@ -913,6 +913,185 @@ function YearFilterPanel({ selectedYear, onSelect, onApply, onClear }: {
   )
 }
 
+// ── FilterBottomSheet (mobile PWA) ───────────────────────────────────────────
+
+const JENIS_CHIPS = [
+  { value: 'pekerjaan_pihak_lain', label: 'PPL' },
+  { value: 'kebakaran',            label: 'Kebakaran' },
+  { value: 'layangan',             label: 'Layang-layang' },
+  { value: 'pemanfaatan_lahan',    label: 'Pemanfaatan Pihak Lain' },
+  { value: 'pencurian',            label: 'Pencurian' },
+]
+
+function FilterBottomSheet({
+  open, onClose,
+  selectedJenis, onToggleJenis,
+  periodMode, onPeriodMode,
+  dateFrom, dateTo, onDateFrom, onDateTo,
+  filterMonth, filterYear, onMonth, onYear,
+  onApply, onReset,
+}: {
+  open: boolean
+  onClose: () => void
+  selectedJenis: string[]
+  onToggleJenis: (v: string) => void
+  periodMode: 'date' | 'month' | 'year'
+  onPeriodMode: (m: 'date' | 'month' | 'year') => void
+  dateFrom: string
+  dateTo: string
+  onDateFrom: (v: string) => void
+  onDateTo: (v: string) => void
+  filterMonth: number | null
+  filterYear: number
+  onMonth: (m: number) => void
+  onYear: (y: number) => void
+  onApply: () => void
+  onReset: () => void
+}) {
+  return (
+    <>
+      <div
+        className={`fixed inset-0 bg-black/40 transition-opacity duration-300 ${open ? 'opacity-100 z-[65] pointer-events-auto' : 'opacity-0 z-[-1] pointer-events-none'}`}
+        onClick={onClose}
+      />
+      <div
+        className={`fixed left-0 right-0 bottom-0 z-[70] bg-white rounded-t-2xl transition-transform duration-300 flex flex-col ${open ? 'translate-y-0' : 'translate-y-full'}`}
+        style={{ maxHeight: '88vh' }}
+      >
+        {/* Drag handle */}
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 8px', flexShrink: 0 }}>
+          <div style={{ width: 40, height: 4, borderRadius: 2, background: '#D1D9E0' }} />
+        </div>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 14px', borderBottom: '1px solid #E1E8EC', flexShrink: 0 }}>
+          <span style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, fontSize: 16, color: '#1C1C1C' }}>Filter</span>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: 'none', background: '#F6F9FC', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#5F737F' }}>
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* Scrollable body */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 16px 8px' }}>
+          {/* Kategori */}
+          <p style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, fontSize: 11, color: '#97AAB3', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Kategori</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+            {JENIS_CHIPS.map(chip => {
+              const active = selectedJenis.includes(chip.value)
+              return (
+                <button key={chip.value} onClick={() => onToggleJenis(chip.value)}
+                  style={{
+                    padding: '8px 14px', borderRadius: 20, border: '1.5px solid', cursor: 'pointer',
+                    fontFamily: 'Inter,sans-serif', fontWeight: 500, fontSize: 13, transition: 'all 0.15s',
+                    borderColor: active ? '#076c9e' : '#E1E8EC',
+                    background: active ? '#EBF5FF' : '#FFF',
+                    color: active ? '#076c9e' : '#5F737F',
+                  }}
+                >{chip.label}</button>
+              )
+            })}
+          </div>
+
+          {/* Periode */}
+          <p style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, fontSize: 11, color: '#97AAB3', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Periode</p>
+
+          {/* Mode tabs */}
+          <div style={{ display: 'flex', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden', marginBottom: 16 }}>
+            {(['date', 'month', 'year'] as const).map((mode, i) => (
+              <button key={mode} onClick={() => onPeriodMode(mode)}
+                style={{
+                  flex: 1, padding: '10px 0', border: 'none', cursor: 'pointer',
+                  fontFamily: 'Inter,sans-serif', fontWeight: 600, fontSize: 13,
+                  borderRight: i < 2 ? '1px solid #E1E8EC' : 'none',
+                  background: periodMode === mode ? '#076c9e' : '#FFF',
+                  color: periodMode === mode ? '#FFF' : '#5F737F',
+                  transition: 'all 0.15s',
+                }}>
+                {mode === 'date' ? 'Tanggal' : mode === 'month' ? 'Bulan' : 'Tahun'}
+              </button>
+            ))}
+          </div>
+
+          {/* Date range */}
+          {periodMode === 'date' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div>
+                <p style={{ fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 600, color: '#1C1C1C', marginBottom: 6 }}>Dari Tanggal</p>
+                <input type="date" value={dateFrom} onChange={e => onDateFrom(e.target.value)}
+                  style={{ width: '100%', border: '1px solid #E1E8EC', borderRadius: 8, padding: '10px 12px', fontFamily: 'Inter,sans-serif', fontSize: 14, color: '#1C1C1C', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <p style={{ fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 600, color: '#1C1C1C', marginBottom: 6 }}>Sampai Tanggal</p>
+                <input type="date" value={dateTo} onChange={e => onDateTo(e.target.value)}
+                  style={{ width: '100%', border: '1px solid #E1E8EC', borderRadius: 8, padding: '10px 12px', fontFamily: 'Inter,sans-serif', fontSize: 14, color: '#1C1C1C', outline: 'none', boxSizing: 'border-box' }} />
+              </div>
+            </div>
+          )}
+
+          {/* Month picker */}
+          {periodMode === 'month' && (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 16 }}>
+                <button onClick={() => onYear(filterYear - 1)} style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #E1E8EC', background: '#FFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#5F737F' }}>
+                  <ChevronLeft size={14} />
+                </button>
+                <span style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, fontSize: 16, color: '#076c9e' }}>{filterYear}</span>
+                <button onClick={() => onYear(Math.min(CURRENT_YEAR + 1, filterYear + 1))} style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #E1E8EC', background: '#FFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#5F737F' }}>
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                {MONTHS.map((m, i) => (
+                  <button key={i} onClick={() => onMonth(i + 1)}
+                    style={{
+                      padding: '12px 8px', borderRadius: 10, border: '1.5px solid', cursor: 'pointer',
+                      fontFamily: 'Inter,sans-serif', fontWeight: 500, fontSize: 13, transition: 'all 0.15s',
+                      borderColor: filterMonth === i + 1 ? '#076c9e' : '#E1E8EC',
+                      background: filterMonth === i + 1 ? '#076c9e' : '#FFF',
+                      color: filterMonth === i + 1 ? '#FFF' : '#5F737F',
+                    }}
+                  >{m}</button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Year picker */}
+          {periodMode === 'year' && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+              {YEARS.map(y => (
+                <button key={y} onClick={() => onYear(y)}
+                  style={{
+                    padding: '10px 4px', borderRadius: 10, border: '1.5px solid', cursor: 'pointer',
+                    fontFamily: 'Inter,sans-serif', fontWeight: filterYear === y ? 700 : 500, fontSize: 13, transition: 'all 0.15s',
+                    borderColor: filterYear === y ? '#076c9e' : '#E1E8EC',
+                    background: filterYear === y ? '#076c9e' : '#FFF',
+                    color: filterYear === y ? '#FFF' : '#5F737F',
+                  }}
+                >{y}</button>
+              ))}
+            </div>
+          )}
+
+          <div style={{ height: 8 }} />
+        </div>
+
+        {/* CTAs */}
+        <div style={{ padding: '12px 16px 24px', borderTop: '1px solid #E1E8EC', display: 'flex', gap: 12, flexShrink: 0 }}>
+          <button onClick={onReset} title="Reset filter"
+            style={{ width: 44, height: 44, borderRadius: 10, border: '1px solid #E1E8EC', background: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#5F737F', flexShrink: 0 }}>
+            <RotateCcw size={18} />
+          </button>
+          <button onClick={onApply}
+            style={{ flex: 1, height: 44, borderRadius: 22, border: 'none', background: '#076c9e', color: '#FFF', fontFamily: 'Inter,sans-serif', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
+            Terapkan
+          </button>
+        </div>
+      </div>
+    </>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function HistoryGangguanPage() {
@@ -946,10 +1125,16 @@ export default function HistoryGangguanPage() {
   const [viewMode, setViewMode] = useState<'edit' | 'detail'>('edit')
   const [deleteRow, setDeleteRow] = useState<any | null>(null)
 
-  // Filter popup refs
+  // Filter popup refs (desktop only)
   const dateRef = useRef<HTMLDivElement>(null)
   const monthRef = useRef<HTMLDivElement>(null)
   const yearRef = useRef<HTMLDivElement>(null)
+
+  // Mobile bottom sheet filter state
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false)
+  const [sheetPeriodMode, setSheetPeriodMode] = useState<'date' | 'month' | 'year'>('date')
+  const [filterJenis, setFilterJenis] = useState<string[]>([])
+  const [appliedJenis, setAppliedJenis] = useState<string[]>([])
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -992,13 +1177,14 @@ export default function HistoryGangguanPage() {
         search: search.trim() || undefined,
         tglMulai: apiTglMulai || undefined,
         tglAkhir: apiTglAkhir || undefined,
+        jenis: appliedJenis.length ? appliedJenis.join(',') : undefined,
       })
       const payload = res.data
       if (Array.isArray(payload)) { setRows(payload); setTotal(payload.length) }
       else { setRows(payload.data ?? []); setTotal(payload.total ?? 0) }
     } catch { setRows([]); setTotal(0) }
     finally { setLoading(false) }
-  }, [page, pageSize, search, apiTglMulai, apiTglAkhir])
+  }, [page, pageSize, search, apiTglMulai, apiTglAkhir, appliedJenis])
 
   useEffect(() => { fetchData() }, [fetchData])
   useEffect(() => { setIsAdminUser(isAdmin()) }, [])
@@ -1012,7 +1198,40 @@ export default function HistoryGangguanPage() {
     setAppliedMonth(null); setAppliedYear(null)
     setDateFrom(''); setDateTo('')
     setFilterMonth(null); setFilterYear(CURRENT_YEAR)
+    setAppliedJenis([]); setFilterJenis([])
     setPage(1)
+  }
+
+  function handleSheetApply() {
+    setAppliedJenis(filterJenis)
+    if (sheetPeriodMode === 'date') {
+      if (dateFrom || dateTo) {
+        setAppliedDateFrom(dateFrom); setAppliedDateTo(dateTo); setActiveFilter('date')
+      } else {
+        setActiveFilter(null)
+      }
+    } else if (sheetPeriodMode === 'month') {
+      if (filterMonth) {
+        setAppliedMonth(filterMonth); setAppliedYear(filterYear); setActiveFilter('month')
+      } else {
+        setActiveFilter(null)
+      }
+    } else {
+      setAppliedYear(filterYear); setActiveFilter('year')
+    }
+    setPage(1)
+    setFilterSheetOpen(false)
+  }
+
+  function handleSheetReset() {
+    setFilterJenis([]); setAppliedJenis([])
+    setDateFrom(''); setDateTo('')
+    setFilterMonth(null); setFilterYear(CURRENT_YEAR)
+    setActiveFilter(null)
+    setAppliedDateFrom(''); setAppliedDateTo('')
+    setAppliedMonth(null); setAppliedYear(null)
+    setPage(1)
+    setFilterSheetOpen(false)
   }
 
   function openDrawer(type: ReportType, row: any | null = null, mode: 'edit' | 'detail' = 'edit') {
@@ -1078,72 +1297,93 @@ export default function HistoryGangguanPage() {
         </div>
 
         {/* Filter tabs */}
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          {/* Active filter chip */}
-          {filterLabel && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: '#EBF5FF', border: '1px solid #076c9e', borderRadius: 20 }}>
-              <span style={{ fontFamily: 'Inter,sans-serif', fontWeight: 600, fontSize: 12, color: '#076c9e' }}>{filterLabel}</span>
-              <button onClick={clearAllFilters} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 0, color: '#076c9e' }}><X size={12} /></button>
+        {isMobile ? (
+          /* Mobile: single filter button + active chip */
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {(filterLabel || appliedJenis.length > 0) && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: '#EBF5FF', border: '1px solid #076c9e', borderRadius: 20 }}>
+                <span style={{ fontFamily: 'Inter,sans-serif', fontWeight: 600, fontSize: 12, color: '#076c9e' }}>
+                  {filterLabel ?? `${appliedJenis.length} kategori`}
+                </span>
+                <button onClick={clearAllFilters} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 0, color: '#076c9e' }}><X size={12} /></button>
+              </div>
+            )}
+            <button
+              onClick={() => setFilterSheetOpen(true)}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: (hasActiveFilter || appliedJenis.length > 0) ? '#EBF5FF' : '#FFF', border: `1px solid ${(hasActiveFilter || appliedJenis.length > 0) ? '#076c9e' : '#E1E8EC'}`, borderRadius: 8, cursor: 'pointer', fontFamily: 'Inter,sans-serif', fontWeight: 500, fontSize: 13, color: (hasActiveFilter || appliedJenis.length > 0) ? '#076c9e' : '#5F737F' }}
+            >
+              <SlidersHorizontal size={14} /> Filter
+            </button>
+          </div>
+        ) : (
+          /* Desktop: 3 separate popup filter buttons */
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {/* Active filter chip */}
+            {filterLabel && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: '#EBF5FF', border: '1px solid #076c9e', borderRadius: 20 }}>
+                <span style={{ fontFamily: 'Inter,sans-serif', fontWeight: 600, fontSize: 12, color: '#076c9e' }}>{filterLabel}</span>
+                <button onClick={clearAllFilters} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 0, color: '#076c9e' }}><X size={12} /></button>
+              </div>
+            )}
+
+            {/* Date filter */}
+            <div style={{ position: 'relative' }} ref={dateRef}>
+              <button
+                onClick={() => setFilterMode(m => m === 'date' ? null : 'date')}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: activeFilter === 'date' ? '#EBF5FF' : '#FFF', border: `1px solid ${activeFilter === 'date' ? '#076c9e' : '#E1E8EC'}`, borderRadius: 8, cursor: 'pointer', fontFamily: 'Inter,sans-serif', fontWeight: 500, fontSize: 13, color: activeFilter === 'date' ? '#076c9e' : '#5F737F' }}
+              >
+                <Calendar size={14} /> Tanggal
+              </button>
+              {filterMode === 'date' && (
+                <DateFilterPanel
+                  dateFrom={dateFrom}
+                  dateTo={dateTo}
+                  onChange={(f, t) => { setDateFrom(f); setDateTo(t) }}
+                  onApply={() => { setAppliedDateFrom(dateFrom); setAppliedDateTo(dateTo); setActiveFilter('date'); setFilterMode(null); setPage(1) }}
+                  onClear={() => { setDateFrom(''); setDateTo(''); setActiveFilter(null); setFilterMode(null); setPage(1) }}
+                />
+              )}
             </div>
-          )}
 
-          {/* Date filter */}
-          <div style={{ position: 'relative' }} ref={dateRef}>
-            <button
-              onClick={() => setFilterMode(m => m === 'date' ? null : 'date')}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: activeFilter === 'date' ? '#EBF5FF' : '#FFF', border: `1px solid ${activeFilter === 'date' ? '#076c9e' : '#E1E8EC'}`, borderRadius: 8, cursor: 'pointer', fontFamily: 'Inter,sans-serif', fontWeight: 500, fontSize: 13, color: activeFilter === 'date' ? '#076c9e' : '#5F737F' }}
-            >
-              <Calendar size={14} /> Tanggal
-            </button>
-            {filterMode === 'date' && (
-              <DateFilterPanel
-                dateFrom={dateFrom}
-                dateTo={dateTo}
-                onChange={(f, t) => { setDateFrom(f); setDateTo(t) }}
-                onApply={() => { setAppliedDateFrom(dateFrom); setAppliedDateTo(dateTo); setActiveFilter('date'); setFilterMode(null); setPage(1) }}
-                onClear={() => { setDateFrom(''); setDateTo(''); setActiveFilter(null); setFilterMode(null); setPage(1) }}
-              />
-            )}
-          </div>
+            {/* Month filter */}
+            <div style={{ position: 'relative' }} ref={monthRef}>
+              <button
+                onClick={() => setFilterMode(m => m === 'month' ? null : 'month')}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: activeFilter === 'month' ? '#EBF5FF' : '#FFF', border: `1px solid ${activeFilter === 'month' ? '#076c9e' : '#E1E8EC'}`, borderRadius: 8, cursor: 'pointer', fontFamily: 'Inter,sans-serif', fontWeight: 500, fontSize: 13, color: activeFilter === 'month' ? '#076c9e' : '#5F737F' }}
+              >
+                Bulan
+              </button>
+              {filterMode === 'month' && (
+                <MonthFilterPanel
+                  month={filterMonth}
+                  year={filterYear}
+                  onChangeMonth={setFilterMonth}
+                  onChangeYear={setFilterYear}
+                  onApply={() => { if (!filterMonth) { toast.error('Pilih bulan terlebih dahulu'); return } setAppliedMonth(filterMonth); setAppliedYear(filterYear); setActiveFilter('month'); setFilterMode(null); setPage(1) }}
+                  onClear={() => { setFilterMonth(null); setFilterYear(CURRENT_YEAR); setActiveFilter(null); setFilterMode(null); setPage(1) }}
+                />
+              )}
+            </div>
 
-          {/* Month filter */}
-          <div style={{ position: 'relative' }} ref={monthRef}>
-            <button
-              onClick={() => setFilterMode(m => m === 'month' ? null : 'month')}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: activeFilter === 'month' ? '#EBF5FF' : '#FFF', border: `1px solid ${activeFilter === 'month' ? '#076c9e' : '#E1E8EC'}`, borderRadius: 8, cursor: 'pointer', fontFamily: 'Inter,sans-serif', fontWeight: 500, fontSize: 13, color: activeFilter === 'month' ? '#076c9e' : '#5F737F' }}
-            >
-              Bulan
-            </button>
-            {filterMode === 'month' && (
-              <MonthFilterPanel
-                month={filterMonth}
-                year={filterYear}
-                onChangeMonth={setFilterMonth}
-                onChangeYear={setFilterYear}
-                onApply={() => { if (!filterMonth) { toast.error('Pilih bulan terlebih dahulu'); return } setAppliedMonth(filterMonth); setAppliedYear(filterYear); setActiveFilter('month'); setFilterMode(null); setPage(1) }}
-                onClear={() => { setFilterMonth(null); setFilterYear(CURRENT_YEAR); setActiveFilter(null); setFilterMode(null); setPage(1) }}
-              />
-            )}
+            {/* Year filter */}
+            <div style={{ position: 'relative' }} ref={yearRef}>
+              <button
+                onClick={() => setFilterMode(m => m === 'year' ? null : 'year')}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: activeFilter === 'year' ? '#EBF5FF' : '#FFF', border: `1px solid ${activeFilter === 'year' ? '#076c9e' : '#E1E8EC'}`, borderRadius: 8, cursor: 'pointer', fontFamily: 'Inter,sans-serif', fontWeight: 500, fontSize: 13, color: activeFilter === 'year' ? '#076c9e' : '#5F737F' }}
+              >
+                Tahun
+              </button>
+              {filterMode === 'year' && (
+                <YearFilterPanel
+                  selectedYear={appliedYear}
+                  onSelect={y => { setAppliedYear(y); setFilterYear(y) }}
+                  onApply={() => { if (!appliedYear) { toast.error('Pilih tahun terlebih dahulu'); return } setActiveFilter('year'); setFilterMode(null); setPage(1) }}
+                  onClear={() => { setAppliedYear(null); setActiveFilter(null); setFilterMode(null); setPage(1) }}
+                />
+              )}
+            </div>
           </div>
-
-          {/* Year filter */}
-          <div style={{ position: 'relative' }} ref={yearRef}>
-            <button
-              onClick={() => setFilterMode(m => m === 'year' ? null : 'year')}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: activeFilter === 'year' ? '#EBF5FF' : '#FFF', border: `1px solid ${activeFilter === 'year' ? '#076c9e' : '#E1E8EC'}`, borderRadius: 8, cursor: 'pointer', fontFamily: 'Inter,sans-serif', fontWeight: 500, fontSize: 13, color: activeFilter === 'year' ? '#076c9e' : '#5F737F' }}
-            >
-              Tahun
-            </button>
-            {filterMode === 'year' && (
-              <YearFilterPanel
-                selectedYear={appliedYear}
-                onSelect={y => { setAppliedYear(y); setFilterYear(y) }}
-                onApply={() => { if (!appliedYear) { toast.error('Pilih tahun terlebih dahulu'); return } setActiveFilter('year'); setFilterMode(null); setPage(1) }}
-                onClear={() => { setAppliedYear(null); setActiveFilter(null); setFilterMode(null); setPage(1) }}
-              />
-            )}
-          </div>
-        </div>
+        )}
 
         {/* Add report button */}
         {isMobile ? (
@@ -1286,6 +1526,26 @@ export default function HistoryGangguanPage() {
           onDeleted={fetchData}
         />
       )}
+
+      {/* Mobile filter bottom sheet */}
+      <FilterBottomSheet
+        open={filterSheetOpen}
+        onClose={() => setFilterSheetOpen(false)}
+        selectedJenis={filterJenis}
+        onToggleJenis={v => setFilterJenis(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])}
+        periodMode={sheetPeriodMode}
+        onPeriodMode={setSheetPeriodMode}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+        onDateFrom={setDateFrom}
+        onDateTo={setDateTo}
+        filterMonth={filterMonth}
+        filterYear={filterYear}
+        onMonth={setFilterMonth}
+        onYear={setFilterYear}
+        onApply={handleSheetApply}
+        onReset={handleSheetReset}
+      />
     </>
   )
 }

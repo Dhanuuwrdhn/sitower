@@ -30,6 +30,11 @@ export const authApi = {
   login: (nik: string, password: string) => api.post('/auth/login', { nik, password }),
   profile: () => api.get('/auth/profile'),
   changePassword: (data: any) => api.put('/auth/password', data),
+  requestChangePassword: (data: { passwordLama: string; passwordBaru: string; konfirmasiPasswordBaru: string }) =>
+    api.post('/auth/request-change-password', data),
+  listPasswordChangeRequests: () => api.get('/auth/password-change-requests'),
+  approvePasswordChangeRequest: (id: string) => api.post(`/auth/password-change-requests/${id}/approve`),
+  rejectPasswordChangeRequest: (id: string) => api.post(`/auth/password-change-requests/${id}/reject`),
 }
 
 export const towersApi = {

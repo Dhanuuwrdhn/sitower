@@ -46,6 +46,21 @@ export function intensitasColor(level: string) {
   return kerawananColor(level)
 }
 
+// Resolve a backend upload URL to a browser-accessible URL.
+// Handles: relative paths, localhost URLs, or stale domain URLs — all mapped
+// through NEXT_PUBLIC_API_URL so nginx can proxy to the correct backend.
+export function resolveMediaUrl(url: string): string {
+  if (!url) return ''
+  const apiBase = (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/\/api\/?$/, '')
+  if (url.startsWith('http')) {
+    // Extract just the /uploads/... segment and remap through the current API base
+    const match = url.match(/(\/uploads\/.+)/)
+    if (match) return `${apiBase}${match[1]}`
+    return url
+  }
+  return `${apiBase}${url}`
+}
+
 export function sertifikatStatusColor(status: string) {
   switch (status) {
     case 'valid':    return 'text-green-700 bg-green-50 border-green-200'

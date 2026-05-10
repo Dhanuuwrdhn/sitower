@@ -247,27 +247,16 @@ export default function Sidebar() {
             ))}
           </nav>
 
-          {/* Footer — Figma: "© 2026. PT PLN (Persero)." + Keluar */}
+          {/* Footer */}
           <div style={{
             borderTop: '1px solid rgba(255,255,255,0.12)',
             padding: '12px 16px',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0, position: 'relative',
           }}>
-            <p style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.5)' }}>
-              © 2026. PT PLN (Persero).
+            <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.04em' }}>
+              born2works
             </p>
-            <button
-              onClick={logout}
-              style={{
-                background: 'rgba(255,255,255,0.12)', border: 'none',
-                borderRadius: 6, color: 'rgba(255,255,255,0.8)',
-                fontSize: 12, fontWeight: 600, padding: '6px 14px',
-                cursor: 'pointer',
-              }}
-            >
-              Keluar
-            </button>
           </div>
         </aside>
       </>
@@ -353,28 +342,13 @@ export default function Sidebar() {
       {/* Footer */}
       <div style={{
         borderTop: '1px solid rgba(255,255,255,0.1)',
-        padding: isCollapsed ? '12px 0' : '10px 16px',
-        display: 'flex', alignItems: 'center',
-        justifyContent: isCollapsed ? 'center' : 'space-between',
-        flexShrink: 0, position: 'relative', gap: 8,
+        padding: '10px 0',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flexShrink: 0, position: 'relative',
       }}>
-        {isCollapsed ? (
-          <button onClick={logout} title="Logout" style={{
-            background: 'transparent', border: 'none',
-            color: 'rgba(255,255,255,0.45)', cursor: 'pointer', fontSize: 9, fontWeight: 700,
-          }}>B2W</button>
-        ) : (
-          <>
-            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.03em' }}>
-              © 2026. PT PLN (Persero).
-            </p>
-            <button onClick={logout} style={{
-              background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: 6,
-              color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: 600,
-              padding: '4px 10px', cursor: 'pointer', flexShrink: 0,
-            }}>Keluar</button>
-          </>
-        )}
+        <p style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.04em' }}>
+          {isCollapsed ? 'b2w' : 'born2works'}
+        </p>
       </div>
     </aside>
   )

@@ -339,7 +339,6 @@ export default function DashboardPage() {
                 <th>Jenis Gangguan</th>
                 <th>Teknisi</th>
                 <th>Status</th>
-                <th>Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -350,20 +349,11 @@ export default function DashboardPage() {
                   <td>{row.jenisGangguan}</td>
                   <td>{row.pelapor}</td>
                   <td><StatusPill status={row.status} /></td>
-                  <td>
-                    <button className="dash-action-dots" aria-label="Aksi">
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <circle cx="5" cy="10" r="1.5" fill="#5F737F"/>
-                        <circle cx="10" cy="10" r="1.5" fill="#5F737F"/>
-                        <circle cx="15" cy="10" r="1.5" fill="#5F737F"/>
-                      </svg>
-                    </button>
-                  </td>
                 </tr>
               ))}
               {recent.length === 0 && (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', color: '#5F737F', padding: '32px 16px' }}>
+                  <td colSpan={5} style={{ textAlign: 'center', color: '#5F737F', padding: '32px 16px' }}>
                     Belum ada data riwayat kerawanan transmisi
                   </td>
                 </tr>

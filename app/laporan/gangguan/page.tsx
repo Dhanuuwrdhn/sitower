@@ -517,11 +517,39 @@ function LaporanDrawer({
         setLocating(false)
       },
       (err) => {
-        setDetectedMsg('')
-        toast.error(err.code === 1 ? 'Izin lokasi ditolak.' : 'Gagal mendapatkan lokasi.')
-        setLocating(false)
+        if (err.code === 1) {
+          setDetectedMsg('')
+          toast.error('Izin lokasi ditolak.')
+          setLocating(false)
+          return
+        }
+        // High-accuracy failed (desktop/no GPS) — retry with low accuracy
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const { latitude: lat, longitude: lng } = pos.coords
+            let min = Infinity; let nearest: TowerOption | null = null
+            for (const t of towerOptions) {
+              if (t.lat && t.lng) { const d = getDistance(lat, lng, t.lat, t.lng); if (d < min) { min = d; nearest = t } }
+            }
+            const towerRadius = nearest?.radius ?? 100
+            if (nearest && min <= towerRadius) {
+              setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: nearest!.nomorTower }))
+              setDetectedMsg(`📍 Tower ${nearest.nomorTower} (${Math.round(min)}m)`)
+              toast.success('Tower terdekat dipilih!')
+            } else if (nearest) {
+              setDetectedMsg(`⚠️ Tower terdekat (${nearest.nomorTower}) ${Math.round(min)}m — di luar radius ${towerRadius}m`)
+            }
+            setLocating(false)
+          },
+          () => {
+            setDetectedMsg('')
+            toast.error('Gagal mendapatkan lokasi.')
+            setLocating(false)
+          },
+          { enableHighAccuracy: false, timeout: 15000 },
+        )
       },
-      { enableHighAccuracy: true, timeout: 10000 },
+      { enableHighAccuracy: true, timeout: 8000 },
     )
   }
 

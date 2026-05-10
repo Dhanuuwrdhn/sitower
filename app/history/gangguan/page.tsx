@@ -809,7 +809,7 @@ function DateFilterPanel({ dateFrom, dateTo, onChange, onApply, onClear }: {
   onApply: () => void; onClear: () => void
 }) {
   return (
-    <div style={{ position: 'absolute', left: 0, top: '100%', marginTop: 8, zIndex: 50, width: 380, background: '#FFF', border: '1px solid #E1E8EC', borderRadius: 8, boxShadow: '0 4px 8px rgba(28,28,28,0.15)', padding: '0' }}>
+    <div style={{ position: 'absolute', left: 0, top: '100%', marginTop: 8, zIndex: 50, width: 'min(380px, calc(100vw - 32px))', background: '#FFF', border: '1px solid #E1E8EC', borderRadius: 8, boxShadow: '0 4px 8px rgba(28,28,28,0.15)', padding: '0' }}>
       <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #E1E8EC' }}>
         <span style={{ fontFamily: 'Inter,sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Filter Tanggal</span>
         <div className="flex items-center gap-2">
@@ -851,7 +851,7 @@ function MonthFilterPanel({ month, year, onChangeMonth, onChangeYear, onApply, o
   onApply: () => void; onClear: () => void
 }) {
   return (
-    <div style={{ position: 'absolute', left: 0, top: '100%', marginTop: 8, zIndex: 50, width: 340, background: '#FFF', border: '1px solid #E1E8EC', borderRadius: 8, boxShadow: '0 4px 8px rgba(28,28,28,0.15)' }}>
+    <div style={{ position: 'absolute', left: 0, top: '100%', marginTop: 8, zIndex: 50, width: 'min(340px, calc(100vw - 32px))', background: '#FFF', border: '1px solid #E1E8EC', borderRadius: 8, boxShadow: '0 4px 8px rgba(28,28,28,0.15)' }}>
       <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #E1E8EC' }}>
         <span style={{ fontWeight: 700, fontSize: 14, color: '#1C1C1C', fontFamily: 'Inter,sans-serif' }}>Filter Bulan</span>
         <div className="flex items-center gap-2">

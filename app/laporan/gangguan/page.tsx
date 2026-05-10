@@ -1076,33 +1076,31 @@ export default function GangguanPage() {
       <h1 style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 24, lineHeight: '36px', color: '#1C1C1C', marginBottom: 24 }}>Riwayat Gangguan</h1>
 
       {/* Top bar: search + filter | button */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 24 }}>
-        {/* Left: search + filter */}
-        <div style={{ display: 'flex', alignItems: 'stretch', gap: 10, flex: 1 }}>
-          {/* Search field */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 24px 12px 16px', background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8 }}>
-            <Search size={16} style={{ color: '#5F737F', flexShrink: 0 }} />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-              placeholder="Cari berdasarkan nama tower"
-              style={{ border: 'none', outline: 'none', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, lineHeight: '20px', color: '#1C1C1C', background: 'transparent', width: 220 }}
-            />
-          </div>
-          {/* Filter button */}
-          <div style={{ position: 'relative' }} ref={filterRef}>
-            <button
-              onClick={() => setFilterOpen(v => !v)}
-              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer', height: '100%' }}
-            >
-              <SlidersHorizontal size={16} style={{ color: '#5F737F' }} />
-              {hasActiveFilters && <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#D92D20', flexShrink: 0 }} />}
-            </button>
+      <div style={{ display: 'flex', alignItems: 'stretch', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
+        {/* Search field */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, flex: 1, minWidth: 0 }}>
+          <Search size={16} style={{ color: '#5F737F', flexShrink: 0 }} />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+            placeholder="Cari berdasarkan nama tower"
+            style={{ border: 'none', outline: 'none', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, lineHeight: '20px', color: '#1C1C1C', background: 'transparent', width: '100%', minWidth: 0 }}
+          />
+        </div>
+        {/* Filter button */}
+        <div style={{ position: 'relative' }} ref={filterRef}>
+          <button
+            onClick={() => setFilterOpen(v => !v)}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer', height: '100%' }}
+          >
+            <SlidersHorizontal size={16} style={{ color: '#5F737F' }} />
+            {hasActiveFilters && <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#D92D20', flexShrink: 0 }} />}
+          </button>
 
-            {/* Filter popup — Figma node 125:1133 */}
-            {filterOpen && (
-              <div style={{ position: 'absolute', left: 0, top: '100%', marginTop: 8, zIndex: 50, width: 401, background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, boxShadow: '0px 4px 8px 0px rgba(28,28,28,0.15)', padding: '8px 0' }}>
+          {/* Filter popup */}
+          {filterOpen && (
+            <div style={{ position: 'absolute', left: isMobile ? 'auto' : 0, right: isMobile ? 0 : 'auto', top: '100%', marginTop: 8, zIndex: 50, width: isMobile ? 'calc(100vw - 32px)' : 401, maxWidth: '95vw', background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, boxShadow: '0px 4px 8px 0px rgba(28,28,28,0.15)', padding: '8px 0' }}>
                 {/* Header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px' }}>
                   <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, lineHeight: '22px', color: '#1C1C1C' }}>Filter</span>
@@ -1176,21 +1174,18 @@ export default function GangguanPage() {
               </div>
             )}
           </div>
-        </div>
 
-        {/* Right: add button */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 16 }}>
-          {isMobile ? (
-            <label className="btn-primary" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
-              <Plus size={16} /> Tambah Laporan Baru
-              <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => { if (e.target.files && e.target.files.length > 0) { const valid = Array.from(e.target.files).filter(f => f.size <= 5 * 1024 * 1024 && /\.(jpe?g|png|webp)$/i.test(f.name)); setPendingFotos(valid); setEditRow(null); setViewMode('edit'); setDrawerOpen(true) } e.target.value = '' }} />
-            </label>
-          ) : (
-            <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 8 }} onClick={openAdd}>
-              <Plus size={16} /> Tambah Laporan Baru
-            </button>
-          )}
-        </div>
+        {/* Add button */}
+        {isMobile ? (
+          <label className="btn-primary" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, margin: 0, whiteSpace: 'nowrap' }}>
+            <Plus size={16} /> Tambah
+            <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => { if (e.target.files && e.target.files.length > 0) { const valid = Array.from(e.target.files).filter(f => f.size <= 5 * 1024 * 1024 && /\.(jpe?g|png|webp)$/i.test(f.name)); setPendingFotos(valid); setEditRow(null); setViewMode('edit'); setDrawerOpen(true) } e.target.value = '' }} />
+          </label>
+        ) : (
+          <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }} onClick={openAdd}>
+            <Plus size={16} /> Tambah Laporan Baru
+          </button>
+        )}
       </div>
 
       {/* Table card — Figma node 14:434 */}

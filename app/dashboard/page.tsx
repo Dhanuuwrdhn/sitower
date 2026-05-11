@@ -409,7 +409,7 @@ export default function DashboardPage() {
                 <th>Tower</th>
                 <th>Jenis Gangguan</th>
                 <th>Teknisi</th>
-                <th>Status</th>
+                <th>Jenis Kerawanan</th>
               </tr>
             </thead>
             <tbody>

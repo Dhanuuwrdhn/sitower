@@ -606,6 +606,7 @@ export default function AsetPage() {
                 <th>Nama Tower</th>
                 <th>Tipe</th>
                 <th>Tegangan (kV)</th>
+                <th>Jalur</th>
                 <th>Kondisi</th>
                 <th>Lokasi</th>
                 <th className="text-right pr-5">Aksi</th>
@@ -613,9 +614,9 @@ export default function AsetPage() {
             </thead>
             <tbody>
               {loading ? (
-                <SkeletonRow cols={8} rows={limit} />
+                <SkeletonRow cols={9} rows={limit} />
               ) : rows.length === 0 ? (
-                <tr><td colSpan={8}><EmptyState title="Belum ada data Aset Transmisi." /></td></tr>
+                <tr><td colSpan={9}><EmptyState title="Belum ada data Aset Transmisi." /></td></tr>
               ) : (
                 rows.map((row, i) => (
                   <tr key={row.id}>
@@ -628,6 +629,7 @@ export default function AsetPage() {
                     <td className="font-semibold text-app-text">{row.namaTower ?? row.nama ?? '—'}</td>
                     <td className="text-app-muted">{row.tipe ?? '—'}</td>
                     <td className="font-mono text-[12px]">{row.tegangan ?? '—'}</td>
+                    <td className="text-app-muted text-[12px] max-w-[180px] truncate" title={row.jalur ?? ''}>{row.jalur ?? '—'}</td>
                     <td><StatusBadge status={row.kondisi ?? 'normal'} /></td>
                     <td className="text-app-muted text-[12px] max-w-[200px] truncate">{row.lokasi ?? '—'}</td>
                     <td className="text-right pr-4">

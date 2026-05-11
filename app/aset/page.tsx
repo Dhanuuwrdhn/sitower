@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { FileUp, Eye, Pencil, Download, X, MapPin, Zap, Activity } from 'lucide-react'
-import { towersApi, importApi, api } from '@/lib/api'
+import { FileUp, Eye, Pencil, Download, X, MapPin, Zap, Activity, Map, Trash2, HelpCircle, ExternalLink } from 'lucide-react'
+import { towersApi, importApi, api, jalurKmlApi } from '@/lib/api'
 import { isAdmin } from '@/lib/auth'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { ActionMenu } from '@/components/ui/ActionMenu'
@@ -429,6 +429,27 @@ export default function AsetPage() {
   const [editOpen, setEditOpen]   = useState(false)
   const [editRow, setEditRow]     = useState<any>(null)
 
+  // Jalur KML
+  const kmlRef = useRef<HTMLInputElement>(null)
+  const [uploadingKml, setUploadingKml] = useState(false)
+  const [jalurKmlList, setJalurKmlList] = useState<any[]>([])
+  const [loadingKml, setLoadingKml] = useState(true)
+  const [showKmlGuide, setShowKmlGuide] = useState(false)
+
+  const fetchJalurKml = useCallback(async () => {
+    setLoadingKml(true)
+    try {
+      const res = await jalurKmlApi.getAll()
+      setJalurKmlList(res.data?.data ?? [])
+    } catch {
+      setJalurKmlList([])
+    } finally {
+      setLoadingKml(false)
+    }
+  }, [])
+
+  useEffect(() => { fetchJalurKml() }, [fetchJalurKml])
+
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [q, setQ] = useState('')
   useEffect(() => {
@@ -488,6 +509,36 @@ export default function AsetPage() {
       toast.error('Gagal mengunduh template')
     } finally {
       setDownloading(false)
+    }
+  }
+
+  async function handleUploadKml(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingKml(true)
+    try {
+      const res = await jalurKmlApi.upload(file)
+      const { total, jalur } = res.data?.data ?? {}
+      toast.success(`${total} jalur berhasil diimport dari KML`)
+      if (jalur?.length) {
+        toast.success(`Jalur: ${(jalur as string[]).slice(0, 3).join(', ')}${jalur.length > 3 ? ` +${jalur.length - 3} lagi` : ''}`, { duration: 5000 })
+      }
+      fetchJalurKml()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'Upload KML gagal')
+    } finally {
+      setUploadingKml(false)
+      if (kmlRef.current) kmlRef.current.value = ''
+    }
+  }
+
+  async function handleDeleteKml(id: number) {
+    try {
+      await jalurKmlApi.remove(id)
+      toast.success('Jalur berhasil dihapus')
+      fetchJalurKml()
+    } catch {
+      toast.error('Gagal menghapus jalur')
     }
   }
 
@@ -615,6 +666,173 @@ export default function AsetPage() {
         onClose={() => setEditOpen(false)}
         onSaved={fetchData}
       />
+
+      {/* KML Guide Modal */}
+      {showKmlGuide && (
+        <>
+          <div className="fixed inset-0 bg-black/40 z-40" onClick={() => setShowKmlGuide(false)} />
+          <div style={{
+            position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+            zIndex: 50, background: '#fff', borderRadius: 12, boxShadow: '0 8px 40px rgba(0,0,0,0.18)',
+            width: '100%', maxWidth: 520, maxHeight: '85vh', overflow: 'hidden', display: 'flex', flexDirection: 'column',
+          }}>
+            <div style={{ padding: '18px 20px', borderBottom: '1px solid #E1E8EC', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div className="flex items-center gap-2">
+                <HelpCircle size={16} className="text-blue-600" />
+                <h2 style={{ fontWeight: 700, fontSize: 15, color: '#1c1c1c', margin: 0 }}>Cara Download KML di Google Maps</h2>
+              </div>
+              <button onClick={() => setShowKmlGuide(false)} style={{ padding: 6, borderRadius: 6, border: 'none', background: '#F6F9FC', cursor: 'pointer', color: '#5F737F', display: 'flex', alignItems: 'center' }}>
+                <X size={18} />
+              </button>
+            </div>
+            <div style={{ overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <p style={{ fontSize: 13, color: '#5F737F', margin: 0 }}>
+                File KML yang bisa diimport harus berisi data koordinat jalur transmisi (LineString). Ikuti langkah berikut untuk mendownload dari Google My Maps:
+              </p>
+              {[
+                { step: '1', text: 'Buka Google My Maps di browser (mymap.google.com)' },
+                { step: '2', text: 'Pilih atau buat peta yang berisi data jalur transmisi' },
+                { step: '3', text: 'Klik ikon titik tiga (⋮) di samping nama peta' },
+                { step: '4', text: 'Pilih "Export to KML/KMZ"' },
+                { step: '5', text: 'Pastikan pilih format KML (bukan KMZ) lalu klik Download' },
+                { step: '6', text: 'Upload file .kml yang sudah didownload ke sistem ini' },
+              ].map(({ step, text }) => (
+                <div key={step} className="flex items-start gap-3">
+                  <div style={{ minWidth: 24, height: 24, borderRadius: '50%', background: '#076C9E', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>
+                    {step}
+                  </div>
+                  <p style={{ fontSize: 13, color: '#1c1c1c', margin: 0, paddingTop: 3 }}>{text}</p>
+                </div>
+              ))}
+              <div style={{ background: '#FEF3C7', borderRadius: 8, padding: '12px 14px', marginTop: 4 }}>
+                <p style={{ fontSize: 12, color: '#92400E', margin: 0, fontWeight: 500 }}>
+                  ⚠️ Catatan: File KML yang berisi NetworkLink (link ke Google Maps) tidak bisa diimport langsung — harus download dulu data aktualnya.
+                </p>
+              </div>
+              <a
+                href="https://mymap.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#076C9E', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}
+              >
+                <ExternalLink size={13} />
+                Buka Google My Maps
+              </a>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Jalur KML Section */}
+      <input ref={kmlRef} type="file" accept=".kml" className="hidden" onChange={handleUploadKml} />
+      <div className="card overflow-hidden mt-6">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-app-border">
+          <div className="flex items-center gap-2">
+            <Map size={16} className="text-app-muted" />
+            <h2 className="text-[14px] font-bold text-app-text">Jalur KML</h2>
+            <span className="text-[11px] text-app-muted bg-app-surface px-2 py-0.5 rounded-full">
+              {jalurKmlList.length} jalur
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowKmlGuide(true)}
+              className="btn-outline"
+              style={{ fontSize: 12 }}
+            >
+              <HelpCircle size={14} />
+              Cara Download KML
+            </button>
+            {isAdminUser && (
+              <button
+                onClick={() => kmlRef.current?.click()}
+                disabled={uploadingKml}
+                className="btn-primary"
+                style={{ fontSize: 12 }}
+              >
+                <Map size={14} />
+                {uploadingKml ? 'Mengimport...' : 'Import KML'}
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th className="w-10">No</th>
+                <th>Nama Jalur</th>
+                <th>Tipe</th>
+                <th>Warna</th>
+                <th>Titik Koordinat</th>
+                <th>Ditambahkan</th>
+                {isAdminUser && <th className="text-right pr-5">Aksi</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {loadingKml ? (
+                <SkeletonRow cols={isAdminUser ? 7 : 6} rows={3} />
+              ) : jalurKmlList.length === 0 ? (
+                <tr>
+                  <td colSpan={isAdminUser ? 7 : 6}>
+                    <EmptyState title="Belum ada jalur KML. Upload file .kml untuk menampilkan jalur transmisi di peta." />
+                  </td>
+                </tr>
+              ) : (
+                jalurKmlList.map((jalur: any, i: number) => (
+                  <tr key={jalur.id}>
+                    <td className="text-app-muted text-[12px]">{i + 1}</td>
+                    <td className="font-semibold text-app-text">{jalur.nama}</td>
+                    <td>
+                      <span style={{
+                        fontSize: 11, fontWeight: 600,
+                        padding: '2px 8px', borderRadius: 999,
+                        background: jalur.tipe === 'SUTET' ? '#FEF3C7' : jalur.tipe === 'SKTT' ? '#EDE9FE' : '#DBEAFE',
+                        color: jalur.tipe === 'SUTET' ? '#92400E' : jalur.tipe === 'SKTT' ? '#5B21B6' : '#1E40AF',
+                      }}>
+                        {jalur.tipe}
+                      </span>
+                    </td>
+                    <td>
+                      {jalur.warna ? (
+                        <div className="flex items-center gap-2">
+                          <div style={{ width: 14, height: 14, borderRadius: 3, background: jalur.warna, border: '1px solid #E1E8EC' }} />
+                          <span className="font-mono text-[11px] text-app-muted">{jalur.warna}</span>
+                        </div>
+                      ) : (
+                        <span className="text-app-muted text-[12px]">—</span>
+                      )}
+                    </td>
+                    <td className="text-app-muted text-[12px]">
+                      {Array.isArray(jalur.path) ? `${jalur.path.length} titik` : '—'}
+                    </td>
+                    <td className="text-app-muted text-[12px]">
+                      {jalur.createdAt
+                        ? new Date(jalur.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+                        : '—'}
+                    </td>
+                    {isAdminUser && (
+                      <td className="text-right pr-4">
+                        <button
+                          onClick={() => handleDeleteKml(jalur.id)}
+                          style={{
+                            padding: '5px 10px', borderRadius: 6, border: '1px solid #FCA5A5',
+                            background: '#FFF', cursor: 'pointer', color: '#DC2626',
+                            display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600,
+                          }}
+                        >
+                          <Trash2 size={13} />
+                          Hapus
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </>
   )
 }

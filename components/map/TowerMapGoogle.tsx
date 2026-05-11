@@ -440,12 +440,12 @@ function Legend() {
 // ─── Filter config ────────────────────────────────────────────────────────────
 
 const FILTER_OPTIONS = [
-  { key: null,                    label: 'Semua' },
-  { key: 'pekerjaan_pihak_lain',  label: 'PPL' },
-  { key: 'kebakaran',             label: 'Kebakaran' },
-  { key: 'layangan',              label: 'Layangan' },
-  { key: 'pencurian',             label: 'Pencurian' },
-  { key: 'pemanfaatan_lahan',     label: 'Pemanfaatan Lahan' },
+  { key: null,                    label: 'Semua',            icon: null },
+  { key: 'pekerjaan_pihak_lain',  label: 'PPL',              icon: 'https://api.iconify.design/twemoji/tractor.svg' },
+  { key: 'kebakaran',             label: 'Kebakaran',        icon: 'https://api.iconify.design/twemoji/fire.svg' },
+  { key: 'layangan',              label: 'Layangan',         icon: 'https://api.iconify.design/twemoji/kite.svg' },
+  { key: 'pencurian',             label: 'Pencurian',        icon: 'https://api.iconify.design/twemoji/ninja-medium-dark-skin-tone.svg' },
+  { key: 'pemanfaatan_lahan',     label: 'Pemanfaatan',      icon: 'https://api.iconify.design/twemoji/house-with-garden.svg' },
 ] as const
 
 // ─── Main component ───────────────────────────────────────────────────────────
@@ -516,14 +516,18 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
               key={String(opt.key)}
               onClick={() => setActiveFilter(opt.key ?? null)}
               style={{
-                padding: '4px 14px', borderRadius: 999,
+                padding: '4px 12px', borderRadius: 999,
                 fontSize: 11, fontWeight: 600, cursor: 'pointer', lineHeight: 1.5,
                 border: 'none', outline: 'none',
                 background: isActive ? '#005DAA' : 'transparent',
                 color: isActive ? '#fff' : '#374151',
                 transition: 'background 0.15s, color 0.15s',
+                display: 'flex', alignItems: 'center', gap: 4,
               }}
             >
+              {opt.icon && (
+                <img src={opt.icon} alt="" width={14} height={14} style={{ display: 'inline-block', flexShrink: 0 }} />
+              )}
               {opt.label}
             </button>
           )

@@ -100,50 +100,52 @@ function makeGarduSvg(count: number) {
   return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg)
 }
 
-/** Tower/Tiang: Titik kecil di sepanjang jalur (normal) atau MERAH besar + pill badge (gangguan) */
+// CellTower icon path dari Figma (26x26 viewBox) — sama untuk normal & gangguan
+const CELL_TOWER_PATH = `M13.3916 10.6167C13.3553 10.5439 13.2995 10.4827 13.2303 10.4399C13.1611 10.3971 13.0814 10.3744 13.0001 10.3744C12.9187 10.3744 12.839 10.3971 12.7698 10.4399C12.7007 10.4827 12.6448 10.5439 12.6085 10.6167L8.671 18.4917C8.61908 18.5955 8.61051 18.7157 8.64717 18.8258C8.68384 18.9359 8.76273 19.0269 8.86651 19.0788C8.97029 19.1307 9.09044 19.1393 9.20054 19.1026C9.31063 19.066 9.40166 18.9871 9.45358 18.8833L10.211 17.375H15.7946L16.5487 18.8833C16.5849 18.9556 16.6404 19.0164 16.709 19.0591C16.7776 19.1018 16.8568 19.1246 16.9376 19.125C17.0121 19.125 17.0855 19.1059 17.1506 19.0695C17.2157 19.0332 17.2704 18.9808 17.3096 18.9174C17.3488 18.8539 17.3711 18.7815 17.3744 18.707C17.3777 18.6325 17.3619 18.5584 17.3286 18.4917L13.3916 10.6167ZM13.0001 11.7909L14.4799 14.75H11.5202L13.0001 11.7909ZM14.7222 11.1264C14.7672 10.8745 14.7565 10.6158 14.6907 10.3685C14.625 10.1212 14.5057 9.89131 14.3415 9.69507C14.1772 9.49883 13.9719 9.341 13.7401 9.2327C13.5082 9.12441 13.2554 9.06829 12.9995 9.06829C12.7436 9.06829 12.4908 9.12441 12.259 9.2327C12.0271 9.341 11.8218 9.49883 11.6575 9.69507C11.4933 9.89131 11.3741 10.1212 11.3083 10.3685C11.2425 10.6158 11.2318 10.8745 11.2769 11.1264C11.2885 11.1835 11.2887 11.2424 11.2773 11.2996C11.2659 11.3567 11.2432 11.411 11.2105 11.4593C11.1779 11.5076 11.1359 11.5488 11.0871 11.5806C11.0382 11.6124 10.9835 11.6342 10.9262 11.6446C10.8688 11.6549 10.81 11.6538 10.7531 11.6411C10.6962 11.6284 10.6424 11.6045 10.5949 11.5708C10.5474 11.537 10.5071 11.4941 10.4764 11.4446C10.4457 11.395 10.4252 11.3399 10.4161 11.2823C10.3475 10.9041 10.3628 10.5154 10.461 10.1438C10.5591 9.77214 10.7377 9.42658 10.984 9.13154C11.2304 8.83649 11.5386 8.59915 11.8867 8.43628C12.2349 8.27341 12.6146 8.189 12.999 8.189C13.3834 8.189 13.763 8.27341 14.1112 8.43628C14.4594 8.59915 14.7675 8.83649 15.0139 9.13154C15.2603 9.42658 15.4388 9.77214 15.537 10.1438C15.6351 10.5154 15.6504 10.9041 15.5819 11.2823C15.5637 11.3831 15.5107 11.4743 15.4321 11.5401C15.3536 11.6059 15.2545 11.642 15.152 11.6421C15.1258 11.6419 15.0996 11.6395 15.0738 11.635C14.9598 11.6141 14.8587 11.5489 14.7928 11.4535C14.7268 11.3581 14.7014 11.2405 14.7222 11.1264ZM9.50827 13.449C9.01805 12.7996 8.71864 12.0264 8.64367 11.2162C8.56871 10.406 8.72116 9.59097 9.0839 8.86265C9.44664 8.13434 10.0053 7.52161 10.6971 7.09331C11.3889 6.66501 12.1864 6.43811 13.0001 6.43811C13.8137 6.43811 14.6112 6.66501 15.303 7.09331C15.9948 7.52161 16.5535 8.13434 16.9162 8.86265C17.279 9.59097 17.4314 10.406 17.3565 11.2162C17.2815 12.0264 16.9821 12.7996 16.4919 13.449C16.4212 13.5396 16.3177 13.5987 16.2038 13.6136C16.0899 13.6285 15.9747 13.598 15.8831 13.5288C15.7915 13.4595 15.7308 13.3569 15.7141 13.2433C15.6975 13.1296 15.7262 13.0139 15.794 12.9213C16.186 12.4017 16.4254 11.7832 16.4852 11.1351C16.5451 10.487 16.423 9.83506 16.1328 9.25251C15.8426 8.66996 15.3956 8.17988 14.8423 7.83732C14.2889 7.49476 13.6509 7.31328 13.0001 7.31328C12.3492 7.31328 11.7113 7.49476 11.1579 7.83732C10.6045 8.17988 10.1576 8.66996 9.86734 9.25251C9.5771 9.83506 9.45505 10.487 9.51489 11.1351C9.57473 11.7832 9.81409 12.4017 10.2061 12.9213C10.274 13.0139 10.3027 13.1296 10.286 13.2433C10.2694 13.3569 10.2087 13.4595 10.117 13.5288C10.0254 13.598 9.91022 13.6285 9.79632 13.6136C9.68242 13.5987 9.57895 13.5396 9.50827 13.449Z`
+
+/** Tower/Tiang: design dari Figma — lingkaran biru #076C9E + CellTower icon (normal) atau merah + badge (gangguan) */
 function makeTowerSvg(hasGangguan: boolean, count: number, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu') {
-  let baseColor = '#0288D1' // SUTT
-  if (tipe === 'SUTET') baseColor = '#e65100'
-  if (tipe === 'SKTT') baseColor = '#7c3aed'
+  const BASE = 26
 
   if (!hasGangguan) {
-    // Titik kecil / simpul di sepanjang jalur (Figma / My Maps style)
-    const W = 16, H = 16, cx = 8, cy = 8, r = 3.5
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-      <circle cx="${cx}" cy="${cy}" r="${r}" fill="${baseColor}" stroke="#FFFFFF" stroke-width="1.5" />
+    // Normal: 26x26, warna berdasarkan tipe jalur
+    let bgColor = '#076C9E' // SUTT (default, sesuai Figma)
+    if (tipe === 'SUTET') bgColor = '#e65100'
+    if (tipe === 'SKTT') bgColor = '#7c3aed'
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${BASE}" height="${BASE}" viewBox="0 0 ${BASE} ${BASE}">
+      <rect width="${BASE}" height="${BASE}" rx="${BASE / 2}" fill="${bgColor}"/>
+      <path d="${CELL_TOWER_PATH}" fill="white"/>
     </svg>`
     return {
       url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
-      size: [W, H],
-      anchor: [cx, cy],
+      size: [BASE, BASE] as [number, number],
+      anchor: [BASE / 2, BASE / 2] as [number, number],
     }
   }
 
-  // Jika ada gangguan, ubah jadi merah besar dengan badge
-  baseColor = '#D32F2F'
-  const W = 70, H = 36, cx = 18, cy = 18, r = 14
-
+  // Gangguan: pill merah #D92D20 + tower icon + badge count
+  const W = BASE + 26
+  const H = BASE
   const badge = `
-    <rect x="${cx + r - 3}" y="3" width="20" height="14" rx="7" fill="#D32F2F" stroke="#FFFFFF" stroke-width="1.5"/>
-    <text x="${cx + r + 7}" y="13" text-anchor="middle"
+    <rect x="${BASE - 4}" y="2" width="22" height="14" rx="7" fill="#D92D20"/>
+    <text x="${BASE + 7}" y="13" text-anchor="middle"
       font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="#fff">${count}</text>
   `
-
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
     <defs>
-      <filter id="ts${count}${hasGangguan}" x="-50%" y="-50%" width="200%" height="200%">
-        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="${baseColor}" flood-opacity="0.5"/>
+      <filter id="te${count}" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#D92D20" flood-opacity="0.45"/>
       </filter>
     </defs>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="${baseColor}" filter="url(#ts${count}${hasGangguan})"/>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.25"/>
-    <path d="M17.5 9l-2 4h-3v1h2.7l-1.8 9h-2.9v1h11v-1h-2.9l-1.8-9h2.7v-1h-3l-2-4h-1zm-1.4 5h3.7l1.3 6.5h-6.3l1.3-6.5zm-2.2 7.5h8.2l.8 4h-9.8l.8-4z" fill="#FFFFFF"/>
+    <rect width="${BASE}" height="${BASE}" rx="${BASE / 2}" fill="#D92D20" filter="url(#te${count})"/>
+    <path d="${CELL_TOWER_PATH}" fill="white"/>
     ${badge}
   </svg>`
   return {
     url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
-    size: [W, H],
-    anchor: [cx, cy],
+    size: [W, H] as [number, number],
+    anchor: [BASE / 2, BASE / 2] as [number, number],
   }
 }
 
@@ -272,8 +274,8 @@ function TowerMarkers({
         marker.addListener('click', () => onSelect(tower))
         return marker
       } else {
-        // Tower/Tiang → Titik kecil (normal) atau MERAH besar (gangguan)
-        const iconData = makeTowerSvg(hasGangguan, count, tower.tipe)
+        // Tower/Tiang → CellTower icon (normal, biru) atau MERAH + badge (gangguan)
+        const iconData = makeTowerSvg(hasGangguan, count, tower.tipe as 'SUTET'|'SUTT'|'SKTT'|'gardu')
         const marker = new window.google.maps.Marker({
           position: { lat: tower.lat, lng: tower.lng },
           map,
@@ -382,12 +384,18 @@ function Legend() {
       </div>
       {/* Tower Normal */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ width: 14, height: 14, borderRadius: '50%', background: '#0288D1', flexShrink: 0 }} />
+        <svg width="18" height="18" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+          <rect width="26" height="26" rx="13" fill="#076C9E"/>
+          <path d={CELL_TOWER_PATH} fill="white"/>
+        </svg>
         <span style={{ color: '#374151' }}>Tower (Normal)</span>
       </div>
       {/* Tower Gangguan */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ width: 14, height: 14, borderRadius: '50%', background: '#D32F2F', flexShrink: 0 }} />
+        <svg width="18" height="18" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+          <rect width="26" height="26" rx="13" fill="#D92D20"/>
+          <path d={CELL_TOWER_PATH} fill="white"/>
+        </svg>
         <span style={{ color: '#374151' }}>Tower (Gangguan)</span>
       </div>
     </div>

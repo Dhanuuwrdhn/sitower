@@ -482,11 +482,32 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
   }
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative', display: 'flex', flexDirection: 'column' }}>
-      {/* Filter chips */}
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <APIProvider apiKey={API_KEY}>
+        <Map
+          defaultCenter={CENTER}
+          defaultZoom={10}
+          style={{ width: '100%', height: '100%' }}
+          gestureHandling="greedy"
+          mapTypeControl={false}
+          streetViewControl={false}
+          fullscreenControl={false}
+        >
+          {jalurKml && jalurKml.length > 0 && <JalurKmlLines jalurKml={jalurKml} />}
+          <TowerMarkers towers={displayTowers} onSelect={handleSelect} />
+          {selected && <TowerPopup tower={selected} onClose={() => setSelected(null)} />}
+        </Map>
+      </APIProvider>
+
+      {/* Filter floating — top center inside map */}
       <div style={{
-        display: 'flex', gap: 6, padding: '8px 10px', flexWrap: 'wrap',
-        background: '#fff', borderBottom: '1px solid #E1E8EC', flexShrink: 0,
+        position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)',
+        zIndex: 10, display: 'flex', gap: 6, alignItems: 'center',
+        background: 'rgba(255,255,255,0.96)',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+        borderRadius: 999, padding: '6px 10px',
+        backdropFilter: 'blur(6px)',
+        flexWrap: 'nowrap', whiteSpace: 'nowrap',
       }}>
         {FILTER_OPTIONS.map((opt) => {
           const isActive = activeFilter === opt.key
@@ -495,11 +516,12 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
               key={String(opt.key)}
               onClick={() => setActiveFilter(opt.key ?? null)}
               style={{
-                padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 600, cursor: 'pointer',
-                border: isActive ? '1.5px solid #005DAA' : '1.5px solid #E1E8EC',
-                background: isActive ? '#005DAA' : '#fff',
+                padding: '4px 14px', borderRadius: 999,
+                fontSize: 11, fontWeight: 600, cursor: 'pointer', lineHeight: 1.5,
+                border: 'none', outline: 'none',
+                background: isActive ? '#005DAA' : 'transparent',
                 color: isActive ? '#fff' : '#374151',
-                transition: 'all 0.15s',
+                transition: 'background 0.15s, color 0.15s',
               }}
             >
               {opt.label}
@@ -508,25 +530,7 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
         })}
       </div>
 
-      {/* Map */}
-      <div style={{ flex: 1, position: 'relative' }}>
-        <APIProvider apiKey={API_KEY}>
-          <Map
-            defaultCenter={CENTER}
-            defaultZoom={10}
-            style={{ width: '100%', height: '100%' }}
-            gestureHandling="greedy"
-            mapTypeControl={false}
-            streetViewControl={false}
-            fullscreenControl={false}
-          >
-            {jalurKml && jalurKml.length > 0 && <JalurKmlLines jalurKml={jalurKml} />}
-            <TowerMarkers towers={displayTowers} onSelect={handleSelect} />
-            {selected && <TowerPopup tower={selected} onClose={() => setSelected(null)} />}
-          </Map>
-        </APIProvider>
-        <Legend />
-      </div>
+      <Legend />
     </div>
   )
 }

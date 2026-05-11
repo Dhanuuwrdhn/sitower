@@ -518,12 +518,13 @@ export default function AsetPage() {
     setUploadingKml(true)
     try {
       const res = await jalurKmlApi.upload(file)
-      const { total, jalur } = res.data?.data ?? {}
-      toast.success(`${total} jalur berhasil diimport dari KML`)
-      if (jalur?.length) {
-        toast.success(`Jalur: ${(jalur as string[]).slice(0, 3).join(', ')}${jalur.length > 3 ? ` +${jalur.length - 3} lagi` : ''}`, { duration: 5000 })
-      }
+      const { towers, jalur } = res.data?.data ?? {}
+      const parts = []
+      if (towers > 0) parts.push(`${towers} tower/gardu baru`)
+      if (jalur > 0) parts.push(`${jalur} jalur`)
+      toast.success(`Import KML berhasil: ${parts.length ? parts.join(', ') : 'tidak ada data baru'}`)
       fetchJalurKml()
+      fetchData()
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? 'Upload KML gagal')
     } finally {

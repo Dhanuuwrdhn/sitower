@@ -22,17 +22,18 @@ type NavItem = {
   href: string
   icon: React.ComponentType<{ size?: number; className?: string; style?: React.CSSProperties }>
   adminOnly?: boolean
+  hidden?: boolean
 }
 
 const ALL_NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard',           icon: IconDashboard,  href: '/dashboard' },
-  { label: 'Riwayat Kerawanan Transmisi', icon: IconRiwayat, href: '/laporan/gangguan' },
-  { label: 'Data Aset Transmisi', icon: IconAset,       href: '/aset' },
-  { label: 'Sertifikat',          icon: IconSertifikat, href: '/sertifikat' },
-  { label: 'As Built Drawing',    icon: IconAsBuilt,    href: '/as-built-drawing' },
-  { label: 'Climb Up Inspection', icon: IconClimb,      href: '/laporan/cui' },
-  { label: 'Clean Up Isolator',   icon: IconCleanup,    href: '/laporan/cleanup' },
-  { label: 'Manajemen User',      icon: IconUsers,      href: '/admin/users', adminOnly: true },
+  { label: 'Dashboard',                   icon: IconDashboard,  href: '/dashboard' },
+  { label: 'Riwayat Kerawanan Transmisi', icon: IconRiwayat,    href: '/laporan/gangguan' },
+  { label: 'Data Aset Transmisi',         icon: IconAset,       href: '/aset',              hidden: true },
+  { label: 'Sertifikat',                  icon: IconSertifikat, href: '/sertifikat' },
+  { label: 'As Built Drawing',            icon: IconAsBuilt,    href: '/as-built-drawing',  hidden: true },
+  { label: 'Climb Up Inspection',         icon: IconClimb,      href: '/laporan/cui',       hidden: true },
+  { label: 'Clean Up Isolator',           icon: IconCleanup,    href: '/laporan/cleanup',   hidden: true },
+  { label: 'Manajemen User',              icon: IconUsers,      href: '/admin/users',       adminOnly: true },
 ]
 
 // ─── Desktop NavLink ───────────────────────────────────────────────────────────
@@ -131,7 +132,7 @@ export default function Sidebar() {
     setIsAdmin(u?.role === 'admin')
   }, [])
 
-  const navItems = ALL_NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin)
+  const navItems = ALL_NAV_ITEMS.filter((item) => !item.hidden && (!item.adminOnly || isAdmin))
 
   function isActive(href: string) {
     if (href === '/dashboard') return pathname === '/dashboard'

@@ -460,9 +460,8 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
   const displayTowers = useMemo<FeaturedTower[]>(() => {
     const all = towers ?? []
     if (!activeFilter) return all
-    // Tampilkan tower yang memiliki kerawanan sesuai filter, plus tower tanpa kerawanan tetap tampil
+    // Hanya tampilkan tower yang punya kerawanan sesuai filter
     return all.filter((t) =>
-      t.kerawanan.length === 0 ||
       t.kerawanan.some((k) => k.kategori === activeFilter)
     )
   }, [towers, activeFilter])

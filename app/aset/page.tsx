@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Eye, Pencil, X, MapPin, Zap, Activity, Map, Trash2, HelpCircle, ExternalLink } from 'lucide-react'
-import { towersApi, jalurKmlApi } from '@/lib/api'
+import { towersApi, asetApi, jalurKmlApi } from '@/lib/api'
 import B2WLoader from '@/components/ui/B2WLoader'
 import { isAdmin } from '@/lib/auth'
 import { StatusBadge } from '@/components/ui/StatusBadge'
@@ -49,7 +49,7 @@ function AsetDetailDrawer({
   useEffect(() => {
     if (!open || !towerId) { setTower(null); return }
     setLoading(true)
-    towersApi.getById(towerId)
+    asetApi.getTowerById(towerId)
       .then((res) => setTower(res.data))
       .catch(() => toast.error('Gagal memuat detail tower'))
       .finally(() => setLoading(false))
@@ -139,8 +139,36 @@ function AsetDetailDrawer({
                 </div>
               </div>
 
+              {/* Kerawanan */}
+              {(tower.statusKerawanan || tower.jenisKerawanan) && (
+                <div style={{ background: '#F6F9FC', borderRadius: 10, padding: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                    <Activity size={13} color="#5F737F" />
+                    <p style={{ fontWeight: 700, fontSize: 12, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>Status Kerawanan</p>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
+                    <LabelValue label="Status" value={tower.statusKerawanan} />
+                    <LabelValue label="Jenis" value={tower.jenisKerawanan ?? '—'} />
+                    {tower.pplNotes && <div style={{ gridColumn: '1 / -1' }}><LabelValue label="Catatan PPL" value={tower.pplNotes} /></div>}
+                    {tower.penanggungJawab && <LabelValue label="Penanggung Jawab" value={tower.penanggungJawab} />}
+                    {tower.telepon && <LabelValue label="Telepon" value={tower.telepon} />}
+                    {tower.sertifikatLink && (
+                      <div style={{ gridColumn: '1 / -1' }}>
+                        <span className="text-[11px] text-app-muted font-medium uppercase tracking-wide">Sertifikat</span>
+                        <div>
+                          <a href={tower.sertifikatLink} target="_blank" rel="noopener noreferrer"
+                            style={{ fontSize: 12, color: '#076C9E', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                            <ExternalLink size={11} /> Lihat di Google Drive
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Jalur */}
-              {(tower.jalur || tower.nomorUrut) && (
+              {(tower.jalur || tower.nomorUrut || tower.route) && (
                 <div style={{ background: '#F6F9FC', borderRadius: 10, padding: '16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
                     <Zap size={13} color="#5F737F" />
@@ -148,9 +176,12 @@ function AsetDetailDrawer({
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
                     <div style={{ gridColumn: '1 / -1' }}>
-                      <LabelValue label="Nama Jalur" value={tower.jalur} />
+                      <LabelValue label="Nama Jalur" value={tower.route?.nama ?? tower.jalur} />
                     </div>
                     <LabelValue label="Nomor Urut" value={tower.nomorUrut} />
+                    {tower.route?.lineType && <LabelValue label="Tipe Saluran" value={`${tower.route.lineType.kode} ${tower.route.lineType.tegangan}`} />}
+                    {tower.route?.garduDari && <LabelValue label="Dari Gardu" value={tower.route.garduDari.nama} />}
+                    {tower.route?.garduKe   && <LabelValue label="Ke Gardu"   value={tower.route.garduKe.nama} />}
                   </div>
                 </div>
               )}
@@ -615,7 +646,11 @@ export default function AsetPage() {
                       <td className="font-mono text-[12px]">{row.tegangan ?? '—'}</td>
                       <td className="text-app-muted text-[12px] max-w-[160px] truncate" title={row.jalur ?? ''}>{row.jalur ?? '—'}</td>
                       <td><StatusBadge status={row.kondisi ?? 'normal'} /></td>
-                      <td className="text-app-muted text-[12px] max-w-[180px] truncate">{row.lokasi ?? '—'}</td>
+                      <td className="text-app-muted text-[12px] font-mono whitespace-nowrap">
+                        {row.lat && row.lng
+                          ? `${Number(row.lat).toFixed(5)}, ${Number(row.lng).toFixed(5)}`
+                          : row.lokasi ?? '—'}
+                      </td>
                       {isAdminUser && (
                         <td className="text-right pr-4">
                           <ActionMenu items={[

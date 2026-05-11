@@ -110,13 +110,22 @@ const LEVEL_BG: Record<string, string> = {
   normal: '#076C9E',
 }
 
+const KATEGORI_EMOJI: Record<string, string> = {
+  pekerjaan_pihak_lain: '🚜',
+  kebakaran:            '🔥',
+  layangan:             '🪁',
+  pencurian:            '🥷',
+  pemanfaatan_lahan:    '🏡',
+}
+
 /** Tower/Tiang:
  *  - Normal (no kerawanan): titik kecil berwarna tipe jalur
- *  - Ada kerawanan: lingkaran 26x26 + CellTower icon, warna berdasarkan level tertinggi
+ *  - 1 kerawanan: lingkaran berwarna level + emoji jenis
+ *  - 2+ kerawanan: lingkaran berwarna level + angka jumlah
  */
-function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu') {
+function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', kerawanan: KerawananItem[]) {
   if (topLevel === 'normal') {
-    // Titik kecil di sepanjang jalur (My Maps style)
+    // Titik kecil di sepanjang jalur
     let dotColor = '#076C9E'
     if (tipe === 'SUTET') dotColor = '#e65100'
     if (tipe === 'SKTT') dotColor = '#7c3aed'
@@ -131,17 +140,31 @@ function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu') {
     }
   }
 
-  // Ada kerawanan: lingkaran dengan warna level + CellTower icon
-  const BASE = 26
+  const BASE = 32
   const bgColor = LEVEL_BG[topLevel] ?? '#076C9E'
+  const cx = BASE / 2, cy = BASE / 2, r = BASE / 2 - 1
+
+  let innerContent: string
+  if (kerawanan.length === 1) {
+    // Satu jenis kerawanan — tampilkan emoji
+    const emoji = KATEGORI_EMOJI[kerawanan[0].kategori] ?? '⚠️'
+    innerContent = `<text x="${cx}" y="${cy + 7}" text-anchor="middle" font-size="16">${emoji}</text>`
+  } else {
+    // Lebih dari 1 — tampilkan jumlah
+    innerContent = `<text x="${cx}" y="${cy + 5}" text-anchor="middle" font-family="Inter,Arial,sans-serif"
+      font-size="13" font-weight="700" fill="#fff">${kerawanan.length}</text>`
+  }
+
+  const filterId = `te${topLevel}${kerawanan.length}`
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${BASE}" height="${BASE}" viewBox="0 0 ${BASE} ${BASE}">
     <defs>
-      <filter id="te${topLevel}" x="-30%" y="-30%" width="160%" height="160%">
-        <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="${bgColor}" flood-opacity="0.5"/>
+      <filter id="${filterId}" x="-40%" y="-40%" width="180%" height="180%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="${bgColor}" flood-opacity="0.5"/>
       </filter>
     </defs>
-    <rect width="${BASE}" height="${BASE}" rx="${BASE / 2}" fill="${bgColor}" filter="url(#te${topLevel})"/>
-    <path d="${CELL_TOWER_PATH}" fill="white"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="${bgColor}" filter="url(#${filterId})"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.3"/>
+    ${innerContent}
   </svg>`
   return {
     url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
@@ -273,7 +296,7 @@ function TowerMarkers({
         marker.addListener('click', () => onSelect(tower))
         return marker
       } else {
-        const iconData = makeTowerSvg(topLevel, tower.tipe as 'SUTET'|'SUTT'|'SKTT'|'gardu')
+        const iconData = makeTowerSvg(topLevel, tower.tipe as 'SUTET'|'SUTT'|'SKTT'|'gardu', tower.kerawanan)
         const marker = new window.google.maps.Marker({
           position: { lat: tower.lat, lng: tower.lng },
           map,

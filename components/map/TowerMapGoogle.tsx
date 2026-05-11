@@ -67,31 +67,34 @@ function getTopLevel(kerawanan: KerawananItem[]): string {
 //  Tower normal → lingkaran BIRU  + icon tiang/pylon (kecil)
 //  Tower gangguan → lingkaran MERAH + icon tiang/pylon + pill badge merah
 
-/** Gardu Induk: lingkaran hitam + building icon, badge merah jika ada gangguan */
+/** Gardu Induk: design dari Figma — lingkaran hitam #1C1C1C + vuesax/bold/bank icon, badge merah jika ada gangguan */
 function makeGarduSvg(count: number) {
   const hasCount = count > 0
-  const W = hasCount ? 72 : 44
-  const H = 44
-  const cx = 22
-  const cy = 22
-  const r  = 18
+  // Base icon: 26x26. Badge extends width if needed.
+  const BASE = 26
+  const W = hasCount ? BASE + 26 : BASE
+  const H = BASE
 
   const badge = hasCount ? `
-    <rect x="${cx + r - 3}" y="4" width="24" height="16" rx="8" fill="#D32F2F"/>
-    <text x="${cx + r + 9}" y="16" text-anchor="middle"
-      font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="#fff">${count}</text>
+    <rect x="${BASE - 4}" y="2" width="22" height="14" rx="7" fill="#D32F2F"/>
+    <text x="${BASE + 7}" y="13" text-anchor="middle"
+      font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="#fff">${count}</text>
   ` : ''
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
     <defs>
       <filter id="gs${count}" x="-50%" y="-50%" width="200%" height="200%">
-        <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.4"/>
+        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.35"/>
       </filter>
     </defs>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="#1A1A1A" filter="url(#gs${count})"/>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.2"/>
-    <!-- Gardu (Substation Building) Icon -->
-    <path d="M12 28v-11l10-6.5 10 6.5v11h-20zm2-1h16v-9.3l-8-5.2-8 5.2v9.3zm6-5h4v6h-4v-6z" fill="#FFFFFF"/>
+    <rect width="26" height="26" rx="13" fill="#1C1C1C" filter="url(#gs${count})"/>
+    <path d="M18.8334 17.0833V18.8333H7.16675V17.0833C7.16675 16.7625 7.42925 16.5 7.75008 16.5H18.2501C18.5709 16.5 18.8334 16.7625 18.8334 17.0833Z" fill="white" stroke="white" stroke-width="0.818182" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M10.0834 12.4167H8.91675V16.5H10.0834V12.4167Z" fill="white"/>
+    <path d="M12.4167 12.4167H11.25V16.5H12.4167V12.4167Z" fill="white"/>
+    <path d="M14.7499 12.4167H13.5833V16.5H14.7499V12.4167Z" fill="white"/>
+    <path d="M17.0834 12.4167H15.9167V16.5H17.0834V12.4167Z" fill="white"/>
+    <path d="M19.4166 19.2708H6.58325C6.34409 19.2708 6.14575 19.0725 6.14575 18.8333C6.14575 18.5941 6.34409 18.3958 6.58325 18.3958H19.4166C19.6558 18.3958 19.8541 18.5941 19.8541 18.8333C19.8541 19.0725 19.6558 19.2708 19.4166 19.2708Z" fill="white"/>
+    <path d="M18.4659 9.35418L13.2159 7.25418C13.0992 7.20751 12.9009 7.20751 12.7842 7.25418L7.53425 9.35418C7.33008 9.43584 7.16675 9.67501 7.16675 9.89668V11.8333C7.16675 12.1542 7.42925 12.4167 7.75008 12.4167H18.2501C18.5709 12.4167 18.8334 12.1542 18.8334 11.8333V9.89668C18.8334 9.67501 18.6701 9.43584 18.4659 9.35418ZM13.0001 10.9583C12.5159 10.9583 12.1251 10.5675 12.1251 10.0833C12.1251 9.59918 12.5159 9.20834 13.0001 9.20834C13.4842 9.20834 13.8751 9.59918 13.8751 10.0833C13.8751 10.5675 13.4842 10.9583 13.0001 10.9583Z" fill="white"/>
     ${badge}
   </svg>`
   return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg)
@@ -251,10 +254,10 @@ function TowerMarkers({
       const hasGangguan = count > 0
 
       if (isGardu) {
-        // Gardu Induk → lingkaran HITAM + building icon (selalu hitam sesuai Figma)
+        // Gardu Induk → design Figma: lingkaran hitam #1C1C1C + vuesax bank icon
         const iconUrl = makeGarduSvg(count)
-        const W = count > 0 ? 72 : 44
-        const H = 44
+        const W = count > 0 ? 52 : 26
+        const H = 26
         const marker = new window.google.maps.Marker({
           position: { lat: tower.lat, lng: tower.lng },
           map,
@@ -262,7 +265,7 @@ function TowerMarkers({
           icon: {
             url: iconUrl,
             scaledSize: new window.google.maps.Size(W, H),
-            anchor: new window.google.maps.Point(22, 22),
+            anchor: new window.google.maps.Point(13, 13),
           },
           zIndex: hasGangguan ? 40 : 20,
         })
@@ -365,11 +368,16 @@ function Legend() {
       <p style={{ fontWeight: 700, fontSize: 11.5, margin: '8px 0 4px', color: '#0f172a' }}>Marker</p>
       {/* Gardu Induk */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
-            <path d="M3 21h18M6 21V7l6-4 6 4v14"/><rect x="9" y="15" width="6" height="6"/>
-          </svg>
-        </div>
+        <svg width="18" height="18" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+          <rect width="26" height="26" rx="13" fill="#1C1C1C"/>
+          <path d="M18.8334 17.0833V18.8333H7.16675V17.0833C7.16675 16.7625 7.42925 16.5 7.75008 16.5H18.2501C18.5709 16.5 18.8334 16.7625 18.8334 17.0833Z" fill="white" stroke="white" strokeWidth="0.818182" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M10.0834 12.4167H8.91675V16.5H10.0834V12.4167Z" fill="white"/>
+          <path d="M12.4167 12.4167H11.25V16.5H12.4167V12.4167Z" fill="white"/>
+          <path d="M14.7499 12.4167H13.5833V16.5H14.7499V12.4167Z" fill="white"/>
+          <path d="M17.0834 12.4167H15.9167V16.5H17.0834V12.4167Z" fill="white"/>
+          <path d="M19.4166 19.2708H6.58325C6.34409 19.2708 6.14575 19.0725 6.14575 18.8333C6.14575 18.5941 6.34409 18.3958 6.58325 18.3958H19.4166C19.6558 18.3958 19.8541 18.5941 19.8541 18.8333C19.8541 19.0725 19.6558 19.2708 19.4166 19.2708Z" fill="white"/>
+          <path d="M18.4659 9.35418L13.2159 7.25418C13.0992 7.20751 12.9009 7.20751 12.7842 7.25418L7.53425 9.35418C7.33008 9.43584 7.16675 9.67501 7.16675 9.89668V11.8333C7.16675 12.1542 7.42925 12.4167 7.75008 12.4167H18.2501C18.5709 12.4167 18.8334 12.1542 18.8334 11.8333V9.89668C18.8334 9.67501 18.6701 9.43584 18.4659 9.35418ZM13.0001 10.9583C12.5159 10.9583 12.1251 10.5675 12.1251 10.0833C12.1251 9.59918 12.5159 9.20834 13.0001 9.20834C13.4842 9.20834 13.8751 9.59918 13.8751 10.0833C13.8751 10.5675 13.4842 10.9583 13.0001 10.9583Z" fill="white"/>
+        </svg>
         <span style={{ color: '#374151' }}>Gardu Induk</span>
       </div>
       {/* Tower Normal */}

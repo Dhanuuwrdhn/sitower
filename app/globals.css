@@ -708,40 +708,40 @@
   background: #E1E8EC;
 }
 
-/* ── Total Aset Transmisi card ── */
+/* ── Total Aset Transmisi card — Figma node 229:4349 ── */
+/* Card: VERTICAL, gap=40 antara 3 section */
 .dash-aset-card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 40px;
   padding: 24px;
   background: #FFFFFF;
   border: 1px solid #E1E8EC;
   border-radius: 8px;
 }
 
-.dash-aset-body {
+/* Section 1: title + divider */
+.dash-aset-section-head {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 16px;
+}
+
+/* Section 2: chart kiri + total kanan — Figma Content HORIZONTAL gap=24 */
+.dash-aset-body {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
   gap: 24px;
 }
 
-/* Mobile: Figma shows chart left + total right (HORIZONTAL) */
-@media (max-width: 640px) {
-  .dash-aset-body {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 16px;
-  }
-  .dash-aset-total { align-items: flex-start; }
-  .dash-aset-legend { flex-direction: column; gap: 8px; }
-  .dash-aset-legend-item { width: auto; }
-}
-
+/* Total label + number — right panel, aligned to bottom of chart */
 .dash-aset-total {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: flex-end;
+  height: 160px;
+  gap: 4px;
 }
 .dash-aset-total-label {
   font-family: 'Inter', sans-serif;
@@ -749,6 +749,7 @@
   font-size: 14px;
   line-height: 20px;
   color: #5F737F;
+  white-space: pre-line;
 }
 .dash-aset-total-num {
   font-family: 'Inter', sans-serif;
@@ -758,23 +759,28 @@
   color: #076C9E;
 }
 
-/* ── Legend ── */
+/* Section 3: legend — Figma DIv VERTICAL gap=16 */
 .dash-aset-legend {
   display: flex;
-  gap: 32px;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
 }
 
+/* Each legend row: space-between, dot+label kiri | angka+persen kanan */
 .dash-aset-legend-item {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: 120px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .dash-legend-header {
   display: flex;
   align-items: center;
   gap: 4px;
+  flex: 1;
 }
 
 .dash-legend-dot {

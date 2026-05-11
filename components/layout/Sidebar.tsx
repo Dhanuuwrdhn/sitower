@@ -132,7 +132,8 @@ export default function Sidebar() {
     setIsAdmin(u?.role === 'admin')
   }, [])
 
-  const navItems = ALL_NAV_ITEMS.filter((item) => !item.hidden && (!item.adminOnly || isAdmin))
+  const showAll = process.env.NEXT_PUBLIC_SHOW_ALL_MENU === 'true'
+  const navItems = ALL_NAV_ITEMS.filter((item) => (!item.hidden || showAll) && (!item.adminOnly || isAdmin))
 
   function isActive(href: string) {
     if (href === '/dashboard') return pathname === '/dashboard'

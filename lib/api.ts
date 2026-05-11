@@ -137,3 +137,13 @@ export const importApi = {
   downloadTemplate: (type: string) =>
     api.get(`/import/template/${type}`, { responseType: 'blob' }),
 }
+
+export const jalurKmlApi = {
+  getAll: () => api.get('/jalur-kml'),
+  upload: (file: File) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    return api.post('/jalur-kml/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+  },
+  remove: (id: number) => api.delete(`/jalur-kml/${id}`),
+}

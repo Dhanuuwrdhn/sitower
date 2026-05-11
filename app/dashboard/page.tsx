@@ -56,51 +56,51 @@ const JENIS_LABEL: Record<string, string> = {
   pemanfaatan_lahan:    'Pemanfaatan Lahan',
 }
 
-// ── Donut Chart ───────────────────────────────────────────────────────────────
-function DonutChart({ normal, gangguan }: { normal: number; gangguan: number }) {
-  const total = normal + gangguan
+// ── Donut Chart — 3 segment: Aman / Sedang / Kritis (Figma node 229-4312) ────
+function DonutChart({ aman, sedang, kritis }: { aman: number; sedang: number; kritis: number }) {
+  const total = aman + sedang + kritis
+  const cx = 80, cy = 80, r = 60, strokeW = 24
+  const circumference = 2 * Math.PI * r
+  const startOffset = circumference * 0.25 // start from top
+
   if (total === 0) {
     return (
       <svg width="160" height="160" viewBox="0 0 160 160">
-        <circle cx="80" cy="80" r="60" fill="none" stroke="#E1E8EC" strokeWidth="24" />
-        <text x="80" y="80" textAnchor="middle" dominantBaseline="central" fontSize="28" fontWeight="700" fill="#1C1C1C">0</text>
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#E1E8EC" strokeWidth={strokeW} />
+        <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" fontSize="28" fontWeight="700" fill="#1C1C1C">0</text>
       </svg>
     )
   }
-  const normalPct = normal / total
-  const gangguanPct = gangguan / total
-  const circumference = 2 * Math.PI * 60
-  const normalArc = circumference * normalPct
-  const gangguanArc = circumference * gangguanPct
-  // Rotate to start from top
-  const offset = circumference * 0.25
+
+  const amanArc   = circumference * (aman   / total)
+  const sedangArc = circumference * (sedang / total)
+  const kritisArc = circumference * (kritis / total)
 
   return (
     <svg width="160" height="160" viewBox="0 0 160 160">
-      {/* Normal arc — blue */}
-      <circle
-        cx="80" cy="80" r="60"
-        fill="none"
-        stroke="#076C9E"
-        strokeWidth="24"
-        strokeDasharray={`${normalArc} ${circumference - normalArc}`}
-        strokeDashoffset={offset}
+      {/* Aman — #039855 */}
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#039855" strokeWidth={strokeW}
+        strokeDasharray={`${amanArc} ${circumference - amanArc}`}
+        strokeDashoffset={startOffset}
         strokeLinecap="round"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
-      {/* Gangguan arc — red */}
-      <circle
-        cx="80" cy="80" r="60"
-        fill="none"
-        stroke="#D92D20"
-        strokeWidth="24"
-        strokeDasharray={`${gangguanArc} ${circumference - gangguanArc}`}
-        strokeDashoffset={offset - normalArc}
+      {/* Sedang — #F79009 */}
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#F79009" strokeWidth={strokeW}
+        strokeDasharray={`${sedangArc} ${circumference - sedangArc}`}
+        strokeDashoffset={startOffset - amanArc}
         strokeLinecap="round"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
-      {/* Center text */}
-      <text x="80" y="80" textAnchor="middle" dominantBaseline="central" fontSize="28" fontWeight="700" fill="#1C1C1C">
+      {/* Kritis — #FD2D03 */}
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#FD2D03" strokeWidth={strokeW}
+        strokeDasharray={`${kritisArc} ${circumference - kritisArc}`}
+        strokeDashoffset={startOffset - amanArc - sedangArc}
+        strokeLinecap="round"
+        style={{ transition: 'stroke-dasharray 0.6s ease' }}
+      />
+      {/* Center total */}
+      <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" fontSize="28" fontWeight="700" fill="#1C1C1C">
         {total}
       </text>
     </svg>
@@ -125,8 +125,9 @@ export default function DashboardPage() {
   const [alertCount, setAlertCount] = useState(0)
   const [towerKerawanan, setTowerKerawanan] = useState<any[]>([])
   const [totalTower, setTotalTower] = useState(0)
-  const [normalTower, setNormalTower] = useState(0)
-  const [gangguanTower, setGangguanTower] = useState(0)
+  const [amanTower, setAmanTower] = useState(0)
+  const [sedangTower, setSedangTower] = useState(0)
+  const [kritisTower, setKritisTower] = useState(0)
   const [loading, setLoading] = useState(true)
   const [jalurKmlData, setJalurKmlData] = useState<any[]>([])
 
@@ -192,12 +193,29 @@ export default function DashboardPage() {
       towersApi.getMap()
         .then((res) => {
           const data = Array.isArray(res.data) ? res.data : []
-          const gangguanCount = data.filter((t: any) => t.kerawanan?.length > 0).length
+
+          const getTopLevel = (kerawanan: any[]) => {
+            if (!kerawanan.length) return 'normal'
+            const priority: Record<string, number> = { kritis: 3, sedang: 2, aman: 1 }
+            return kerawanan.reduce((top: string, k: any) =>
+              (priority[k.level] ?? 0) > (priority[top] ?? 0) ? k.level : top, 'aman')
+          }
+
+          let aman = 0, sedang = 0, kritis = 0, gangguanCount = 0
+          for (const t of data) {
+            const level = getTopLevel(t.kerawanan ?? [])
+            if (level === 'kritis') { kritis++; gangguanCount++ }
+            else if (level === 'sedang') { sedang++; gangguanCount++ }
+            else if (level === 'aman') { aman++; gangguanCount++ }
+            else { aman++ } // normal tower → masuk aman
+          }
+
           setAlertCount(gangguanCount)
           setTowerKerawanan(data)
           setTotalTower(data.length)
-          setNormalTower(data.length - gangguanCount)
-          setGangguanTower(gangguanCount)
+          setAmanTower(aman)
+          setSedangTower(sedang)
+          setKritisTower(kritis)
         })
         .catch(() => {}),
 
@@ -216,8 +234,9 @@ export default function DashboardPage() {
     pemanfaatan_lahan: stats.pemanfaatan_lahan,
   }
 
-  const normalPct = totalTower > 0 ? Math.round((normalTower / totalTower) * 100) : 0
-  const gangguanPct = totalTower > 0 ? Math.round((gangguanTower / totalTower) * 100) : 0
+  const amanPct   = totalTower > 0 ? Math.round((amanTower   / totalTower) * 100) : 0
+  const sedangPct = totalTower > 0 ? Math.round((sedangTower / totalTower) * 100) : 0
+  const kritisPct = totalTower > 0 ? Math.round((kritisTower / totalTower) * 100) : 0
 
   if (loading) return <B2WLoader label="Memuat dashboard..." />
 
@@ -261,35 +280,45 @@ export default function DashboardPage() {
           <div className="dash-aset-divider" />
 
           <div className="dash-aset-body">
-            {/* Donut chart */}
-            <DonutChart normal={normalTower} gangguan={gangguanTower} />
+            {/* Donut chart — 3 segment sesuai Figma */}
+            <DonutChart aman={amanTower} sedang={sedangTower} kritis={kritisTower} />
 
-            {/* Total Tower */}
+            {/* Total Aset Transmisi */}
             <div className="dash-aset-total">
-              <span className="dash-aset-total-label">Total Tower</span>
+              <span className="dash-aset-total-label">Total Aset Transmisi</span>
               <span className="dash-aset-total-num">{totalTower}</span>
             </div>
 
-            {/* Legend */}
+            {/* Legend — Aman / Sedang / Kritis */}
             <div className="dash-aset-legend">
               <div className="dash-aset-legend-item">
                 <div className="dash-legend-header">
-                  <span className="dash-legend-dot" style={{ background: '#076C9E' }} />
-                  <span className="dash-legend-label">Normal</span>
+                  <span className="dash-legend-dot" style={{ background: '#039855' }} />
+                  <span className="dash-legend-label">Aman</span>
                 </div>
                 <div className="dash-legend-values">
-                  <span className="dash-legend-num">{normalTower}</span>
-                  <span className="dash-legend-pct">({normalPct}%)</span>
+                  <span className="dash-legend-num">{amanTower}</span>
+                  <span className="dash-legend-pct">({amanPct}%)</span>
                 </div>
               </div>
               <div className="dash-aset-legend-item">
                 <div className="dash-legend-header">
-                  <span className="dash-legend-dot" style={{ background: '#D92D20' }} />
-                  <span className="dash-legend-label">Gangguan</span>
+                  <span className="dash-legend-dot" style={{ background: '#F79009' }} />
+                  <span className="dash-legend-label">Sedang</span>
                 </div>
                 <div className="dash-legend-values">
-                  <span className="dash-legend-num">{gangguanTower}</span>
-                  <span className="dash-legend-pct">({gangguanPct}%)</span>
+                  <span className="dash-legend-num">{sedangTower}</span>
+                  <span className="dash-legend-pct">({sedangPct}%)</span>
+                </div>
+              </div>
+              <div className="dash-aset-legend-item">
+                <div className="dash-legend-header">
+                  <span className="dash-legend-dot" style={{ background: '#FD2D03' }} />
+                  <span className="dash-legend-label">Kritis</span>
+                </div>
+                <div className="dash-legend-values">
+                  <span className="dash-legend-num">{kritisTower}</span>
+                  <span className="dash-legend-pct">({kritisPct}%)</span>
                 </div>
               </div>
             </div>

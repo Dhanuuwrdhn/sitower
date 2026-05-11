@@ -134,7 +134,7 @@ function AsetDetailDrawer({
                   <LabelValue label="Latitude" value={tower.lat} />
                   <LabelValue label="Longitude" value={tower.lng} />
                   <div style={{ gridColumn: '1 / -1' }}>
-                    <LabelValue label="Lokasi" value={tower.lokasi} />
+                    <LabelValue label="Lokasi" value={tower.lokasi ?? (tower.lat && tower.lng ? `${Number(tower.lat).toFixed(6)}, ${Number(tower.lng).toFixed(6)}` : undefined)} />
                   </div>
                 </div>
               </div>

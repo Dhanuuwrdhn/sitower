@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import { CloudUpload } from 'lucide-react'
 import Swal from 'sweetalert2'
-import { laporanApi, towersApi, importApi, jalurKmlApi } from '@/lib/api'
+import { laporanApi, towersApi, asetApi, importApi, jalurKmlApi } from '@/lib/api'
 import B2WLoader from '@/components/ui/B2WLoader'
 import { TwIcon } from '@/components/ui/TwIcon'
 
@@ -190,33 +190,41 @@ export default function DashboardPage() {
         })
         .catch(() => {}),
 
-      // Pakai endpoint /towers/map untuk data kerawanan di peta
-      towersApi.getMap()
+      // Pakai asetApi.getStats() untuk counts + asetApi.getMapOverview() untuk peta
+      asetApi.getStats()
         .then((res) => {
-          const data = Array.isArray(res.data) ? res.data : []
-
-          const getTopLevel = (kerawanan: any[]) => {
-            if (!kerawanan.length) return 'normal'
-            const priority: Record<string, number> = { kritis: 3, sedang: 2, aman: 1 }
-            return kerawanan.reduce((top: string, k: any) =>
-              (priority[k.level] ?? 0) > (priority[top] ?? 0) ? k.level : top, 'aman')
-          }
-
-          let aman = 0, sedang = 0, kritis = 0, gangguanCount = 0
-          for (const t of data) {
-            const level = getTopLevel(t.kerawanan ?? [])
-            if (level === 'kritis') { kritis++; gangguanCount++ }
-            else if (level === 'sedang') { sedang++; gangguanCount++ }
-            else if (level === 'aman') { aman++; gangguanCount++ }
-            else { aman++ } // normal tower → masuk aman
-          }
-
-          setAlertCount(gangguanCount)
-          setTowerKerawanan(data)
-          setTotalTower(data.length)
+          const s = res.data
+          const total  = s.total  ?? 0
+          const aman   = s.aman   ?? 0
+          const sedang = s.sedang ?? 0
+          const kritis = s.kritis ?? 0
+          setTotalTower(total)
           setAmanTower(aman)
           setSedangTower(sedang)
           setKritisTower(kritis)
+          setAlertCount(sedang + kritis)
+        })
+        .catch(() => {}),
+
+      asetApi.getMapOverview()
+        .then((res) => {
+          const overview = res.data
+          // Transform aset towers to FeaturedTower format expected by TowerMapGoogle
+          const mapTowers = (overview.towers ?? []).map((t: any) => ({
+            id:         t.id,
+            nama:       t.name,
+            lat:        t.lat,
+            lng:        t.lng,
+            tipe:       'SUTT' as const,
+            jalur:      null,
+            nomorUrut:  null,
+            kerawanan:  t.status !== 'aman' ? [{
+              kategori: t.kerawanan_type ?? 'unknown',
+              level:    t.status as 'kritis' | 'sedang' | 'aman',
+              status:   t.status,
+            }] : [],
+          }))
+          setTowerKerawanan(mapTowers)
         })
         .catch(() => {}),
 

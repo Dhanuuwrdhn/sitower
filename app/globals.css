@@ -640,12 +640,13 @@
 .dash-stat-card {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 8px;
   padding: 16px;
   background: #FFFFFF;
   border: 1px solid #E1E8EC;
   border-radius: 8px;
+  min-height: 120px;
   transition: box-shadow 0.2s;
 }
 .dash-stat-card:hover {

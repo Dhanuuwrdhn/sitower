@@ -6,6 +6,7 @@ import { CloudUpload } from 'lucide-react'
 import Swal from 'sweetalert2'
 import { laporanApi, towersApi, importApi, jalurKmlApi } from '@/lib/api'
 import B2WLoader from '@/components/ui/B2WLoader'
+import { TwIcon } from '@/components/ui/TwIcon'
 
 const TowerMap = dynamic(() => import('@/components/map/TowerMapGoogle'), { ssr: false })
 
@@ -15,7 +16,7 @@ interface Stats {
   kebakaran: number
   layangan: number
   pencurian: number
-  pemanfaatan_lahan: number
+  pemanfaatan: number  // API returns "pemanfaatan", not "pemanfaatan_lahan"
 }
 
 interface RecentRow {
@@ -28,7 +29,7 @@ interface RecentRow {
 }
 
 // ── Fallback data ─────────────────────────────────────────────────────────────
-const MOCK_STATS: Stats = { ppl: 0, kebakaran: 0, layangan: 0, pencurian: 0, pemanfaatan_lahan: 0 }
+const MOCK_STATS: Stats = { ppl: 0, kebakaran: 0, layangan: 0, pencurian: 0, pemanfaatan: 0 }
 
 const MOCK_RECENT: RecentRow[] = []
 
@@ -38,7 +39,7 @@ const STAT_CARDS = [
   { key: 'kebakaran',   label: 'Kebakaran',                emoji: '🔥', numColor: '#FD2D03' },
   { key: 'layangan',    label: 'Layangan',                 emoji: '🪁', numColor: '#3B84CE' },
   { key: 'pencurian',   label: 'Pencurian',                emoji: '🥷', numColor: '#1B1B1B' },
-  { key: 'pemanfaatan_lahan', label: 'Pemanfaatan Lahan', emoji: '🏡', numColor: '#059669' },
+  { key: 'pemanfaatan',       label: 'Pemanfaatan Lahan', emoji: '🏡', numColor: '#059669' },
 ] as const
 
 // ── Status config — Figma tokens ──────────────────────────────────────────────
@@ -231,7 +232,7 @@ export default function DashboardPage() {
     kebakaran: stats.kebakaran,
     layangan: stats.layangan,
     pencurian: stats.pencurian,
-    pemanfaatan_lahan: stats.pemanfaatan_lahan,
+    pemanfaatan: stats.pemanfaatan,
   }
 
   const amanPct   = totalTower > 0 ? Math.round((amanTower   / totalTower) * 100) : 0
@@ -255,12 +256,12 @@ export default function DashboardPage() {
       {/* Title */}
       <h1 className="dash-title">Dashboard</h1>
 
-      {/* Stat cards — 5 columns */}
+      {/* Stat cards — 5 columns (desktop) */}
       <div className="dash-stat-row">
         {STAT_CARDS.map((card) => (
           <div key={card.key} className="dash-stat-card">
             <div className="dash-stat-head">
-              <span className="dash-stat-emoji">{card.emoji}</span>
+              <TwIcon emoji={card.emoji} size={32} />
               <span className="dash-stat-label">{card.label}</span>
             </div>
             <span className="dash-stat-number" style={{ color: card.numColor }}>
@@ -268,6 +269,38 @@ export default function DashboardPage() {
             </span>
           </div>
         ))}
+      </div>
+
+      {/* PWA stat rows — 2+3 layout (Figma node 100:1912, mobile only) */}
+      <div className="pwa-stat-rows">
+        {/* Row 1: PPL + Pemanfaatan */}
+        <div className="pwa-stat-row-2">
+          {[STAT_CARDS[0], STAT_CARDS[4]].map((card) => (
+            <div key={card.key} className="pwa-stat-card">
+              <div className="pwa-stat-head">
+                <TwIcon emoji={card.emoji} size={28} />
+                <span className="pwa-stat-label">{card.label}</span>
+              </div>
+              <span className="pwa-stat-number" style={{ color: card.numColor }}>
+                {statValues[card.key]}
+              </span>
+            </div>
+          ))}
+        </div>
+        {/* Row 2: Pencurian + Kebakaran + Layangan */}
+        <div className="pwa-stat-row-3">
+          {[STAT_CARDS[3], STAT_CARDS[1], STAT_CARDS[2]].map((card) => (
+            <div key={card.key} className="pwa-stat-card">
+              <div className="pwa-stat-head">
+                <TwIcon emoji={card.emoji} size={24} />
+                <span className="pwa-stat-label">{card.label}</span>
+              </div>
+              <span className="pwa-stat-number" style={{ color: card.numColor, fontSize: 20 }}>
+                {statValues[card.key]}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Middle row: Total Aset + Peta */}
@@ -374,9 +407,9 @@ export default function DashboardPage() {
               <tr>
                 <th>Tanggal</th>
                 <th>Tower</th>
-                <th>Jenis Gangguan</th>
+                <th>Jenis Kerawanan</th>
                 <th>Teknisi</th>
-                <th>Status</th>
+                <th>Jenis Kerawanan</th>
               </tr>
             </thead>
             <tbody>

@@ -305,57 +305,44 @@ export default function DashboardPage() {
 
       {/* Middle row: Total Aset + Peta */}
       <div className="dash-mid-row">
-        {/* Total Aset Transmisi card */}
+        {/* Total Aset Transmisi card — Figma node 229:4349 */}
         <div className="dash-aset-card">
-          <div className="dash-section-head">
+
+          {/* Section 1 — Title + divider */}
+          <div className="dash-aset-section-head">
             <h2 className="dash-section-title">Total Aset Transmisi</h2>
+            <div className="dash-aset-divider" />
           </div>
-          <div className="dash-aset-divider" />
 
+          {/* Section 2 — Chart (kiri) + Total label+num (kanan), Figma: HORIZONTAL gap=24 */}
           <div className="dash-aset-body">
-            {/* Donut chart — 3 segment sesuai Figma */}
             <DonutChart aman={amanTower} sedang={sedangTower} kritis={kritisTower} />
-
-            {/* Total Aset Transmisi */}
             <div className="dash-aset-total">
-              <span className="dash-aset-total-label">Total Aset Transmisi</span>
+              <span className="dash-aset-total-label">Total Aset{'\n'}Transmisi</span>
               <span className="dash-aset-total-num">{totalTower}</span>
             </div>
-
-            {/* Legend — Aman / Sedang / Kritis */}
-            <div className="dash-aset-legend">
-              <div className="dash-aset-legend-item">
-                <div className="dash-legend-header">
-                  <span className="dash-legend-dot" style={{ background: '#039855' }} />
-                  <span className="dash-legend-label">Aman</span>
-                </div>
-                <div className="dash-legend-values">
-                  <span className="dash-legend-num">{amanTower}</span>
-                  <span className="dash-legend-pct">({amanPct}%)</span>
-                </div>
-              </div>
-              <div className="dash-aset-legend-item">
-                <div className="dash-legend-header">
-                  <span className="dash-legend-dot" style={{ background: '#F79009' }} />
-                  <span className="dash-legend-label">Sedang</span>
-                </div>
-                <div className="dash-legend-values">
-                  <span className="dash-legend-num">{sedangTower}</span>
-                  <span className="dash-legend-pct">({sedangPct}%)</span>
-                </div>
-              </div>
-              <div className="dash-aset-legend-item">
-                <div className="dash-legend-header">
-                  <span className="dash-legend-dot" style={{ background: '#FD2D03' }} />
-                  <span className="dash-legend-label">Kritis</span>
-                </div>
-                <div className="dash-legend-values">
-                  <span className="dash-legend-num">{kritisTower}</span>
-                  <span className="dash-legend-pct">({kritisPct}%)</span>
-                </div>
-              </div>
-            </div>
           </div>
+
+          {/* Section 3 — Legend rows, Figma: VERTICAL gap=16, each row space-between */}
+          <div className="dash-aset-legend">
+            {[
+              { color: '#039855', label: 'Aman',   count: amanTower,   pct: amanPct },
+              { color: '#F79009', label: 'Sedang', count: sedangTower, pct: sedangPct },
+              { color: '#FD2D03', label: 'Kritis', count: kritisTower, pct: kritisPct },
+            ].map((row) => (
+              <div key={row.label} className="dash-aset-legend-item">
+                <div className="dash-legend-header">
+                  <span className="dash-legend-dot" style={{ background: row.color }} />
+                  <span className="dash-legend-label">{row.label}</span>
+                </div>
+                <div className="dash-legend-values">
+                  <span className="dash-legend-num">{row.count}</span>
+                  <span className="dash-legend-pct">({row.pct}%)</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
         </div>
 
         {/* Peta Jalur */}

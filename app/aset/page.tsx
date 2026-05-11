@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { FileUp, Eye, Pencil, Download, X, MapPin, Zap, Activity, Map, Trash2, HelpCircle, ExternalLink } from 'lucide-react'
 import { towersApi, importApi, api, jalurKmlApi } from '@/lib/api'
+import B2WLoader from '@/components/ui/B2WLoader'
 import { isAdmin } from '@/lib/auth'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { ActionMenu } from '@/components/ui/ActionMenu'
@@ -545,6 +546,7 @@ export default function AsetPage() {
 
   return (
     <>
+      {uploadingKml && <B2WLoader fullPage label="Mengimport data KML..." />}
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-2xl font-bold text-app-text">Data Aset Transmisi</h1>
         {isAdminUser && (

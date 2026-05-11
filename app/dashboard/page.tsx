@@ -16,7 +16,7 @@ interface Stats {
   kebakaran: number
   layangan: number
   pencurian: number
-  pemanfaatan_lahan: number
+  pemanfaatan: number  // API returns "pemanfaatan", not "pemanfaatan_lahan"
 }
 
 interface RecentRow {
@@ -29,7 +29,7 @@ interface RecentRow {
 }
 
 // ── Fallback data ─────────────────────────────────────────────────────────────
-const MOCK_STATS: Stats = { ppl: 0, kebakaran: 0, layangan: 0, pencurian: 0, pemanfaatan_lahan: 0 }
+const MOCK_STATS: Stats = { ppl: 0, kebakaran: 0, layangan: 0, pencurian: 0, pemanfaatan: 0 }
 
 const MOCK_RECENT: RecentRow[] = []
 
@@ -39,7 +39,7 @@ const STAT_CARDS = [
   { key: 'kebakaran',   label: 'Kebakaran',                emoji: '🔥', numColor: '#FD2D03' },
   { key: 'layangan',    label: 'Layangan',                 emoji: '🪁', numColor: '#3B84CE' },
   { key: 'pencurian',   label: 'Pencurian',                emoji: '🥷', numColor: '#1B1B1B' },
-  { key: 'pemanfaatan_lahan', label: 'Pemanfaatan Lahan', emoji: '🏡', numColor: '#059669' },
+  { key: 'pemanfaatan',       label: 'Pemanfaatan Lahan', emoji: '🏡', numColor: '#059669' },
 ] as const
 
 // ── Status config — Figma tokens ──────────────────────────────────────────────
@@ -232,7 +232,7 @@ export default function DashboardPage() {
     kebakaran: stats.kebakaran,
     layangan: stats.layangan,
     pencurian: stats.pencurian,
-    pemanfaatan_lahan: stats.pemanfaatan_lahan,
+    pemanfaatan: stats.pemanfaatan,
   }
 
   const amanPct   = totalTower > 0 ? Math.round((amanTower   / totalTower) * 100) : 0

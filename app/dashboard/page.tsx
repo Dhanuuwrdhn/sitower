@@ -407,7 +407,7 @@ export default function DashboardPage() {
               <tr>
                 <th>Tanggal</th>
                 <th>Tower</th>
-                <th>Jenis Gangguan</th>
+                <th>Jenis Kerawanan</th>
                 <th>Teknisi</th>
                 <th>Jenis Kerawanan</th>
               </tr>

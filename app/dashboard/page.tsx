@@ -31,9 +31,11 @@ interface RecentRow {
 }
 
 const LEVEL_BADGE: Record<string, { bg: string; text: string; label: string }> = {
-  kritis: { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis' },
-  sedang: { bg: '#FFFAEB', text: '#F79009', label: 'Sedang' },
-  aman:   { bg: '#ECFDF3', text: '#039855', label: 'Aman'   },
+  kritis_terpenuhi:       { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis Terpenuhi'       },
+  kritis_tidak_terpenuhi: { bg: '#FEE4E2', text: '#912018', label: 'Kritis Tidak Terpenuhi'  },
+  sedang:                 { bg: '#FFFAEB', text: '#F79009', label: 'Sedang'                  },
+  aman:                   { bg: '#ECFDF3', text: '#039855', label: 'Aman'                    },
+  kritis:                 { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis'                  },
 }
 
 const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {

@@ -836,7 +836,8 @@ function ProgressSection({ laporanId }: { laporanId: string }) {
   async function handleUpload(tipe: string, file: File) {
     setUploading(tipe)
     try {
-      await laporanApi.uploadProgress(laporanId, tipe, file)
+      const toUpload = /\.(jpe?g|png|webp)$/i.test(file.name) ? await compressImage(file) : file
+      await laporanApi.uploadProgress(laporanId, tipe, toUpload)
       const r = await laporanApi.getProgress(laporanId)
       setData(r.data)
       toast.success('Dokumen berhasil diunggah')
@@ -1089,7 +1090,8 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
   async function handleProgressUpload(tipe: string, file: File) {
     setUploading(tipe)
     try {
-      await laporanApi.uploadProgress(laporan.id, tipe, file)
+      const toUpload = /\.(jpe?g|png|webp)$/i.test(file.name) ? await compressImage(file) : file
+      await laporanApi.uploadProgress(laporan.id, tipe, toUpload)
       const r = await laporanApi.getProgress(laporan.id)
       setProgress(r.data)
       toast.success('Dokumen berhasil diunggah')
@@ -1617,7 +1619,8 @@ function LaporanDrawer({
     try {
       let uploadedUrls: string[] = []
       if (fotos.length > 0) {
-        const up = await laporanApi.uploadFoto(fotos)
+        const compressed = await Promise.all(fotos.map(f => compressImage(f)))
+        const up = await laporanApi.uploadFoto(compressed)
         uploadedUrls = up.data.urls ?? []
       }
 

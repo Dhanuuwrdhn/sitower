@@ -35,10 +35,10 @@ const MOCK_RECENT: RecentRow[] = []
 
 // ── Stat card config ───────────────────────────────────────────────────────────
 const STAT_CARDS = [
-  { key: 'ppl',         label: 'Pekerjaan Pihak Lain',    emoji: '🚜', numColor: '#005DAA' },
+  { key: 'ppl',         label: 'Pekerjaan Pihak Lain',    emoji: '🚧', numColor: '#005DAA' },
   { key: 'kebakaran',   label: 'Kebakaran',                emoji: '🔥', numColor: '#FD2D03' },
   { key: 'layangan',    label: 'Layangan',                 emoji: '🪁', numColor: '#3B84CE' },
-  { key: 'pencurian',   label: 'Pencurian',                emoji: '🥷', numColor: '#1B1B1B' },
+  { key: 'pencurian',   label: 'Pencurian',                emoji: '☠️', numColor: '#1B1B1B' },
   { key: 'pemanfaatan',       label: 'Pemanfaatan Lahan', emoji: '🏡', numColor: '#059669' },
 ] as const
 

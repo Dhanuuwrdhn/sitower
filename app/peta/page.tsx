@@ -71,7 +71,7 @@ export default function PetaPage() {
     }
     const result: JalurKmlItem[] = []
     let fakeId = -1
-    for (const [, group] of groups) {
+    for (const group of Array.from(groups.values())) {
       const sorted = [...group.towers].sort((a: any, b: any) => (a.nomorUrut ?? 0) - (b.nomorUrut ?? 0))
       const path = sorted.map((t: any) => ({ lat: t.lat, lng: t.lng }))
       if (path.length < 2) continue

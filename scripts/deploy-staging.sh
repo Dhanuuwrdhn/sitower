@@ -1,32 +1,34 @@
 #!/bin/bash
 # Deploy script for staging — always overwrites .env.local before building
 # Usage: bash scripts/deploy-staging.sh
-# Run from: /opt/frontend-staging
+# Run from anywhere on the staging server
 
 set -e
 
 STAGING_DIR="/opt/frontend-staging"
 API_URL="https://staging.spektra.biz.id/api"
-PM2_NAME="frontend-staging"
+GMAPS_KEY="AIzaSyB4ua1H23GgioJCdWSNGzopOBxOvEw1VqQ"
+SERVICE="sitower-staging-frontend"
 
 echo "[1/5] Pulling latest code..."
 cd "$STAGING_DIR"
 git pull origin main
 
 echo "[2/5] Writing .env.local (staging)..."
-cat > "$STAGING_DIR/.env.local" <<EOF
-NEXT_PUBLIC_API_URL=$API_URL
-EOF
+printf "NEXT_PUBLIC_API_URL=%s\nNEXT_PUBLIC_GOOGLE_MAPS_API_KEY=%s\nNEXT_PUBLIC_SHOW_ALL_MENU=true\n" \
+  "$API_URL" "$GMAPS_KEY" > "$STAGING_DIR/.env.local"
 echo "  => NEXT_PUBLIC_API_URL=$API_URL"
 
 echo "[3/5] Installing dependencies..."
-npm install --omit=dev
+npm install
 
 echo "[4/5] Building..."
 npm run build
 
-echo "[5/5] Restarting PM2 ($PM2_NAME)..."
-pm2 restart "$PM2_NAME" || pm2 start npm --name "$PM2_NAME" -- start
+echo "[5/5] Restarting service ($SERVICE)..."
+sudo systemctl restart "$SERVICE"
+sleep 2
+sudo systemctl status "$SERVICE" --no-pager
 
 echo ""
 echo "Done. Staging deployed at https://staging.spektra.biz.id"

@@ -48,9 +48,10 @@ const STATUS_LABEL: Record<string, string> = {
 }
 
 const LEVEL_OPTIONS = [
-  { value: 'kritis', label: 'Kritis', color: 'text-red-600',    bg: 'bg-red-50 border-red-300',       dot: 'bg-red-500' },
-  { value: 'sedang', label: 'Sedang', color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-300', dot: 'bg-yellow-500' },
-  { value: 'aman',   label: 'Aman',   color: 'text-green-600',  bg: 'bg-green-50 border-green-300',   dot: 'bg-green-500' },
+  { value: 'kritis_terpenuhi',      label: 'Kritis Terpenuhi',      color: 'text-red-600',    bg: 'bg-red-50 border-red-300',       dot: 'bg-red-500' },
+  { value: 'kritis_tidak_terpenuhi', label: 'Kritis Tidak Terpenuhi', color: 'text-red-700',    bg: 'bg-red-100 border-red-400',      dot: 'bg-red-700' },
+  { value: 'sedang',                label: 'Sedang',                color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-300', dot: 'bg-yellow-500' },
+  { value: 'aman',                  label: 'Aman',                  color: 'text-green-600',  bg: 'bg-green-50 border-green-300',   dot: 'bg-green-500' },
 ]
 
 const JENIS_ITEMS = [
@@ -78,9 +79,12 @@ const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
 
 // Exact colors from Figma node 229-8374
 const LEVEL_BADGE: Record<string, { bg: string; text: string; label: string }> = {
+  kritis_terpenuhi:      { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis Terpenuhi'      },
+  kritis_tidak_terpenuhi:{ bg: '#FEE4E2', text: '#912018', label: 'Kritis Tidak Terpenuhi' },
+  sedang:                { bg: '#FFFAEB', text: '#F79009', label: 'Sedang'                 },
+  aman:                  { bg: '#ECFDF3', text: '#039855', label: 'Aman'                   },
+  // legacy fallback
   kritis: { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis' },
-  sedang: { bg: '#FFFAEB', text: '#F79009', label: 'Sedang' },
-  aman:   { bg: '#ECFDF3', text: '#039855', label: 'Aman'   },
 }
 
 const PROGRESS_TIPE_LABEL: Record<string, string> = {
@@ -598,6 +602,52 @@ function JenisKerawananSheet({
             }}
           >
             <span style={{ fontSize: 20, marginRight: 14 }}>{item.emoji}</span>
+            <span style={{ flex: 1, fontWeight: 500, fontSize: 14, color: '#1B1B1B' }}>{item.label}</span>
+            {isSelected && (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M4 10L8 14L16 6" stroke="#076C9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+          </button>
+        )
+      })}
+    </BottomSheet>
+  )
+}
+
+// ── Status Kerawanan bottom sheet ────────────────────────────────────────────
+
+function StatusKerawananSheet({
+  open, value, onSelect, onClose,
+}: {
+  open: boolean; value: string; onSelect: (v: string) => void; onClose: () => void
+}) {
+  return (
+    <BottomSheet open={open} onClose={onClose} height={316}>
+      <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 48, position: 'relative' }}>
+        <button
+          onClick={onClose}
+          style={{ position: 'absolute', left: 16, background: 'none', border: 'none', padding: 4, cursor: 'pointer', display: 'flex' }}
+        >
+          <X size={15} style={{ color: '#97AAB3' }} />
+        </button>
+        <span style={{ flex: 1, textAlign: 'center', fontWeight: 700, fontSize: 16, color: '#1B1B1B' }}>
+          Pilih Status Kerawanan
+        </span>
+      </div>
+      {LEVEL_OPTIONS.map((item, idx) => {
+        const isSelected = value === item.value
+        return (
+          <button
+            key={item.value}
+            onClick={() => { onSelect(item.value); onClose() }}
+            style={{
+              width: '100%', height: 56, display: 'flex', alignItems: 'center',
+              padding: '0 20px', background: '#FFFFFF',
+              border: 'none', borderBottom: idx < LEVEL_OPTIONS.length - 1 ? '1px solid #F0F4F6' : 'none',
+              cursor: 'pointer', textAlign: 'left',
+            }}
+          >
             <span style={{ flex: 1, fontWeight: 500, fontSize: 14, color: '#1B1B1B' }}>{item.label}</span>
             {isSelected && (
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -1446,6 +1496,7 @@ function LaporanDrawer({
 
   // Mobile bottom-sheet state
   const [jenisSheetOpen, setJenisSheetOpen] = useState(false)
+  const [levelSheetOpen, setLevelSheetOpen] = useState(false)
   const [towerSheetOpen, setTowerSheetOpen] = useState(false)
   const [towerSheetTarget, setTowerSheetTarget] = useState<'start' | 'end'>('start')
   const [fotoSheetOpen, setFotoSheetOpen] = useState(false)
@@ -1898,21 +1949,38 @@ function LaporanDrawer({
       )}
 
       <div>
-        <label className="block text-[12px] font-semibold text-app-text mb-2">Status Kerawanan</label>
-        <div className="grid grid-cols-3 gap-2">
-          {LEVEL_OPTIONS.map((l) => (
-            <button
-              key={l.value} type="button" disabled={readOnly}
-              onClick={() => set('levelRisiko', l.value)}
-              className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all text-[13px] font-semibold ${
-                form.levelRisiko === l.value ? `${l.bg} ${l.color} border-current` : 'border-app-border text-app-muted hover:border-gray-300'
-              }`}
-            >
-              <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${l.dot}`} />
-              {l.label}
-            </button>
-          ))}
-        </div>
+        <label className={`block font-semibold text-app-text mb-2 ${isMobile ? 'text-[14px]' : 'text-[12px]'}`}>Status Kerawanan</label>
+        {isMobile && !readOnly ? (
+          <button
+            type="button"
+            onClick={() => setLevelSheetOpen(true)}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              width: '100%', padding: '10px 14px', background: '#FFFFFF',
+              border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+            }}
+          >
+            <span style={{ fontSize: 14, color: form.levelRisiko ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
+              {LEVEL_OPTIONS.find(l => l.value === form.levelRisiko)?.label || 'Pilih status...'}
+            </span>
+            <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+          </button>
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            {LEVEL_OPTIONS.map((l) => (
+              <button
+                key={l.value} type="button" disabled={readOnly}
+                onClick={() => set('levelRisiko', l.value)}
+                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all text-[13px] font-semibold ${
+                  form.levelRisiko === l.value ? `${l.bg} ${l.color} border-current` : 'border-app-border text-app-muted hover:border-gray-300'
+                }`}
+              >
+                <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${l.dot}`} />
+                {l.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div>
@@ -1941,6 +2009,12 @@ function LaporanDrawer({
         value={form.jenisGangguan}
         onSelect={(v) => set('jenisGangguan', v)}
         onClose={() => setJenisSheetOpen(false)}
+      />
+      <StatusKerawananSheet
+        open={levelSheetOpen}
+        value={form.levelRisiko}
+        onSelect={(v) => set('levelRisiko', v)}
+        onClose={() => setLevelSheetOpen(false)}
       />
       <PilihTowerSheet
         open={towerSheetOpen}

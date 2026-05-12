@@ -3,6 +3,7 @@
 import { APIProvider, Map, InfoWindow, useMap } from '@vis.gl/react-google-maps'
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { JALUR_COLORS } from '@/lib/geodata'
+import { TwIcon } from '@/components/ui/TwIcon'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -118,14 +119,25 @@ const KATEGORI_EMOJI: Record<string, string> = {
   pemanfaatan_lahan:    '🏡',
 }
 
-/** Tower/Tiang:
- *  - Normal (no kerawanan): titik kecil berwarna tipe jalur
- *  - 1 kerawanan: lingkaran berwarna level + emoji jenis
- *  - 2+ kerawanan: lingkaran berwarna level + angka jumlah
+// Twemoji SVG bodies from @iconify-json/twemoji (36x36 viewBox, no external deps)
+const TWEMOJI_BODIES: Record<string, string> = {
+  pekerjaan_pihak_lain: `<path fill="#ccd6dd" d="M11 11h3v9h-3z"/><path fill="#77b255" d="M24 26.157C24 28.832 22.354 31 20.325 31H4.709c-2.029 0-3.488-1.565-3.258-3.494l.625-5.241c.23-1.93 1.992-3.808 3.928-4.199l14.628-3.21C22.496 14.413 24 16.219 24 18.893z"/><path fill="#292f33" d="M16.535 24.167C16.239 26.283 17.791 28 20 28h9c2.209 0 4-1.717 4-3.833V8.833C33 6.716 31.547 5 29.755 5h-7.303c-1.792 0-3.484 1.716-3.78 3.833z"/><path fill="#bbddf5" d="M18.245 25c-.135 1.104.65 2 1.755 2h9a2 2 0 0 0 2-2V11c0-1.104-.743-2-1.66-2h-7.473c-.917 0-1.771.896-1.906 2z"/><path fill="#77b255" d="M15 21h18v10H15z"/><path fill="#ffcc4d" d="M33 23H2l1-2h30z"/><circle cx="8" cy="31" r="4" fill="#292f33"/><circle cx="8" cy="31" r="2" fill="#ffcc4d"/><path fill="#77b255" d="M33 16v4l-10 9l-7-1l3-10l3-2z"/><path fill="#292f33" d="M18.222 26.111a8.89 8.89 0 0 1 8.889-8.889A8.89 8.89 0 0 1 36 26.111A8.89 8.89 0 0 1 27.111 35a8.89 8.89 0 0 1-8.889-8.889"/><path fill="#ffcc4d" d="M32.667 26.111a5.556 5.556 0 1 1-11.112 0a5.556 5.556 0 0 1 11.112 0"/><path fill="#ffe8b6" d="M30.444 26.111a3.333 3.333 0 1 1-6.667 0a3.333 3.333 0 1 1 6.667 0"/><path fill="#77b255" d="M32.588 7c-.552-1.187-1.606-2-2.833-2h-7.303c-1.227 0-2.395.813-3.112 2z"/><path fill="#f4900c" d="M29.333 26.111a2.222 2.222 0 1 1-4.444 0a2.222 2.222 0 0 1 4.444 0"/><circle cx="8" cy="31" r="1" fill="#f4900c"/><path fill="#66757f" d="M11 13h3v2h-3z"/><path fill="#5c913b" d="M16 28.75q-.142 0-.285-.041a1 1 0 0 1-.675-1.243l2-6.75C17.421 18.796 19.188 15 23 15h10a1 1 0 1 1 0 2H23c-3.144 0-4.011 4.154-4.02 4.196l-2.021 6.838a1 1 0 0 1-.959.716"/><path fill="#3e721d" d="M2.001 29q-.062 0-.125-.008a1 1 0 0 1-.868-1.116l1-8a1 1 0 1 1 1.984.248l-1 8a1 1 0 0 1-.991.876"/>`,
+  kebakaran: `<path fill="#f4900c" d="M35 19a17 17 0 0 0-1.04-5.868c-.46 5.389-3.333 8.157-6.335 6.868c-2.812-1.208-.917-5.917-.777-8.164c.236-3.809-.012-8.169-6.931-11.794c2.875 5.5.333 8.917-2.333 9.125c-2.958.231-5.667-2.542-4.667-7.042c-3.238 2.386-3.332 6.402-2.333 9c1.042 2.708-.042 4.958-2.583 5.208c-2.84.28-4.418-3.041-2.963-8.333A16.94 16.94 0 0 0 1 19c0 9.389 7.611 17 17 17s17-7.611 17-17"/><path fill="#ffcc4d" d="M28.394 23.999c.148 3.084-2.561 4.293-4.019 3.709c-2.106-.843-1.541-2.291-2.083-5.291s-2.625-5.083-5.708-6c2.25 6.333-1.247 8.667-3.08 9.084c-1.872.426-3.753-.001-3.968-4.007A11.96 11.96 0 0 0 6 30c0 .368.023.73.055 1.09C9.125 34.124 13.342 36 18 36s8.875-1.876 11.945-4.91c.032-.36.055-.722.055-1.09c0-2.187-.584-4.236-1.606-6.001"/>`,
+  layangan: `<path fill="#55acee" d="M22.45 32.289L.592 18.752L6.55.711l18.042 5.958z"/><path fill="#269" d="M20.543 29.5a1 1 0 0 1-.895-.551L6.929 3.687a1 1 0 1 1 1.786-.9l12.72 25.264a1 1 0 0 1-.892 1.449"/><path fill="#269" d="M3.12 18.48a1 1 0 0 1-.451-1.893l18.947-9.54a1 1 0 1 1 .9 1.786l-18.947 9.54a1 1 0 0 1-.449.107"/><path fill="#3b88c3" d="M27.367 35.339c-2.44 0-4.521-1.268-6.199-3.784a1 1 0 1 1 1.664-1.11c1.564 2.343 3.359 3.228 5.644 2.781c.945-.184 1.793-.98 2.27-2.132c.701-1.693.47-3.668-.62-5.282c-2.006-2.971-2.777-6.787-2.063-10.21c.615-2.956 2.24-5.344 4.698-6.905a1 1 0 0 1 1.072 1.688c-2.516 1.598-3.462 3.941-3.813 5.625c-.604 2.905.055 6.151 1.765 8.683c1.466 2.172 1.769 4.851.811 7.167c-.734 1.772-2.131 3.018-3.736 3.329q-.768.15-1.493.15"/><path fill="#9266cc" d="M31.532 30.992c-.781-2.485-2.807-4.482-4.157-2.075c-1.342 2.392 1.04 3.456 3.717 2.74c.781 2.485 2.807 4.482 4.157 2.075c1.342-2.392-1.039-3.456-3.717-2.74m-1.425-7.039c2.377 1.066 5.215.876 4.311-1.731c-.898-2.592-3.275-1.517-4.517.961c-2.377-1.066-5.215-.876-4.311 1.731c.898 2.592 3.275 1.517 4.517-.961m-1.261-6.597c1.355 2.225 3.802 3.676 4.534 1.015c.727-2.645-1.84-3.105-4.267-1.766c-1.355-2.224-3.802-3.676-4.534-1.015c-.728 2.645 1.84 3.105 4.267 1.766m2.897-6.557c-.132 2.602 1.074 5.178 3.177 3.39c2.089-1.777.226-3.602-2.534-3.861c.132-2.602-1.074-5.178-3.177-3.39c-2.089 1.777-.225 3.602 2.534 3.861"/>`,
+  pencurian: `<path fill="#42484c" d="m1.072 17.668l2.048-1.434l6.31 9.011l-2.048 1.434z"/><path fill="#66757f" d="M3.897 16.909L1.44 18.63a.501.501 0 0 1-.573-.819l2.457-1.721a.501.501 0 0 1 .573.819m6.555 7.618l-4.096 2.868a.501.501 0 0 1-.573-.819l4.096-2.868a.501.501 0 0 1 .573.819"/><path d="m6.971 26.966l2.868-2.008L15 32.331l-2.867 2.008zm-4.752-7.66l2.048-1.434l.573.82l-2.048 1.433zm1.147 1.638l2.048-1.434l.573.82l-2.048 1.434zm1.147 1.639l2.048-1.434l.574.82l-2.048 1.434zm1.147 1.639l2.048-1.434l.574.819l-2.048 1.434z"/><path fill="#292f33" d="M23.35 20.14s3.921 3.102 2.223 6.86c.001 0-4.541-2.318-2.223-6.86"/><path d="M25.967 25.593c.191-1.638-.552-3.065-1.296-4.05a9 9 0 0 0-1.667-.602c-.04.111-.061.215-.093.324c.139 2.639 1.694 3.814 3.056 4.328"/><path fill="#292f33" d="M23 20s4.905.968 5.112 5.086c0 0-5.099.013-5.112-5.086m9 16v-2c0-3.314-2.685-6-6-6H10a6 6 0 0 0-6 6v2z"/><path fill="#292f33" d="M12.799 26.751h10.403V31H12.799z"/><path fill="#292f33" d="M14 27h8s-1.018 7-4 7s-4-7-4-7"/><path fill="#292f33" d="M13.64 30.038c1.744 1.268 2.848 1.963 4.36 1.963s2.615-.696 4.359-1.963v-5.749h-8.72z"/><path d="M13.632 25.973c1.216 1.374 2.724 1.746 4.364 1.746s3.146-.373 4.363-1.746v-3.491h-8.728v3.491z"/><path fill="#292f33" d="M11.444 15.936c0 1.448-.734 2.622-1.639 2.622s-1.639-1.174-1.639-2.622s.734-2.623 1.639-2.623c.905-.001 1.639 1.174 1.639 2.623m16.389 0c0 1.448-.733 2.622-1.639 2.622c-.905 0-1.639-1.174-1.639-2.622s.733-2.623 1.639-2.623c.906-.001 1.639 1.174 1.639 2.623"/><path fill="#292f33" d="M9.477 16.54C9.477 9 12 5 18 5s8.522 4 8.522 11.54c0 5.821-3.815 10.54-8.522 10.54s-8.523-4.719-8.523-10.54"/><path fill="#66757f" d="M11 28c0 1 1 3 3 5c1.581 1.581 2.719 3 2.719 3c.797-.005 1.9-.004 2.73-.001c-.891-2.02-2.477-3.471-3.279-4.273C15.17 30.726 13 29 13 27c0-1-2 1-2 1"/><path fill="#292f33" d="m16.719 36l2.724-.001c-.512-1.161-1.251-2.127-1.94-2.897a12 12 0 0 0-1.405 2.16c.388.449.621.738.621.738"/><path fill="#66757f" d="M25 28c0 1-1 3-3 5c-1.581 1.581-2.5 3-2.5 3c-.902-.004-1.418-.002-3 0c.891-2.02 2.528-3.472 3.33-4.274C20.83 30.726 23 29 23 27c0-1 2 1 2 1"/><path fill="#ffdc5d" d="M18 13.711c-2.995 0-8.116-2.044-7.064 1.98c.614 2.348 1.417 2.881 3.475 2.606c2.124-.283 1.991-1.016 3.495-1.016s1.56.733 3.684 1.016c2.058.274 2.861-.258 3.475-2.606c1.051-4.024-4.07-1.98-7.065-1.98"/><path fill="#662113" d="M14 17c-.55 0-1-.45-1-1v-1c0-.55.45-1 1-1s1 .45 1 1v1c0 .55-.45 1-1 1m8 0c-.55 0-1-.45-1-1v-1c0-.55.45-1 1-1s1 .45 1 1v1c0 .55-.45 1-1 1"/>`,
+  pemanfaatan_lahan: `<path fill="#5c913b" d="M36 33.5a1.5 1.5 0 0 1-1.5 1.5h-33a1.5 1.5 0 0 1 0-3h33a1.5 1.5 0 0 1 1.5 1.5"/><path fill="#a0041e" d="M12.344 14.702h-2a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5"/><path fill="#ffcc4d" d="M5.942 32c-.137-4.657-.506-8-.942-8s-.804 3.343-.941 8z"/><path fill="#77b255" d="M10 18.731C10 24.306 7.762 26 5 26s-5-1.694-5-7.269C0 13.154 4 5 5 5s5 8.154 5 13.731"/><path fill="#ffe8b6" d="M8 16L21 3l13 13v16H8z"/><path fill="#ffcc4d" d="M21 16h1v16h-1z"/><path fill="#66757f" d="M34 17a1 1 0 0 1-.707-.293L21 4.414L8.707 16.707a.999.999 0 1 1-1.414-1.414l13-13a1 1 0 0 1 1.414 0l13 13A.999.999 0 0 1 34 17"/><path fill="#66757f" d="M21 17a.999.999 0 0 1-.707-1.707l6.5-6.5a.999.999 0 1 1 1.414 1.414l-6.5 6.5A1 1 0 0 1 21 17"/><path fill="#c1694f" d="M13 26h4v6h-4z"/><path fill="#55acee" d="M13 17h4v4h-4zm12.5 0h4v4h-4zm0 9h4v4h-4z"/><path fill="#77b255" d="M10.625 29.991c0 1.613-.858 2.103-1.917 2.103c-1.058 0-1.917-.49-1.917-2.103s1.533-3.973 1.917-3.973s1.917 2.359 1.917 3.973m25.25 0c0 1.613-.858 2.103-1.917 2.103c-1.058 0-1.917-.49-1.917-2.103s1.533-3.973 1.917-3.973s1.917 2.359 1.917 3.973"/>`,
+}
+
+/**
+ * Tower marker with badge system:
+ * - Normal: small colored dot along route line
+ * - With kerawanan: colored circle (status) + tower icon + Twemoji badge(s) top-right
+ *   - 1 kerawanan  → circle + 1 emoji badge
+ *   - 2 kerawanan  → circle + 2 emoji badges side by side
+ *   - 3+ kerawanan → circle + count pill (e.g. "3+")
  */
 function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', kerawanan: KerawananItem[]) {
   if (topLevel === 'normal') {
-    // Titik kecil di sepanjang jalur
     let dotColor = '#076C9E'
     if (tipe === 'SUTET') dotColor = '#e65100'
     if (tipe === 'SKTT') dotColor = '#7c3aed'
@@ -140,36 +152,78 @@ function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', ker
     }
   }
 
-  const BASE = 32
+  // Layout constants
+  const CIRCLE_D = 32          // main circle diameter
+  const PAD_TOP  = 8           // top padding so badges don't clip
+  const BADGE_D  = 18          // badge diameter
+  const BADGE_OVERLAP = 6      // how many px badge overlaps circle edge
+  const CX = CIRCLE_D / 2     // circle center x
+  const CY = CIRCLE_D / 2 + PAD_TOP  // circle center y (shifted down for badge room)
+  const R  = CIRCLE_D / 2 - 1
   const bgColor = LEVEL_BG[topLevel] ?? '#076C9E'
-  const cx = BASE / 2, cy = BASE / 2, r = BASE / 2 - 1
+  const filterId = `f${topLevel}${kerawanan.length}`
 
-  let innerContent: string
-  if (kerawanan.length === 1) {
-    // Satu jenis kerawanan — tampilkan emoji
-    const emoji = KATEGORI_EMOJI[kerawanan[0].kategori] ?? '⚠️'
-    innerContent = `<text x="${cx}" y="${cy + 7}" text-anchor="middle" font-size="16">${emoji}</text>`
-  } else {
-    // Lebih dari 1 — tampilkan jumlah
-    innerContent = `<text x="${cx}" y="${cy + 5}" text-anchor="middle" font-family="Inter,Arial,sans-serif"
-      font-size="13" font-weight="700" fill="#fff">${kerawanan.length}</text>`
-  }
-
-  const filterId = `te${topLevel}${kerawanan.length}`
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${BASE}" height="${BASE}" viewBox="0 0 ${BASE} ${BASE}">
+  // Main circle + tower icon (nested SVG of CELL_TOWER_PATH in 26x26 viewBox)
+  const mainCircle = `
     <defs>
-      <filter id="${filterId}" x="-40%" y="-40%" width="180%" height="180%">
-        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="${bgColor}" flood-opacity="0.5"/>
+      <filter id="${filterId}" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="${bgColor}" flood-opacity="0.45"/>
       </filter>
     </defs>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="${bgColor}" filter="url(#${filterId})"/>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.3"/>
-    ${innerContent}
+    <circle cx="${CX}" cy="${CY}" r="${R}" fill="${bgColor}" filter="url(#${filterId})"/>
+    <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+    <svg x="${CX - 13}" y="${CY - 13}" width="26" height="26" viewBox="0 0 26 26">
+      <path d="${CELL_TOWER_PATH}" fill="white" opacity="0.9"/>
+    </svg>
+  `
+
+  const numBadges = kerawanan.length
+  const BADGE_X0 = CIRCLE_D - BADGE_OVERLAP  // x where first badge starts
+  let badgeContent = ''
+  let SVG_W: number
+
+  if (numBadges === 1) {
+    SVG_W = CIRCLE_D + BADGE_D - BADGE_OVERLAP + 2
+    const bx = BADGE_X0, by = 0
+    const bcx = bx + BADGE_D / 2, bcy = by + BADGE_D / 2
+    const iconBody = TWEMOJI_BODIES[kerawanan[0].kategori] ?? ''
+    badgeContent = `
+      <circle cx="${bcx}" cy="${bcy}" r="${BADGE_D / 2 + 1.5}" fill="white"/>
+      <svg x="${bx}" y="${by}" width="${BADGE_D}" height="${BADGE_D}" viewBox="0 0 36 36">${iconBody}</svg>
+    `
+  } else if (numBadges === 2) {
+    const GAP = BADGE_D - 4  // slight overlap between badges
+    SVG_W = CIRCLE_D + GAP + BADGE_D - BADGE_OVERLAP + 2
+    for (let i = 0; i < 2; i++) {
+      const bx = BADGE_X0 + i * GAP, by = 0
+      const bcx = bx + BADGE_D / 2, bcy = by + BADGE_D / 2
+      const iconBody = TWEMOJI_BODIES[kerawanan[i].kategori] ?? ''
+      badgeContent += `
+        <circle cx="${bcx}" cy="${bcy}" r="${BADGE_D / 2 + 1.5}" fill="white"/>
+        <svg x="${bx}" y="${by}" width="${BADGE_D}" height="${BADGE_D}" viewBox="0 0 36 36">${iconBody}</svg>
+      `
+    }
+  } else {
+    // 3+ → count pill
+    SVG_W = CIRCLE_D + 26
+    const px = BADGE_X0, py = 2
+    badgeContent = `
+      <rect x="${px}" y="${py}" width="24" height="15" rx="7.5" fill="#D32F2F"/>
+      <text x="${px + 12}" y="${py + 10.5}" text-anchor="middle"
+        font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="white">${numBadges}+</text>
+    `
+  }
+
+  const SVG_H = CIRCLE_D + PAD_TOP  // 40
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${SVG_W}" height="${SVG_H}" viewBox="0 0 ${SVG_W} ${SVG_H}">
+    ${mainCircle}
+    ${badgeContent}
   </svg>`
+
   return {
     url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
-    size: [BASE, BASE] as [number, number],
-    anchor: [BASE / 2, BASE / 2] as [number, number],
+    size: [SVG_W, SVG_H] as [number, number],
+    anchor: [CX, CY] as [number, number],
   }
 }
 
@@ -326,38 +380,67 @@ function TowerMarkers({
 
 // ─── Info popup ───────────────────────────────────────────────────────────────
 
+const RISIKO_LABEL: Record<string, string> = {
+  kritis: 'RISIKO KRITIS',
+  sedang: 'RISIKO SEDANG',
+  aman:   'AMAN',
+}
+
 function TowerPopup({ tower, onClose }: { tower: FeaturedTower; onClose: () => void }) {
   const level = getTopLevel(tower.kerawanan)
   const levelColor = LEVEL_COLOR[level]
+  const hasKerawanan = tower.kerawanan.length > 0
+  const shown = tower.kerawanan.slice(0, 3)
+  const extra = tower.kerawanan.length - shown.length
+
   return (
     <InfoWindow position={{ lat: tower.lat, lng: tower.lng }} onCloseClick={onClose}>
-      <div style={{ minWidth: 240, fontFamily: 'Inter, sans-serif', fontSize: 12, padding: 4 }}>
-        <div style={{ fontWeight: 700, fontSize: 12, color: '#1c1c1c', marginBottom: 8 }}>
+      <div style={{ minWidth: 240, maxWidth: 280, fontFamily: 'Inter, sans-serif', fontSize: 12, padding: 4 }}>
+        <div style={{ fontWeight: 700, fontSize: 12, color: '#1c1c1c', marginBottom: 6 }}>
           Informasi Tower
         </div>
-        <div style={{ color: '#1c1c1c', fontWeight: 600, marginBottom: 3 }}>{tower.nama}</div>
+        <div style={{ color: '#1c1c1c', fontWeight: 600, marginBottom: 2, lineHeight: 1.4 }}>{tower.nama}</div>
         <div style={{ color: '#97aab3', fontSize: 11, marginBottom: 10 }}>
           {tower.tipe}{tower.tegangan ? ` · ${tower.tegangan}` : ''}
         </div>
-        {tower.kerawanan.length > 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <div style={{ color: '#1c1c1c', fontWeight: 600 }}>Gangguan</div>
-            {tower.kerawanan.map((k, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ width: 7, height: 7, borderRadius: '50%', background: LEVEL_COLOR[k.level] ?? '#94a3b8', flexShrink: 0 }} />
-                <span style={{ color: '#5f737f', fontSize: 11 }}>{KATEGORI_LABEL[k.kategori] ?? k.kategori}</span>
-              </div>
-            ))}
+
+        {hasKerawanan ? (
+          <div>
+            <div style={{ fontWeight: 600, color: '#1c1c1c', marginBottom: 6 }}>
+              Kerawanan{tower.kerawanan.length > 1 ? ` (${tower.kerawanan.length})` : ''}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              {shown.map((k, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 14, lineHeight: 1 }}>{KATEGORI_EMOJI[k.kategori] ?? '⚠️'}</span>
+                  <span style={{ color: '#374151', fontSize: 11, flex: 1 }}>{KATEGORI_LABEL[k.kategori] ?? k.kategori}</span>
+                  <span style={{
+                    fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 999,
+                    background: (LEVEL_COLOR[k.level] ?? '#94a3b8') + '22',
+                    color: LEVEL_COLOR[k.level] ?? '#94a3b8',
+                    textTransform: 'uppercase', whiteSpace: 'nowrap',
+                  }}>
+                    {RISIKO_LABEL[k.level] ?? k.level}
+                  </span>
+                </div>
+              ))}
+              {extra > 0 && (
+                <div style={{ color: '#97aab3', fontSize: 10, fontStyle: 'italic' }}>
+                  +{extra} lainnya — klik tower untuk detail
+                </div>
+              )}
+            </div>
           </div>
         ) : (
-          <div style={{ color: '#5f737f', fontSize: 11 }}>Tidak ada gangguan aktif</div>
+          <div style={{ color: '#5f737f', fontSize: 11 }}>Tidak ada kerawanan aktif</div>
         )}
+
         <div style={{ marginTop: 10, color: '#97aab3', fontSize: 10 }}>
           Terakhir update: {tower.updatedAt ? new Date(tower.updatedAt).toLocaleString('id-ID') : '—'}
         </div>
         {level !== 'normal' && (
-          <div style={{ marginTop: 8, padding: '3px 8px', background: levelColor + '20', borderRadius: 999, display: 'inline-block', fontSize: 10, fontWeight: 700, color: levelColor, textTransform: 'uppercase' }}>
-            Risiko {level}
+          <div style={{ marginTop: 8, padding: '3px 8px', background: levelColor + '20', borderRadius: 999, display: 'inline-block', fontSize: 10, fontWeight: 700, color: levelColor }}>
+            {RISIKO_LABEL[level] ?? level}
           </div>
         )}
       </div>
@@ -408,30 +491,36 @@ function Legend() {
         <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#076C9E', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #076C9E', flexShrink: 0 }} />
         <span style={{ color: '#374151' }}>Tower (Normal)</span>
       </div>
-      {/* Tower Kerawanan Aman */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <svg width="14" height="14" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
-          <rect width="26" height="26" rx="13" fill="#16A34A"/>
-          <path d={CELL_TOWER_PATH} fill="white"/>
-        </svg>
-        <span style={{ color: '#374151' }}>Kerawanan Aman</span>
-      </div>
-      {/* Tower Kerawanan Sedang */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <svg width="14" height="14" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
-          <rect width="26" height="26" rx="13" fill="#F59E0B"/>
-          <path d={CELL_TOWER_PATH} fill="white"/>
-        </svg>
-        <span style={{ color: '#374151' }}>Kerawanan Sedang</span>
-      </div>
-      {/* Tower Kerawanan Kritis */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <svg width="14" height="14" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
-          <rect width="26" height="26" rx="13" fill="#D92D20"/>
-          <path d={CELL_TOWER_PATH} fill="white"/>
-        </svg>
-        <span style={{ color: '#374151' }}>Kerawanan Kritis</span>
-      </div>
+      {/* Tower with kerawanan — status colors */}
+      {([
+        { bg: '#16A34A', label: 'Aman' },
+        { bg: '#F59E0B', label: 'Sedang' },
+        { bg: '#D92D20', label: 'Kritis' },
+      ] as const).map(({ bg, label }) => (
+        <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <svg width="14" height="14" viewBox="0 0 26 26" fill="none" style={{ flexShrink: 0 }}>
+            <rect width="26" height="26" rx="13" fill={bg}/>
+            <path d={CELL_TOWER_PATH} fill="white"/>
+          </svg>
+          <span style={{ color: '#374151' }}>Kerawanan {label}</span>
+        </div>
+      ))}
+
+      <p style={{ fontWeight: 700, fontSize: 11.5, margin: '8px 0 4px', color: '#0f172a' }}>Jenis Kerawanan</p>
+      {([
+        { emoji: '🚜', label: 'PPL',               bg: '#F59E0B' },
+        { emoji: '🔥', label: 'Kebakaran',          bg: '#D92D20' },
+        { emoji: '🪁', label: 'Layangan',           bg: '#F59E0B' },
+        { emoji: '🥷', label: 'Pencurian',          bg: '#D92D20' },
+        { emoji: '🏡', label: 'Pemanfaatan Lahan',  bg: '#F59E0B' },
+      ] as const).map(({ emoji, label, bg }) => (
+        <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 18, height: 18, borderRadius: '50%', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <TwIcon emoji={emoji} size={12} />
+          </div>
+          <span style={{ color: '#374151' }}>{label}</span>
+        </div>
+      ))}
     </div>
   )
 }

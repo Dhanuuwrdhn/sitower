@@ -1131,7 +1131,6 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
                   typeLabel="Bukti Kerawanan"
                   fileName={`Foto Bukti ${i + 1}`}
                   fileUrl={resolveMediaUrl(url)}
-                  onUpload={() => fotoUpdateRef.current?.click()}
                 />
               ))}
             </>
@@ -1152,27 +1151,23 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
             </div>
           )}
 
-          {/* Progress file rows */}
+          {/* Progress file rows — only show types that have files */}
           {PROGRESS_TIPE_LIST.map((tipe) => {
             const items: any[] = progress[tipe] ?? []
             const latest = items[0]
+            if (!latest) return null
             return (
               <div key={tipe}>
                 <div style={{ height: 1, background: '#E1E8EC', margin: '0 -16px' }} />
                 <MobileFileRow
-                  thumbnailUrl={latest?.fileUrl}
+                  thumbnailUrl={latest.fileUrl}
                   typeLabel={PROGRESS_TIPE_LABEL[tipe]}
-                  fileName={latest?.namaFile}
-                  fileUrl={latest?.fileUrl}
-                  onUpload={() => progressRefs.current[tipe]?.click()}
+                  fileName={latest.namaFile}
+                  fileUrl={latest.fileUrl}
                 />
               </div>
             )
           })}
-
-          {progressInputs}
-          <input ref={fotoUpdateRef} type="file" accept=".jpg,.jpeg,.png,.webp" multiple className="hidden"
-            onChange={e => { if (e.target.files?.length) { handleFotoUpdate(e.target.files); e.target.value = '' } }} />
 
           <div style={{ height: 24 }} />
         </div>

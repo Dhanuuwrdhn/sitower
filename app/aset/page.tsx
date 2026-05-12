@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Eye, Pencil, X, MapPin, Zap, Activity, ExternalLink } from 'lucide-react'
+import { Eye, Pencil, X, MapPin, Zap, Activity, ExternalLink, Plus } from 'lucide-react'
 import { towersApi, asetApi } from '@/lib/api'
 import { isAdmin } from '@/lib/auth'
 import { StatusBadge } from '@/components/ui/StatusBadge'
@@ -433,6 +433,126 @@ function AsetEditDrawer({
   )
 }
 
+// ── Add Drawer ────────────────────────────────────────────────────────────────
+
+const EMPTY_FORM = { id: '', nama: '', tegangan: '150kV', tipe: 'SUTT', kondisi: 'normal', lokasi: '', lat: '', lng: '', radius: 100, jalur: '', nomorUrut: '' }
+
+function AsetAddDrawer({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
+  const [form, setForm] = useState<any>(EMPTY_FORM)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => { if (open) setForm(EMPTY_FORM) }, [open])
+
+  const set = (k: string, v: string) => setForm((f: any) => ({ ...f, [k]: v }))
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!form.id.trim()) { toast.error('ID tower wajib diisi'); return }
+    if (!form.nama.trim()) { toast.error('Nama tower wajib diisi'); return }
+    setSaving(true)
+    try {
+      await towersApi.create({
+        id:        form.id.trim().toUpperCase(),
+        nama:      form.nama,
+        tegangan:  form.tegangan,
+        tipe:      form.tipe,
+        kondisi:   form.kondisi,
+        lokasi:    form.lokasi || null,
+        lat:       Number(form.lat),
+        lng:       Number(form.lng),
+        radius:    Number(form.radius) || 100,
+        jalur:     form.jalur || null,
+        nomorUrut: form.nomorUrut ? Number(form.nomorUrut) : null,
+      })
+      toast.success('Tower berhasil ditambahkan')
+      onSaved()
+      onClose()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'Gagal menambahkan tower')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (!open) return null
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
+      <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: '100%', maxWidth: 480, zIndex: 50, background: '#FFFFFF', boxShadow: '-4px 0 24px rgba(0,0,0,0.12)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ padding: '18px 20px', borderBottom: '1px solid #E1E8EC', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2 style={{ fontWeight: 700, fontSize: 15, color: '#1c1c1c', margin: 0 }}>Tambah Tower Baru</h2>
+          <button onClick={onClose} style={{ padding: 6, borderRadius: 6, border: 'none', background: '#F6F9FC', cursor: 'pointer', color: '#5F737F', display: 'flex', alignItems: 'center' }}>
+            <X size={18} />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-app-muted">ID Tower <span className="text-red-500">*</span></label>
+            <input className="form-input" value={form.id} onChange={(e) => set('id', e.target.value)} required placeholder="TOWER-SUTT-150KV-KMBNG-#001" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-app-muted">Nama Tower <span className="text-red-500">*</span></label>
+            <input className="form-input" value={form.nama} onChange={(e) => set('nama', e.target.value)} required placeholder="TOWER SUTT 150kV KEMBANGAN #001" />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="flex flex-col gap-1">
+              <label className="text-[12px] font-semibold text-app-muted">Tipe</label>
+              <select className="form-input" value={form.tipe} onChange={(e) => set('tipe', e.target.value)}>
+                {TIPE_EDIT_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[12px] font-semibold text-app-muted">Tegangan</label>
+              <input className="form-input" value={form.tegangan} onChange={(e) => set('tegangan', e.target.value)} placeholder="150kV" />
+            </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-app-muted">Kondisi</label>
+            <select className="form-input" value={form.kondisi} onChange={(e) => set('kondisi', e.target.value)}>
+              {KONDISI_EDIT_OPTIONS.map((k) => <option key={k} value={k}>{k}</option>)}
+            </select>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="flex flex-col gap-1">
+              <label className="text-[12px] font-semibold text-app-muted">Latitude <span className="text-red-500">*</span></label>
+              <input className="form-input" type="number" step="any" value={form.lat} onChange={(e) => set('lat', e.target.value)} required placeholder="-6.1234" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[12px] font-semibold text-app-muted">Longitude <span className="text-red-500">*</span></label>
+              <input className="form-input" type="number" step="any" value={form.lng} onChange={(e) => set('lng', e.target.value)} required placeholder="106.7654" />
+            </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-app-muted">Lokasi</label>
+            <input className="form-input" value={form.lokasi} onChange={(e) => set('lokasi', e.target.value)} placeholder="Kel. Rawa Buaya, Cengkareng" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-app-muted">Radius Deteksi (m)</label>
+            <input className="form-input" type="number" value={form.radius} onChange={(e) => set('radius', e.target.value)} placeholder="100" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-app-muted">Jalur Transmisi</label>
+            <input className="form-input" value={form.jalur} onChange={(e) => set('jalur', e.target.value)} placeholder="KMBNG-DKSBI" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-[12px] font-semibold text-app-muted">Nomor Urut dalam Jalur</label>
+            <input className="form-input" type="number" value={form.nomorUrut} onChange={(e) => set('nomorUrut', e.target.value)} placeholder="1" />
+          </div>
+          <div style={{ display: 'flex', gap: 10, paddingTop: 8, marginTop: 4, borderTop: '1px solid #E1E8EC' }}>
+            <button type="button" onClick={onClose} style={{ flex: 1, padding: '10px 0', border: '1px solid #E1E8EC', borderRadius: 8, background: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: 13, color: '#5F737F' }}>
+              Batal
+            </button>
+            <button type="submit" disabled={saving} style={{ flex: 2, padding: '10px 0', border: 'none', borderRadius: 8, background: '#076C9E', cursor: 'pointer', fontWeight: 600, fontSize: 13, color: '#fff', opacity: saving ? 0.7 : 1 }}>
+              {saving ? 'Menyimpan...' : 'Tambah Tower'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
+  )
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function AsetPage() {
@@ -451,6 +571,9 @@ export default function AsetPage() {
   // Detail drawer
   const [detailOpen, setDetailOpen] = useState(false)
   const [detailRow, setDetailRow]   = useState<any>(null)
+
+  // Add drawer
+  const [addOpen, setAddOpen]     = useState(false)
 
   // Edit drawer
   const [editOpen, setEditOpen]   = useState(false)
@@ -492,6 +615,11 @@ export default function AsetPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-2xl font-bold text-app-text">Data Aset Transmisi</h1>
+        {isAdminUser && (
+          <button onClick={() => setAddOpen(true)} className="btn-primary" style={{ fontSize: 12 }}>
+            <Plus size={14} /> Tambah Tower
+          </button>
+        )}
       </div>
 
       {/* Filters */}
@@ -562,6 +690,7 @@ export default function AsetPage() {
         <Pagination total={total} page={page} limit={limit} onChange={setPage} onLimitChange={setLimit} />
       </div>
 
+      <AsetAddDrawer open={addOpen} onClose={() => setAddOpen(false)} onSaved={fetchData} />
       <AsetDetailDrawer towerId={detailRow?.id ?? null} open={detailOpen} onClose={() => setDetailOpen(false)} />
       <AsetEditDrawer tower={editRow} open={editOpen} onClose={() => setEditOpen(false)} onSaved={fetchData} />
     </>

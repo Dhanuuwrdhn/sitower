@@ -310,8 +310,8 @@ function TowerDropdown({
       (t.nama ?? '').toLowerCase().includes(q)
     )
   })
-  // Show top 5 by default; show all when searching
-  const limited = !q ? allFiltered.slice(0, 5) : allFiltered
+  // Show top 50 by default; show all when searching
+  const limited = !q ? allFiltered.slice(0, 50) : allFiltered
   limited.forEach((t) => {
     const g = resolveGroup(t)
     grouped[g].push(t)

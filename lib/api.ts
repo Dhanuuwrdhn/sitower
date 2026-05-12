@@ -178,5 +178,10 @@ export const jalurKmlApi = {
     fd.append('file', file)
     return api.post('/jalur-kml/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
   },
+  importSktt: (file: File) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    return api.post('/jalur-kml/import-sktt', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+  },
   remove: (id: number) => api.delete(`/jalur-kml/${id}`),
 }

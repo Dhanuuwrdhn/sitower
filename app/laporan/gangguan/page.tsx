@@ -827,7 +827,12 @@ function ProgressSection({ laporanId }: { laporanId: string }) {
     spanduk: [], brosur: [], laporan_baru: [], berita_acara: [],
   })
   const [uploading, setUploading] = useState<string | null>(null)
+  const [isAdminUser, setIsAdminUser] = useState(false)
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({})
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') setIsAdminUser(isAdmin())
+  }, [])
 
   useEffect(() => {
     laporanApi.getProgress(laporanId).then((r) => setData(r.data)).catch(() => {})
@@ -904,14 +909,16 @@ function ProgressSection({ laporanId }: { laporanId: string }) {
                     <span className="text-[10px] text-app-subtle shrink-0">
                       {new Date(item.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(tipe, item.id)}
-                      className="p-1 rounded text-app-muted hover:text-red-500 transition-colors shrink-0"
-                      title="Hapus"
-                    >
-                      <X size={12} />
-                    </button>
+                    {isAdminUser && (
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(tipe, item.id)}
+                        className="p-1 rounded text-app-muted hover:text-red-500 transition-colors shrink-0"
+                        title="Hapus"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>

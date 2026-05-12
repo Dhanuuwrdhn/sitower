@@ -80,6 +80,20 @@ export const laporanApi = {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
   },
+  getProgress:   (id: string) => api.get(`/laporan/${id}/progress`),
+  uploadProgress: (id: string, tipe: string, file: File) => {
+    const form = new FormData()
+    form.append('tipe', tipe)
+    form.append('file', file)
+    return api.post(`/laporan/${id}/progress`, form, { headers: { 'Content-Type': 'multipart/form-data' } })
+  },
+  deleteProgress: (id: string, progressId: string) => api.delete(`/laporan/${id}/progress/${progressId}`),
+  getFotoHistory: (id: string) => api.get(`/laporan/${id}/foto-history`),
+  uploadFotoUpdate: (id: string, files: File[]) => {
+    const form = new FormData()
+    files.forEach((f) => form.append('foto', f))
+    return api.post(`/laporan/${id}/foto-update`, form, { headers: { 'Content-Type': 'multipart/form-data' } })
+  },
 }
 
 export const sertifikatApi = {

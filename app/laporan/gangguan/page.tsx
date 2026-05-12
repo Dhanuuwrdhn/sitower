@@ -6,7 +6,7 @@ import {
   Search, Plus, Calendar, SlidersHorizontal, RotateCcw,
   Trash2, X, Upload, ChevronLeft, ChevronRight,
   ChevronDown, MoreHorizontal, Eye, Pencil,
-  ArrowLeft, AlertTriangle,
+  ArrowLeft, AlertTriangle, FileText, ImagePlus, Clock,
 } from 'lucide-react'
 import { laporanApi, towersApi } from '@/lib/api'
 import { getUser, isAdmin } from '@/lib/auth'
@@ -28,9 +28,9 @@ const JENIS_OPTIONS = [
 ]
 
 const JENIS_LABEL: Record<string, string> = {
-  pekerjaan_pihak_lain: 'Pekerjaan Pihak Lain',
+  pekerjaan_pihak_lain: 'Pekerjaan Pihak Lain (PPL)',
   kebakaran:            'Kebakaran',
-  layangan:             'Layangan',
+  layangan:             'Layang-layang',
   pencurian:            'Pencurian',
   pemanfaatan_lahan:    'Pemanfaatan Lahan',
 }
@@ -76,6 +76,29 @@ const STATUS_CLASS: Record<string, string> = {
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
 
+// Exact colors from Figma node 229-8374
+const LEVEL_BADGE: Record<string, { bg: string; text: string; label: string }> = {
+  kritis: { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis' },
+  sedang: { bg: '#FFFAEB', text: '#F79009', label: 'Sedang' },
+  aman:   { bg: '#ECFDF3', text: '#039855', label: 'Aman'   },
+}
+
+const PROGRESS_TIPE_LABEL: Record<string, string> = {
+  spanduk:      'Spanduk',
+  brosur:       'Brosur',
+  laporan_baru: 'Laporan Baru',
+  berita_acara: 'Berita Acara',
+}
+
+const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {
+  laporan_baru: { bg: '#076C9E', text: '#FFFFFF' },
+  berita_acara: { bg: '#F79009', text: '#FFFFFF' },
+  spanduk:      { bg: '#9F09F7', text: '#FFFFFF' },
+  brosur:       { bg: '#5F737F', text: '#FFFFFF' },
+}
+
+const PROGRESS_TIPE_LIST = ['spanduk', 'brosur', 'laporan_baru', 'berita_acara'] as const
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatTanggal(iso: string) {
@@ -88,6 +111,51 @@ function formatTanggal(iso: string) {
 function StatusPill({ status }: { status: string }) {
   const label = STATUS_LABEL[status] ?? status
   return <span className={STATUS_CLASS[status] ?? 'badge-menunggu'}>{label}</span>
+}
+
+function LevelBadge({ level }: { level: string }) {
+  const cfg = LEVEL_BADGE[level?.toLowerCase()]
+  if (!cfg) return <span className="text-app-muted text-[12px]">—</span>
+  return (
+    <span style={{ background: cfg.bg, color: cfg.text, display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 10px', borderRadius: 99, fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>
+      {cfg.label}
+    </span>
+  )
+}
+
+function ProgressBadge({ tipe }: { tipe: string | null | undefined }) {
+  if (!tipe) return <span className="text-app-subtle text-[12px]">—</span>
+  const label = PROGRESS_TIPE_LABEL[tipe] ?? tipe
+  const color = PROGRESS_BADGE_COLOR[tipe] ?? { bg: '#5F737F', text: '#FFFFFF' }
+  return (
+    <span style={{ background: color.bg, color: color.text, display: 'inline-flex', alignItems: 'center', padding: '2px 10px', borderRadius: 99, fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>
+      {label}
+    </span>
+  )
+}
+
+async function compressImage(file: File, maxPx = 1920, quality = 0.75): Promise<File> {
+  return new Promise((resolve) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      let { width, height } = img
+      if (width > maxPx || height > maxPx) {
+        if (width > height) { height = Math.round(height * maxPx / width); width = maxPx }
+        else { width = Math.round(width * maxPx / height); height = maxPx }
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = width; canvas.height = height
+      canvas.getContext('2d')!.drawImage(img, 0, 0, width, height)
+      canvas.toBlob((blob) => {
+        if (!blob) { resolve(file); return }
+        resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }))
+      }, 'image/jpeg', quality)
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file) }
+    img.src = url
+  })
 }
 
 // ── Row action 3-dot menu ─────────────────────────────────────────────────────
@@ -695,6 +763,439 @@ function PilihTowerSheet({
   )
 }
 
+// ── Progress Laporan section ──────────────────────────────────────────────────
+
+function ProgressSection({ laporanId }: { laporanId: string }) {
+  const [data, setData] = useState<Record<string, any[]>>({
+    spanduk: [], brosur: [], laporan_baru: [], berita_acara: [],
+  })
+  const [uploading, setUploading] = useState<string | null>(null)
+  const inputRefs = useRef<Record<string, HTMLInputElement | null>>({})
+
+  useEffect(() => {
+    laporanApi.getProgress(laporanId).then((r) => setData(r.data)).catch(() => {})
+  }, [laporanId])
+
+  async function handleUpload(tipe: string, file: File) {
+    setUploading(tipe)
+    try {
+      await laporanApi.uploadProgress(laporanId, tipe, file)
+      const r = await laporanApi.getProgress(laporanId)
+      setData(r.data)
+      toast.success('Dokumen berhasil diunggah')
+    } catch {
+      toast.error('Gagal mengunggah dokumen')
+    } finally {
+      setUploading(null)
+    }
+  }
+
+  async function handleDelete(tipe: string, progressId: string) {
+    try {
+      await laporanApi.deleteProgress(laporanId, progressId)
+      setData((prev) => ({ ...prev, [tipe]: prev[tipe].filter((p) => p.id !== progressId) }))
+      toast.success('Dokumen dihapus')
+    } catch {
+      toast.error('Gagal menghapus dokumen')
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      {PROGRESS_TIPE_LIST.map((tipe) => {
+        const items: any[] = data[tipe] ?? []
+        const isUploading = uploading === tipe
+        return (
+          <div key={tipe} className="border border-app-border rounded-xl overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2.5 bg-app-bg border-b border-app-border">
+              <span className="text-[12px] font-bold text-app-text uppercase tracking-wide">
+                {PROGRESS_TIPE_LABEL[tipe]}
+              </span>
+              <button
+                type="button"
+                onClick={() => inputRefs.current[tipe]?.click()}
+                disabled={isUploading}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-600 text-white text-[11px] font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60"
+              >
+                <Upload size={12} />
+                {isUploading ? 'Mengunggah...' : 'Upload'}
+              </button>
+              <input
+                ref={(el) => { inputRefs.current[tipe] = el }}
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0]
+                  if (f) handleUpload(tipe, f)
+                  e.target.value = ''
+                }}
+              />
+            </div>
+            {items.length === 0 ? (
+              <p className="text-[12px] text-app-subtle text-center py-4">Belum ada dokumen</p>
+            ) : (
+              <ul className="divide-y divide-app-border">
+                {items.map((item) => (
+                  <li key={item.id} className="flex items-center gap-3 px-4 py-2.5">
+                    <FileText size={14} className="text-blue-500 shrink-0" />
+                    <a href={item.fileUrl} target="_blank" rel="noreferrer"
+                      className="flex-1 text-[12px] text-blue-600 hover:underline truncate" title={item.namaFile}>
+                      {item.namaFile}
+                    </a>
+                    <span className="text-[10px] text-app-subtle shrink-0">
+                      {new Date(item.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(tipe, item.id)}
+                      className="p-1 rounded text-app-muted hover:text-red-500 transition-colors shrink-0"
+                      title="Hapus"
+                    >
+                      <X size={12} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// ── Foto History section ──────────────────────────────────────────────────────
+
+function FotoHistorySection({ laporanId }: { laporanId: string }) {
+  const [history, setHistory] = useState<any[]>([])
+  const [uploading, setUploading] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  function loadHistory() {
+    laporanApi.getFotoHistory(laporanId).then((r) => setHistory(r.data ?? [])).catch(() => {})
+  }
+
+  useEffect(() => { loadHistory() }, [laporanId])
+
+  async function handleUpload(files: FileList) {
+    const raw = Array.from(files).filter((f) => /\.(jpe?g|png|webp)$/i.test(f.name)).slice(0, 10)
+    if (raw.length === 0) { toast.error('Hanya JPG/PNG/WEBP'); return }
+    setUploading(true)
+    try {
+      const compressed = await Promise.all(raw.map((f) => compressImage(f)))
+      await laporanApi.uploadFotoUpdate(laporanId, compressed)
+      toast.success(`${compressed.length} foto berhasil diunggah`)
+      loadHistory()
+    } catch {
+      toast.error('Gagal mengunggah foto')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Upload button */}
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        disabled={uploading}
+        className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-app-border rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-colors disabled:opacity-60"
+      >
+        <ImagePlus size={18} className="text-app-muted" />
+        <span className="text-[13px] text-app-muted font-medium">
+          {uploading ? 'Mengunggah...' : 'Upload Foto Update (maks 10, auto-compress)'}
+        </span>
+      </button>
+      <input ref={inputRef} type="file" accept=".jpg,.jpeg,.png,.webp" multiple className="hidden"
+        onChange={(e) => { if (e.target.files?.length) { handleUpload(e.target.files); e.target.value = '' } }} />
+
+      {/* History grouped by date */}
+      {history.length === 0 ? (
+        <p className="text-[12px] text-app-subtle text-center py-4">Belum ada foto update</p>
+      ) : (
+        history.map((entry) => (
+          <div key={entry.id} className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Clock size={12} className="text-app-muted" />
+              <span className="text-[11px] font-bold text-app-muted">
+                {new Date(entry.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </span>
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {(entry.urls as string[]).map((url, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={i} src={url} alt="" className="w-full aspect-square object-cover rounded-lg border border-app-border" />
+              ))}
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  )
+}
+
+// ── Detail read-only view (Figma 305-4621) ────────────────────────────────────
+
+function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+      <span style={{ fontSize: 13, fontWeight: 400, color: '#5F737F' }}>{label}</span>
+      <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B', wordBreak: 'break-word' }}>{value ?? '—'}</span>
+    </div>
+  )
+}
+
+function SectionHeader({ title }: { title: string }) {
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <span style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>{title}</span>
+      <div style={{ height: 1, background: '#E1E8EC', marginTop: 8 }} />
+    </div>
+  )
+}
+
+function DetailReadView({ laporan }: { laporan: any }) {
+  const [progress, setProgress] = useState<Record<string, any[]>>({ spanduk: [], brosur: [], laporan_baru: [], berita_acara: [] })
+  const [fotoHistory, setFotoHistory] = useState<any[]>([])
+  const [uploading, setUploading] = useState<string | null>(null)
+  const [uploadingFoto, setUploadingFoto] = useState(false)
+  const fotoUpdateRef = useRef<HTMLInputElement>(null)
+  const progressRefs = useRef<Record<string, HTMLInputElement | null>>({})
+
+  useEffect(() => {
+    if (!laporan?.id) return
+    laporanApi.getProgress(laporan.id).then(r => setProgress(r.data)).catch(() => {})
+    laporanApi.getFotoHistory(laporan.id).then(r => setFotoHistory(r.data ?? [])).catch(() => {})
+  }, [laporan?.id])
+
+  async function handleProgressUpload(tipe: string, file: File) {
+    setUploading(tipe)
+    try {
+      await laporanApi.uploadProgress(laporan.id, tipe, file)
+      const r = await laporanApi.getProgress(laporan.id)
+      setProgress(r.data)
+      toast.success('Dokumen berhasil diunggah')
+    } catch { toast.error('Gagal mengunggah') } finally { setUploading(null) }
+  }
+
+  async function handleProgressDelete(tipe: string, progressId: string) {
+    try {
+      await laporanApi.deleteProgress(laporan.id, progressId)
+      setProgress(prev => ({ ...prev, [tipe]: prev[tipe].filter(p => p.id !== progressId) }))
+      toast.success('Dokumen dihapus')
+    } catch { toast.error('Gagal menghapus') }
+  }
+
+  async function handleFotoUpdate(files: FileList) {
+    const raw = Array.from(files).filter(f => /\.(jpe?g|png|webp)$/i.test(f.name)).slice(0, 10)
+    if (!raw.length) { toast.error('Hanya JPG/PNG/WEBP'); return }
+    setUploadingFoto(true)
+    try {
+      const compressed = await Promise.all(raw.map(f => compressImage(f)))
+      await laporanApi.uploadFotoUpdate(laporan.id, compressed)
+      toast.success(`${compressed.length} foto diunggah`)
+      laporanApi.getFotoHistory(laporan.id).then(r => setFotoHistory(r.data ?? [])).catch(() => {})
+    } catch { toast.error('Gagal upload foto') } finally { setUploadingFoto(false) }
+  }
+
+  const fotoUrls: string[] = laporan?.foto ?? []
+  const isPPL = laporan?.jenisGangguan === 'pekerjaan_pihak_lain'
+
+  return (
+    <div className="flex-1 overflow-y-auto">
+      {/* Title bar */}
+      <div style={{ padding: '16px 24px 12px', borderBottom: '1px solid #E1E8EC' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 20, fontWeight: 700, color: '#1B1B1B' }}>Detail Kerawanan</span>
+          <LevelBadge level={laporan?.levelRisiko} />
+        </div>
+        <div style={{ display: 'flex', gap: 12, marginTop: 4, fontSize: 13, color: '#5F737F', flexWrap: 'wrap' }}>
+          <span>Dibuat pada: {formatTanggal(laporan?.tanggal)}</span>
+          {laporan?.pelapor?.nama && <><span>·</span><span>Dibuat oleh: {laporan.pelapor.nama}</span></>}
+        </div>
+      </div>
+
+      <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 28 }}>
+
+        {/* Section 1: Informasi Kerawanan */}
+        <div>
+          <SectionHeader title="Informasi Kerawanan" />
+          {/* 2-col grid for key info */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 24px', marginBottom: 16 }}>
+            <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan} />
+            <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
+            <InfoRow label="Tower Terdampak" value={laporan?.tower?.nomorTower ?? laporan?.towerId} />
+            {laporan?.lokasiDetail && <InfoRow label="Span / Lokasi" value={laporan.lokasiDetail} />}
+            {laporan?.status && <InfoRow label="Status Laporan" value={<StatusPill status={laporan.status} />} />}
+            {laporan?.tanggal && <InfoRow label="Tanggal" value={formatTanggal(laporan.tanggal)} />}
+          </div>
+
+          {/* Description row */}
+          {laporan?.deskripsi && (
+            <div style={{ marginBottom: 12 }}>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 4 }}>
+                {isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'}
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.deskripsi}</span>
+            </div>
+          )}
+          {isPPL && laporan?.teknisi && (
+            <div style={{ marginBottom: 12 }}>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 4 }}>Informasi Pihak Lain</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.teknisi}</span>
+            </div>
+          )}
+          {laporan?.keterangan && (
+            <div style={{ marginBottom: 12 }}>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 4 }}>
+                {isPPL ? 'Upaya Pengendalian' : 'Keterangan'}
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.keterangan}</span>
+            </div>
+          )}
+
+          {/* Foto bukti */}
+          {fotoUrls.length > 0 && (
+            <div>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 8 }}>
+                Foto Bukti Terjadinya Kerawanan
+              </span>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                {fotoUrls.map((url, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={i} src={resolveMediaUrl(url)} alt="" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 8, border: '1px solid #E1E8EC' }} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Section 2: Informasi Pengendalian */}
+        <div>
+          <SectionHeader title="Informasi Pengendalian Kerawanan" />
+
+          {/* Progress documents — 2-col grid style like Figma */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            {PROGRESS_TIPE_LIST.map((tipe) => {
+              const items: any[] = progress[tipe] ?? []
+              const isUp = uploading === tipe
+              const latestItem = items[0]
+              return (
+                <div key={tipe}>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 8 }}>
+                    {PROGRESS_TIPE_LABEL[tipe]}
+                  </span>
+                  {/* File container (Figma style) */}
+                  <div style={{ border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
+                    {latestItem ? (
+                      <div>
+                        {/* Preview image/icon */}
+                        <div style={{ height: 100, background: '#F6F9FC', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                          {/\.(jpg|jpeg|png|webp)$/i.test(latestItem.fileUrl) ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={latestItem.fileUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          ) : (
+                            <FileText size={32} style={{ color: '#5F737F' }} />
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => progressRefs.current[tipe]?.click()}
+                            style={{ position: 'absolute', top: 6, right: 6, width: 28, height: 28, borderRadius: '50%', background: '#076C9E', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                          >
+                            <Upload size={12} style={{ color: '#FFF' }} />
+                          </button>
+                        </div>
+                        {/* File info + actions */}
+                        <div style={{ padding: '8px 10px' }}>
+                          <a href={latestItem.fileUrl} target="_blank" rel="noreferrer" style={{ fontSize: 12, fontWeight: 600, color: '#1B1B1B', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {latestItem.namaFile}
+                          </a>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
+                            <span style={{ fontSize: 11, color: '#5F737F' }}>
+                              {new Date(latestItem.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </span>
+                            <button type="button" onClick={() => handleProgressDelete(tipe, latestItem.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#D92D20', display: 'flex' }}>
+                              <X size={12} />
+                            </button>
+                          </div>
+                        </div>
+                        {/* More files indicator */}
+                        {items.length > 1 && (
+                          <div style={{ padding: '4px 10px', borderTop: '1px solid #E1E8EC', fontSize: 11, color: '#5F737F' }}>
+                            +{items.length - 1} file lainnya
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => progressRefs.current[tipe]?.click()}
+                        disabled={isUp}
+                        style={{ width: '100%', height: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, background: '#F6F9FC', border: 'none', cursor: 'pointer' }}
+                      >
+                        <Upload size={20} style={{ color: '#97AAB3' }} />
+                        <span style={{ fontSize: 11, color: '#97AAB3' }}>{isUp ? 'Mengunggah...' : 'Upload file'}</span>
+                      </button>
+                    )}
+                    <input
+                      ref={el => { progressRefs.current[tipe] = el }}
+                      type="file"
+                      accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx"
+                      className="hidden"
+                      onChange={e => { const f = e.target.files?.[0]; if (f) handleProgressUpload(tipe, f); e.target.value = '' }}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Section 3: Foto Update History */}
+        <div>
+          <SectionHeader title="Foto Update" />
+          <button
+            type="button"
+            onClick={() => fotoUpdateRef.current?.click()}
+            disabled={uploadingFoto}
+            style={{ width: '100%', padding: '12px', border: '2px dashed #E1E8EC', borderRadius: 8, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', marginBottom: 16 }}
+          >
+            <ImagePlus size={18} style={{ color: '#5F737F' }} />
+            <span style={{ fontSize: 13, color: '#5F737F', fontWeight: 500 }}>
+              {uploadingFoto ? 'Mengunggah...' : 'Upload Foto Update (maks 10, auto-compress)'}
+            </span>
+          </button>
+          <input ref={fotoUpdateRef} type="file" accept=".jpg,.jpeg,.png,.webp" multiple className="hidden"
+            onChange={e => { if (e.target.files?.length) { handleFotoUpdate(e.target.files); e.target.value = '' } }} />
+
+          {fotoHistory.map(entry => (
+            <div key={entry.id} style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                <Clock size={12} style={{ color: '#97AAB3' }} />
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#97AAB3' }}>
+                  {new Date(entry.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                {(entry.urls as string[]).map((url, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={i} src={url} alt="" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 6, border: '1px solid #E1E8EC' }} />
+                ))}
+              </div>
+            </div>
+          ))}
+          {fotoHistory.length === 0 && (
+            <p style={{ fontSize: 12, color: '#97AAB3', textAlign: 'center', padding: '16px 0' }}>Belum ada foto update</p>
+          )}
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
 // ── Form drawer ───────────────────────────────────────────────────────────────
 
 const EMPTY_FORM = {
@@ -1264,41 +1765,61 @@ function LaporanDrawer({
             </button>
             <p className="text-white font-bold text-[16px] leading-tight">{title}</p>
           </div>
-          {formBody}
-          <div className="px-5 py-4 border-t border-app-border shrink-0 bg-white">
-            {readOnly ? (
+          {readOnly && initial ? (
+            <DetailReadView laporan={initial} />
+          ) : (
+            <>
+              {formBody}
+              <div className="px-5 py-4 border-t border-app-border shrink-0 bg-white">
+                <button type="submit" form="laporan-form" disabled={saving} className="btn-primary w-full justify-center">
+                  {saving ? 'Menyimpan...' : initial ? 'Simpan Perubahan' : 'Buat Laporan'}
+                </button>
+              </div>
+            </>
+          )}
+          {readOnly && (
+            <div className="px-5 py-4 border-t border-app-border shrink-0 bg-white">
               <button onClick={onClose} className="btn-outline w-full justify-center">Tutup</button>
-            ) : (
-              <button type="submit" form="laporan-form" disabled={saving} className="btn-primary w-full justify-center">
-                {saving ? 'Menyimpan...' : 'Buat Laporan'}
-              </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 
       {/* ── Desktop: right-side drawer ────────────────────────────────────── */}
       {!isMobile && (
         <div
-          className={`fixed top-0 right-0 bottom-0 z-50 flex flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out w-full sm:w-[560px] ${open ? 'translate-x-0' : 'translate-x-full'}`}
+          className={`fixed top-0 right-0 bottom-0 z-50 flex flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out w-full sm:w-[580px] ${open ? 'translate-x-0' : 'translate-x-full'}`}
         >
-          <div className="flex items-center justify-between px-6 py-4 border-b border-app-border shrink-0">
-            <h2 className="text-[15px] font-bold text-app-text">{title}</h2>
-            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted transition-colors">
-              <X size={18} />
-            </button>
-          </div>
-          {formBody}
-          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border shrink-0 bg-white">
-            <button type="button" onClick={onClose} className="btn-outline">
-              {readOnly ? 'Tutup' : 'Batal'}
-            </button>
-            {!readOnly && (
-              <button type="submit" form="laporan-form" disabled={saving} className="btn-primary">
-                {saving ? 'Menyimpan...' : 'Buat Laporan'}
+          {!readOnly && (
+            <div className="flex items-center justify-between px-6 py-4 border-b border-app-border shrink-0">
+              <h2 className="text-[15px] font-bold text-app-text">{title}</h2>
+              <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted transition-colors">
+                <X size={18} />
               </button>
-            )}
-          </div>
+            </div>
+          )}
+          {readOnly && initial ? (
+            <>
+              {/* close button pinned top-right for detail view */}
+              <button
+                onClick={onClose}
+                style={{ position: 'absolute', top: 12, right: 12, zIndex: 10, background: '#F6F9FC', border: '1px solid #E1E8EC', borderRadius: 8, padding: '6px', cursor: 'pointer', display: 'flex' }}
+              >
+                <X size={16} style={{ color: '#5F737F' }} />
+              </button>
+              <DetailReadView laporan={initial} />
+            </>
+          ) : (
+            <>
+              {formBody}
+              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border shrink-0 bg-white">
+                <button type="button" onClick={onClose} className="btn-outline">Batal</button>
+                <button type="submit" form="laporan-form" disabled={saving} className="btn-primary">
+                  {saving ? 'Menyimpan...' : initial ? 'Simpan Perubahan' : 'Buat Laporan'}
+                </button>
+              </div>
+            </>
+          )}
         </div>
       )}
     </>
@@ -1593,10 +2114,12 @@ export default function GangguanPage() {
              <thead>
               <tr>
                 <th>Tanggal</th>
-                <th>Tower</th>
-                <th>Jenis Gangguan</th>
+                <th>Ruas</th>
+                <th>No. Tower</th>
+                <th>Jenis Kerawanan</th>
                 <th>Teknisi</th>
-                <th>Status</th>
+                <th>Status Kerawanan</th>
+                <th>Progres Laporan</th>
                 <th style={{ textAlign: 'center' }}>Aksi</th>
               </tr>
             </thead>
@@ -1604,27 +2127,31 @@ export default function GangguanPage() {
               {loading ? (
                 Array.from({ length: pageSize }).map((_, i) => (
                   <tr key={i}>
-                    {Array.from({ length: 6 }).map((_, j) => (
+                    {Array.from({ length: 8 }).map((_, j) => (
                       <td key={j}><div className="h-4 bg-gray-100 rounded animate-pulse" /></td>
                     ))}
                   </tr>
                 ))
               ) : rows.length === 0 ? (
                 <tr>
-                  <td colSpan={6}><EmptyState title="Belum ada data Riwayat Kerawanan Transmisi." /></td>
+                  <td colSpan={8}><EmptyState title="Belum ada data Riwayat Kerawanan Transmisi." /></td>
                 </tr>
               ) : (
                 rows.map((row) => (
                   <tr key={row.id}>
-                    <td className="text-[14px] text-[#5f737f]">{formatTanggal(row.tanggal)}</td>
-                    <td>
-                      <span className="font-mono text-[14px] font-medium text-[#5f737f]">
-                        {row.tower?.nomorTower ?? row.towerId ?? '—'}
+                    <td className="text-[14px] text-[#5f737f] whitespace-nowrap">{formatTanggal(row.tanggal)}</td>
+                    <td className="text-[14px] text-[#5f737f] max-w-[220px]">
+                      <span className="block truncate" title={row.tower?.nama ?? row.towerId}>
+                        {row.tower?.nama ?? row.towerId ?? '—'}
                       </span>
                     </td>
+                    <td className="text-[14px] text-[#5f737f] whitespace-nowrap">
+                      {row.lokasiDetail ?? row.tower?.nomorTower ?? row.towerId ?? '—'}
+                    </td>
                     <td className="text-[14px] text-[#5f737f]">{JENIS_LABEL[row.jenisGangguan] ?? row.jenisGangguan ?? '—'}</td>
-                    <td className="text-[14px] text-[#5f737f]">{row.teknisi ?? row.pelapor?.nama ?? row.pegawai?.nama ?? '—'}</td>
-                    <td><StatusPill status={row.status?.toLowerCase()} /></td>
+                    <td className="text-[14px] text-[#5f737f]">{row.teknisi ?? row.pelapor?.nama ?? '—'}</td>
+                    <td><LevelBadge level={row.levelRisiko} /></td>
+                    <td><ProgressBadge tipe={row.latestProgressTipe} /></td>
                     <td className="text-center">
                       <RowActions
                         row={row}

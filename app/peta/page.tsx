@@ -1,10 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { SlidersHorizontal, X } from 'lucide-react'
+import { SlidersHorizontal, X, Upload } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { towersApi, jalurKmlApi } from '@/lib/api'
+import { isAdmin } from '@/lib/auth'
 import B2WLoader from '@/components/ui/B2WLoader'
+import type { JalurKmlItem } from '@/components/map/TowerMapGoogle'
 
 const TowerMap = dynamic(() => import('@/components/map/TowerMapGoogle'), { ssr: false })
 
@@ -22,6 +25,9 @@ export default function PetaPage() {
   const [towers, setTowers] = useState<any[]>([])
   const [jalurKml, setJalurKml] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [adminUser, setAdminUser] = useState(false)
+  const [importingSktt, setImportingSktt] = useState(false)
+  const skttInputRef = useRef<HTMLInputElement>(null)
 
   // Filter state
   const [tipe, setTipe] = useState('Semua')
@@ -33,11 +39,54 @@ export default function PetaPage() {
   const [pendingKondisi, setPendingKondisi] = useState('Semua')
 
   useEffect(() => {
+    setAdminUser(isAdmin())
     Promise.allSettled([
       towersApi.getMap().then((r) => setTowers(Array.isArray(r.data) ? r.data : [])),
       jalurKmlApi.getAll().then((r) => setJalurKml(r.data?.data ?? [])),
     ]).finally(() => setLoading(false))
   }, [])
+
+  async function handleSkttImport(file: File) {
+    setImportingSktt(true)
+    try {
+      const res = await jalurKmlApi.importSktt(file)
+      toast.success(`Import SKTT selesai: ${res.data.data?.created ?? 0} rute baru`)
+      jalurKmlApi.getAll().then((r) => setJalurKml(r.data?.data ?? []))
+    } catch (e: any) {
+      toast.error(e?.response?.data?.message ?? 'Gagal import SKTT')
+    } finally {
+      setImportingSktt(false)
+    }
+  }
+
+  // Generate SUTT/SUTET polylines from tower data (group by tipe+jalur, sort by nomorUrut)
+  const computedJalurLines = useMemo<JalurKmlItem[]>(() => {
+    const groups = new Map<string, { tipe: string; towers: any[] }>()
+    for (const t of towers) {
+      if (t.tipe !== 'SUTT' && t.tipe !== 'SUTET') continue
+      if (!t.jalur) continue
+      const key = `${t.tipe}::${t.jalur}`
+      if (!groups.has(key)) groups.set(key, { tipe: t.tipe, towers: [] })
+      groups.get(key)!.towers.push(t)
+    }
+    const result: JalurKmlItem[] = []
+    let fakeId = -1
+    for (const [, group] of groups) {
+      const sorted = [...group.towers].sort((a: any, b: any) => (a.nomorUrut ?? 0) - (b.nomorUrut ?? 0))
+      const path = sorted.map((t: any) => ({ lat: t.lat, lng: t.lng }))
+      if (path.length < 2) continue
+      result.push({
+        id: fakeId--,
+        nama: group.towers[0].jalur,
+        tipe: group.tipe,
+        warna: group.tipe === 'SUTET' ? '#e65100' : '#0288D1',
+        path,
+      })
+    }
+    return result
+  }, [towers])
+
+  const allJalurKml = useMemo(() => [...computedJalurLines, ...jalurKml], [computedJalurLines, jalurKml])
 
   const filteredTowers = towers.filter((t) => {
     if (tipe !== 'Semua' && t.tipe !== tipe) return false
@@ -65,13 +114,29 @@ export default function PetaPage() {
     <>
       {/* ─── DESKTOP MAP ──────────────────────────────────────────── */}
       <div className="desktop-map-page p-6 flex flex-col h-full gap-4">
-        <div>
-          <h1 style={{ fontWeight: 700, fontSize: 22, color: '#1c1c1c', lineHeight: '32px' }}>
-            Peta Jalur Transmisi
-          </h1>
-          <p style={{ fontSize: 13, color: '#5f737f', marginTop: 2 }}>
-            Sebaran tower transmisi PLN UIW Banten
-          </p>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div>
+            <h1 style={{ fontWeight: 700, fontSize: 22, color: '#1c1c1c', lineHeight: '32px' }}>
+              Peta Jalur Transmisi
+            </h1>
+            <p style={{ fontSize: 13, color: '#5f737f', marginTop: 2 }}>
+              Sebaran tower transmisi PLN UIW Banten
+            </p>
+          </div>
+          {adminUser && (
+            <>
+              <input ref={skttInputRef} type="file" accept=".xlsx,.xls" style={{ display: 'none' }}
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleSkttImport(f); e.target.value = '' }}
+              />
+              <button
+                onClick={() => skttInputRef.current?.click()}
+                disabled={importingSktt}
+                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 22, background: '#fff', border: '1px solid #076c9e', color: '#076c9e', fontWeight: 600, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}
+              >
+                <Upload size={14} /> {importingSktt ? 'Mengimport...' : 'Import SKTT Excel'}
+              </button>
+            </>
+          )}
         </div>
 
         {/* Desktop filters */}
@@ -113,7 +178,7 @@ export default function PetaPage() {
             flex: 1, background: '#fff', border: '1px solid #E1E8EC',
             borderRadius: 12, overflow: 'hidden', minHeight: 500,
           }}>
-            <TowerMap towers={filteredTowers} jalurKml={jalurKml} />
+            <TowerMap towers={filteredTowers} jalurKml={allJalurKml} />
           </div>
 
           {/* Side panel — legend */}
@@ -152,7 +217,7 @@ export default function PetaPage() {
       <div className="pwa-map-page">
         {/* Full screen map */}
         <div className="pwa-map-fullscreen">
-          <TowerMap towers={filteredTowers} jalurKml={jalurKml} />
+          <TowerMap towers={filteredTowers} jalurKml={allJalurKml} />
 
           {/* Legend overlay */}
           <div className="pwa-map-legend">

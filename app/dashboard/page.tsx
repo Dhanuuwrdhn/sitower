@@ -278,6 +278,7 @@ export default function DashboardPage() {
               tipe:       'SUTT' as const,
               jalur:      null,
               nomorUrut:  null,
+              updatedAt:  t.updated_at ?? null,
               kerawanan:  t.status !== 'aman'
                 ? types.map((jenis: string) => ({
                     kategori: jenis,

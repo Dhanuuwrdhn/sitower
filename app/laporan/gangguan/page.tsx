@@ -1258,6 +1258,7 @@ function LaporanDrawer({
   // Mobile bottom-sheet state
   const [jenisSheetOpen, setJenisSheetOpen] = useState(false)
   const [towerSheetOpen, setTowerSheetOpen] = useState(false)
+  const [towerSheetTarget, setTowerSheetTarget] = useState<'start' | 'end'>('start')
   const [fotoSheetOpen, setFotoSheetOpen] = useState(false)
 
   useEffect(() => {
@@ -1444,8 +1445,9 @@ function LaporanDrawer({
 
       {/* Foto bukti */}
       <div>
-        <label className="block text-[12px] font-semibold text-app-text mb-1.5">Foto Bukti Terjadinya Kerawanan</label>
-        {fotoUrls.length > 0 && (
+        <label className="block text-[14px] font-bold text-app-text mb-2">Foto Bukti Terjadinya Kerawanan</label>
+        {/* Desktop: grid preview of existing foto URLs */}
+        {!isMobile && fotoUrls.length > 0 && (
           <div className="grid grid-cols-4 gap-2 mb-2">
             {fotoUrls.map((url, i) => (
               // eslint-disable-next-line @next/next/no-img-element
@@ -1453,51 +1455,50 @@ function LaporanDrawer({
             ))}
           </div>
         )}
-        {/* Mobile foto preview */}
-        {isMobile && fotos.length > 0 && (
-          <div className="grid grid-cols-5 gap-2 mb-2">
-            {fotos.map((f, i) => (
-              <div key={i} className="relative group rounded-lg overflow-hidden bg-app-bg aspect-square">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={URL.createObjectURL(f)} alt={f.name} className="w-full h-full object-cover" />
-                {!readOnly && (
-                  <button
-                    type="button"
-                    onClick={() => setFotos(fotos.filter((_, j) => j !== i))}
-                    className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <X size={10} />
-                  </button>
+        {/* Mobile: Figma-style full-width preview */}
+        {isMobile && (
+          <div style={{ border: '1px solid #E1E8EC', borderRadius: 12, overflow: 'hidden', background: '#FFFFFF' }}>
+            <div
+              style={{ position: 'relative', width: '100%', height: 128, background: '#F6F9FC', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: readOnly ? 'default' : 'pointer' }}
+              onClick={() => !readOnly && setFotoSheetOpen(true)}
+            >
+              {(fotos.length > 0 || fotoUrls.length > 0) ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={fotos.length > 0 ? URL.createObjectURL(fotos[0]) : resolveMediaUrl(fotoUrls[0])}
+                  alt="preview"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
+                />
+              ) : null}
+              {!readOnly && (
+                <div style={{ position: 'relative', zIndex: 1, width: 44, height: 44, borderRadius: 22, background: '#076C9E', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+                  <ImagePlus size={20} color="#fff" />
+                </div>
+              )}
+            </div>
+            {(fotos.length > 0 || fotoUrls.length > 0) && (
+              <div style={{ padding: '8px 14px' }}>
+                <p style={{ fontSize: 12, fontWeight: 500, color: '#1B1B1B' }}>
+                  {fotos.length > 0 ? fotos[0].name : 'Foto tersimpan'}
+                  {fotos.length > 1 ? ` (+${fotos.length - 1} foto lainnya)` : ''}
+                </p>
+                {fotos.length > 0 && (
+                  <p style={{ fontSize: 12, fontWeight: 500, color: '#1B1B1B', marginTop: 2 }}>
+                    Size: {(fotos.reduce((a, f) => a + f.size, 0) / (1024 * 1024)).toFixed(1)}MB
+                  </p>
                 )}
               </div>
-            ))}
+            )}
           </div>
         )}
-        {!readOnly && (
-          isMobile ? (
-            <button
-              type="button"
-              onClick={() => setFotoSheetOpen(true)}
-              style={{
-                width: '100%', padding: '14px 16px', border: '2px dashed #E1E8EC',
-                borderRadius: 12, background: '#F6F9FC', display: 'flex',
-                alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer',
-              }}
-            >
-              <Upload size={18} style={{ color: '#5F737F' }} />
-              <span style={{ fontSize: 13, color: '#5F737F' }}>
-                {fotos.length > 0 ? `${fotos.length} foto — tambah lagi` : 'Tambah Foto Bukti'}
-              </span>
-            </button>
-          ) : (
-            <FotoUpload fotos={fotos} onChange={setFotos} onPhotoAdded={handleDetectLocation} />
-          )
+        {!readOnly && !isMobile && (
+          <FotoUpload fotos={fotos} onChange={setFotos} onPhotoAdded={handleDetectLocation} />
         )}
       </div>
 
       {/* Tower terdampak — start (always) */}
       <div>
-        <label className="block text-[12px] font-semibold text-app-text mb-1.5">
+        <label className="block text-[14px] font-bold text-app-text mb-2">
           {isPPL ? 'Tower Terdampak (Start)' : 'Tower Terganggu'}
         </label>
         {readOnly ? (
@@ -1505,14 +1506,15 @@ function LaporanDrawer({
         ) : isMobile ? (
           <button
             type="button"
-            onClick={() => setTowerSheetOpen(true)}
+            onClick={() => { setTowerSheetTarget('start'); setTowerSheetOpen(true) }}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              width: '100%', padding: '10px 14px', background: '#FFFFFF',
+              width: '100%', padding: '10px 14px',
+              background: form.towerId ? '#E1E8EC' : '#FFFFFF',
               border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
             }}
           >
-            <span style={{ fontSize: 14, color: form.towerId ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
+            <span style={{ fontSize: 14, color: form.towerId ? '#5F737F' : '#97AAB3', fontWeight: 500 }}>
               {form.towerLabel || 'Pilih tower...'}
             </span>
             <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
@@ -1553,18 +1555,36 @@ function LaporanDrawer({
       {/* Tower end (span) — only for pekerjaan_pihak_lain */}
       {isPPL && !readOnly && (
         <div>
-          <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tower Terdampak (End)</label>
-          <TowerDropdown
-            options={towerOptions}
-            value={form.towerIdEnd}
-            onChange={(id, label) => setForm(f => ({ ...f, towerIdEnd: id, towerLabelEnd: label }))}
-          />
+          <label className="block text-[14px] font-bold text-app-text mb-2">Tower Terdampak (End)</label>
+          {isMobile ? (
+            <button
+              type="button"
+              onClick={() => { setTowerSheetTarget('end'); setTowerSheetOpen(true) }}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                width: '100%', padding: '10px 14px',
+                background: form.towerIdEnd ? '#E1E8EC' : '#FFFFFF',
+                border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+              }}
+            >
+              <span style={{ fontSize: 14, color: form.towerIdEnd ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
+                {form.towerLabelEnd || 'Pilih tower...'}
+              </span>
+              <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+            </button>
+          ) : (
+            <TowerDropdown
+              options={towerOptions}
+              value={form.towerIdEnd}
+              onChange={(id, label) => setForm(f => ({ ...f, towerIdEnd: id, towerLabelEnd: label }))}
+            />
+          )}
         </div>
       )}
 
-      {/* Klasifikasi kerawanan */}
+      {/* Jenis kerawanan */}
       <div>
-        <label className="block text-[12px] font-semibold text-app-text mb-1.5">Klasifikasi Kerawanan</label>
+        <label className="block text-[14px] font-bold text-app-text mb-2">Jenis Kerawanan</label>
         {isMobile && !readOnly ? (
           <button
             type="button"
@@ -1597,7 +1617,7 @@ function LaporanDrawer({
 
       {/* Uraian Pekerjaan / Deskripsi */}
       <div>
-        <label className="block text-[12px] font-semibold text-app-text mb-1.5">
+        <label className="block text-[14px] font-bold text-app-text mb-2">
           {isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'}
         </label>
         <textarea
@@ -1613,13 +1633,13 @@ function LaporanDrawer({
       {/* Pekerjaan Pihak Lain section */}
       {isPPL && (
         <>
-          <div className="flex items-center gap-3 py-1">
-            <hr className="flex-1 border-app-border" />
-            <span className="text-[11px] font-bold text-app-muted uppercase tracking-wider">Informasi Pihak Lain</span>
-            <hr className="flex-1 border-app-border" />
+          {/* Figma: gray 8px divider strip + section heading 18px/700 */}
+          <div style={{ margin: '8px -20px 0', height: 8, background: '#F6F9FC' }} />
+          <div style={{ padding: '12px 0 4px' }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B' }}>Informasi Pihak Lain</h3>
           </div>
           <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Pihak Lain</label>
+            <label className="block text-[14px] font-bold text-app-text mb-2">Pihak Lain</label>
             <input
               disabled={readOnly}
               type="text"
@@ -1630,7 +1650,7 @@ function LaporanDrawer({
             />
           </div>
           <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Upaya Pengendalian</label>
+            <label className="block text-[14px] font-bold text-app-text mb-2">Upaya Pengendalian</label>
             <textarea
               disabled={readOnly}
               rows={4}
@@ -1736,8 +1756,11 @@ function LaporanDrawer({
       <PilihTowerSheet
         open={towerSheetOpen}
         options={towerOptions}
-        value={form.towerId}
-        onSelect={(id, label) => setForm(f => ({ ...f, towerId: id, towerLabel: label }))}
+        value={towerSheetTarget === 'end' ? form.towerIdEnd : form.towerId}
+        onSelect={(id, label) => {
+          if (towerSheetTarget === 'end') setForm(f => ({ ...f, towerIdEnd: id, towerLabelEnd: label }))
+          else setForm(f => ({ ...f, towerId: id, towerLabel: label }))
+        }}
         onClose={() => setTowerSheetOpen(false)}
       />
       <AmbilFotoSheet

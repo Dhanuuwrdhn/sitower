@@ -461,13 +461,17 @@ function FotoUpload({
   fotos,
   onChange,
   onPhotoAdded,
+  onPreview,
 }: {
   fotos: File[]
   onChange: (files: File[]) => void
   onPhotoAdded?: () => void
+  onPreview?: (index: number) => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
+  // memoize object URLs so lightbox can reuse them
+  const objectUrls = fotos.map((f) => URL.createObjectURL(f))
 
   function addFiles(incoming: FileList | null) {
     if (!incoming) return
@@ -492,7 +496,7 @@ function FotoUpload({
       >
         <Upload size={22} className="text-app-muted" />
         <p className="text-[13px] text-app-muted">
-          Drag & drop foto, atau <span className="text-blue-600 font-medium">klik untuk pilih</span>
+          Drag &amp; drop foto, atau <span className="text-blue-600 font-medium">klik untuk pilih</span>
         </p>
         <p className="text-[11px] text-app-subtle">JPG, PNG, WEBP · Maks 5MB per file · Maks 10 foto</p>
       </div>
@@ -510,13 +514,14 @@ function FotoUpload({
             <div key={i} className="relative group rounded-lg overflow-hidden bg-app-bg aspect-square">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={URL.createObjectURL(f)}
+                src={objectUrls[i]}
                 alt={f.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover cursor-pointer"
+                onClick={(e) => { e.stopPropagation(); onPreview?.(i) }}
               />
               <button
                 type="button"
-                onClick={() => onChange(fotos.filter((_, j) => j !== i))}
+                onClick={(e) => { e.stopPropagation(); onChange(fotos.filter((_, j) => j !== i)) }}
                 className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <X size={10} />
@@ -1065,6 +1070,102 @@ function MobileFileRow({
   )
 }
 
+// ── Photo Lightbox ────────────────────────────────────────────────────────────
+
+function PhotoLightbox({
+  urls,
+  startIndex,
+  onClose,
+}: {
+  urls: string[]
+  startIndex: number
+  onClose: () => void
+}) {
+  const [idx, setIdx] = useState(startIndex)
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowRight') setIdx((i) => Math.min(i + 1, urls.length - 1))
+      if (e.key === 'ArrowLeft')  setIdx((i) => Math.max(i - 1, 0))
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose, urls.length])
+
+  if (typeof document === 'undefined') return null
+  return createPortal(
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 99999,
+        background: 'rgba(0,0,0,0.88)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}
+    >
+      {/* Prev */}
+      {idx > 0 && (
+        <button
+          onClick={(e) => { e.stopPropagation(); setIdx((i) => i - 1) }}
+          style={{
+            position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)',
+            background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '50%',
+            width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', color: '#fff', fontSize: 24,
+          }}
+        >‹</button>
+      )}
+
+      {/* Image */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={urls[idx]}
+        alt=""
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          maxWidth: '90vw', maxHeight: '88vh',
+          objectFit: 'contain', borderRadius: 8,
+          boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
+        }}
+      />
+
+      {/* Next */}
+      {idx < urls.length - 1 && (
+        <button
+          onClick={(e) => { e.stopPropagation(); setIdx((i) => i + 1) }}
+          style={{
+            position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)',
+            background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '50%',
+            width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', color: '#fff', fontSize: 24,
+          }}
+        >›</button>
+      )}
+
+      {/* Close */}
+      <button
+        onClick={onClose}
+        style={{
+          position: 'absolute', top: 16, right: 16,
+          background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '50%',
+          width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', color: '#fff', fontSize: 18,
+        }}
+      >✕</button>
+
+      {/* Counter */}
+      {urls.length > 1 && (
+        <span style={{
+          position: 'absolute', bottom: 20,
+          background: 'rgba(0,0,0,0.5)', color: '#fff',
+          fontSize: 12, padding: '4px 12px', borderRadius: 99,
+        }}>{idx + 1} / {urls.length}</span>
+      )}
+    </div>,
+    document.body
+  )
+}
+
 function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?: () => void; onClose?: () => void }) {
   const { isMobile } = useSidebar()
   const [progress, setProgress] = useState<Record<string, any[]>>({ spanduk: [], brosur: [], laporan_baru: [], berita_acara: [] })
@@ -1072,6 +1173,7 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
   const [uploading, setUploading] = useState<string | null>(null)
   const [uploadingFoto, setUploadingFoto] = useState(false)
   const [selesaiLoading, setSelesaiLoading] = useState(false)
+  const [lightbox, setLightbox] = useState<{ urls: string[]; index: number } | null>(null)
   const fotoUpdateRef = useRef<HTMLInputElement>(null)
   const progressRefs = useRef<Record<string, HTMLInputElement | null>>({})
 
@@ -1316,7 +1418,7 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
                   // eslint-disable-next-line @next/next/no-img-element
                   <img key={i} src={resolveMediaUrl(url)} alt=""
                     style={{ width: 240, height: 160, objectFit: 'cover', borderRadius: 8, border: '1px solid #E1E8EC', display: 'block', cursor: 'pointer' }}
-                    onClick={() => window.open(resolveMediaUrl(url), '_blank')}
+                    onClick={() => setLightbox({ urls: fotoUrls.map(resolveMediaUrl), index: i })}
                   />
                 ))}
               </div>
@@ -1358,8 +1460,14 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
                   <div style={{ border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
                     {latestItem ? (
                       <>
-                        {/* Image/file preview full-width */}
-                        <div style={{ position: 'relative', height: 140, background: '#F6F9FC', overflow: 'hidden' }}>
+                        {/* Image/file preview full-width — click to lightbox */}
+                        <div style={{ position: 'relative', height: 140, background: '#F6F9FC', overflow: 'hidden', cursor: 'pointer' }}
+                          onClick={() => {
+                            if (/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl))
+                              setLightbox({ urls: [resolveMediaUrl(latestItem.fileUrl)], index: 0 })
+                            else window.open(resolveMediaUrl(latestItem.fileUrl), '_blank')
+                          }}
+                        >
                           {/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl) ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={resolveMediaUrl(latestItem.fileUrl)} alt=""
@@ -1370,7 +1478,7 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
                             </div>
                           )}
                           {/* Upload replace button */}
-                          <button type="button" onClick={() => progressRefs.current[tipe]?.click()}
+                          <button type="button" onClick={(e) => { e.stopPropagation(); progressRefs.current[tipe]?.click() }}
                             style={{ position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderRadius: '50%', background: '#076C9E', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
                             <Upload size={13} style={{ color: '#FFF' }} />
                           </button>
@@ -1431,8 +1539,8 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
                 {(entry.urls as string[]).map((url, i) => (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img key={i} src={url} alt="" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 6, border: '1px solid #E1E8EC', cursor: 'pointer' }}
-                    onClick={() => window.open(resolveMediaUrl(url), '_blank')} />
+                  <img key={i} src={resolveMediaUrl(url)} alt="" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 6, border: '1px solid #E1E8EC', cursor: 'pointer' }}
+                    onClick={() => setLightbox({ urls: (entry.urls as string[]).map(resolveMediaUrl), index: i })} />
                 ))}
               </div>
             </div>
@@ -1445,6 +1553,15 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
       </div>
 
       {progressInputs}
+
+      {/* Lightbox */}
+      {lightbox && (
+        <PhotoLightbox
+          urls={lightbox.urls}
+          startIndex={lightbox.index}
+          onClose={() => setLightbox(null)}
+        />
+      )}
     </div>
   )
 }
@@ -1508,6 +1625,7 @@ function LaporanDrawer({
   const [towerSheetOpen, setTowerSheetOpen] = useState(false)
   const [towerSheetTarget, setTowerSheetTarget] = useState<'start' | 'end'>('start')
   const [fotoSheetOpen, setFotoSheetOpen] = useState(false)
+  const [lightbox, setLightbox] = useState<{ urls: string[]; index: number } | null>(null)
 
   useEffect(() => {
     if (open) {
@@ -1693,12 +1811,13 @@ function LaporanDrawer({
       {/* Foto bukti */}
       <div>
         <label className="block text-[14px] font-bold text-app-text mb-2">Foto Bukti Terjadinya Kerawanan</label>
-        {/* Desktop: grid preview of existing foto URLs */}
+        {/* Desktop: grid preview of existing foto URLs — click to lightbox */}
         {!isMobile && fotoUrls.length > 0 && (
           <div className="grid grid-cols-4 gap-2 mb-2">
             {fotoUrls.map((url, i) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={i} src={resolveMediaUrl(url)} alt="" className="w-full aspect-square object-cover rounded-lg" />
+              <img key={i} src={resolveMediaUrl(url)} alt="" className="w-full aspect-square object-cover rounded-lg cursor-pointer"
+                onClick={() => setLightbox({ urls: fotoUrls.map(resolveMediaUrl), index: i })} />
             ))}
           </div>
         )}
@@ -1739,7 +1858,12 @@ function LaporanDrawer({
           </div>
         )}
         {!readOnly && !isMobile && (
-          <FotoUpload fotos={fotos} onChange={setFotos} onPhotoAdded={handleDetectLocation} />
+          <FotoUpload
+            fotos={fotos}
+            onChange={setFotos}
+            onPhotoAdded={handleDetectLocation}
+            onPreview={(i) => setLightbox({ urls: fotos.map((f) => URL.createObjectURL(f)), index: i })}
+          />
         )}
       </div>
 
@@ -2119,6 +2243,14 @@ function LaporanDrawer({
             </button>
           </div>
         </div>
+      )}
+      {/* Lightbox — foto preview in edit/add mode */}
+      {lightbox && (
+        <PhotoLightbox
+          urls={lightbox.urls}
+          startIndex={lightbox.index}
+          onClose={() => setLightbox(null)}
+        />
       )}
     </>
   )

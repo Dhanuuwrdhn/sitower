@@ -40,9 +40,9 @@ const LEVEL_BADGE: Record<string, { bg: string; text: string; label: string }> =
 
 const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {
   laporan_baru: { bg: '#076C9E', text: '#FFFFFF' },
-  berita_acara: { bg: '#F79009', text: '#FFFFFF' },
-  spanduk:      { bg: '#9F09F7', text: '#FFFFFF' },
-  brosur:       { bg: '#5F737F', text: '#FFFFFF' },
+  berita_acara: { bg: '#076C9E', text: '#FFFFFF' },
+  spanduk:      { bg: '#076C9E', text: '#FFFFFF' },
+  brosur:       { bg: '#076C9E', text: '#FFFFFF' },
 }
 
 const PROGRESS_TIPE_LABEL: Record<string, string> = {

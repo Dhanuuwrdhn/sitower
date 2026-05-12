@@ -113,12 +113,14 @@ const JENIS_LABEL: Record<string, string> = {
   pemanfaatan_lahan:    'Pemanfaatan Lahan',
 }
 
-// ── Donut Chart — 3 segment: Aman / Sedang / Kritis (Figma node 229-4312) ────
-function DonutChart({ aman, sedang, kritis }: { aman: number; sedang: number; kritis: number }) {
-  const total = aman + sedang + kritis
+// ── Donut Chart — 4 segments: Aman / Sedang / Kritis Terpenuhi / Kritis Tidak Terpenuhi ────
+function DonutChart({ aman, sedang, kritisTerpenuhi, kritisLdakTerpenuhi }: {
+  aman: number; sedang: number; kritisTerpenuhi: number; kritisLdakTerpenuhi: number
+}) {
+  const total = aman + sedang + kritisTerpenuhi + kritisLdakTerpenuhi
   const cx = 80, cy = 80, r = 60, strokeW = 24
   const circumference = 2 * Math.PI * r
-  const startOffset = circumference * 0.25 // start from top
+  const startOffset = circumference * 0.25
 
   if (total === 0) {
     return (
@@ -129,9 +131,10 @@ function DonutChart({ aman, sedang, kritis }: { aman: number; sedang: number; kr
     )
   }
 
-  const amanArc   = circumference * (aman   / total)
-  const sedangArc = circumference * (sedang / total)
-  const kritisArc = circumference * (kritis / total)
+  const amanArc  = circumference * (aman              / total)
+  const sedArc   = circumference * (sedang            / total)
+  const ktArc    = circumference * (kritisTerpenuhi   / total)
+  const kntArc   = circumference * (kritisLdakTerpenuhi / total)
 
   return (
     <svg width="160" height="160" viewBox="0 0 160 160">
@@ -144,15 +147,22 @@ function DonutChart({ aman, sedang, kritis }: { aman: number; sedang: number; kr
       />
       {/* Sedang — #F79009 */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#F79009" strokeWidth={strokeW}
-        strokeDasharray={`${sedangArc} ${circumference - sedangArc}`}
+        strokeDasharray={`${sedArc} ${circumference - sedArc}`}
         strokeDashoffset={startOffset - amanArc}
         strokeLinecap="round"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
-      {/* Kritis — #FD2D03 */}
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#FD2D03" strokeWidth={strokeW}
-        strokeDasharray={`${kritisArc} ${circumference - kritisArc}`}
-        strokeDashoffset={startOffset - amanArc - sedangArc}
+      {/* Kritis Terpenuhi — #EF4444 */}
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#EF4444" strokeWidth={strokeW}
+        strokeDasharray={`${ktArc} ${circumference - ktArc}`}
+        strokeDashoffset={startOffset - amanArc - sedArc}
+        strokeLinecap="round"
+        style={{ transition: 'stroke-dasharray 0.6s ease' }}
+      />
+      {/* Kritis Tidak Terpenuhi — #991B1B */}
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#991B1B" strokeWidth={strokeW}
+        strokeDasharray={`${kntArc} ${circumference - kntArc}`}
+        strokeDashoffset={startOffset - amanArc - sedArc - ktArc}
         strokeLinecap="round"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
@@ -184,7 +194,8 @@ export default function DashboardPage() {
   const [totalTower, setTotalTower] = useState(0)
   const [amanTower, setAmanTower] = useState(0)
   const [sedangTower, setSedangTower] = useState(0)
-  const [kritisTower, setKritisTower] = useState(0)
+  const [kritisTerpenuhiTower, setKritisTerpenuhiTower] = useState(0)
+  const [kritisLdakTerpenuhiTower, setKritisLdakTerpenuhiTower] = useState(0)
   const [loading, setLoading] = useState(true)
   const [jalurKmlData, setJalurKmlData] = useState<any[]>([])
 
@@ -252,15 +263,18 @@ export default function DashboardPage() {
       asetApi.getStats()
         .then((res) => {
           const s = res.data
-          const total  = s.total  ?? 0
-          const aman   = s.aman   ?? 0
-          const sedang = s.sedang ?? 0
-          const kritis = s.kritis ?? 0
+          const total              = s.total                   ?? 0
+          const aman               = s.aman                   ?? 0
+          const sedang             = s.sedang                 ?? 0
+          const kritisTerpenuhi    = s.kritis_terpenuhi       ?? 0
+          const kritisLdak         = s.kritis_tidak_terpenuhi ?? 0
+          const kritisLegacy       = s.kritis                 ?? 0
           setTotalTower(total)
           setAmanTower(aman)
           setSedangTower(sedang)
-          setKritisTower(kritis)
-          setAlertCount(sedang + kritis)
+          setKritisTerpenuhiTower(kritisTerpenuhi + kritisLegacy)
+          setKritisLdakTerpenuhiTower(kritisLdak)
+          setAlertCount(sedang + kritisTerpenuhi + kritisLdak + kritisLegacy)
         })
         .catch(() => {}),
 
@@ -309,9 +323,10 @@ export default function DashboardPage() {
     pemanfaatan: stats.pemanfaatan,
   }
 
-  const amanPct   = totalTower > 0 ? Math.round((amanTower   / totalTower) * 100) : 0
-  const sedangPct = totalTower > 0 ? Math.round((sedangTower / totalTower) * 100) : 0
-  const kritisPct = totalTower > 0 ? Math.round((kritisTower / totalTower) * 100) : 0
+  const amanPct   = totalTower > 0 ? Math.round((amanTower                / totalTower) * 100) : 0
+  const sedangPct = totalTower > 0 ? Math.round((sedangTower             / totalTower) * 100) : 0
+  const ktPct     = totalTower > 0 ? Math.round((kritisTerpenuhiTower    / totalTower) * 100) : 0
+  const kntPct    = totalTower > 0 ? Math.round((kritisLdakTerpenuhiTower / totalTower) * 100) : 0
 
   if (loading) return <B2WLoader label="Memuat dashboard..." />
 
@@ -390,7 +405,7 @@ export default function DashboardPage() {
 
           {/* Section 2 — Chart (kiri) + Total label+num (kanan), Figma: HORIZONTAL gap=24 */}
           <div className="dash-aset-body">
-            <DonutChart aman={amanTower} sedang={sedangTower} kritis={kritisTower} />
+            <DonutChart aman={amanTower} sedang={sedangTower} kritisTerpenuhi={kritisTerpenuhiTower} kritisLdakTerpenuhi={kritisLdakTerpenuhiTower} />
             <div className="dash-aset-total">
               <span className="dash-aset-total-label">Total Aset{'\n'}Transmisi</span>
               <span className="dash-aset-total-num">{totalTower}</span>
@@ -400,9 +415,10 @@ export default function DashboardPage() {
           {/* Section 3 — Legend rows, Figma: VERTICAL gap=16, each row space-between */}
           <div className="dash-aset-legend">
             {[
-              { color: '#039855', label: 'Aman',   count: amanTower,   pct: amanPct },
-              { color: '#F79009', label: 'Sedang', count: sedangTower, pct: sedangPct },
-              { color: '#FD2D03', label: 'Kritis', count: kritisTower, pct: kritisPct },
+              { color: '#039855', label: 'Aman',                  count: amanTower,                 pct: amanPct   },
+              { color: '#F79009', label: 'Sedang',                count: sedangTower,               pct: sedangPct },
+              { color: '#EF4444', label: 'Kritis Terpenuhi',      count: kritisTerpenuhiTower,      pct: ktPct     },
+              { color: '#991B1B', label: 'Kritis Tidak Terpenuhi', count: kritisLdakTerpenuhiTower, pct: kntPct    },
             ].map((row) => (
               <div key={row.label} className="dash-aset-legend-item">
                 <div className="dash-legend-header">

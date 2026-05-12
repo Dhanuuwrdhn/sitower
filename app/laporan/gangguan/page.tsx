@@ -299,6 +299,13 @@ function RowActions({
   )
 }
 
+// Extract #XXXX tower number from tower nama (e.g. "TOWER SUTET 500kV GNDUL-KMBNG #0001" → "#0001")
+function extractTowerNo(nama?: string | null): string | null {
+  if (!nama) return null
+  const m = nama.match(/#(\d+)/)
+  return m ? `#${m[1]}` : null
+}
+
 // ── Tower searchable dropdown ─────────────────────────────────────────────────
 
 interface TowerOption {
@@ -2146,7 +2153,7 @@ export default function GangguanPage() {
                       </span>
                     </td>
                     <td className="text-[14px] text-[#5f737f] whitespace-nowrap">
-                      {row.lokasiDetail ?? row.tower?.nomorTower ?? row.towerId ?? '—'}
+                      {extractTowerNo(row.tower?.nama) ?? '—'}
                     </td>
                     <td className="text-[14px] text-[#5f737f]">{JENIS_LABEL[row.jenisGangguan] ?? row.jenisGangguan ?? '—'}</td>
                     <td className="text-[14px] text-[#5f737f]">{row.teknisi ?? row.pelapor?.nama ?? '—'}</td>

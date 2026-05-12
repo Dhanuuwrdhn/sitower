@@ -1646,7 +1646,7 @@ function LaporanDrawer({
           temuan:  form.jenisGangguan === 'cui' ? form.temuan : undefined,
           hasil:   form.jenisGangguan === 'cui' ? form.hasil  : undefined,
         }),
-        ...(form.jenisGangguan === 'gangguan' && { penyebab: form.penyebab, durasi: form.durasi }),
+        ...(!isPPL && !['cui', 'cleanup'].includes(form.jenisGangguan) && { penyebab: form.penyebab, durasi: form.durasi }),
       }
 
       if (initial?.id) {
@@ -1667,10 +1667,8 @@ function LaporanDrawer({
   const isPPL     = form.jenisGangguan === 'pekerjaan_pihak_lain'
   const isCUI     = form.jenisGangguan === 'cui'
   const isCleanup = form.jenisGangguan === 'cleanup'
-  const isGangg   = form.jenisGangguan === 'gangguan'
+  const isGangg   = !isPPL && !isCUI && !isCleanup && !!form.jenisGangguan
   const title     = readOnly ? 'Detail Laporan' : initial ? 'Edit Laporan' : 'Buat Laporan Gangguan'
-
-  // ── Shared form body ─────────────────────────────────────────────────────────
   const formBody = (
     <form id="laporan-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
 
@@ -1905,6 +1903,20 @@ function LaporanDrawer({
           placeholder={isPPL ? 'Uraikan pekerjaan pihak lain...' : 'Deskripsi gangguan...'}
         />
       </div>
+
+      {!isPPL && (
+        <div>
+          <label className="block text-[14px] font-bold text-app-text mb-2">Keterangan</label>
+          <textarea
+            disabled={readOnly}
+            rows={4}
+            value={form.keterangan}
+            onChange={(e) => set('keterangan', e.target.value)}
+            className="form-input resize-none"
+            placeholder="Catatan tambahan laporan..."
+          />
+        </div>
+      )}
 
       {/* Pekerjaan Pihak Lain section */}
       {isPPL && (

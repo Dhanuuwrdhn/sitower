@@ -310,6 +310,7 @@ function JalurKmlLines({ jalurKml, visibleTypes }: {
             },
             title: jalur.nama,
             zIndex: 20,
+            clickable: false,
           }))
         }
       }

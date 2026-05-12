@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { SlidersHorizontal, X, Upload } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { towersApi, jalurKmlApi } from '@/lib/api'
 import { isAdmin } from '@/lib/auth'
 import B2WLoader from '@/components/ui/B2WLoader'
+import type { JalurKmlItem } from '@/components/map/TowerMapGoogle'
 
 const TowerMap = dynamic(() => import('@/components/map/TowerMapGoogle'), { ssr: false })
 
@@ -57,6 +58,35 @@ export default function PetaPage() {
       setImportingSktt(false)
     }
   }
+
+  // Generate SUTT/SUTET polylines from tower data (group by tipe+jalur, sort by nomorUrut)
+  const computedJalurLines = useMemo<JalurKmlItem[]>(() => {
+    const groups = new Map<string, { tipe: string; towers: any[] }>()
+    for (const t of towers) {
+      if (t.tipe !== 'SUTT' && t.tipe !== 'SUTET') continue
+      if (!t.jalur) continue
+      const key = `${t.tipe}::${t.jalur}`
+      if (!groups.has(key)) groups.set(key, { tipe: t.tipe, towers: [] })
+      groups.get(key)!.towers.push(t)
+    }
+    const result: JalurKmlItem[] = []
+    let fakeId = -1
+    for (const [, group] of groups) {
+      const sorted = [...group.towers].sort((a: any, b: any) => (a.nomorUrut ?? 0) - (b.nomorUrut ?? 0))
+      const path = sorted.map((t: any) => ({ lat: t.lat, lng: t.lng }))
+      if (path.length < 2) continue
+      result.push({
+        id: fakeId--,
+        nama: group.towers[0].jalur,
+        tipe: group.tipe,
+        warna: group.tipe === 'SUTET' ? '#e65100' : '#0288D1',
+        path,
+      })
+    }
+    return result
+  }, [towers])
+
+  const allJalurKml = useMemo(() => [...computedJalurLines, ...jalurKml], [computedJalurLines, jalurKml])
 
   const filteredTowers = towers.filter((t) => {
     if (tipe !== 'Semua' && t.tipe !== tipe) return false
@@ -148,7 +178,7 @@ export default function PetaPage() {
             flex: 1, background: '#fff', border: '1px solid #E1E8EC',
             borderRadius: 12, overflow: 'hidden', minHeight: 500,
           }}>
-            <TowerMap towers={filteredTowers} jalurKml={jalurKml} />
+            <TowerMap towers={filteredTowers} jalurKml={allJalurKml} />
           </div>
 
           {/* Side panel — legend */}
@@ -187,7 +217,7 @@ export default function PetaPage() {
       <div className="pwa-map-page">
         {/* Full screen map */}
         <div className="pwa-map-fullscreen">
-          <TowerMap towers={filteredTowers} jalurKml={jalurKml} />
+          <TowerMap towers={filteredTowers} jalurKml={allJalurKml} />
 
           {/* Legend overlay */}
           <div className="pwa-map-legend">

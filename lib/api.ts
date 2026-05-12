@@ -38,13 +38,32 @@ export const authApi = {
 }
 
 export const towersApi = {
-  getAll: (params?: any) => api.get('/towers', { params }),
-  getMap: () => api.get('/towers/map'),
-  getDropdown: () => api.get('/towers/dropdown'),
-  getById: (id: string) => api.get(`/towers/${id}`),
-  create: (data: any) => api.post('/towers', data),
-  update: (id: string, data: any) => api.put(`/towers/${id}`, data),
-  delete: (id: string) => api.delete(`/towers/${id}`),
+  getAll:    (params?: any) => api.get('/towers', { params }),
+  getMap:    ()             => api.get('/towers/map'),
+  getDropdown: ()           => api.get('/towers/dropdown'),
+  getById:  (id: string)    => api.get(`/towers/${encodeURIComponent(id)}`),
+  create:   (data: any)     => api.post('/towers', data),
+  update:   (id: string, data: any) => api.put(`/towers/${encodeURIComponent(id)}`, data),
+  delete:   (id: string)    => api.delete(`/towers/${encodeURIComponent(id)}`),
+}
+
+export const asetApi = {
+  getStats:    ()             => api.get('/aset/stats'),
+  getLineTypes: ()            => api.get('/aset/line-types'),
+  getGardu:    ()             => api.get('/aset/gardu-induk'),
+  getGarduById: (id: number)  => api.get(`/aset/gardu-induk/${id}`),
+  getRoutes:   ()             => api.get('/aset/routes'),
+  getRouteById: (id: number)  => api.get(`/aset/routes/${id}`),
+  getTowers:   (params?: any) => api.get('/aset/towers', { params }),
+  getTowerById: (id: string)  => api.get(`/aset/towers/${encodeURIComponent(id)}`),
+  getMapOverview: ()          => api.get('/aset/map/overview'),
+  getMapRoutes: ()            => api.get('/aset/map/routes'),
+  getMapFilter: (type: string) => api.get('/aset/map/filter', { params: { type } }),
+  importExcel: (file: File) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    return api.post('/aset/import', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+  },
 }
 
 export const laporanApi = {
@@ -60,6 +79,20 @@ export const laporanApi = {
     return api.post('/laporan/upload-foto', form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
+  },
+  getProgress:   (id: string) => api.get(`/laporan/${id}/progress`),
+  uploadProgress: (id: string, tipe: string, file: File) => {
+    const form = new FormData()
+    form.append('tipe', tipe)
+    form.append('file', file)
+    return api.post(`/laporan/${id}/progress`, form, { headers: { 'Content-Type': 'multipart/form-data' } })
+  },
+  deleteProgress: (id: string, progressId: string) => api.delete(`/laporan/${id}/progress/${progressId}`),
+  getFotoHistory: (id: string) => api.get(`/laporan/${id}/foto-history`),
+  uploadFotoUpdate: (id: string, files: File[]) => {
+    const form = new FormData()
+    files.forEach((f) => form.append('foto', f))
+    return api.post(`/laporan/${id}/foto-update`, form, { headers: { 'Content-Type': 'multipart/form-data' } })
   },
 }
 
@@ -144,6 +177,11 @@ export const jalurKmlApi = {
     const fd = new FormData()
     fd.append('file', file)
     return api.post('/jalur-kml/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+  },
+  importSktt: (file: File) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    return api.post('/jalur-kml/import-sktt', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
   },
   remove: (id: number) => api.delete(`/jalur-kml/${id}`),
 }

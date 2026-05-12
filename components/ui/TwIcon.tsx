@@ -4,6 +4,8 @@ import { Icon } from '@iconify/react'
 
 // Mapping emoji character → twemoji iconify ID
 const EMOJI_MAP: Record<string, string> = {
+  '🚧': 'twemoji:construction',
+  '☠️': 'twemoji:skull-and-crossbones',
   '🚜': 'twemoji:tractor',
   '🏡': 'twemoji:house-with-garden',
   '🥷': 'twemoji:ninja',

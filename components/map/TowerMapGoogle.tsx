@@ -115,10 +115,12 @@ const CELL_TOWER_PATH = `M13.3916 10.6167C13.3553 10.5439 13.2995 10.4827 13.230
 
 // Match Figma token colors exactly (same as LEVEL_COLOR)
 const LEVEL_BG: Record<string, string> = {
-  kritis: '#EF4444',
-  sedang: '#F59E0B',
-  aman:   '#22C55E',
-  normal: '#3B82F6',
+  kritis_tidak_terpenuhi: '#EF4444',
+  kritis_terpenuhi:       '#EF4444',
+  kritis:                 '#EF4444',
+  sedang:                 '#F59E0B',
+  aman:                   '#22C55E',
+  normal:                 '#3B82F6',
 }
 
 const KATEGORI_EMOJI: Record<string, string> = {

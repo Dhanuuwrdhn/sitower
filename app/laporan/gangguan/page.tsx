@@ -1959,14 +1959,6 @@ function LaporanDrawer({
         </div>
       )}
 
-      {/* Non-PPL keterangan */}
-      {!isPPL && (
-        <div>
-          <label className="block text-[12px] font-semibold text-app-text mb-1.5">Keterangan</label>
-          <textarea disabled={readOnly} rows={3} value={form.keterangan} onChange={(e) => set('keterangan', e.target.value)} className="form-input resize-none" />
-        </div>
-      )}
-
       {/* Tanggal & Waktu — hidden on create (auto = now), editable on edit, disabled on detail */}
       {(readOnly || !!initial) && (
         <div>

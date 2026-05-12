@@ -120,8 +120,9 @@ function StatusPill({ status }: { status: string }) {
 function LevelBadge({ level }: { level: string }) {
   const cfg = LEVEL_BADGE[level?.toLowerCase()]
   if (!cfg) return <span className="text-app-muted text-[12px]">—</span>
+  const blink = level?.toLowerCase() === 'kritis_tidak_terpenuhi'
   return (
-    <span style={{ background: cfg.bg, color: cfg.text, display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 10px', borderRadius: 99, fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>
+    <span className={blink ? 'badge-blink' : undefined} style={{ background: cfg.bg, color: cfg.text, display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 10px', borderRadius: 99, fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>
       {cfg.label}
     </span>
   )
@@ -1981,16 +1982,6 @@ function LaporanDrawer({
             ))}
           </div>
         )}
-      </div>
-
-      <div>
-        <label className="block text-[12px] font-semibold text-app-text mb-1.5">Progress Laporan</label>
-        <div className="flex items-center gap-3">
-          <select disabled={readOnly} value={form.status} onChange={(e) => set('status', e.target.value)} className="form-input">
-            {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
-          </select>
-          <StatusPill status={form.status} />
-        </div>
       </div>
 
       <div>

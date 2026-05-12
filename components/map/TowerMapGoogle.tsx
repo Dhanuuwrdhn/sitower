@@ -542,7 +542,7 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
   const [selected, setSelected] = useState<FeaturedTower | null>(null)
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
   const [layerPanelOpen, setLayerPanelOpen] = useState(false)
-  const [visibleLayers, setVisibleLayers] = useState<Set<string>>(new Set(ALL_LAYER_TYPES))
+  const [visibleLayers, setVisibleLayers] = useState<Set<string>>(new Set(['SUTT', 'SUTET']))
 
   function toggleLayer(tipe: string) {
     setVisibleLayers(prev => {

@@ -13,7 +13,6 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonRow } from '@/components/ui/SkeletonRow'
 
 const TIPE_OPTIONS = ['Semua', 'SUTET', 'SUTT', 'SKTT', 'Gardu Induk']
-const KONDISI_OPTIONS = ['Semua', 'normal', 'waspada', 'gangguan', 'maintenance']
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -559,11 +558,10 @@ export default function AsetPage() {
   const [rows, setRows]       = useState<any[]>([])
   const [total, setTotal]     = useState(0)
   const [loading, setLoading] = useState(true)
-  const [search, setSearch]   = useState('')
-  const [tipe, setTipe]       = useState('')
-  const [kondisi, setKondisi] = useState('')
-  const [page, setPage]       = useState(1)
-  const [limit, setLimit]     = useState(10)
+  const [search, setSearch] = useState('')
+  const [tipe, setTipe]     = useState('')
+  const [page, setPage]     = useState(1)
+  const [limit, setLimit]   = useState(10)
 
   const [isAdminUser, setIsAdminUser] = useState(false)
   useEffect(() => { setIsAdminUser(isAdmin()) }, [])
@@ -594,7 +592,6 @@ export default function AsetPage() {
         page, limit,
         search: q || undefined,
         tipe: tipe || undefined,
-        kondisi: kondisi || undefined,
       })
       const p = res.data
       if (Array.isArray(p)) { setRows(p); setTotal(p.length) }
@@ -604,11 +601,11 @@ export default function AsetPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, limit, q, tipe, kondisi])
+  }, [page, limit, q, tipe])
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  const COLS = isAdminUser ? 8 : 7
+  const COLS = isAdminUser ? 7 : 6
 
   return (
     <>
@@ -628,9 +625,6 @@ export default function AsetPage() {
         <select value={tipe} onChange={(e) => { setTipe(e.target.value === 'Semua' ? '' : e.target.value); setPage(1) }} className="form-input w-auto pr-8" style={{ height: 40 }}>
           {TIPE_OPTIONS.map((t) => <option key={t} value={t === 'Semua' ? '' : t}>{t}</option>)}
         </select>
-        <select value={kondisi} onChange={(e) => { setKondisi(e.target.value === 'Semua' ? '' : e.target.value); setPage(1) }} className="form-input w-auto pr-8" style={{ height: 40 }}>
-          {KONDISI_OPTIONS.map((k) => <option key={k} value={k === 'Semua' ? '' : k}>{k}</option>)}
-        </select>
       </div>
 
       {/* Unified Table */}
@@ -645,7 +639,6 @@ export default function AsetPage() {
                 <th>Tipe</th>
                 <th>Tegangan (kV)</th>
                 <th>Jalur</th>
-                <th>Kondisi</th>
                 <th>Lokasi</th>
                 {isAdminUser && <th className="text-right pr-5">Aksi</th>}
               </tr>
@@ -665,7 +658,6 @@ export default function AsetPage() {
                       <td className="text-app-muted">{row.tipe ?? '—'}</td>
                       <td className="font-mono text-[12px]">{row.tegangan ?? '—'}</td>
                       <td className="text-app-muted text-[12px] max-w-[160px] truncate" title={row.jalur ?? ''}>{row.jalur ?? '—'}</td>
-                      <td><StatusBadge status={row.kondisi ?? 'normal'} /></td>
                       <td className="text-app-muted text-[12px] font-mono whitespace-nowrap">
                         {row.lat && row.lng
                           ? `${Number(row.lat).toFixed(5)}, ${Number(row.lng).toFixed(5)}`

@@ -1898,7 +1898,7 @@ function LaporanDrawer({
       )}
 
       <div>
-        <label className="block text-[12px] font-semibold text-app-text mb-2">Level Risiko</label>
+        <label className="block text-[12px] font-semibold text-app-text mb-2">Status Kerawanan</label>
         <div className="grid grid-cols-3 gap-2">
           {LEVEL_OPTIONS.map((l) => (
             <button
@@ -1916,7 +1916,7 @@ function LaporanDrawer({
       </div>
 
       <div>
-        <label className="block text-[12px] font-semibold text-app-text mb-1.5">Status</label>
+        <label className="block text-[12px] font-semibold text-app-text mb-1.5">Progress Laporan</label>
         <div className="flex items-center gap-3">
           <select disabled={readOnly} value={form.status} onChange={(e) => set('status', e.target.value)} className="form-input">
             {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}

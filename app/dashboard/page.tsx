@@ -210,20 +210,27 @@ export default function DashboardPage() {
         .then((res) => {
           const overview = res.data
           // Transform aset towers to FeaturedTower format expected by TowerMapGoogle
-          const mapTowers = (overview.towers ?? []).map((t: any) => ({
-            id:         t.id,
-            nama:       t.name,
-            lat:        t.lat,
-            lng:        t.lng,
-            tipe:       'SUTT' as const,
-            jalur:      null,
-            nomorUrut:  null,
-            kerawanan:  t.status !== 'aman' ? [{
-              kategori: t.kerawanan_type ?? 'unknown',
-              level:    t.status as 'kritis' | 'sedang' | 'aman',
-              status:   t.status,
-            }] : [],
-          }))
+          const mapTowers = (overview.towers ?? []).map((t: any) => {
+            const types: string[] = t.kerawanan_types?.length
+              ? t.kerawanan_types
+              : (t.kerawanan_type ? [t.kerawanan_type] : [])
+            return {
+              id:         t.id,
+              nama:       t.name,
+              lat:        t.lat,
+              lng:        t.lng,
+              tipe:       'SUTT' as const,
+              jalur:      null,
+              nomorUrut:  null,
+              kerawanan:  t.status !== 'aman'
+                ? types.map((jenis: string) => ({
+                    kategori: jenis,
+                    level:    t.status as 'kritis' | 'sedang' | 'aman',
+                    status:   t.status,
+                  }))
+                : [],
+            }
+          })
           setTowerKerawanan(mapTowers)
         })
         .catch(() => {}),

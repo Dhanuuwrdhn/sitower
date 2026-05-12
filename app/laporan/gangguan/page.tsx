@@ -1856,6 +1856,38 @@ function LaporanDrawer({
         )}
       </div>
 
+      {/* Status Kerawanan */}
+      <div>
+        <label className={`block font-semibold text-app-text mb-2 ${isMobile ? 'text-[14px]' : 'text-[12px]'}`}>Status Kerawanan</label>
+        {isMobile && !readOnly ? (
+          <button
+            type="button"
+            onClick={() => setLevelSheetOpen(true)}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              width: '100%', padding: '10px 14px', background: '#FFFFFF',
+              border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+            }}
+          >
+            <span style={{ fontSize: 14, color: form.levelRisiko ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
+              {LEVEL_OPTIONS.find(l => l.value === form.levelRisiko)?.label || 'Pilih status...'}
+            </span>
+            <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+          </button>
+        ) : (
+          <select
+            disabled={readOnly}
+            value={form.levelRisiko}
+            onChange={(e) => set('levelRisiko', e.target.value)}
+            className={`form-input ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
+          >
+            {LEVEL_OPTIONS.map(l => (
+              <option key={l.value} value={l.value}>{l.label}</option>
+            ))}
+          </select>
+        )}
+      </div>
+
       {/* Uraian Pekerjaan / Deskripsi */}
       <div>
         <label className="block text-[14px] font-bold text-app-text mb-2">
@@ -1948,41 +1980,6 @@ function LaporanDrawer({
           />
         </div>
       )}
-
-      <div>
-        <label className={`block font-semibold text-app-text mb-2 ${isMobile ? 'text-[14px]' : 'text-[12px]'}`}>Status Kerawanan</label>
-        {isMobile && !readOnly ? (
-          <button
-            type="button"
-            onClick={() => setLevelSheetOpen(true)}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              width: '100%', padding: '10px 14px', background: '#FFFFFF',
-              border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
-            }}
-          >
-            <span style={{ fontSize: 14, color: form.levelRisiko ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
-              {LEVEL_OPTIONS.find(l => l.value === form.levelRisiko)?.label || 'Pilih status...'}
-            </span>
-            <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
-          </button>
-        ) : (
-          <div className="grid grid-cols-2 gap-2">
-            {LEVEL_OPTIONS.map((l) => (
-              <button
-                key={l.value} type="button" disabled={readOnly}
-                onClick={() => set('levelRisiko', l.value)}
-                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all text-[13px] font-semibold ${
-                  form.levelRisiko === l.value ? `${l.bg} ${l.color} border-current` : 'border-app-border text-app-muted hover:border-gray-300'
-                }`}
-              >
-                <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${l.dot}`} />
-                {l.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
 
       <div>
         <label className="block text-[12px] font-semibold text-app-text mb-1.5">Pelapor</label>

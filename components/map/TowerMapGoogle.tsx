@@ -54,6 +54,12 @@ const KATEGORI_LABEL: Record<string, string> = {
   pemanfaatan_lahan: 'Pemanfaatan Lahan',
 }
 
+// DB may store short aliases (e.g. "ppl") — normalize to canonical keys
+const KATEGORI_ALIAS: Record<string, string> = {
+  ppl: 'pekerjaan_pihak_lain',
+}
+function normKat(k: string): string { return KATEGORI_ALIAS[k] ?? k }
+
 function getTopLevel(kerawanan: KerawananItem[]): string {
   if (!kerawanan.length) return 'normal'
   return kerawanan.reduce((top, k) =>
@@ -187,7 +193,7 @@ function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', ker
     SVG_W = CIRCLE_D + BADGE_D - BADGE_OVERLAP + 2
     const bx = BADGE_X0, by = 0
     const bcx = bx + BADGE_D / 2, bcy = by + BADGE_D / 2
-    const iconBody = TWEMOJI_BODIES[kerawanan[0].kategori] ?? ''
+    const iconBody = TWEMOJI_BODIES[normKat(kerawanan[0].kategori)] ?? ''
     badgeContent = `
       <circle cx="${bcx}" cy="${bcy}" r="${BADGE_D / 2 + 1.5}" fill="white"/>
       <svg x="${bx}" y="${by}" width="${BADGE_D}" height="${BADGE_D}" viewBox="0 0 36 36">${iconBody}</svg>
@@ -198,7 +204,7 @@ function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', ker
     for (let i = 0; i < 2; i++) {
       const bx = BADGE_X0 + i * GAP, by = 0
       const bcx = bx + BADGE_D / 2, bcy = by + BADGE_D / 2
-      const iconBody = TWEMOJI_BODIES[kerawanan[i].kategori] ?? ''
+      const iconBody = TWEMOJI_BODIES[normKat(kerawanan[i].kategori)] ?? ''
       badgeContent += `
         <circle cx="${bcx}" cy="${bcy}" r="${BADGE_D / 2 + 1.5}" fill="white"/>
         <svg x="${bx}" y="${by}" width="${BADGE_D}" height="${BADGE_D}" viewBox="0 0 36 36">${iconBody}</svg>
@@ -413,8 +419,8 @@ function TowerPopup({ tower, onClose }: { tower: FeaturedTower; onClose: () => v
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
               {shown.map((k, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ fontSize: 14, lineHeight: 1 }}>{KATEGORI_EMOJI[k.kategori] ?? '⚠️'}</span>
-                  <span style={{ color: '#374151', fontSize: 11, flex: 1 }}>{KATEGORI_LABEL[k.kategori] ?? k.kategori}</span>
+                  <span style={{ fontSize: 14, lineHeight: 1 }}>{KATEGORI_EMOJI[normKat(k.kategori)] ?? '⚠️'}</span>
+                  <span style={{ color: '#374151', fontSize: 11, flex: 1 }}>{KATEGORI_LABEL[normKat(k.kategori)] ?? k.kategori}</span>
                   <span style={{
                     fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 999,
                     background: (LEVEL_COLOR[k.level] ?? '#94a3b8') + '22',
@@ -458,21 +464,7 @@ function Legend() {
       background: 'rgba(255,255,255,0.96)', borderRadius: 8,
       boxShadow: '0 2px 8px rgba(0,0,0,0.15)', padding: '10px 14px', fontSize: 11, lineHeight: 1.9,
     }}>
-      <p style={{ fontWeight: 700, fontSize: 11.5, marginBottom: 4, color: '#0f172a' }}>Jalur Transmisi</p>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ width: 24, height: 4, background: JALUR_COLORS.SUTET_500kV, borderRadius: 2 }} />
-        <span style={{ color: '#374151' }}>SUTET 500kV</span>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ width: 24, height: 3, background: JALUR_COLORS.SUTT_150kV, borderRadius: 2 }} />
-        <span style={{ color: '#374151' }}>SUTT 150kV</span>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ width: 24, height: 3, borderTop: `3px dashed ${JALUR_COLORS.SKTT_150kV}` }} />
-        <span style={{ color: '#374151' }}>SKTT 150kV</span>
-      </div>
-
-      <p style={{ fontWeight: 700, fontSize: 11.5, margin: '8px 0 4px', color: '#0f172a' }}>Marker</p>
+      <p style={{ fontWeight: 700, fontSize: 11.5, marginBottom: 4, color: '#0f172a' }}>Legenda</p>
       {/* Gardu Induk */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <svg width="18" height="18" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
@@ -507,21 +499,6 @@ function Legend() {
         </div>
       ))}
 
-      <p style={{ fontWeight: 700, fontSize: 11.5, margin: '8px 0 4px', color: '#0f172a' }}>Jenis Kerawanan</p>
-      {([
-        { emoji: '🚜', label: 'PPL',               bg: '#F59E0B' },
-        { emoji: '🔥', label: 'Kebakaran',          bg: '#D92D20' },
-        { emoji: '🪁', label: 'Layangan',           bg: '#F59E0B' },
-        { emoji: '🥷', label: 'Pencurian',          bg: '#D92D20' },
-        { emoji: '🏡', label: 'Pemanfaatan Lahan',  bg: '#F59E0B' },
-      ] as const).map(({ emoji, label, bg }) => (
-        <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 18, height: 18, borderRadius: '50%', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <TwIcon emoji={emoji} size={12} />
-          </div>
-          <span style={{ color: '#374151' }}>{label}</span>
-        </div>
-      ))}
     </div>
   )
 }
@@ -550,7 +527,7 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
   const displayTowers = useMemo<FeaturedTower[]>(() => {
     const all = towers ?? []
     if (!activeFilter) return all
-    return all.filter((t) => t.kerawanan.some((k) => k.kategori === activeFilter))
+    return all.filter((t) => t.kerawanan.some((k) => normKat(k.kategori) === activeFilter))
   }, [towers, activeFilter])
 
   // Count per filter category for tab badges
@@ -561,7 +538,7 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
     }
     for (const opt of FILTER_OPTIONS) {
       if (opt.key) {
-        counts[opt.key] = all.filter((t) => t.kerawanan.some((k) => k.kategori === opt.key)).length
+        counts[opt.key] = all.filter((t) => t.kerawanan.some((k) => normKat(k.kategori) === opt.key)).length
       }
     }
     return counts

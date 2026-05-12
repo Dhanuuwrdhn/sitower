@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import toast from 'react-hot-toast'
 import {
   Search, Plus, Calendar, SlidersHorizontal, RotateCcw,
@@ -179,59 +180,88 @@ function RowActions({
   showDelete: boolean
 }) {
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 })
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
+  // Close on outside click
   useEffect(() => {
+    if (!open) return
     function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      if (
+        btnRef.current && !btnRef.current.contains(e.target as Node) &&
+        menuRef.current && !menuRef.current.contains(e.target as Node)
+      ) setOpen(false)
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
+  }, [open])
+
+  // Close on scroll
+  useEffect(() => {
+    if (!open) return
+    const handleScroll = () => setOpen(false)
+    window.addEventListener('scroll', handleScroll, true)
+    return () => window.removeEventListener('scroll', handleScroll, true)
+  }, [open])
+
+  function handleToggle() {
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      setMenuPos({
+        top: rect.bottom + 4,
+        left: rect.right - 200, // align right edge of menu to button
+      })
+    }
+    setOpen((v) => !v)
+  }
+
+  const menuStyle: React.CSSProperties = {
+    position: 'fixed',
+    top: menuPos.top,
+    left: menuPos.left,
+    zIndex: 9999,
+    background: '#FFFFFF',
+    borderRadius: 4,
+    boxShadow: '0px 4px 8px 0px rgba(28, 28, 28, 0.15)',
+    padding: '8px 0',
+    minWidth: 200,
+  }
+
+  const itemStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    padding: '8px 8px',
+    width: '100%',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: 14,
+    fontWeight: 500,
+    fontFamily: 'Inter, sans-serif',
+    color: '#5F737F',
+    lineHeight: '20px',
+    textAlign: 'left' as const,
+    transition: 'background 0.15s',
+  }
 
   return (
-    <div className="relative inline-flex mx-auto" ref={ref}>
+    <div className="inline-flex mx-auto">
       <button
-        onClick={() => setOpen((v) => !v)}
+        ref={btnRef}
+        onClick={handleToggle}
         className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted hover:text-app-text transition-colors"
         title="Aksi"
       >
         <MoreHorizontal size={16} />
       </button>
 
-      {open && (
-        <div
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: 32,
-            zIndex: 50,
-            background: '#FFFFFF',
-            borderRadius: 4,
-            boxShadow: '0px 4px 8px 0px rgba(28, 28, 28, 0.15)',
-            padding: '8px 0',
-            minWidth: 200,
-          }}
-        >
+      {open && typeof document !== 'undefined' && createPortal(
+        <div ref={menuRef} style={menuStyle}>
           <button
             onClick={() => { setOpen(false); onDetail(row) }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              padding: '8px 8px',
-              width: '100%',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: 14,
-              fontWeight: 500,
-              fontFamily: 'Inter, sans-serif',
-              color: '#5F737F',
-              lineHeight: '20px',
-              textAlign: 'left' as const,
-              transition: 'background 0.15s',
-            }}
+            style={itemStyle}
             onMouseEnter={(e) => (e.currentTarget.style.background = '#F6F9FC')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
           >
@@ -239,28 +269,11 @@ function RowActions({
             Lihat Detail Laporan
           </button>
 
-          {/* Divider */}
-          <div style={{ height: 1, background: '#E1E8EC', margin: '0' }} />
+          <div style={{ height: 1, background: '#E1E8EC' }} />
 
           <button
             onClick={() => { setOpen(false); onEdit(row) }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              padding: '8px 8px',
-              width: '100%',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: 14,
-              fontWeight: 500,
-              fontFamily: 'Inter, sans-serif',
-              color: '#5F737F',
-              lineHeight: '20px',
-              textAlign: 'left' as const,
-              transition: 'background 0.15s',
-            }}
+            style={itemStyle}
             onMouseEnter={(e) => (e.currentTarget.style.background = '#F6F9FC')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
           >
@@ -270,26 +283,10 @@ function RowActions({
 
           {showDelete && (
             <>
-              <div style={{ height: 1, background: '#E1E8EC', margin: '0' }} />
+              <div style={{ height: 1, background: '#E1E8EC' }} />
               <button
                 onClick={() => { setOpen(false); onDelete(row) }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '8px 8px',
-                  width: '100%',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: 14,
-                  fontWeight: 500,
-                  fontFamily: 'Inter, sans-serif',
-                  color: '#D92D20',
-                  lineHeight: '20px',
-                  textAlign: 'left' as const,
-                  transition: 'background 0.15s',
-                }}
+                style={{ ...itemStyle, color: '#D92D20' }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = '#FEF3F2')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
@@ -298,7 +295,8 @@ function RowActions({
               </button>
             </>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

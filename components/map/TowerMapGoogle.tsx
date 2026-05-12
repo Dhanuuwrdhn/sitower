@@ -465,20 +465,6 @@ function Legend() {
       boxShadow: '0 2px 8px rgba(0,0,0,0.15)', padding: '10px 14px', fontSize: 11, lineHeight: 1.9,
     }}>
       <p style={{ fontWeight: 700, fontSize: 11.5, marginBottom: 4, color: '#0f172a' }}>Legenda</p>
-      {/* Gardu Induk */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <svg width="18" height="18" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
-          <rect width="26" height="26" rx="13" fill="#1F2937"/>
-          <path d="M18.8334 17.0833V18.8333H7.16675V17.0833C7.16675 16.7625 7.42925 16.5 7.75008 16.5H18.2501C18.5709 16.5 18.8334 16.7625 18.8334 17.0833Z" fill="white" stroke="white" strokeWidth="0.818182" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M10.0834 12.4167H8.91675V16.5H10.0834V12.4167Z" fill="white"/>
-          <path d="M12.4167 12.4167H11.25V16.5H12.4167V12.4167Z" fill="white"/>
-          <path d="M14.7499 12.4167H13.5833V16.5H14.7499V12.4167Z" fill="white"/>
-          <path d="M17.0834 12.4167H15.9167V16.5H17.0834V12.4167Z" fill="white"/>
-          <path d="M19.4166 19.2708H6.58325C6.34409 19.2708 6.14575 19.0725 6.14575 18.8333C6.14575 18.5941 6.34409 18.3958 6.58325 18.3958H19.4166C19.6558 18.3958 19.8541 18.5941 19.8541 18.8333C19.8541 19.0725 19.6558 19.2708 19.4166 19.2708Z" fill="white"/>
-          <path d="M18.4659 9.35418L13.2159 7.25418C13.0992 7.20751 12.9009 7.20751 12.7842 7.25418L7.53425 9.35418C7.33008 9.43584 7.16675 9.67501 7.16675 9.89668V11.8333C7.16675 12.1542 7.42925 12.4167 7.75008 12.4167H18.2501C18.5709 12.4167 18.8334 12.1542 18.8334 11.8333V9.89668C18.8334 9.67501 18.6701 9.43584 18.4659 9.35418ZM13.0001 10.9583C12.5159 10.9583 12.1251 10.5675 12.1251 10.0833C12.1251 9.59918 12.5159 9.20834 13.0001 9.20834C13.4842 9.20834 13.8751 9.59918 13.8751 10.0833C13.8751 10.5675 13.4842 10.9583 13.0001 10.9583Z" fill="white"/>
-        </svg>
-        <span style={{ color: '#374151' }}>Gardu Induk</span>
-      </div>
       {/* Tower Normal */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#3B82F6', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #3B82F6', flexShrink: 0 }} />

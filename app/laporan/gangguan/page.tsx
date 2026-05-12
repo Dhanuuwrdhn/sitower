@@ -9,7 +9,7 @@ import {
   ChevronDown, MoreHorizontal, Eye, Pencil,
   ArrowLeft, AlertTriangle, FileText, ImagePlus, Clock,
 } from 'lucide-react'
-import { laporanApi, towersApi } from '@/lib/api'
+import { laporanApi, towersApi, importApi } from '@/lib/api'
 import { getUser, isAdmin } from '@/lib/auth'
 import { getDistance } from '@/lib/geo'
 import { resolveMediaUrl } from '@/lib/utils'
@@ -2330,6 +2330,12 @@ export default function GangguanPage() {
   // Tower dropdown options
   const [towerOptions, setTowerOptions] = useState<TowerOption[]>([])
 
+  // Import Excel state
+  const [importOpen, setImportOpen] = useState(false)
+  const [importFile, setImportFile] = useState<File | null>(null)
+  const [importing, setImporting] = useState(false)
+  const importInputRef = useRef<HTMLInputElement>(null)
+
   // Drawer / modal state
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [pendingFotos, setPendingFotos] = useState<File[]>([])
@@ -2406,6 +2412,23 @@ export default function GangguanPage() {
   function openEdit(row: any) { setEditRow(row); setViewMode('edit'); setDrawerOpen(true) }
   function openDetail(row: any) { setEditRow(row); setViewMode('detail'); setDrawerOpen(true) }
 
+  async function handleImport() {
+    if (!importFile) return
+    setImporting(true)
+    try {
+      const res = await importApi.import('laporan', importFile)
+      const { total: imported } = res.data
+      toast.success(`Berhasil import ${imported} laporan`)
+      setImportOpen(false)
+      setImportFile(null)
+      fetchData()
+    } catch (e: any) {
+      toast.error(e?.response?.data?.message ?? 'Gagal import')
+    } finally {
+      setImporting(false)
+    }
+  }
+
   const from = total === 0 ? 0 : (page - 1) * pageSize + 1
   const to   = Math.min(page * pageSize, total)
 
@@ -2439,13 +2462,21 @@ export default function GangguanPage() {
               {hasActiveFilters && <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#D92D20]" />}
             </button>
           </div>
-          {/* Row 2: Tambah Laporan Baru */}
-          <button
-            onClick={openAdd}
-            className="w-full h-11 rounded-[22px] bg-[#076c9e] text-white font-semibold text-[14px] border-none cursor-pointer flex items-center justify-center gap-2"
-          >
-            <Plus size={16} /> Tambah Laporan Baru
-          </button>
+          {/* Row 2: Import + Tambah Laporan Baru */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setImportOpen(true)}
+              className="flex-1 h-11 rounded-[22px] bg-white border border-[#076c9e] text-[#076c9e] font-semibold text-[14px] cursor-pointer flex items-center justify-center gap-2"
+            >
+              <Upload size={16} /> Import Excel
+            </button>
+            <button
+              onClick={openAdd}
+              className="flex-1 h-11 rounded-[22px] bg-[#076c9e] text-white font-semibold text-[14px] border-none cursor-pointer flex items-center justify-center gap-2"
+            >
+              <Plus size={16} /> Tambah Laporan Baru
+            </button>
+          </div>
         </div>
       ) : (
         /* Desktop top bar — Figma 11:260: Search+Filter left, Add right */
@@ -2525,13 +2556,21 @@ export default function GangguanPage() {
             </div>
           </div>
 
-          {/* Right: Add button — Figma 212x44 corner=22 */}
-          <button
-            onClick={openAdd}
-            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', height: 44, borderRadius: 22, background: '#076c9e', border: 'none', color: '#FFFFFF', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14, cursor: 'pointer', whiteSpace: 'nowrap' }}
-          >
-            <Plus size={16} /> Tambah Laporan Baru
-          </button>
+          {/* Right: Import + Add buttons */}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={() => setImportOpen(true)}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', height: 44, borderRadius: 22, background: '#FFFFFF', border: '1px solid #076c9e', color: '#076c9e', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14, cursor: 'pointer', whiteSpace: 'nowrap' }}
+            >
+              <Upload size={16} /> Import Excel
+            </button>
+            <button
+              onClick={openAdd}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', height: 44, borderRadius: 22, background: '#076c9e', border: 'none', color: '#FFFFFF', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14, cursor: 'pointer', whiteSpace: 'nowrap' }}
+            >
+              <Plus size={16} /> Tambah Laporan Baru
+            </button>
+          </div>
         </div>
       )}
 
@@ -2768,6 +2807,55 @@ export default function GangguanPage() {
           </div>
         </div>
       </>
+
+      {/* Import Excel Modal */}
+      {importOpen && typeof window !== 'undefined' && createPortal(
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' }}
+          onClick={(e) => { if (e.target === e.currentTarget) { setImportOpen(false); setImportFile(null) } }}
+        >
+          <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: '100%', maxWidth: 420, margin: '0 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontWeight: 700, fontSize: 16, color: '#1C1C1C' }}>Import Data Laporan</span>
+              <button onClick={() => { setImportOpen(false); setImportFile(null) }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
+                <X size={18} style={{ color: '#5F737F' }} />
+              </button>
+            </div>
+            <p style={{ fontSize: 13, color: '#5F737F', margin: 0 }}>Upload file Excel (.xlsx) dengan kolom: NO, RUAS, NO. TOWER, SPAN, URAIAN PEKERJAAN, KLASIFIKASI, STATUS, PENGENDALIAN, PIHAK LAIN, PETUGAS LW.</p>
+            <input
+              ref={importInputRef}
+              type="file"
+              accept=".xlsx,.xls"
+              style={{ display: 'none' }}
+              onChange={(e) => setImportFile(e.target.files?.[0] ?? null)}
+            />
+            <button
+              onClick={() => importInputRef.current?.click()}
+              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', border: '2px dashed #E1E8EC', borderRadius: 8, background: importFile ? '#F0F9FF' : '#F6F9FC', cursor: 'pointer', textAlign: 'left' }}
+            >
+              <FileText size={20} style={{ color: '#076c9e', flexShrink: 0 }} />
+              <span style={{ fontSize: 13, color: importFile ? '#076c9e' : '#5F737F', fontWeight: importFile ? 600 : 400 }}>
+                {importFile ? importFile.name : 'Pilih file Excel...'}
+              </span>
+            </button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={() => { setImportOpen(false); setImportFile(null) }}
+                style={{ flex: 1, height: 44, borderRadius: 22, background: '#fff', border: '1px solid #E1E8EC', color: '#5F737F', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleImport}
+                disabled={!importFile || importing}
+                style={{ flex: 1, height: 44, borderRadius: 22, background: importFile && !importing ? '#076c9e' : '#E1E8EC', border: 'none', color: importFile && !importing ? '#fff' : '#97AAB3', fontWeight: 600, fontSize: 14, cursor: importFile && !importing ? 'pointer' : 'not-allowed' }}
+              >
+                {importing ? 'Mengimport...' : 'Import'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </>
   )
 }

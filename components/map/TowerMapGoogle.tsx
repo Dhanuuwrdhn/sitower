@@ -31,7 +31,7 @@ export interface JalurKmlItem {
   nama: string
   tipe: string   // SUTET | SUTT | SKTT
   warna: string | null
-  path: Array<{ lat: number; lng: number }>
+  path: Array<{ lat: number; lng: number; isMarker?: boolean }>
 }
 
 interface Props {
@@ -247,59 +247,79 @@ function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', ker
 const KML_JALUR_COLORS: Record<string, string> = {
   SUTET: '#e65100',   // orange
   SUTT:  '#0288D1',   // blue
-  SKTT:  '#7c3aed',   // purple
+  SKTT:  '#FF00FF',   // magenta
 }
 
-function JalurKmlLines({ jalurKml }: { jalurKml: JalurKmlItem[] }) {
+function JalurKmlLines({ jalurKml, visibleTypes }: {
+  jalurKml: JalurKmlItem[]
+  visibleTypes: Set<string>
+}) {
   const map = useMap()
 
   useEffect(() => {
     if (!map || !window.google || !jalurKml.length) return
 
     const lines: google.maps.Polyline[] = []
+    const markers: google.maps.Marker[] = []
 
     for (const jalur of jalurKml) {
-      if (!jalur.path || jalur.path.length < 2) continue
+      if (!jalur.path || jalur.path.length < 1) continue
+      if (!visibleTypes.has(jalur.tipe)) continue
 
       const path = jalur.path.map((p) => ({ lat: p.lat, lng: p.lng }))
       const isSktt  = jalur.tipe === 'SKTT'
       const isSutet = jalur.tipe === 'SUTET'
 
-      // Use jalur.warna if provided, otherwise fall back to tipe color
       const color = jalur.warna ?? KML_JALUR_COLORS[jalur.tipe] ?? '#6B7280'
-      const strokeWeight  = isSutet ? 4 : 3
-      const strokeOpacity = isSktt ? 0 : 0.85
-      const zIndex = isSutet ? 36 : isSktt ? 16 : 26
 
-      const icons: google.maps.PolylineOptions['icons'] = isSktt
-        ? [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3, strokeColor: color }, offset: '0', repeat: '12px' }]
-        : undefined
+      if (path.length >= 2) {
+        const strokeWeight  = isSutet ? 4 : 3
+        const strokeOpacity = isSktt ? 0 : 0.85
+        const zIndex = isSutet ? 36 : isSktt ? 16 : 26
 
-      // Glow/outline for solid lines
-      if (!isSktt) {
+        const icons: google.maps.PolylineOptions['icons'] = isSktt
+          ? [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3, strokeColor: color }, offset: '0', repeat: '14px' }]
+          : undefined
+
+        if (!isSktt) {
+          lines.push(new window.google.maps.Polyline({
+            path, strokeColor: '#FFFFFF', strokeOpacity: 0.45,
+            strokeWeight: strokeWeight + 4, zIndex: zIndex - 1, map,
+          }))
+        }
+
         lines.push(new window.google.maps.Polyline({
-          path,
-          strokeColor: '#FFFFFF',
-          strokeOpacity: 0.45,
-          strokeWeight: strokeWeight + 4,
-          zIndex: zIndex - 1,
-          map,
+          path, strokeColor: color, strokeOpacity, strokeWeight, icons, zIndex, map,
         }))
       }
 
-      lines.push(new window.google.maps.Polyline({
-        path,
-        strokeColor: color,
-        strokeOpacity,
-        strokeWeight,
-        icons,
-        zIndex,
-        map,
-      }))
+      // Black circle markers at isMarker points (joints) for SKTT
+      if (isSktt) {
+        for (const pt of jalur.path) {
+          if (!pt.isMarker) continue
+          markers.push(new window.google.maps.Marker({
+            position: { lat: pt.lat, lng: pt.lng },
+            map,
+            icon: {
+              path: window.google.maps.SymbolPath.CIRCLE,
+              scale: 5,
+              fillColor: '#000000',
+              fillOpacity: 1,
+              strokeColor: '#FFFFFF',
+              strokeWeight: 1.5,
+            },
+            title: jalur.nama,
+            zIndex: 20,
+          }))
+        }
+      }
     }
 
-    return () => lines.forEach((l) => l.setMap(null))
-  }, [map, jalurKml])
+    return () => {
+      lines.forEach((l) => l.setMap(null))
+      markers.forEach((m) => m.setMap(null))
+    }
+  }, [map, jalurKml, visibleTypes])
 
   return null
 }
@@ -514,9 +534,22 @@ const FILTER_OPTIONS = [
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''
 const CENTER  = { lat: -6.18, lng: 106.50 }
 
+const ALL_LAYER_TYPES = ['SUTT', 'SUTET', 'SKTT'] as const
+type LayerType = typeof ALL_LAYER_TYPES[number]
+
 export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props) {
   const [selected, setSelected] = useState<FeaturedTower | null>(null)
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
+  const [layerPanelOpen, setLayerPanelOpen] = useState(false)
+  const [visibleLayers, setVisibleLayers] = useState<Set<string>>(new Set(ALL_LAYER_TYPES))
+
+  function toggleLayer(tipe: string) {
+    setVisibleLayers(prev => {
+      const next = new Set(prev)
+      if (next.has(tipe)) next.delete(tipe); else next.add(tipe)
+      return next
+    })
+  }
 
   const displayTowers = useMemo<FeaturedTower[]>(() => {
     const all = towers ?? []
@@ -565,7 +598,7 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
           streetViewControl={false}
           fullscreenControl={false}
         >
-          {jalurKml && jalurKml.length > 0 && <JalurKmlLines jalurKml={jalurKml} />}
+          {jalurKml && jalurKml.length > 0 && <JalurKmlLines jalurKml={jalurKml} visibleTypes={visibleLayers} />}
           <TowerMarkers towers={displayTowers} onSelect={handleSelect} />
           {selected && <TowerPopup tower={selected} onClose={() => setSelected(null)} />}
         </Map>
@@ -622,6 +655,60 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
       </div>
 
       <Legend />
+
+      {/* Layer filter — bottom right */}
+      <div style={{ position: 'absolute', bottom: 36, right: 12, zIndex: 20 }}>
+        {layerPanelOpen && (
+          <div style={{
+            marginBottom: 8, background: '#fff', borderRadius: 10,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
+            padding: '12px 16px', minWidth: 180,
+          }}>
+            <div style={{ fontWeight: 700, fontSize: 12, color: '#374151', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Tampilkan Jalur
+            </div>
+            {[
+              { tipe: 'SUTT',  label: 'Jalur SUTT',  color: '#0288D1', dash: false },
+              { tipe: 'SUTET', label: 'Jalur SUTET', color: '#e65100', dash: false },
+              { tipe: 'SKTT',  label: 'Jalur SKTT',  color: '#FF00FF', dash: true  },
+            ].map(({ tipe, label, color, dash }) => (
+              <label key={tipe} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '5px 0', userSelect: 'none' }}>
+                <input
+                  type="checkbox"
+                  checked={visibleLayers.has(tipe)}
+                  onChange={() => toggleLayer(tipe)}
+                  style={{ width: 15, height: 15, accentColor: color, cursor: 'pointer' }}
+                />
+                <svg width="24" height="10" viewBox="0 0 24 10">
+                  {dash
+                    ? <line x1="0" y1="5" x2="24" y2="5" stroke={color} strokeWidth="2.5" strokeDasharray="5,3" />
+                    : <line x1="0" y1="5" x2="24" y2="5" stroke={color} strokeWidth="2.5" />
+                  }
+                </svg>
+                <span style={{ fontSize: 13, color: '#1C1C1C', fontWeight: 500 }}>{label}</span>
+              </label>
+            ))}
+          </div>
+        )}
+        <button
+          onClick={() => setLayerPanelOpen(v => !v)}
+          title="Filter Jalur"
+          style={{
+            width: 40, height: 40, borderRadius: 8,
+            background: layerPanelOpen ? '#076c9e' : '#fff',
+            border: '1px solid #E1E8EC',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={layerPanelOpen ? '#fff' : '#5F737F'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+            <polyline points="2 17 12 22 22 17"/>
+            <polyline points="2 12 12 17 22 12"/>
+          </svg>
+        </button>
+      </div>
     </div>
   )
 }

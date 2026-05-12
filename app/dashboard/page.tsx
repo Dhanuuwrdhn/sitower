@@ -281,7 +281,7 @@ export default function DashboardPage() {
               kerawanan:  t.status !== 'aman'
                 ? types.map((jenis: string) => ({
                     kategori: jenis,
-                    level:    t.status as 'kritis' | 'sedang' | 'aman',
+                    level:    t.status as string,
                     status:   t.status,
                   }))
                 : [],

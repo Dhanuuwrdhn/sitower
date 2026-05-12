@@ -9,7 +9,7 @@ import { TwIcon } from '@/components/ui/TwIcon'
 
 interface KerawananItem {
   kategori: string
-  level: 'kritis' | 'sedang' | 'aman'
+  level: string
   status: string
 }
 
@@ -42,8 +42,11 @@ interface Props {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const LEVEL_PRIORITY: Record<string, number> = { kritis: 3, sedang: 2, aman: 1 }
+const LEVEL_PRIORITY: Record<string, number> = {
+  kritis_tidak_terpenuhi: 4, kritis_terpenuhi: 3, kritis: 3, sedang: 2, aman: 1,
+}
 const LEVEL_COLOR: Record<string, string> = {
+  kritis_tidak_terpenuhi: '#ef4444', kritis_terpenuhi: '#ef4444',
   kritis: '#ef4444', sedang: '#f59e0b', aman: '#22c55e', normal: '#3b82f6',
 }
 const KATEGORI_LABEL: Record<string, string> = {
@@ -388,9 +391,11 @@ function TowerMarkers({
 // ─── Info popup ───────────────────────────────────────────────────────────────
 
 const RISIKO_LABEL: Record<string, string> = {
-  kritis: 'RISIKO KRITIS',
-  sedang: 'RISIKO SEDANG',
-  aman:   'AMAN',
+  kritis_tidak_terpenuhi: 'KRITIS TIDAK TERPENUHI',
+  kritis_terpenuhi:       'KRITIS TERPENUHI',
+  kritis:                 'RISIKO KRITIS',
+  sedang:                 'RISIKO SEDANG',
+  aman:                   'AMAN',
 }
 
 function TowerPopup({ tower, onClose }: { tower: FeaturedTower; onClose: () => void }) {
@@ -474,8 +479,9 @@ function Legend() {
       {([
         { bg: '#22C55E', label: 'Aman' },
         { bg: '#F59E0B', label: 'Sedang' },
-        { bg: '#EF4444', label: 'Kritis' },
-      ] as const).map(({ bg, label }) => (
+        { bg: '#EF4444', label: 'Kritis Terpenuhi' },
+        { bg: '#EF4444', label: 'Kritis Tidak Terpenuhi' },
+      ] as { bg: string; label: string }[]).map(({ bg, label }) => (
         <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <svg width="14" height="14" viewBox="0 0 26 26" fill="none" style={{ flexShrink: 0 }}>
             <rect width="26" height="26" rx="13" fill={bg}/>

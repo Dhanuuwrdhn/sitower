@@ -529,12 +529,12 @@ function Legend() {
 // ─── Filter config ────────────────────────────────────────────────────────────
 
 const FILTER_OPTIONS = [
-  { key: null,                    label: 'Semua' },
-  { key: 'pekerjaan_pihak_lain',  label: 'PPL' },
-  { key: 'kebakaran',             label: 'Kebakaran' },
-  { key: 'layangan',              label: 'Layangan' },
-  { key: 'pencurian',             label: 'Pencurian' },
-  { key: 'pemanfaatan_lahan',     label: 'Pemanfaatan Lahan' },
+  { key: null,                    label: 'Semua Kerawanan',   emoji: null },
+  { key: 'pekerjaan_pihak_lain',  label: 'PPL',               emoji: '🚜' },
+  { key: 'kebakaran',             label: 'Kebakaran',          emoji: '🔥' },
+  { key: 'layangan',              label: 'Layangan',           emoji: '🪁' },
+  { key: 'pencurian',             label: 'Pencurian',          emoji: '🥷' },
+  { key: 'pemanfaatan_lahan',     label: 'Pemanfaatan Lahan', emoji: '🏡' },
 ] as const
 
 // ─── Main component ───────────────────────────────────────────────────────────
@@ -549,11 +549,22 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
   const displayTowers = useMemo<FeaturedTower[]>(() => {
     const all = towers ?? []
     if (!activeFilter) return all
-    // Hanya tampilkan tower yang punya kerawanan sesuai filter
-    return all.filter((t) =>
-      t.kerawanan.some((k) => k.kategori === activeFilter)
-    )
+    return all.filter((t) => t.kerawanan.some((k) => k.kategori === activeFilter))
   }, [towers, activeFilter])
+
+  // Count per filter category for tab badges
+  const filterCounts = useMemo(() => {
+    const all = towers ?? []
+    const counts: Record<string, number> = {
+      '__semua': all.filter((t) => t.kerawanan.length > 0).length,
+    }
+    for (const opt of FILTER_OPTIONS) {
+      if (opt.key) {
+        counts[opt.key] = all.filter((t) => t.kerawanan.some((k) => k.kategori === opt.key)).length
+      }
+    }
+    return counts
+  }, [towers])
 
   const handleSelect = useMemo(() => (t: FeaturedTower) => {
     setSelected(t)
@@ -588,32 +599,51 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
         </Map>
       </APIProvider>
 
-      {/* Filter floating — top center inside map */}
+      {/* Filter tabs — top center, horizontally scrollable */}
       <div style={{
         position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)',
-        zIndex: 10, display: 'flex', gap: 6, alignItems: 'center',
-        background: 'rgba(255,255,255,0.96)',
+        zIndex: 10, maxWidth: 'calc(100% - 24px)',
+        background: 'rgba(255,255,255,0.97)',
         boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
-        borderRadius: 999, padding: '6px 10px',
-        backdropFilter: 'blur(6px)',
-        flexWrap: 'nowrap', whiteSpace: 'nowrap',
+        borderRadius: 999, padding: '5px 8px',
+        backdropFilter: 'blur(8px)',
+        display: 'flex', gap: 4, alignItems: 'center',
+        overflowX: 'auto', flexWrap: 'nowrap', whiteSpace: 'nowrap',
+        scrollbarWidth: 'none',
       }}>
         {FILTER_OPTIONS.map((opt) => {
           const isActive = activeFilter === opt.key
+          const count = opt.key ? (filterCounts[opt.key] ?? 0) : (filterCounts['__semua'] ?? 0)
           return (
             <button
               key={String(opt.key)}
               onClick={() => setActiveFilter(opt.key ?? null)}
               style={{
-                padding: '4px 14px', borderRadius: 999,
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '4px 12px', borderRadius: 999, flexShrink: 0,
                 fontSize: 11, fontWeight: 600, cursor: 'pointer', lineHeight: 1.5,
-                border: 'none', outline: 'none',
-                background: isActive ? '#005DAA' : 'transparent',
+                border: isActive ? 'none' : '1px solid #E5E7EB',
+                outline: 'none',
+                background: isActive ? '#005DAA' : '#fff',
                 color: isActive ? '#fff' : '#374151',
-                transition: 'background 0.15s, color 0.15s',
+                transition: 'background 0.15s, color 0.15s, border-color 0.15s',
               }}
             >
-              {opt.label}
+              {opt.emoji && (
+                <TwIcon emoji={opt.emoji} size={13} />
+              )}
+              <span>{opt.label}</span>
+              {count > 0 && (
+                <span style={{
+                  background: isActive ? 'rgba(255,255,255,0.25)' : '#F3F4F6',
+                  color: isActive ? '#fff' : '#6B7280',
+                  borderRadius: 999, fontSize: 10, fontWeight: 700,
+                  padding: '0px 5px', lineHeight: '16px',
+                  minWidth: 16, textAlign: 'center',
+                }}>
+                  {count}
+                </span>
+              )}
             </button>
           )
         })}

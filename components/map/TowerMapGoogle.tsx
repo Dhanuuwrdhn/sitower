@@ -577,6 +577,12 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
     onTowerClick?.(t)
   }, [onTowerClick])
 
+  // Only show layer options that have data
+  const availableLayerTypes = useMemo(() => {
+    const types = new Set((jalurKml ?? []).map((j) => j.tipe))
+    return ALL_LAYER_TYPES.filter((t) => types.has(t))
+  }, [jalurKml])
+
   if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE') {
     return (
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', gap: 10 }}>
@@ -657,8 +663,8 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
 
       <Legend />
 
-      {/* Layer filter — bottom right */}
-      <div style={{ position: 'absolute', bottom: 36, right: 12, zIndex: 20 }}>
+      {/* Layer filter — bottom right, only shown when there are jalur to toggle */}
+      {availableLayerTypes.length > 0 && <div style={{ position: 'absolute', bottom: 36, right: 12, zIndex: 20 }}>
         {layerPanelOpen && (
           <div style={{
             marginBottom: 8, background: '#fff', borderRadius: 10,
@@ -668,11 +674,13 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
             <div style={{ fontWeight: 700, fontSize: 12, color: '#374151', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Tampilkan Jalur
             </div>
-            {[
+            {([
               { tipe: 'SUTT',  label: 'Jalur SUTT',  color: '#0288D1', dash: false },
               { tipe: 'SUTET', label: 'Jalur SUTET', color: '#e65100', dash: false },
               { tipe: 'SKTT',  label: 'Jalur SKTT',  color: '#FF00FF', dash: true  },
-            ].map(({ tipe, label, color, dash }) => (
+            ] as { tipe: string; label: string; color: string; dash: boolean }[])
+            .filter(({ tipe }) => availableLayerTypes.includes(tipe as typeof ALL_LAYER_TYPES[number]))
+            .map(({ tipe, label, color, dash }) => (
               <label key={tipe} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '5px 0', userSelect: 'none' }}>
                 <input
                   type="checkbox"
@@ -709,7 +717,7 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
             <polyline points="2 12 12 17 22 12"/>
           </svg>
         </button>
-      </div>
+      </div>}
     </div>
   )
 }

@@ -255,12 +255,19 @@ function JalurKmlLines({ jalurKml, visibleTypes }: {
   visibleTypes: Set<string>
 }) {
   const map = useMap()
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null)
 
   useEffect(() => {
     if (!map || !window.google || !jalurKml.length) return
 
     const lines: google.maps.Polyline[] = []
     const markers: google.maps.Marker[] = []
+
+    // Shared InfoWindow for SKTT popups
+    if (!infoWindowRef.current) {
+      infoWindowRef.current = new window.google.maps.InfoWindow()
+    }
+    const infoWindow = infoWindowRef.current
 
     for (const jalur of jalurKml) {
       if (!jalur.path || jalur.path.length < 1) continue
@@ -288,16 +295,32 @@ function JalurKmlLines({ jalurKml, visibleTypes }: {
           }))
         }
 
-        lines.push(new window.google.maps.Polyline({
+        const polyline = new window.google.maps.Polyline({
           path, strokeColor: color, strokeOpacity, strokeWeight, icons, zIndex, map,
-        }))
+        })
+        lines.push(polyline)
+
+        // Click on SKTT polyline → show route info
+        if (isSktt) {
+          polyline.addListener('click', (e: google.maps.PolyMouseEvent) => {
+            infoWindow.setContent(`
+              <div style="font-family:Inter,sans-serif;font-size:12px;padding:4px;min-width:180px">
+                <div style="font-weight:700;font-size:12px;color:#1c1c1c;margin-bottom:4px">Jalur SKTT</div>
+                <div style="color:#5f737f;font-size:12px;margin-bottom:4px">${jalur.nama}</div>
+                <div style="font-size:11px;color:#97aab3">${jalur.path.length} titik koordinat</div>
+              </div>
+            `)
+            infoWindow.setPosition(e.latLng ?? null)
+            infoWindow.open(map)
+          })
+        }
       }
 
       // Black circle markers at isMarker points (joints) for SKTT
       if (isSktt) {
         for (const pt of jalur.path) {
           if (!pt.isMarker) continue
-          markers.push(new window.google.maps.Marker({
+          const marker = new window.google.maps.Marker({
             position: { lat: pt.lat, lng: pt.lng },
             map,
             icon: {
@@ -310,8 +333,19 @@ function JalurKmlLines({ jalurKml, visibleTypes }: {
             },
             title: jalur.nama,
             zIndex: 20,
-            clickable: false,
-          }))
+          })
+          marker.addListener('click', () => {
+            infoWindow.setContent(`
+              <div style="font-family:Inter,sans-serif;font-size:12px;padding:4px;min-width:180px">
+                <div style="font-weight:700;font-size:12px;color:#1c1c1c;margin-bottom:4px">Jalur SKTT</div>
+                <div style="color:#5f737f;font-size:12px;margin-bottom:4px">${jalur.nama}</div>
+                <div style="font-size:11px;color:#97aab3">${Number(pt.lat).toFixed(6)}, ${Number(pt.lng).toFixed(6)}</div>
+              </div>
+            `)
+            infoWindow.setPosition({ lat: pt.lat, lng: pt.lng })
+            infoWindow.open(map)
+          })
+          markers.push(marker)
         }
       }
     }
@@ -319,6 +353,7 @@ function JalurKmlLines({ jalurKml, visibleTypes }: {
     return () => {
       lines.forEach((l) => l.setMap(null))
       markers.forEach((m) => m.setMap(null))
+      infoWindowRef.current?.close()
     }
   }, [map, jalurKml, visibleTypes])
 

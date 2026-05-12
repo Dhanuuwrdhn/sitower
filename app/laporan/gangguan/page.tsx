@@ -942,31 +942,79 @@ function FotoHistorySection({ laporanId }: { laporanId: string }) {
   )
 }
 
-// ── Detail read-only view (Figma 305-4621) ────────────────────────────────────
+// ── Detail read-only view (Figma 305-4621 desktop · 315-2798 mobile) ────────────
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
-      <span style={{ fontSize: 13, fontWeight: 400, color: '#5F737F' }}>{label}</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+      <span style={{ fontSize: 14, fontWeight: 400, color: '#5F737F' }}>{label}</span>
       <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B', wordBreak: 'break-word' }}>{value ?? '—'}</span>
     </div>
   )
 }
 
-function SectionHeader({ title }: { title: string }) {
+function SectionHeader({ title, size = 18 }: { title: string; size?: number }) {
   return (
     <div style={{ marginBottom: 16 }}>
-      <span style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>{title}</span>
+      <span style={{ fontSize: size, fontWeight: 700, color: '#1B1B1B' }}>{title}</span>
       <div style={{ height: 1, background: '#E1E8EC', marginTop: 8 }} />
     </div>
   )
 }
 
-function DetailReadView({ laporan }: { laporan: any }) {
+// Mobile file row: thumbnail + label/filename/action + eye icon
+function MobileFileRow({
+  thumbnailUrl, typeLabel, fileName, fileUrl,
+  onUpload, onView,
+}: {
+  thumbnailUrl?: string; typeLabel: string; fileName?: string; fileUrl?: string;
+  onUpload?: () => void; onView?: () => void;
+}) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 12, paddingBottom: 12 }}>
+      {/* Thumbnail */}
+      <div style={{ width: 56, height: 56, borderRadius: 8, overflow: 'hidden', flexShrink: 0, background: '#F6F9FC', border: '1px solid #E1E8EC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {thumbnailUrl && /\.(jpe?g|png|webp)$/i.test(thumbnailUrl) ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={resolveMediaUrl(thumbnailUrl)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : thumbnailUrl ? (
+          <FileText size={24} style={{ color: '#5F737F' }} />
+        ) : (
+          <FileText size={24} style={{ color: '#BBC7CD' }} />
+        )}
+      </div>
+      {/* Content */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 14, fontWeight: 400, color: '#5F737F', margin: 0 }}>{typeLabel}</p>
+        {fileName ? (
+          <p style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B', margin: '2px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fileName}</p>
+        ) : (
+          <p style={{ fontSize: 14, fontWeight: 400, color: '#BBC7CD', margin: '2px 0' }}>Belum ada file</p>
+        )}
+        {onUpload && (
+          <button type="button" onClick={onUpload} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <RotateCcw size={14} style={{ color: '#005AA9' }} />
+            <span style={{ fontSize: 14, fontWeight: 500, color: '#005AA9' }}>Unggah ulang</span>
+          </button>
+        )}
+      </div>
+      {/* Eye icon */}
+      {fileUrl && (
+        <button type="button" onClick={onView ?? (() => window.open(resolveMediaUrl(fileUrl), '_blank'))} style={{ background: 'none', border: 'none', padding: 4, cursor: 'pointer', flexShrink: 0 }}>
+          <Eye size={20} style={{ color: '#BBC7CD' }} />
+        </button>
+      )}
+    </div>
+  )
+}
+
+function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?: () => void; onClose?: () => void }) {
+  const { isMobile } = useSidebar()
   const [progress, setProgress] = useState<Record<string, any[]>>({ spanduk: [], brosur: [], laporan_baru: [], berita_acara: [] })
   const [fotoHistory, setFotoHistory] = useState<any[]>([])
   const [uploading, setUploading] = useState<string | null>(null)
   const [uploadingFoto, setUploadingFoto] = useState(false)
+  const [selesaiLoading, setSelesaiLoading] = useState(false)
   const fotoUpdateRef = useRef<HTMLInputElement>(null)
   const progressRefs = useRef<Record<string, HTMLInputElement | null>>({})
 
@@ -975,6 +1023,17 @@ function DetailReadView({ laporan }: { laporan: any }) {
     laporanApi.getProgress(laporan.id).then(r => setProgress(r.data)).catch(() => {})
     laporanApi.getFotoHistory(laporan.id).then(r => setFotoHistory(r.data ?? [])).catch(() => {})
   }, [laporan?.id])
+
+  async function handleSelesaikan() {
+    if (!laporan?.id) return
+    setSelesaiLoading(true)
+    try {
+      await laporanApi.update(laporan.id, { status: 'selesai' })
+      toast.success('Laporan berhasil diselesaikan')
+      onSaved?.()
+      onClose?.()
+    } catch { toast.error('Gagal menyelesaikan laporan') } finally { setSelesaiLoading(false) }
+  }
 
   async function handleProgressUpload(tipe: string, file: File) {
     setUploading(tipe)
@@ -1009,80 +1068,203 @@ function DetailReadView({ laporan }: { laporan: any }) {
   const fotoUrls: string[] = laporan?.foto ?? []
   const isPPL = laporan?.jenisGangguan === 'pekerjaan_pihak_lain'
 
+  // ── shared progress hidden inputs
+  const progressInputs = PROGRESS_TIPE_LIST.map((tipe) => (
+    <input
+      key={tipe}
+      ref={el => { progressRefs.current[tipe] = el }}
+      type="file"
+      accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx"
+      className="hidden"
+      onChange={e => { const f = e.target.files?.[0]; if (f) handleProgressUpload(tipe, f); e.target.value = '' }}
+    />
+  ))
+
+  // ══════════════════════════════════════════════════
+  // MOBILE — Figma 315-2798
+  // ══════════════════════════════════════════════════
+  if (isMobile) {
+    return (
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto" style={{ padding: '0 16px' }}>
+
+          {/* Header: jenis name + progress badge + date */}
+          <div style={{ paddingTop: 16, paddingBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+              <span style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B', flex: 1 }}>
+                {JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan ?? '—'}
+              </span>
+              <ProgressBadge tipe={laporan?.latestProgressTipe} />
+            </div>
+            <div style={{ display: 'flex', gap: 4, marginTop: 4, fontSize: 12, color: '#5F737F' }}>
+              <span>Tanggal Laporan Dibuat:</span>
+              <span style={{ color: '#1B1B1B' }}>{formatTanggal(laporan?.tanggal)}</span>
+            </div>
+          </div>
+
+          <div style={{ height: 1, background: '#E1E8EC', margin: '0 -16px' }} />
+
+          {/* 2-col info grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px', padding: '16px 0' }}>
+            {isPPL && <InfoRow label="Informasi Pihak Lain" value={laporan?.teknisi} />}
+            <InfoRow label="Jenis Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
+            <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama)} />
+            {laporan?.lokasiDetail && <InfoRow label="Span" value={laporan.lokasiDetail} />}
+            {!isPPL && laporan?.pelapor?.nama && <InfoRow label="Dilaporkan Oleh" value={laporan.pelapor.nama} />}
+          </div>
+
+          {/* Uraian / Deskripsi */}
+          {laporan?.deskripsi && (
+            <div style={{ paddingBottom: 16 }}>
+              <InfoRow label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'} value={laporan.deskripsi} />
+            </div>
+          )}
+
+          {/* Foto bukti as file row */}
+          {fotoUrls.length > 0 && (
+            <>
+              <div style={{ height: 1, background: '#E1E8EC', margin: '0 -16px' }} />
+              {fotoUrls.map((url, i) => (
+                <MobileFileRow
+                  key={i}
+                  thumbnailUrl={resolveMediaUrl(url)}
+                  typeLabel="Bukti Kerawanan"
+                  fileName={`Foto Bukti ${i + 1}`}
+                  fileUrl={resolveMediaUrl(url)}
+                  onUpload={() => fotoUpdateRef.current?.click()}
+                />
+              ))}
+            </>
+          )}
+
+          {/* Divider before pengendalian */}
+          <div style={{ height: 1, background: '#E1E8EC', margin: '4px -16px 16px' }} />
+
+          {/* Informasi Pengendalian heading */}
+          <span style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 8 }}>
+            Informasi Pengendalian
+          </span>
+
+          {/* Upaya pengendalian */}
+          {laporan?.keterangan && (
+            <div style={{ marginBottom: 12 }}>
+              <InfoRow label={isPPL ? 'Deskripsi Pengendalian' : 'Keterangan'} value={laporan.keterangan} />
+            </div>
+          )}
+
+          {/* Progress file rows */}
+          {PROGRESS_TIPE_LIST.map((tipe) => {
+            const items: any[] = progress[tipe] ?? []
+            const latest = items[0]
+            return (
+              <div key={tipe}>
+                <div style={{ height: 1, background: '#E1E8EC', margin: '0 -16px' }} />
+                <MobileFileRow
+                  thumbnailUrl={latest?.fileUrl}
+                  typeLabel={PROGRESS_TIPE_LABEL[tipe]}
+                  fileName={latest?.namaFile}
+                  fileUrl={latest?.fileUrl}
+                  onUpload={() => progressRefs.current[tipe]?.click()}
+                />
+              </div>
+            )
+          })}
+
+          {progressInputs}
+          <input ref={fotoUpdateRef} type="file" accept=".jpg,.jpeg,.png,.webp" multiple className="hidden"
+            onChange={e => { if (e.target.files?.length) { handleFotoUpdate(e.target.files); e.target.value = '' } }} />
+
+          <div style={{ height: 24 }} />
+        </div>
+
+        {/* Bottom CTA — "Selesaikan Laporan" */}
+        {laporan?.status !== 'selesai' && (
+          <div style={{ padding: '16px', borderTop: '1px solid #E1E8EC', flexShrink: 0 }}>
+            <button
+              type="button"
+              onClick={handleSelesaikan}
+              disabled={selesaiLoading}
+              style={{ width: '100%', height: 44, background: '#076C9E', border: 'none', borderRadius: 8, color: '#FFFFFF', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+            >
+              {selesaiLoading ? 'Menyimpan...' : 'Selesaikan Laporan'}
+            </button>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // ══════════════════════════════════════════════════
+  // DESKTOP — Figma 305-4621
+  // ══════════════════════════════════════════════════
   return (
     <div className="flex-1 overflow-y-auto">
-      {/* Title bar */}
+      {/* Title bar — "Detail Kerawanan" 24px/700 + progress badge */}
       <div style={{ padding: '16px 24px 12px', borderBottom: '1px solid #E1E8EC' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 20, fontWeight: 700, color: '#1B1B1B' }}>Detail Kerawanan</span>
-          <LevelBadge level={laporan?.levelRisiko} />
+          <span style={{ fontSize: 24, fontWeight: 700, color: '#1B1B1B' }}>Detail Kerawanan</span>
+          <ProgressBadge tipe={laporan?.latestProgressTipe} />
         </div>
-        <div style={{ display: 'flex', gap: 12, marginTop: 4, fontSize: 13, color: '#5F737F', flexWrap: 'wrap' }}>
-          <span>Dibuat pada: {formatTanggal(laporan?.tanggal)}</span>
-          {laporan?.pelapor?.nama && <><span>·</span><span>Dibuat oleh: {laporan.pelapor.nama}</span></>}
+        <div style={{ display: 'flex', gap: 6, marginTop: 6, fontSize: 14, color: '#566B75', flexWrap: 'wrap' }}>
+          <span>Dibuat pada : {formatTanggal(laporan?.tanggal)}</span>
+          {laporan?.pelapor?.nama && <><span>·</span><span>Dibuat oleh : {laporan.pelapor.nama}</span></>}
         </div>
       </div>
 
-      <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div style={{ padding: '24px 24px', display: 'flex', flexDirection: 'column', gap: 32 }}>
 
-        {/* Section 1: Informasi Kerawanan */}
+        {/* Section 1: Informasi Kerawanan (18px/700) */}
         <div>
-          <SectionHeader title="Informasi Kerawanan" />
-          {/* 2-col grid for key info */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 24px', marginBottom: 16 }}>
+          <SectionHeader title="Informasi Kerawanan" size={18} />
+          {/* 4-col row */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px 20px', marginBottom: 20 }}>
             <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan} />
             <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
-            <InfoRow label="Tower Terdampak" value={laporan?.tower?.nomorTower ?? laporan?.towerId} />
-            {laporan?.lokasiDetail && <InfoRow label="Span / Lokasi" value={laporan.lokasiDetail} />}
-            {laporan?.status && <InfoRow label="Status Laporan" value={<StatusPill status={laporan.status} />} />}
-            {laporan?.tanggal && <InfoRow label="Tanggal" value={formatTanggal(laporan.tanggal)} />}
+            <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama)} />
+            <InfoRow label="Tanggal" value={formatTanggal(laporan?.tanggal)} />
           </div>
 
-          {/* Description row */}
-          {laporan?.deskripsi && (
-            <div style={{ marginBottom: 12 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 4 }}>
-                {isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'}
-              </span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.deskripsi}</span>
-            </div>
-          )}
-          {isPPL && laporan?.teknisi && (
-            <div style={{ marginBottom: 12 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 4 }}>Informasi Pihak Lain</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.teknisi}</span>
-            </div>
-          )}
-          {laporan?.keterangan && (
-            <div style={{ marginBottom: 12 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 4 }}>
-                {isPPL ? 'Upaya Pengendalian' : 'Keterangan'}
-              </span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.keterangan}</span>
-            </div>
-          )}
-
-          {/* Foto bukti */}
-          {fotoUrls.length > 0 && (
-            <div>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 8 }}>
-                Foto Bukti Terjadinya Kerawanan
-              </span>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                {fotoUrls.map((url, i) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img key={i} src={resolveMediaUrl(url)} alt="" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 8, border: '1px solid #E1E8EC' }} />
-                ))}
+          {/* Description rows */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 20px', marginBottom: 20 }}>
+            {laporan?.deskripsi && (
+              <div style={{ gridColumn: '1 / -1' }}>
+                <InfoRow label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'} value={laporan.deskripsi} />
               </div>
+            )}
+            {laporan?.lokasiDetail && <InfoRow label="Span / Lokasi" value={laporan.lokasiDetail} />}
+            {isPPL && laporan?.teknisi && <InfoRow label="Informasi Pihak Lain" value={laporan.teknisi} />}
+          </div>
+
+          {/* Foto Bukti */}
+          {fotoUrls.length > 0 && (
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              {fotoUrls.map((url, i) => (
+                <div key={i} style={{ width: 240 }}>
+                  {i === 0 && (
+                    <span style={{ fontSize: 14, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 8 }}>
+                      Foto Bukti Terjadinya Kerawanan
+                    </span>
+                  )}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={resolveMediaUrl(url)} alt="" style={{ width: 240, height: 160, objectFit: 'cover', borderRadius: 8, border: '1px solid #E1E8EC', display: 'block' }} />
+                </div>
+              ))}
             </div>
           )}
         </div>
 
-        {/* Section 2: Informasi Pengendalian */}
+        {/* Section 2: Informasi Pengendalian Kerawanan (18px/700) */}
         <div>
-          <SectionHeader title="Informasi Pengendalian Kerawanan" />
+          <SectionHeader title="Informasi Pengendalian Kerawanan" size={18} />
 
-          {/* Progress documents — 2-col grid style like Figma */}
+          {/* Upaya Pengendalian text */}
+          {laporan?.keterangan && (
+            <div style={{ marginBottom: 20 }}>
+              <InfoRow label={isPPL ? 'Upaya Pengendalian' : 'Keterangan'} value={laporan.keterangan} />
+            </div>
+          )}
+
+          {/* Progress docs — 2-col image grid */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             {PROGRESS_TIPE_LIST.map((tipe) => {
               const items: any[] = progress[tipe] ?? []
@@ -1090,44 +1272,39 @@ function DetailReadView({ laporan }: { laporan: any }) {
               const latestItem = items[0]
               return (
                 <div key={tipe}>
-                  <span style={{ fontSize: 13, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 8 }}>
+                  <span style={{ fontSize: 14, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 8 }}>
                     {PROGRESS_TIPE_LABEL[tipe]}
                   </span>
-                  {/* File container (Figma style) */}
                   <div style={{ border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
                     {latestItem ? (
                       <div>
-                        {/* Preview image/icon */}
-                        <div style={{ height: 100, background: '#F6F9FC', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                          {/\.(jpg|jpeg|png|webp)$/i.test(latestItem.fileUrl) ? (
+                        <div style={{ height: 120, background: '#F6F9FC', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                          {/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl) ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={latestItem.fileUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <img src={resolveMediaUrl(latestItem.fileUrl)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           ) : (
                             <FileText size={32} style={{ color: '#5F737F' }} />
                           )}
-                          <button
-                            type="button"
-                            onClick={() => progressRefs.current[tipe]?.click()}
-                            style={{ position: 'absolute', top: 6, right: 6, width: 28, height: 28, borderRadius: '50%', background: '#076C9E', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                          >
+                          <button type="button" onClick={() => progressRefs.current[tipe]?.click()}
+                            style={{ position: 'absolute', top: 6, right: 6, width: 28, height: 28, borderRadius: '50%', background: '#076C9E', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
                             <Upload size={12} style={{ color: '#FFF' }} />
                           </button>
                         </div>
-                        {/* File info + actions */}
                         <div style={{ padding: '8px 10px' }}>
-                          <a href={latestItem.fileUrl} target="_blank" rel="noreferrer" style={{ fontSize: 12, fontWeight: 600, color: '#1B1B1B', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <a href={resolveMediaUrl(latestItem.fileUrl)} target="_blank" rel="noreferrer"
+                            style={{ fontSize: 12, fontWeight: 600, color: '#1B1B1B', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {latestItem.namaFile}
                           </a>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
                             <span style={{ fontSize: 11, color: '#5F737F' }}>
                               {new Date(latestItem.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </span>
-                            <button type="button" onClick={() => handleProgressDelete(tipe, latestItem.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#D92D20', display: 'flex' }}>
+                            <button type="button" onClick={() => handleProgressDelete(tipe, latestItem.id)}
+                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#D92D20', display: 'flex' }}>
                               <X size={12} />
                             </button>
                           </div>
                         </div>
-                        {/* More files indicator */}
                         {items.length > 1 && (
                           <div style={{ padding: '4px 10px', borderTop: '1px solid #E1E8EC', fontSize: 11, color: '#5F737F' }}>
                             +{items.length - 1} file lainnya
@@ -1135,23 +1312,12 @@ function DetailReadView({ laporan }: { laporan: any }) {
                         )}
                       </div>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={() => progressRefs.current[tipe]?.click()}
-                        disabled={isUp}
-                        style={{ width: '100%', height: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, background: '#F6F9FC', border: 'none', cursor: 'pointer' }}
-                      >
+                      <button type="button" onClick={() => progressRefs.current[tipe]?.click()} disabled={isUp}
+                        style={{ width: '100%', height: 120, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, background: '#F6F9FC', border: 'none', cursor: 'pointer' }}>
                         <Upload size={20} style={{ color: '#97AAB3' }} />
                         <span style={{ fontSize: 11, color: '#97AAB3' }}>{isUp ? 'Mengunggah...' : 'Upload file'}</span>
                       </button>
                     )}
-                    <input
-                      ref={el => { progressRefs.current[tipe] = el }}
-                      type="file"
-                      accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx"
-                      className="hidden"
-                      onChange={e => { const f = e.target.files?.[0]; if (f) handleProgressUpload(tipe, f); e.target.value = '' }}
-                    />
                   </div>
                 </div>
               )
@@ -1159,15 +1325,11 @@ function DetailReadView({ laporan }: { laporan: any }) {
           </div>
         </div>
 
-        {/* Section 3: Foto Update History */}
+        {/* Section 3: Foto Update */}
         <div>
-          <SectionHeader title="Foto Update" />
-          <button
-            type="button"
-            onClick={() => fotoUpdateRef.current?.click()}
-            disabled={uploadingFoto}
-            style={{ width: '100%', padding: '12px', border: '2px dashed #E1E8EC', borderRadius: 8, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', marginBottom: 16 }}
-          >
+          <SectionHeader title="Foto Update" size={18} />
+          <button type="button" onClick={() => fotoUpdateRef.current?.click()} disabled={uploadingFoto}
+            style={{ width: '100%', padding: 12, border: '2px dashed #E1E8EC', borderRadius: 8, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', marginBottom: 16 }}>
             <ImagePlus size={18} style={{ color: '#5F737F' }} />
             <span style={{ fontSize: 13, color: '#5F737F', fontWeight: 500 }}>
               {uploadingFoto ? 'Mengunggah...' : 'Upload Foto Update (maks 10, auto-compress)'}
@@ -1175,7 +1337,6 @@ function DetailReadView({ laporan }: { laporan: any }) {
           </button>
           <input ref={fotoUpdateRef} type="file" accept=".jpg,.jpeg,.png,.webp" multiple className="hidden"
             onChange={e => { if (e.target.files?.length) { handleFotoUpdate(e.target.files); e.target.value = '' } }} />
-
           {fotoHistory.map(entry => (
             <div key={entry.id} style={{ marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
@@ -1198,6 +1359,8 @@ function DetailReadView({ laporan }: { laporan: any }) {
         </div>
 
       </div>
+
+      {progressInputs}
     </div>
   )
 }
@@ -1792,10 +1955,12 @@ function LaporanDrawer({
             <button onClick={onClose} className="p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors">
               <ArrowLeft size={22} />
             </button>
-            <p className="text-white font-bold text-[16px] leading-tight">{title}</p>
+            <p className="text-white font-bold text-[16px] leading-tight">
+              {readOnly ? 'Detail Laporan Kerawanan' : title}
+            </p>
           </div>
           {readOnly && initial ? (
-            <DetailReadView laporan={initial} />
+            <DetailReadView laporan={initial} onSaved={onSaved} onClose={onClose} />
           ) : (
             <>
               {formBody}
@@ -1836,7 +2001,7 @@ function LaporanDrawer({
               >
                 <X size={16} style={{ color: '#5F737F' }} />
               </button>
-              <DetailReadView laporan={initial} />
+              <DetailReadView laporan={initial} onSaved={onSaved} onClose={onClose} />
             </>
           ) : (
             <>

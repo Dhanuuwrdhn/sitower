@@ -1546,7 +1546,7 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
                 </span>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
                   <LevelBadge level={laporan?.levelRisiko} />
-                  {laporan?.latestProgressTipe && <ProgressBadge tipe={laporan.latestProgressTipe} />}
+                  {laporan?.progresLaporan && <ProgressBadge tipe={laporan.progresLaporan} />}
                 </div>
               </div>
               {laporan?.status !== 'selesai' && (

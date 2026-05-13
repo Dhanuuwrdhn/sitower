@@ -94,7 +94,10 @@ const PROGRESS_TIPE_LABEL: Record<string, string> = {
 }
 
 const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {
+  laporan_baru: { bg: '#076C9E', text: '#FFFFFF' },
   berita_acara: { bg: '#076C9E', text: '#FFFFFF' },
+  spanduk:      { bg: '#076C9E', text: '#FFFFFF' },
+  brosur:       { bg: '#076C9E', text: '#FFFFFF' },
   surat:        { bg: '#076C9E', text: '#FFFFFF' },
 }
 

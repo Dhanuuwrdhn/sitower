@@ -2092,6 +2092,7 @@ const EMPTY_FORM = {
   deskripsi: '',        // Uraian Pekerjaan
   keterangan: '',       // Upaya Pengendalian (ppl) / notes
   pihakLain: '',        // company name for pekerjaan_pihak_lain (stored in teknisi)
+  contactPerson: '',
   // CUI / Cleanup
   teknisi: '',
   noSpk: '',
@@ -2312,12 +2313,12 @@ function LaporanDrawer({
 
       {/* GPS alert */}
       {!readOnly && alertVisible && (
-        <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
-          <AlertTriangle size={16} className="text-amber-500 shrink-0 mt-0.5" />
-          <p className="text-[12px] text-amber-700 leading-relaxed flex-1">
-            Perhatian: Jika anda memilih opsi "Gunakan lokasi saat ini". Pastikan anda sudah menghidupkan akses lokasi di handphone anda.
+        <div className="flex items-start gap-3 p-3 bg-[#FFF8E6] border border-[#FFE5A3] rounded-xl">
+          <AlertTriangle size={16} className="text-[#F79009] shrink-0 mt-0.5" />
+          <p className="text-[12px] text-[#1B1B1B] leading-relaxed flex-1">
+            <span className="font-bold text-[#F79009]">Perhatian:</span> Pastikan anda sudah menghidupkan akses lokasi di handphone anda.
           </p>
-          <button type="button" onClick={() => setAlertVisible(false)} className="text-amber-400 hover:text-amber-600 shrink-0">
+          <button type="button" onClick={() => setAlertVisible(false)} className="text-[#F79009] hover:text-[#D97706] shrink-0">
             <X size={14} />
           </button>
         </div>
@@ -2382,40 +2383,64 @@ function LaporanDrawer({
         )}
       </div>
 
-      {/* Tower terdampak — start (always) */}
-      <div>
-        <label className="block text-[14px] font-bold text-app-text mb-2">
-          {isPPL ? 'Tower Terdampak (Start)' : 'Tower Terganggu'}
-        </label>
-        {readOnly ? (
-          <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
-        ) : isMobile && gpsLocked ? (
-          <div className="form-input bg-app-bg flex items-center justify-between">
-            <span style={{ fontSize: 14, color: '#1B1B1B', fontWeight: 500 }}>{form.towerLabel || '—'}</span>
-            <span style={{ fontSize: 11, color: '#039855', fontWeight: 600 }}>📍 GPS</span>
+      {/* Tower terdampak & Span */}
+      <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>
+        <div className="flex-1 min-w-0">
+          <label className="block text-[14px] font-bold text-app-text mb-2">
+            {isPPL ? 'No. Tower' : 'Tower Terganggu'}
+          </label>
+          {readOnly ? (
+            <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
+          ) : isMobile && gpsLocked ? (
+            <div className="form-input bg-app-bg flex items-center justify-between">
+              <span style={{ fontSize: 14, color: '#1B1B1B', fontWeight: 500 }}>{form.towerLabel || '—'}</span>
+              <span style={{ fontSize: 11, color: '#039855', fontWeight: 600 }}>📍 GPS</span>
+            </div>
+          ) : isMobile ? (
+            <button
+              type="button"
+              onClick={() => { setTowerSheetTarget('start'); setTowerSheetOpen(true) }}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                width: '100%', padding: '10px 14px',
+                background: form.towerId ? '#E1E8EC' : '#FFFFFF',
+                border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+              }}
+            >
+              <span style={{ fontSize: 14, color: form.towerId ? '#5F737F' : '#97AAB3', fontWeight: 500 }}>
+                {form.towerLabel || 'Pilih tower...'}
+              </span>
+              <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+            </button>
+          ) : (
+            <TowerDropdown
+              options={towerOptions}
+              value={form.towerId}
+              onChange={(id, label) => setForm(f => ({ ...f, towerId: id, towerLabel: label }))}
+            />
+          )}
+        </div>
+
+        {/* Span — free text, optional, semua jenis laporan */}
+        {isPPL && (
+          <div className="flex-1 min-w-0">
+            <label className="block text-[14px] font-bold text-app-text mb-2">Span</label>
+            <div className="relative">
+              <input
+                type="text"
+                disabled={readOnly}
+                value={form.lokasiDetail}
+                onChange={e => set('lokasiDetail', e.target.value)}
+                placeholder="Contoh: T-23 - T-25"
+                className="form-input pr-8"
+              />
+              {form.lokasiDetail && !readOnly && (
+                <button type="button" onClick={() => set('lokasiDetail', '')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <X size={14} className="text-[#97AAB3]"/>
+                </button>
+              )}
+            </div>
           </div>
-        ) : isMobile ? (
-          <button
-            type="button"
-            onClick={() => { setTowerSheetTarget('start'); setTowerSheetOpen(true) }}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              width: '100%', padding: '10px 14px',
-              background: form.towerId ? '#E1E8EC' : '#FFFFFF',
-              border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
-            }}
-          >
-            <span style={{ fontSize: 14, color: form.towerId ? '#5F737F' : '#97AAB3', fontWeight: 500 }}>
-              {form.towerLabel || 'Pilih tower...'}
-            </span>
-            <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
-          </button>
-        ) : (
-          <TowerDropdown
-            options={towerOptions}
-            value={form.towerId}
-            onChange={(id, label) => setForm(f => ({ ...f, towerId: id, towerLabel: label }))}
-          />
         )}
       </div>
 
@@ -2424,7 +2449,7 @@ function LaporanDrawer({
         <div className="flex items-center gap-2.5">
           <div
             onClick={() => setUseGPS(v => !v)}
-            className={`w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors shrink-0 ${useGPS ? 'bg-blue-600 border-blue-600' : 'border-app-border bg-white'}`}
+            className={`w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors shrink-0 ${useGPS ? 'bg-[#076C9E] border-[#076C9E]' : 'border-app-border bg-white'}`}
           >
             {useGPS && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
           </div>
@@ -2436,92 +2461,78 @@ function LaporanDrawer({
           >
             Gunakan lokasi anda saat ini.
           </button>
-          {locating && <span className="text-[11px] text-blue-500 animate-pulse">Mendeteksi...</span>}
+          {locating && <span className="text-[11px] text-[#076C9E] animate-pulse">Mendeteksi...</span>}
         </div>
       )}
       {detectedMsg && (
         <p className={`text-[12px] font-medium -mt-2 ${detectedMsg.includes('⚠️') ? 'text-orange-600' : 'text-green-600'}`}>{detectedMsg}</p>
       )}
 
-      {/* Span — free text, optional, semua jenis laporan */}
-      {isPPL && (
-        <div>
-          <label className="block text-[14px] font-bold text-app-text mb-2">Span</label>
-          <input
-            type="text"
-            disabled={readOnly}
-            value={form.lokasiDetail}
-            onChange={e => set('lokasiDetail', e.target.value)}
-            placeholder="Contoh: T-23 - T-25"
-            className="form-input"
-          />
+      {/* Jenis & Status Kerawanan */}
+      <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>
+        <div className="flex-1 min-w-0">
+          <label className="block text-[14px] font-bold text-app-text mb-2">Jenis Kerawanan</label>
+          {isMobile && !readOnly ? (
+            <button
+              type="button"
+              onClick={() => setJenisSheetOpen(true)}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                width: '100%', padding: '10px 14px', background: '#FFFFFF',
+                border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+              }}
+            >
+              <span style={{ fontSize: 14, color: form.jenisGangguan ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }} className="truncate">
+                {JENIS_LABEL[form.jenisGangguan] || 'Pilih kategori...'}
+              </span>
+              <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+            </button>
+          ) : (
+            <select
+              disabled={readOnly}
+              value={form.jenisGangguan}
+              onChange={(e) => set('jenisGangguan', e.target.value)}
+              className="form-input truncate pr-8"
+            >
+              <option value="">Pilih kategori...</option>
+              {JENIS_OPTIONS.filter(o => o.value).map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          )}
         </div>
-      )}
 
-      {/* Jenis kerawanan */}
-      <div>
-        <label className="block text-[14px] font-bold text-app-text mb-2">Jenis Kerawanan</label>
-        {isMobile && !readOnly ? (
-          <button
-            type="button"
-            onClick={() => setJenisSheetOpen(true)}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              width: '100%', padding: '10px 14px', background: '#FFFFFF',
-              border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
-            }}
-          >
-            <span style={{ fontSize: 14, color: form.jenisGangguan ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
-              {JENIS_LABEL[form.jenisGangguan] || 'Pilih kategori...'}
-            </span>
-            <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
-          </button>
-        ) : (
-          <select
-            disabled={readOnly}
-            value={form.jenisGangguan}
-            onChange={(e) => set('jenisGangguan', e.target.value)}
-            className="form-input"
-          >
-            <option value="">Pilih kategori...</option>
-            {JENIS_OPTIONS.filter(o => o.value).map(o => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        )}
-      </div>
-
-      {/* Status Kerawanan */}
-      {isPPL && (
-        <>
-          <div>
-        <label className={`block font-semibold text-app-text mb-2 ${isMobile ? 'text-[14px]' : 'text-[12px]'}`}>Status Kerawanan</label>
-        {isMobile && !readOnly ? (
-          <button
-            type="button"
-            onClick={() => setLevelSheetOpen(true)}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              width: '100%', padding: '10px 14px', background: '#FFFFFF',
-              border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
-            }}
-          >
-            <span style={{ fontSize: 14, color: form.levelRisiko ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
-              {LEVEL_OPTIONS.find(l => l.value === form.levelRisiko)?.label || 'Pilih status...'}
-            </span>
-            <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
-          </button>
-        ) : (
-          <select
-            disabled={readOnly}
-            value={form.levelRisiko}
-            onChange={(e) => set('levelRisiko', e.target.value)}
-            className={`form-input ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
-          >
-            {LEVEL_OPTIONS.map(l => (
-              <option key={l.value} value={l.value}>{l.label}</option>
-            ))}
-          </select>
+        {isPPL && (
+          <div className="flex-1 min-w-0">
+            <label className="block text-[14px] font-bold text-app-text mb-2">Status Kerawanan</label>
+            {isMobile && !readOnly ? (
+              <button
+                type="button"
+                onClick={() => setLevelSheetOpen(true)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  width: '100%', padding: '10px 14px', background: '#FFFFFF',
+                  border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+                }}
+              >
+                <span style={{ fontSize: 14, color: form.levelRisiko ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
+                  {LEVEL_OPTIONS.find(l => l.value === form.levelRisiko)?.label || 'Pilih status...'}
+                </span>
+                <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+              </button>
+            ) : (
+              <select
+                disabled={readOnly}
+                value={form.levelRisiko}
+                onChange={(e) => set('levelRisiko', e.target.value)}
+                className={`form-input truncate pr-8 ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
+              >
+                {LEVEL_OPTIONS.map(l => (
+                  <option key={l.value} value={l.value}>{l.label}</option>
+                ))}
+              </select>
+            )}
+          </div>
         )}
       </div>
 
@@ -2544,16 +2555,23 @@ function LaporanDrawer({
       {/* Uraian Pekerjaan / Deskripsi */}
       <div>
         <label className="block text-[14px] font-bold text-app-text mb-2">
-          {isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'}
+          {isPPL ? <>Uraian Pekerjaan <span className="font-normal text-[#5F737F]">(Opsional)</span></> : 'Deskripsi'}
         </label>
-        <textarea
-          disabled={readOnly}
-          rows={4}
-          value={form.deskripsi}
-          onChange={(e) => set('deskripsi', e.target.value)}
-          className="form-input resize-none"
-          placeholder={isPPL ? 'Uraikan pekerjaan pihak lain...' : 'Deskripsi gangguan...'}
-        />
+        <div className="relative">
+          <textarea
+            disabled={readOnly}
+            rows={4}
+            value={form.deskripsi}
+            onChange={(e) => set('deskripsi', e.target.value)}
+            className="form-input resize-none w-full"
+            placeholder={isPPL ? 'Proyek renovasi gudang menggunakan alat berat crane' : 'Deskripsi gangguan...'}
+          />
+          {form.deskripsi && !readOnly && (
+            <button type="button" onClick={() => set('deskripsi', '')} className="absolute bottom-3 right-3">
+              <X size={14} className="text-[#97AAB3]"/>
+            </button>
+          )}
+        </div>
       </div>
 
       {!isPPL && (
@@ -2576,30 +2594,55 @@ function LaporanDrawer({
           {/* Figma: gray 8px divider strip + section heading 18px/700 */}
           <div style={{ margin: '8px -20px 0', height: 8, background: '#F6F9FC' }} />
           <div style={{ padding: '12px 0 4px' }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B' }}>Informasi Pihak Lain</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>Informasi Pihak Lain</h3>
           </div>
-          <div>
-            <label className="block text-[14px] font-bold text-app-text mb-2">Pihak Lain</label>
-            <input
-              disabled={readOnly}
-              type="text"
-              value={form.pihakLain}
-              onChange={(e) => set('pihakLain', e.target.value)}
-              className="form-input"
-              placeholder="Nama perusahaan / pihak lain..."
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex-1 min-w-0">
+              <label className="block text-[14px] font-bold text-app-text mb-2">Pihak Lain</label>
+              <div className="relative">
+                <input
+                  disabled={readOnly}
+                  type="text"
+                  value={form.pihakLain}
+                  onChange={(e) => set('pihakLain', e.target.value)}
+                  className="form-input pr-8"
+                  placeholder="PT. Grakindo Maju Sukses"
+                />
+                {form.pihakLain && !readOnly && (
+                  <button type="button" onClick={() => set('pihakLain', '')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <X size={14} className="text-[#97AAB3]"/>
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="block text-[14px] font-bold text-app-text mb-2">Contact Person</label>
+              <div className="relative">
+                <input
+                  disabled={readOnly}
+                  type="text"
+                  value={form.contactPerson}
+                  onChange={(e) => set('contactPerson', e.target.value)}
+                  className="form-input pr-8"
+                  placeholder="081315555271"
+                />
+                {form.contactPerson && !readOnly && (
+                  <button type="button" onClick={() => set('contactPerson', '')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <X size={14} className="text-[#97AAB3]"/>
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-          <div>
-            <label className="block text-[14px] font-bold text-app-text mb-2">Upaya Pengendalian</label>
-            <textarea
-              disabled={readOnly}
-              rows={4}
-              value={form.keterangan}
-              onChange={(e) => set('keterangan', e.target.value)}
-              className="form-input resize-none"
-              placeholder="Tindakan pengendalian yang sudah dilakukan..."
-            />
-          </div>
+          
+          {!readOnly && (
+            <>
+              <div style={{ margin: '8px -20px 0', height: 8, background: '#F6F9FC' }} />
+              <div style={{ padding: '12px 0 4px' }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>Informasi Progres Laporan</h3>
+              </div>
+            </>
+          )}
         </>
       )}
 
@@ -2714,9 +2757,14 @@ function LaporanDrawer({
             <>
               {formBody}
               <div className="px-5 py-4 border-t border-app-border shrink-0 bg-white">
-                <button type="submit" form="laporan-form" disabled={saving} className="btn-primary w-full justify-center">
-                  {saving ? 'Menyimpan...' : initial ? 'Simpan Perubahan' : 'Buat Laporan'}
-                </button>
+                <div className="flex gap-3">
+                  <button type="button" onClick={onClose} className="flex-1 h-11 rounded-[22px] bg-white border border-[#D92D20] text-[#D92D20] font-semibold text-[14px]">
+                    Batalkan
+                  </button>
+                  <button type="submit" form="laporan-form" disabled={saving} className="flex-1 h-11 rounded-[22px] bg-[#076C9E] text-white font-semibold text-[14px] border-none">
+                    {saving ? 'Menyimpan...' : initial ? 'Simpan' : 'Buat Laporan'}
+                  </button>
+                </div>
               </div>
             </>
           )}
@@ -2762,8 +2810,8 @@ function LaporanDrawer({
           </div>
           {formBody}
           <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border shrink-0 bg-white">
-            <button type="button" onClick={onClose} className="btn-outline">Batal</button>
-            <button type="submit" form="laporan-form" disabled={saving} className="btn-primary">
+            <button type="button" onClick={onClose} className="px-6 h-11 rounded-[22px] bg-white border border-[#D92D20] text-[#D92D20] font-semibold text-[14px] cursor-pointer">Batalkan</button>
+            <button type="submit" form="laporan-form" disabled={saving} className="px-6 h-11 rounded-[22px] bg-[#076C9E] text-white font-semibold text-[14px] border-none cursor-pointer">
               {saving ? 'Menyimpan...' : initial ? 'Simpan Perubahan' : 'Buat Laporan'}
             </button>
           </div>

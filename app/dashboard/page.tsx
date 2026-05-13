@@ -338,15 +338,7 @@ export default function DashboardPage() {
 
   return (
     <div className="dash-container">
-      {/* Alert banner — Figma: #FEF3F2 bg, #D92D20 text/border */}
-      {alertCount > 0 && (
-        <div className="dash-alert">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M9 1.5C4.86 1.5 1.5 4.86 1.5 9C1.5 13.14 4.86 16.5 9 16.5C13.14 16.5 16.5 13.14 16.5 9C16.5 4.86 13.14 1.5 9 1.5ZM8.25 5.25H9.75V9.75H8.25V5.25ZM9 13.5C8.5875 13.5 8.25 13.1625 8.25 12.75C8.25 12.3375 8.5875 12 9 12C9.4125 12 9.75 12.3375 9.75 12.75C9.75 13.1625 9.4125 13.5 9 13.5Z" fill="#D92D20"/>
-          </svg>
-          <span>{alertCount} tower dalam kondisi gangguan aktif — segera tindaklanjuti</span>
-        </div>
-      )}
+      {/* Alert banner — Removed as requested */}
 
       {/* Title */}
       <h1 className="dash-title">Dashboard</h1>

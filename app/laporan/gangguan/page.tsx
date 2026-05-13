@@ -1170,18 +1170,49 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
   const { isMobile } = useSidebar()
   const [progress, setProgress] = useState<Record<string, any[]>>({ spanduk: [], brosur: [], laporan_baru: [], berita_acara: [] })
   const [fotoHistory, setFotoHistory] = useState<any[]>([])
+  const [riwayat, setRiwayat] = useState<any[]>([])
   const [uploading, setUploading] = useState<string | null>(null)
   const [uploadingFoto, setUploadingFoto] = useState(false)
   const [selesaiLoading, setSelesaiLoading] = useState(false)
   const [lightbox, setLightbox] = useState<{ urls: string[]; index: number } | null>(null)
+  const [showAddRiwayat, setShowAddRiwayat] = useState(false)
+  const [riwayatForm, setRiwayatForm] = useState({ statusKerawanan: 'aman', progresLaporan: 'sedang_berlangsung', uraianPekerjaan: '', upayaPengendalian: '' })
+  const [savingRiwayat, setSavingRiwayat] = useState(false)
   const fotoUpdateRef = useRef<HTMLInputElement>(null)
   const progressRefs = useRef<Record<string, HTMLInputElement | null>>({})
+
+  const user = getUser()
 
   useEffect(() => {
     if (!laporan?.id) return
     laporanApi.getProgress(laporan.id).then(r => setProgress(r.data)).catch(() => {})
     laporanApi.getFotoHistory(laporan.id).then(r => setFotoHistory(r.data ?? [])).catch(() => {})
+    laporanApi.getRiwayat(laporan.id).then(r => setRiwayat(r.data ?? [])).catch(() => {})
   }, [laporan?.id])
+
+  async function handleAddRiwayat(e: React.FormEvent) {
+    e.preventDefault()
+    if (!laporan?.id) return
+    setSavingRiwayat(true)
+    try {
+      const res = await laporanApi.addRiwayat(laporan.id, {
+        oleh: user?.nama ?? 'Unknown',
+        ...riwayatForm,
+      })
+      setRiwayat(prev => [res.data, ...prev])
+      setShowAddRiwayat(false)
+      setRiwayatForm({ statusKerawanan: 'aman', progresLaporan: 'sedang_berlangsung', uraianPekerjaan: '', upayaPengendalian: '' })
+      toast.success('Riwayat pembaruan ditambahkan')
+    } catch { toast.error('Gagal menyimpan riwayat') } finally { setSavingRiwayat(false) }
+  }
+
+  async function handleDeleteRiwayat(riwayatId: string) {
+    if (!laporan?.id || !confirm('Hapus riwayat ini?')) return
+    try {
+      await laporanApi.deleteRiwayat(laporan.id, riwayatId)
+      setRiwayat(prev => prev.filter(r => r.id !== riwayatId))
+    } catch { toast.error('Gagal menghapus riwayat') }
+  }
 
   async function handleSelesaikan() {
     if (!laporan?.id) return
@@ -1547,6 +1578,108 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
           ))}
           {fotoHistory.length === 0 && (
             <p style={{ fontSize: 12, color: '#97AAB3', textAlign: 'center', padding: '16px 0' }}>Belum ada foto update</p>
+          )}
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: '#E1E8EC', margin: '32px 0' }} />
+
+        {/* ── Section 4: Riwayat Pembaruan Laporan ── */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B' }}>Riwayat Pembaruan Laporan</span>
+            <button
+              type="button"
+              onClick={() => setShowAddRiwayat(v => !v)}
+              style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid #076C9E', background: showAddRiwayat ? '#076C9E' : '#fff', color: showAddRiwayat ? '#fff' : '#076C9E', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+            >
+              {showAddRiwayat ? 'Batal' : '+ Tambah Pembaruan'}
+            </button>
+          </div>
+          <div style={{ height: 1, background: '#E1E8EC', marginBottom: 20 }} />
+
+          {/* Add form */}
+          {showAddRiwayat && (
+            <form onSubmit={handleAddRiwayat} style={{ background: '#F6F9FC', borderRadius: 10, padding: '20px', marginBottom: 24, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#5F737F', display: 'block', marginBottom: 4 }}>Status Kerawanan</label>
+                  <select className="form-input" value={riwayatForm.statusKerawanan} onChange={e => setRiwayatForm(f => ({ ...f, statusKerawanan: e.target.value }))}>
+                    <option value="aman">Aman</option>
+                    <option value="sedang">Sedang</option>
+                    <option value="kritis_terpenuhi">Kritis</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#5F737F', display: 'block', marginBottom: 4 }}>Progres Laporan</label>
+                  <select className="form-input" value={riwayatForm.progresLaporan} onChange={e => setRiwayatForm(f => ({ ...f, progresLaporan: e.target.value }))}>
+                    <option value="sedang_berlangsung">Sedang Berlangsung</option>
+                    <option value="tidak_ada_aktivitas">Tidak Ada Aktivitas</option>
+                    <option value="selesai">Selesai</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#5F737F', display: 'block', marginBottom: 4 }}>Uraian Pekerjaan</label>
+                <textarea className="form-input" rows={3} value={riwayatForm.uraianPekerjaan} onChange={e => setRiwayatForm(f => ({ ...f, uraianPekerjaan: e.target.value }))} placeholder="Uraian pekerjaan..." style={{ resize: 'vertical' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#5F737F', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</label>
+                <textarea className="form-input" rows={3} value={riwayatForm.upayaPengendalian} onChange={e => setRiwayatForm(f => ({ ...f, upayaPengendalian: e.target.value }))} placeholder="Upaya pengendalian..." style={{ resize: 'vertical' }} />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button type="submit" disabled={savingRiwayat} style={{ padding: '8px 24px', borderRadius: 8, border: 'none', background: '#076C9E', color: '#fff', fontWeight: 600, fontSize: 13, cursor: 'pointer', opacity: savingRiwayat ? 0.7 : 1 }}>
+                  {savingRiwayat ? 'Menyimpan...' : 'Simpan'}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* Riwayat list */}
+          {riwayat.length === 0 ? (
+            <p style={{ fontSize: 13, color: '#97AAB3', textAlign: 'center', padding: '24px 0' }}>Belum ada riwayat pembaruan</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {riwayat.map((r: any) => (
+                <div key={r.id} style={{ borderLeft: '2px solid #E1E8EC', paddingLeft: 20, paddingBottom: 28, position: 'relative' }}>
+                  {/* Timeline dot */}
+                  <div style={{ position: 'absolute', left: -5, top: 2, width: 8, height: 8, borderRadius: '50%', background: '#076C9E', border: '2px solid #fff', boxShadow: '0 0 0 2px #076C9E' }} />
+                  <div style={{ fontSize: 12, color: '#97AAB3', marginBottom: 10 }}>
+                    Tanggal Pembaruan: {new Date(r.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} · Oleh: {r.oleh}
+                  </div>
+                  <div style={{ background: '#fff', border: '1px solid #E1E8EC', borderRadius: 10, padding: '16px 20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: '#1B1B1B' }}>Detail Pembaruan</span>
+                      <button type="button" onClick={() => handleDeleteRiwayat(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 4, display: 'flex' }}>
+                        <X size={14} />
+                      </button>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 20px', marginBottom: 12 }}>
+                      <div>
+                        <span style={{ fontSize: 12, color: '#5F737F', display: 'block', marginBottom: 4 }}>Status Kerawanan</span>
+                        <LevelBadge level={r.statusKerawanan} />
+                      </div>
+                      <div>
+                        <span style={{ fontSize: 12, color: '#5F737F', display: 'block', marginBottom: 4 }}>Progres Laporan</span>
+                        <ProgressBadge tipe={r.progresLaporan} />
+                      </div>
+                    </div>
+                    {r.uraianPekerjaan && (
+                      <div style={{ marginBottom: 10 }}>
+                        <span style={{ fontSize: 12, color: '#5F737F', display: 'block', marginBottom: 4 }}>Uraian Pekerjaan</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.uraianPekerjaan}</span>
+                      </div>
+                    )}
+                    {r.upayaPengendalian && (
+                      <div>
+                        <span style={{ fontSize: 12, color: '#5F737F', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.upayaPengendalian}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 

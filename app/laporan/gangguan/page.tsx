@@ -289,7 +289,7 @@ function RowActions({
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
                 <Clock size={16} />
-                Perbarui Laporan
+                Update Riwayat Laporan
               </button>
             </>
           )}
@@ -1549,13 +1549,6 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
                   {laporan?.progresLaporan && <ProgressBadge tipe={laporan.progresLaporan} />}
                 </div>
               </div>
-              {laporan?.status !== 'selesai' && (
-                <button type="button" onClick={() => setShowUpdateDrawer(true)}
-                  style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: 'none', background: '#076C9E', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                  <Clock size={12} />
-                  Perbarui
-                </button>
-              )}
             </div>
             <div style={{ display: 'flex', gap: 4, marginTop: 6, fontSize: 12, color: '#5F737F' }}>
               <span>Dibuat pada:</span>
@@ -1718,6 +1711,54 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
             )}
           </div>
 
+          <div style={{ height: 1, background: '#E1E8EC', margin: '16px -16px' }} />
+
+          {/* ── Progres Laporan timeline (mobile) ── */}
+          <div style={{ paddingBottom: 16 }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
+              Progres Laporan
+            </span>
+            <div style={{ position: 'relative', paddingLeft: 24 }}>
+              <div style={{ position: 'absolute', left: 6, top: 16, bottom: 16, width: 2, background: '#E1E8EC' }} />
+
+              {/* Laporan Dibuat */}
+              <div style={{ position: 'relative', marginBottom: 16 }}>
+                <div style={{ position: 'absolute', left: -24, top: 2, width: 14, height: 14, borderRadius: '50%', background: '#076C9E', border: '2px solid #fff', boxShadow: '0 0 0 2px #076C9E' }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#076C9E', display: 'block' }}>Laporan Dibuat</span>
+                <span style={{ fontSize: 11, color: '#97AAB3' }}>{formatTanggal(laporan?.tanggal)}</span>
+              </div>
+
+              {/* Riwayat steps */}
+              {[...riwayat].reverse().map((r: any, i: number) => {
+                const isLast = i === riwayat.length - 1 && laporan?.status !== 'selesai'
+                return (
+                  <div key={r.id} style={{ position: 'relative', marginBottom: 16 }}>
+                    <div style={{ position: 'absolute', left: -24, top: 2, width: 14, height: 14, borderRadius: '50%', background: isLast ? '#076C9E' : '#E1E8EC', border: '2px solid #fff', boxShadow: `0 0 0 2px ${isLast ? '#076C9E' : '#C5D3D9'}` }} />
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 2 }}>
+                      <ProgressBadge tipe={r.progresLaporan} />
+                      <LevelBadge level={r.statusKerawanan} />
+                    </div>
+                    <span style={{ fontSize: 11, color: '#97AAB3' }}>{formatTanggal(r.tanggal)} · {r.oleh}</span>
+                  </div>
+                )
+              })}
+
+              {laporan?.status === 'selesai' && (
+                <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', left: -24, top: 2, width: 14, height: 14, borderRadius: '50%', background: '#039855', border: '2px solid #fff', boxShadow: '0 0 0 2px #039855' }} />
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#039855' }}>Laporan Selesai</span>
+                </div>
+              )}
+
+              {riwayat.length === 0 && laporan?.status !== 'selesai' && (
+                <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', left: -24, top: 2, width: 14, height: 14, borderRadius: '50%', background: '#F6F9FC', border: '2px solid #C5D3D9' }} />
+                  <span style={{ fontSize: 12, color: '#97AAB3', fontStyle: 'italic' }}>Belum ada pembaruan</span>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div style={{ height: 16 }} />
         </div>
 
@@ -1747,19 +1788,10 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
     <div style={{ minHeight: '100%', padding: '32px 40px 48px' }}>
       {/* Head — outside white card */}
       <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: 24, fontWeight: 700, color: '#1B1B1B' }}>Detail Kerawanan</span>
-            <LevelBadge level={laporan?.levelRisiko} />
-            {laporan?.latestProgressTipe && <ProgressBadge tipe={laporan.latestProgressTipe} />}
-          </div>
-          {laporan?.status !== 'selesai' && (
-            <button type="button" onClick={() => setShowUpdateDrawer(true)}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 8, border: 'none', background: '#076C9E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-              <Clock size={14} />
-              Perbarui Laporan
-            </button>
-          )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+          <span style={{ fontSize: 24, fontWeight: 700, color: '#1B1B1B' }}>Detail Kerawanan</span>
+          <LevelBadge level={laporan?.levelRisiko} />
+          {laporan?.progresLaporan && <ProgressBadge tipe={laporan.progresLaporan} />}
         </div>
         <div style={{ display: 'flex', gap: 8, fontSize: 14, fontWeight: 500, color: '#566B75' }}>
           <span>Dibuat pada : {formatTanggal(laporan?.tanggal)}</span>
@@ -1767,7 +1799,10 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
         </div>
       </div>
 
-      {/* White card */}
+      {/* Two-column layout: Detail + Progress */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24, alignItems: 'start' }}>
+
+      {/* Left: White card */}
       <div style={{ background: '#FFFFFF', borderRadius: 12, border: '1px solid #E1E8EC', padding: '32px' }}>
 
         {/* ── Section 1: Informasi Kerawanan ── */}
@@ -1968,6 +2003,64 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
 
       </div>
 
+      {/* Right: Progres Laporan panel */}
+      <div style={{ background: '#FFFFFF', borderRadius: 12, border: '1px solid #E1E8EC', overflow: 'hidden', position: 'sticky', top: 24 }}>
+        {/* Panel header */}
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid #E1E8EC', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B' }}>Progres Laporan</span>
+          <ProgressBadge tipe={laporan?.progresLaporan} />
+        </div>
+
+        {/* Timeline */}
+        <div style={{ padding: '20px' }}>
+          <div style={{ position: 'relative', paddingLeft: 28 }}>
+            {/* Vertical connector line */}
+            <div style={{ position: 'absolute', left: 7, top: 18, bottom: 18, width: 2, background: '#E1E8EC' }} />
+
+            {/* Step 1: Laporan Dibuat */}
+            <div style={{ position: 'relative', marginBottom: 20 }}>
+              <div style={{ position: 'absolute', left: -28, top: 3, width: 16, height: 16, borderRadius: '50%', background: '#076C9E', border: '2px solid #fff', boxShadow: '0 0 0 2px #076C9E' }} />
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#076C9E', display: 'block', marginBottom: 2 }}>Laporan Dibuat</span>
+              <span style={{ fontSize: 11, color: '#97AAB3' }}>{formatTanggal(laporan?.tanggal)}</span>
+              {laporan?.pelapor?.nama && <span style={{ fontSize: 11, color: '#97AAB3', display: 'block' }}>Oleh: {laporan.pelapor.nama}</span>}
+            </div>
+
+            {/* Riwayat steps (oldest first) */}
+            {[...riwayat].reverse().map((r: any, i: number) => {
+              const isLast = i === riwayat.length - 1 && laporan?.status !== 'selesai'
+              return (
+                <div key={r.id} style={{ position: 'relative', marginBottom: 20 }}>
+                  <div style={{ position: 'absolute', left: -28, top: 3, width: 16, height: 16, borderRadius: '50%', background: isLast ? '#076C9E' : '#E1E8EC', border: '2px solid #fff', boxShadow: `0 0 0 2px ${isLast ? '#076C9E' : '#C5D3D9'}` }} />
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 3, flexWrap: 'wrap' }}>
+                    <ProgressBadge tipe={r.progresLaporan} />
+                    <LevelBadge level={r.statusKerawanan} />
+                  </div>
+                  <span style={{ fontSize: 11, color: '#97AAB3' }}>{formatTanggal(r.tanggal)} · Oleh: {r.oleh}</span>
+                </div>
+              )
+            })}
+
+            {/* Final step: Selesai */}
+            {laporan?.status === 'selesai' && (
+              <div style={{ position: 'relative', marginBottom: 0 }}>
+                <div style={{ position: 'absolute', left: -28, top: 3, width: 16, height: 16, borderRadius: '50%', background: '#039855', border: '2px solid #fff', boxShadow: '0 0 0 2px #039855' }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#039855', display: 'block', marginBottom: 2 }}>Laporan Selesai</span>
+              </div>
+            )}
+
+            {/* Empty state */}
+            {riwayat.length === 0 && laporan?.status !== 'selesai' && (
+              <div style={{ position: 'relative', marginBottom: 0 }}>
+                <div style={{ position: 'absolute', left: -28, top: 3, width: 16, height: 16, borderRadius: '50%', background: '#F6F9FC', border: '2px solid #C5D3D9', boxShadow: '0 0 0 2px #C5D3D9' }} />
+                <span style={{ fontSize: 12, color: '#97AAB3', fontStyle: 'italic' }}>Belum ada pembaruan</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      </div>{/* end grid */}
+
       {progressInputs}
       {updateDrawer}
 
@@ -2061,6 +2154,7 @@ function LaporanDrawer({
           tanggalWaktu: initial.tanggal?.slice(0, 16) ?? new Date().toISOString().slice(0, 16),
           levelRisiko:  initial.levelRisiko ?? 'sedang',
           status:       initial.status ?? 'berlangsung',
+          progresLaporan: initial.progresLaporan ?? 'sedang_berlangsung',
           lokasiDetail: initial.lokasiDetail ?? '',
           deskripsi:    initial.deskripsi ?? '',
           keterangan:   initial.keterangan ?? '',
@@ -2178,6 +2272,7 @@ function LaporanDrawer({
         tanggal:      form.tanggalWaktu,
         levelRisiko:  form.levelRisiko,
         status:       form.status,
+        progresLaporan: form.progresLaporan,
         lokasiDetail: form.lokasiDetail || null,
         deskripsi:    form.deskripsi,
         keterangan:   form.keterangan,
@@ -2425,6 +2520,22 @@ function LaporanDrawer({
           </select>
         )}
       </div>
+
+      {/* Progres Laporan */}
+      {!readOnly && (
+        <div>
+          <label className={`block font-semibold text-app-text mb-2 ${isMobile ? 'text-[14px]' : 'text-[12px]'}`}>Progres Laporan</label>
+          <select
+            value={form.progresLaporan}
+            onChange={(e) => set('progresLaporan', e.target.value)}
+            className="form-input"
+          >
+            <option value="sedang_berlangsung">Sedang Berlangsung</option>
+            <option value="tidak_ada_aktivitas">Tidak Ada Aktivitas</option>
+            <option value="selesai">Selesai</option>
+          </select>
+        </div>
+      )}
 
       {/* Uraian Pekerjaan / Deskripsi */}
       <div>

@@ -1207,6 +1207,17 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
 
   const user = getUser()
 
+  async function handleDelete(id: string) {
+    try {
+      await laporanApi.delete(id)
+      toast.success('Laporan berhasil dihapus')
+      onSaved?.()
+      onClose?.()
+    } catch {
+      toast.error('Gagal menghapus laporan')
+    }
+  }
+
   useEffect(() => {
     if (autoOpenUpdate && laporan?.status !== 'selesai') setShowUpdateDrawer(true)
   }, [autoOpenUpdate, laporan?.status])

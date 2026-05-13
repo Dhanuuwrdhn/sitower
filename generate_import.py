@@ -264,9 +264,10 @@ def map_status(status_raw):
 
 def map_level(status_raw):
     s = str(status_raw or '').lower().strip()
-    if 'kritis' in s: return 'kritis'
+    if 'tidak terpenuhi' in s: return 'kritis_tidak_terpenuhi'
+    if 'kritis' in s: return 'kritis_terpenuhi'
     if 'sedang' in s: return 'sedang'
-    return 'rendah'
+    return 'aman'
 
 # Default pelapor
 DEFAULT_PELAPOR_ID = 'pegawai-teknisi-001'

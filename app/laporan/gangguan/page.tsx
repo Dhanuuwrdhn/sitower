@@ -2622,16 +2622,16 @@ function LaporanDrawer({
         </div>
       )}
 
-      {/* Tanggal & Waktu — hidden on create (auto = now), editable on edit, disabled on detail */}
-      {(readOnly || !!initial) && (
+      {/* Tanggal & Waktu — editable by admin, readonly for teknisi, hidden for teknisi on create */}
+      {(readOnly || !!initial || isAdmin() || isSuperadmin()) && (
         <div>
-          <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tanggal & Waktu</label>
+          <label className="block text-[12px] font-semibold text-app-text mb-1.5">Dibuat pada</label>
           <input
-            disabled={readOnly}
+            disabled={readOnly || (!isAdmin() && !isSuperadmin())}
             type="datetime-local"
             value={form.tanggalWaktu}
             onChange={(e) => set('tanggalWaktu', e.target.value)}
-            className={`form-input ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
+            className={`form-input ${(readOnly || (!isAdmin() && !isSuperadmin())) ? 'bg-app-bg text-app-muted' : ''}`}
           />
         </div>
       )}

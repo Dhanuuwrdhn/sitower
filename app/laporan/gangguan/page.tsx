@@ -10,7 +10,7 @@ import {
   ArrowLeft, AlertTriangle, FileText, ImagePlus, Clock,
 } from 'lucide-react'
 import { laporanApi, towersApi, importApi } from '@/lib/api'
-import { getUser, isAdmin } from '@/lib/auth'
+import { getUser, isAdmin, isSuperadmin } from '@/lib/auth'
 import { getDistance } from '@/lib/geo'
 import { resolveMediaUrl } from '@/lib/utils'
 import { useSidebar } from '@/components/layout/SidebarContext'
@@ -89,19 +89,25 @@ const LEVEL_BADGE: Record<string, { bg: string; text: string; label: string }> =
 }
 
 const PROGRESS_TIPE_LABEL: Record<string, string> = {
-  spanduk:      'Spanduk',
-  brosur:       'Brosur',
-  laporan_baru: 'Laporan Baru',
-  berita_acara: 'Berita Acara',
-  surat:        'Surat',
+  spanduk:              'Spanduk',
+  brosur:               'Brosur',
+  laporan_baru:         'Laporan Baru',
+  berita_acara:         'Berita Acara',
+  surat:                'Surat',
+  sedang_berlangsung:   'Sedang Berlangsung',
+  selesai:              'Selesai',
+  tidak_ada_aktivitas:  'Tidak Ada Aktivitas',
 }
 
 const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {
-  laporan_baru: { bg: '#076C9E', text: '#FFFFFF' },
-  berita_acara: { bg: '#076C9E', text: '#FFFFFF' },
-  spanduk:      { bg: '#076C9E', text: '#FFFFFF' },
-  brosur:       { bg: '#076C9E', text: '#FFFFFF' },
-  surat:        { bg: '#076C9E', text: '#FFFFFF' },
+  laporan_baru:         { bg: '#076C9E', text: '#FFFFFF' },
+  berita_acara:         { bg: '#076C9E', text: '#FFFFFF' },
+  spanduk:              { bg: '#076C9E', text: '#FFFFFF' },
+  brosur:               { bg: '#076C9E', text: '#FFFFFF' },
+  surat:                { bg: '#076C9E', text: '#FFFFFF' },
+  sedang_berlangsung:   { bg: '#F79009', text: '#FFFFFF' },
+  selesai:              { bg: '#039855', text: '#FFFFFF' },
+  tidak_ada_aktivitas:  { bg: '#5F737F', text: '#FFFFFF' },
 }
 
 const PROGRESS_TIPE_LIST = ['spanduk', 'brosur', 'laporan_baru', 'berita_acara', 'surat'] as const
@@ -171,12 +177,14 @@ async function compressImage(file: File, maxPx = 1920, quality = 0.75): Promise<
 function RowActions({
   row,
   onDetail,
+  onUpdate,
   onEdit,
   onDelete,
   showDelete,
 }: {
   row: any
   onDetail: (row: any) => void
+  onUpdate: (row: any) => void
   onEdit: (row: any) => void
   onDelete: (row: any) => void
   showDelete: boolean
@@ -270,6 +278,21 @@ function RowActions({
             <Eye size={16} />
             Lihat Detail Laporan
           </button>
+
+          {row.status !== 'selesai' && (
+            <>
+              <div style={{ height: 1, background: '#E1E8EC' }} />
+              <button
+                onClick={() => { setOpen(false); onUpdate(row) }}
+                style={itemStyle}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#F6F9FC')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <Clock size={16} />
+                Perbarui Laporan
+              </button>
+            </>
+          )}
 
           <div style={{ height: 1, background: '#E1E8EC' }} />
 
@@ -1168,7 +1191,7 @@ function PhotoLightbox({
   )
 }
 
-function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?: () => void; onClose?: () => void }) {
+function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan: any; onSaved?: () => void; onClose?: () => void; autoOpenUpdate?: boolean }) {
   const { isMobile } = useSidebar()
   const [progress, setProgress] = useState<Record<string, any[]>>({ spanduk: [], brosur: [], laporan_baru: [], berita_acara: [], surat: [] })
   const [riwayat, setRiwayat] = useState<any[]>([])
@@ -1183,6 +1206,10 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
   const progressRefs = useRef<Record<string, HTMLInputElement | null>>({})
 
   const user = getUser()
+
+  useEffect(() => {
+    if (autoOpenUpdate && laporan?.status !== 'selesai') setShowUpdateDrawer(true)
+  }, [autoOpenUpdate, laporan?.status])
 
   useEffect(() => {
     if (!laporan?.id) return
@@ -1526,7 +1553,7 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
                 <button type="button" onClick={() => setShowUpdateDrawer(true)}
                   style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: 'none', background: '#076C9E', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
                   <Clock size={12} />
-                  Update
+                  Perbarui
                 </button>
               )}
             </div>
@@ -1659,10 +1686,12 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
                       <span style={{ fontSize: 12, color: '#97AAB3' }}>
                         {new Date(r.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} · {r.oleh}
                       </span>
-                      <button type="button" onClick={() => handleDeleteRiwayat(r.id)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 2 }}>
-                        <X size={13} />
-                      </button>
+                      {isSuperadmin() && (
+                        <button type="button" onClick={() => handleDeleteRiwayat(r.id)}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 2 }}>
+                          <X size={13} />
+                        </button>
+                      )}
                     </div>
                     <div style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
                       <div>
@@ -1728,7 +1757,7 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
             <button type="button" onClick={() => setShowUpdateDrawer(true)}
               style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 8, border: 'none', background: '#076C9E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
               <Clock size={14} />
-              Update Laporan
+              Perbarui Laporan
             </button>
           )}
         </div>
@@ -1915,9 +1944,11 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
                           <ProgressBadge tipe={r.progresLaporan} />
                         </div>
                       </div>
-                      <button type="button" onClick={() => handleDeleteRiwayat(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 4, display: 'flex' }}>
-                        <X size={14} />
-                      </button>
+                      {isSuperadmin() && (
+                        <button type="button" onClick={() => handleDeleteRiwayat(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 4, display: 'flex' }}>
+                          <X size={14} />
+                        </button>
+                      )}
                     </div>
                     {(r.uraianPekerjaan || r.upayaPengendalian || r.pihakLain || r.contactPerson) && (
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 20px', marginBottom: 14 }}>
@@ -1981,6 +2012,7 @@ function LaporanDrawer({
   open,
   initial,
   readOnly = false,
+  autoOpenUpdate = false,
   towerOptions,
   initialFotos,
   onClose,
@@ -1990,6 +2022,7 @@ function LaporanDrawer({
   initial: any | null
   initialFotos?: File[]
   readOnly?: boolean
+  autoOpenUpdate?: boolean
   towerOptions: TowerOption[]
   onClose: () => void
   onSaved: () => void
@@ -2558,7 +2591,7 @@ function LaporanDrawer({
             </p>
           </div>
           {readOnly && initial ? (
-            <DetailReadView laporan={initial} onSaved={onSaved} onClose={onClose} />
+            <DetailReadView laporan={initial} onSaved={onSaved} onClose={onClose} autoOpenUpdate={autoOpenUpdate} />
           ) : (
             <>
               {formBody}
@@ -2594,7 +2627,7 @@ function LaporanDrawer({
           >
             <X size={16} style={{ color: '#5F737F' }} />
           </button>
-          <DetailReadView laporan={initial} onSaved={onSaved} onClose={onClose} />
+          <DetailReadView laporan={initial} onSaved={onSaved} onClose={onClose} autoOpenUpdate={autoOpenUpdate} />
         </div>
       )}
 
@@ -2717,6 +2750,7 @@ export default function GangguanPage() {
   const [editRow, setEditRow] = useState<any | null>(null)
   const [deleteRow, setDeleteRow] = useState<any | null>(null)
   const [viewMode, setViewMode] = useState<'edit' | 'detail' | null>(null)
+  const [autoOpenUpdate, setAutoOpenUpdate] = useState(false)
   const [filterOpen, setFilterOpen] = useState(false)
   const filterRef = useRef<HTMLDivElement>(null)
   const [calendarOpen, setCalendarOpen] = useState(false)
@@ -2766,7 +2800,7 @@ export default function GangguanPage() {
   useEffect(() => { fetchData() }, [fetchData])
 
   // Set role setelah mount agar tidak mismatch SSR/CSR
-  useEffect(() => { setIsAdminUser(isAdmin()) }, [])
+  useEffect(() => { setIsAdminUser(isAdmin() || isSuperadmin()) }, [])
 
   useEffect(() => {
     towersApi.getDropdown()
@@ -2796,8 +2830,9 @@ export default function GangguanPage() {
     setPendingFotos(arr)
     setDrawerOpen(true)
   }
-  function openEdit(row: any) { setEditRow(row); setViewMode('edit'); setDrawerOpen(true) }
-  function openDetail(row: any) { setEditRow(row); setViewMode('detail'); setDrawerOpen(true) }
+  function openEdit(row: any) { setAutoOpenUpdate(false); setEditRow(row); setViewMode('edit'); setDrawerOpen(true) }
+  function openDetail(row: any) { setAutoOpenUpdate(false); setEditRow(row); setViewMode('detail'); setDrawerOpen(true) }
+  function openUpdate(row: any) { setAutoOpenUpdate(true); setEditRow(row); setViewMode('detail'); setDrawerOpen(true) }
 
   async function handleImport() {
     if (!importFile) return
@@ -3007,11 +3042,12 @@ export default function GangguanPage() {
                     <td className="text-[14px] text-[#5f737f]">{JENIS_LABEL[row.jenisGangguan] ?? row.jenisGangguan ?? '—'}</td>
                     <td className="text-[14px] text-[#5f737f]">{row.teknisi ?? row.pelapor?.nama ?? '—'}</td>
                     <td><LevelBadge level={row.levelRisiko} /></td>
-                    <td><ProgressBadge tipe={row.latestProgressTipe} /></td>
+                    <td><ProgressBadge tipe={row.progresLaporan} /></td>
                     <td className="text-center">
                       <RowActions
                         row={row}
                         onDetail={openDetail}
+                        onUpdate={openUpdate}
                         onEdit={openEdit}
                         onDelete={setDeleteRow}
                         showDelete={isAdminUser}
@@ -3091,8 +3127,9 @@ export default function GangguanPage() {
         initial={editRow}
         initialFotos={pendingFotos}
         readOnly={viewMode === 'detail'}
+        autoOpenUpdate={autoOpenUpdate}
         towerOptions={towerOptions}
-        onClose={() => setDrawerOpen(false)}
+        onClose={() => { setDrawerOpen(false); setAutoOpenUpdate(false) }}
         onSaved={fetchData}
       />
 

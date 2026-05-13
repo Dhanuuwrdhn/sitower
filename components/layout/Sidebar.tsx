@@ -129,7 +129,7 @@ export default function Sidebar() {
   useLayoutEffect(() => {
     const u = getUser()
     setUser(u)
-    setIsAdmin(u?.role === 'admin')
+    setIsAdmin(u?.role === 'admin' || u?.role === 'superadmin')
   }, [])
 
   const showAll = process.env.NEXT_PUBLIC_SHOW_ALL_MENU === 'true'

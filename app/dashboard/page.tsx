@@ -480,7 +480,6 @@ export default function DashboardPage() {
               <tr>
                 <th>Tanggal</th>
                 <th>Ruas</th>
-                <th>No. Tower</th>
                 <th>Jenis Kerawanan</th>
                 <th>Teknisi</th>
                 <th>Status Kerawanan</th>
@@ -494,7 +493,6 @@ export default function DashboardPage() {
                   <td className="text-[14px] text-[#5f737f]" style={{ maxWidth: 220 }}>
                     <span className="block truncate" title={row.towerNama}>{row.towerNama}</span>
                   </td>
-                  <td className="text-[14px] text-[#5f737f] whitespace-nowrap">{row.towerNo}</td>
                   <td className="text-[14px] text-[#5f737f]">{row.jenisGangguan}</td>
                   <td className="text-[14px] text-[#5f737f]">{row.teknisi}</td>
                   <td><LevelBadge level={row.levelRisiko} /></td>
@@ -503,7 +501,7 @@ export default function DashboardPage() {
               ))}
               {recent.length === 0 && (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', color: '#5F737F', padding: '32px 16px' }}>
+                  <td colSpan={6} style={{ textAlign: 'center', color: '#5F737F', padding: '32px 16px' }}>
                     Belum ada data riwayat kerawanan transmisi
                   </td>
                 </tr>

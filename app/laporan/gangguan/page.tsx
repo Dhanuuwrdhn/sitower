@@ -89,6 +89,9 @@ const LEVEL_BADGE: Record<string, { bg: string; text: string; label: string }> =
 }
 
 const PROGRESS_TIPE_LABEL: Record<string, string> = {
+  spanduk:      'Spanduk',
+  brosur:       'Brosur',
+  laporan_baru: 'Laporan Baru',
   berita_acara: 'Berita Acara',
   surat:        'Surat',
 }
@@ -101,7 +104,7 @@ const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {
   surat:        { bg: '#076C9E', text: '#FFFFFF' },
 }
 
-const PROGRESS_TIPE_LIST = ['berita_acara', 'surat'] as const
+const PROGRESS_TIPE_LIST = ['spanduk', 'brosur', 'laporan_baru', 'berita_acara', 'surat'] as const
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -1167,7 +1170,7 @@ function PhotoLightbox({
 
 function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?: () => void; onClose?: () => void }) {
   const { isMobile } = useSidebar()
-  const [progress, setProgress] = useState<Record<string, any[]>>({ berita_acara: [], surat: [] })
+  const [progress, setProgress] = useState<Record<string, any[]>>({ spanduk: [], brosur: [], laporan_baru: [], berita_acara: [], surat: [] })
   const [riwayat, setRiwayat] = useState<any[]>([])
   const [uploading, setUploading] = useState<string | null>(null)
   const [selesaiLoading, setSelesaiLoading] = useState(false)
@@ -1411,8 +1414,12 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
           </div>
 
           {/* Description + Pihak Lain side by side */}
-          {(laporan?.deskripsi || (isPPL && laporan?.teknisi)) && (
-            <div style={{ display: 'grid', gridTemplateColumns: laporan?.deskripsi && isPPL && laporan?.teknisi ? '1fr 1fr' : '1fr', gap: '0 20px', marginBottom: 20 }}>
+          {(() => {
+            const pihakLain = isPPL ? laporan?.teknisi : null
+            const hasBoth = laporan?.deskripsi && pihakLain
+            if (!laporan?.deskripsi && !pihakLain) return null
+            return (
+            <div style={{ display: 'grid', gridTemplateColumns: hasBoth ? '1fr 1fr' : '1fr', gap: '0 20px', marginBottom: 20 }}>
               {laporan?.deskripsi && (
                 <div>
                   <span style={{ fontSize: 14, fontWeight: 400, color: '#5F737F', display: 'block', marginBottom: 4 }}>
@@ -1421,14 +1428,15 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
                   <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.deskripsi}</span>
                 </div>
               )}
-              {isPPL && laporan?.teknisi && (
+              {pihakLain && (
                 <div>
                   <span style={{ fontSize: 14, fontWeight: 400, color: '#5F737F', display: 'block', marginBottom: 4 }}>Informasi Pihak Lain</span>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.teknisi}</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{pihakLain}</span>
                 </div>
               )}
             </div>
-          )}
+            )
+          })()}
 
           {/* Foto Bukti — single image 240px wide */}
           {fotoUrls.length > 0 && (

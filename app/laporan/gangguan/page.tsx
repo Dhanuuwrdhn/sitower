@@ -2444,17 +2444,19 @@ function LaporanDrawer({
       )}
 
       {/* Span — free text, optional, semua jenis laporan */}
-      <div>
-        <label className="block text-[14px] font-bold text-app-text mb-2">Span</label>
-        <input
-          type="text"
-          disabled={readOnly}
-          value={form.lokasiDetail}
-          onChange={e => set('lokasiDetail', e.target.value)}
-          placeholder="Contoh: T-23 - T-25"
-          className="form-input"
-        />
-      </div>
+      {isPPL && (
+        <div>
+          <label className="block text-[14px] font-bold text-app-text mb-2">Span</label>
+          <input
+            type="text"
+            disabled={readOnly}
+            value={form.lokasiDetail}
+            onChange={e => set('lokasiDetail', e.target.value)}
+            placeholder="Contoh: T-23 - T-25"
+            className="form-input"
+          />
+        </div>
+      )}
 
       {/* Jenis kerawanan */}
       <div>
@@ -2490,7 +2492,9 @@ function LaporanDrawer({
       </div>
 
       {/* Status Kerawanan */}
-      <div>
+      {isPPL && (
+        <>
+          <div>
         <label className={`block font-semibold text-app-text mb-2 ${isMobile ? 'text-[14px]' : 'text-[12px]'}`}>Status Kerawanan</label>
         {isMobile && !readOnly ? (
           <button
@@ -2620,6 +2624,8 @@ function LaporanDrawer({
           <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Penyebab</label><input disabled={readOnly} type="text" value={form.penyebab} onChange={(e) => set('penyebab', e.target.value)} className="form-input" /></div>
           <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Durasi (jam)</label><input disabled={readOnly} type="number" value={form.durasi} onChange={(e) => set('durasi', e.target.value)} className="form-input" /></div>
         </div>
+      )}
+        </>
       )}
 
       {/* Tanggal & Waktu — editable by admin, readonly for teknisi, hidden for teknisi on create */}

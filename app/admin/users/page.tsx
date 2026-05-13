@@ -8,7 +8,7 @@ import {
   KeyRound, RefreshCw, SlidersHorizontal, ChevronLeft, ChevronRight,
 } from 'lucide-react'
 import { pegawaiApi, authApi } from '@/lib/api'
-import { isAdmin } from '@/lib/auth'
+import { isAdmin, isSuperadmin, isAdminOrSuperadmin } from '@/lib/auth'
 import { ActionMenu } from '@/components/ui/ActionMenu'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
@@ -183,12 +183,13 @@ function FilterDropdown({
 
 // ── User modal ────────────────────────────────────────────────────────────────
 
-const EMPTY_USER = { nik: '', nama: '', jabatan: '', unit: 'UPT Banten', role: 'teknisi', password: '' }
+const EMPTY_USER = { nik: '', nama: '', jabatan: '', unit: 'UPT Banten', role: 'teknisi', password: '', expiredAt: '' }
 
 function UserModal({ open, initial, onClose, onSaved }: { open: boolean; initial: any | null; onClose: () => void; onSaved: () => void }) {
   const [form, setForm] = useState(EMPTY_USER)
   const [saving, setSaving] = useState(false)
   const [showPass, setShowPass] = useState(false)
+  const superadmin = isSuperadmin()
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }))
 
   useEffect(() => {
@@ -197,6 +198,7 @@ function UserModal({ open, initial, onClose, onSaved }: { open: boolean; initial
         nik: initial.nik ?? '', nama: initial.nama ?? '',
         jabatan: initial.jabatan ?? '', unit: initial.unit ?? 'UPT Banten',
         role: initial.role ?? 'teknisi', password: '',
+        expiredAt: initial.expiredAt ? new Date(initial.expiredAt).toISOString().slice(0, 10) : '',
       } : EMPTY_USER)
     }
   }, [open, initial])
@@ -209,6 +211,8 @@ function UserModal({ open, initial, onClose, onSaved }: { open: boolean; initial
     try {
       const payload: any = { nik: form.nik, nama: form.nama, jabatan: form.jabatan, unit: form.unit, role: form.role }
       if (form.password) payload.password = form.password
+      if (superadmin && form.expiredAt) payload.expiredAt = new Date(form.expiredAt).toISOString()
+      if (superadmin && !form.expiredAt) payload.expiredAt = null
       if (initial?.id) await pegawaiApi.update(initial.id, payload)
       else await pegawaiApi.create(payload)
       toast.success(initial ? 'User diperbarui' : 'User ditambahkan')
@@ -262,6 +266,21 @@ function UserModal({ open, initial, onClose, onSaved }: { open: boolean; initial
               {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
             </select>
           </div>
+          {superadmin && (
+            <div>
+              <label className="block text-[12px] font-semibold text-app-text mb-1.5">
+                Tanggal Kedaluwarsa Akun
+                <span className="text-app-muted font-normal ml-1">(kosongkan = tidak ada batas)</span>
+              </label>
+              <input
+                type="date"
+                value={form.expiredAt}
+                onChange={(e) => set('expiredAt', e.target.value)}
+                className="form-input"
+                min={new Date().toISOString().slice(0, 10)}
+              />
+            </div>
+          )}
           <div>
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">
               Password {initial && <span className="text-app-muted font-normal">(kosongkan jika tidak diubah)</span>}
@@ -303,7 +322,7 @@ export default function UsersPage() {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    if (!isAdmin()) {
+    if (!isAdminOrSuperadmin()) {
       router.replace('/dashboard')
     } else {
       setReady(true)
@@ -370,6 +389,7 @@ export default function UsersPage() {
   useEffect(() => { setPage(1) }, [search, appliedJabatan, appliedStatus, pageSize])
 
   const filtered = rows.filter((r) => {
+    if (r.role === 'superadmin') return false
     if (search) {
       const q = search.toLowerCase()
       const match = (
@@ -518,19 +538,38 @@ export default function UsersPage() {
                 <th>Jabatan</th>
                 <th>Role</th>
                 <th>Status</th>
+                {isSuperadmin() && <th>Kedaluwarsa</th>}
                 <th className="text-right pr-5">Aksi</th>
               </tr>
             </thead>
             <tbody>
-              {loading ? <SkeletonRow cols={6} rows={8} />
-              : paginated.length === 0 ? <tr><td colSpan={6}><EmptyState title="Tidak ada user" /></td></tr>
-              : paginated.map((row) => (
+              {loading ? <SkeletonRow cols={isSuperadmin() ? 7 : 6} rows={8} />
+              : paginated.length === 0 ? <tr><td colSpan={isSuperadmin() ? 7 : 6}><EmptyState title="Tidak ada user" /></td></tr>
+              : paginated.map((row) => {
+                const isExpired = row.expiredAt && new Date(row.expiredAt) < new Date()
+                return (
                 <tr key={row.id}>
                   <td><span className="font-mono text-[12px] text-blue-600 font-semibold">{row.nik}</span></td>
                   <td className="font-semibold text-app-text">{row.nama}</td>
                   <td className="text-app-muted text-[13px]">{row.jabatan ?? '—'}</td>
                   <td><RoleBadge role={row.role} /></td>
                   <td><StatusBadge aktif={row.aktif ?? true} /></td>
+                  {isSuperadmin() && (
+                    <td className="text-[12px]">
+                      {row.expiredAt ? (
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center',
+                          padding: '2px 8px', borderRadius: 999,
+                          fontSize: 11, fontWeight: 600,
+                          background: isExpired ? '#fef2f2' : '#f0fdf4',
+                          color: isExpired ? '#dc2626' : '#15803d',
+                          border: isExpired ? '1px solid #fecaca' : '1px solid #bbf7d0',
+                        }}>
+                          {isExpired ? 'Kedaluwarsa' : new Date(row.expiredAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </span>
+                      ) : <span className="text-app-muted">—</span>}
+                    </td>
+                  )}
                   <td className="text-right pr-4">
                     <ActionMenu items={[
                       {
@@ -553,7 +592,8 @@ export default function UsersPage() {
                     ]} />
                   </td>
                 </tr>
-              ))}
+              )
+              })}
             </tbody>
           </table>
         </div>

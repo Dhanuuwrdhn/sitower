@@ -444,7 +444,6 @@ export default function DashboardPage() {
           <div className="dash-map-container">
             <TowerMap
               towers={towerKerawanan.length > 0 ? towerKerawanan : undefined}
-              jalurKml={jalurKmlData.length > 0 ? jalurKmlData : undefined}
             />
           </div>
         </div>

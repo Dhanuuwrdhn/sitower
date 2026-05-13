@@ -562,11 +562,14 @@ export default function AsetPage() {
   const [tipe, setTipe]     = useState('')
   const [page, setPage]     = useState(1)
   const [limit, setLimit]   = useState(10)
+  const [filterOpen, setFilterOpen] = useState(false)
 
   const [isAdminUser, setIsAdminUser] = useState(false)
   useEffect(() => { setIsAdminUser(isAdmin()) }, [])
 
   const [skttRoutes, setSkttRoutes] = useState<any[]>([])
+  const [skttPage, setSkttPage]     = useState(1)
+  const [skttLimit, setSkttLimit]   = useState(10)
   useEffect(() => {
     jalurKmlApi.getAll().then((r) => {
       const all = r.data?.data ?? []

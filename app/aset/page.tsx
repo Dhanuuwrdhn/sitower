@@ -1097,7 +1097,7 @@ export default function AsetPage() {
                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Nama</th>
                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Tipe</th>
                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Tegangan</th>
-                <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Ruas</th>
+                <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Jalur Transmisi</th>
                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Sertifikat</th>
                 {isAdminUser && <th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">Aksi</th>}
               </tr>

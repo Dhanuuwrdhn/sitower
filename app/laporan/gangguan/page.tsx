@@ -2843,8 +2843,9 @@ export default function GangguanPage() {
 
   // Filters
   const [search, setSearch] = useState('')
-  const [jenis, setJenis] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
+  const [jenis, setJenis] = useState<string[]>([])
+  const [statusFilter, setStatusFilter] = useState<string[]>([])
+  const [levelFilter, setLevelFilter] = useState<string[]>([])
   const [tglMulai, setTglMulai] = useState('')
   const [tglAkhir, setTglAkhir] = useState('')
 
@@ -2884,7 +2885,7 @@ export default function GangguanPage() {
   }, [filterOpen])
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
-  const hasActiveFilters = Boolean(search.trim() || jenis || statusFilter || tglMulai || tglAkhir)
+  const hasActiveFilters = Boolean(search.trim() || jenis.length || statusFilter.length || levelFilter.length || tglMulai || tglAkhir)
   const { isMobile } = useSidebar()
 
   const fetchData = useCallback(async () => {
@@ -2894,8 +2895,9 @@ export default function GangguanPage() {
         page,
         limit: pageSize,
         search: search.trim() || undefined,
-        jenisGangguan: jenis || undefined,
-        status: statusFilter || undefined,
+        jenisGangguan: jenis.length ? jenis.join(',') : undefined,
+        status: statusFilter.length ? statusFilter.join(',') : undefined,
+        levelRisiko: levelFilter.length ? levelFilter.join(',') : undefined,
         tglMulai: tglMulai || undefined,
         tglAkhir: tglAkhir || undefined,
       })
@@ -2913,7 +2915,7 @@ export default function GangguanPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize, search, jenis, statusFilter, tglMulai, tglAkhir])
+  }, [page, pageSize, search, jenis, statusFilter, levelFilter, tglMulai, tglAkhir])
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -2928,8 +2930,9 @@ export default function GangguanPage() {
 
   function resetFilters() {
     setSearch('')
-    setJenis('')
-    setStatusFilter('')
+    setJenis([])
+    setStatusFilter([])
+    setLevelFilter([])
     setTglMulai('')
     setTglAkhir('')
     setPage(1)
@@ -3045,7 +3048,7 @@ export default function GangguanPage() {
 
               {/* Desktop filter popup — Figma Popup Filter 401x388 */}
               {filterOpen && (
-                <div style={{ position: 'absolute', left: 0, top: '100%', marginTop: 8, zIndex: 50, width: 401, background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, boxShadow: '0px 4px 8px 0px rgba(28,28,28,0.15)' }}>
+                <div style={{ position: 'absolute', left: 0, top: '100%', marginTop: 8, zIndex: 50, width: 420, background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, boxShadow: '0px 4px 8px 0px rgba(28,28,28,0.15)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 16px' }}>
                     <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Filter</span>
                     <button onClick={() => setFilterOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
@@ -3053,44 +3056,77 @@ export default function GangguanPage() {
                     </button>
                   </div>
                   <div style={{ height: 1, background: '#E1E8EC' }} />
-                  {/* Kategori */}
-                  <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Kategori</span>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                      {JENIS_OPTIONS.filter(o => o.value).map(o => (
-                        <button key={o.value} onClick={() => { setJenis(jenis === o.value ? '' : o.value); setPage(1) }}
-                          style={{ padding: '4px 12px', borderRadius: 18, border: '1px solid', borderColor: jenis === o.value ? '#076C9E' : '#E1E8EC', background: jenis === o.value ? '#076C9E' : 'transparent', color: jenis === o.value ? '#FFFFFF' : '#5F737F', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
-                        >{o.label}</button>
-                      ))}
-                    </div>
-                  </div>
-                  <div style={{ height: 1, background: '#E1E8EC' }} />
-                  {/* Rentang Waktu */}
-                  <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Rentang Waktu</span>
-                    <div style={{ display: 'flex', gap: 16 }}>
-                      <div style={{ flex: 1 }}>
-                        <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C', marginBottom: 4 }}>Tanggal Mulai</p>
-                        <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
-                          <input type="date" value={tglMulai} onChange={(e) => { setTglMulai(e.target.value); setPage(1) }} style={{ flex: 1, border: 'none', outline: 'none', padding: '10px 12px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#5F737F' }} />
-                          <div style={{ padding: '10px 12px', background: '#F6F9FC', borderLeft: '1px solid #E1E8EC', display: 'flex', alignItems: 'center' }}><Calendar size={16} style={{ color: '#5F737F' }} /></div>
-                        </div>
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C', marginBottom: 4 }}>Tanggal Berakhir</p>
-                        <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
-                          <input type="date" value={tglAkhir} onChange={(e) => { setTglAkhir(e.target.value); setPage(1) }} style={{ flex: 1, border: 'none', outline: 'none', padding: '10px 12px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#5F737F' }} />
-                          <div style={{ padding: '10px 12px', background: '#F6F9FC', borderLeft: '1px solid #E1E8EC', display: 'flex', alignItems: 'center' }}><Calendar size={16} style={{ color: '#5F737F' }} /></div>
-                        </div>
+                  
+                  <div style={{ maxHeight: 450, overflowY: 'auto' }}>
+                    {/* Jenis Kerawanan */}
+                    <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Jenis Kerawanan</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        {JENIS_OPTIONS.filter(o => o.value).map(o => {
+                          const active = jenis.includes(o.value)
+                          return (
+                            <button key={o.value} onClick={() => { setJenis(active ? jenis.filter(v => v !== o.value) : [...jenis, o.value]); setPage(1) }}
+                              style={{ padding: '4px 12px', borderRadius: 18, border: '1px solid', borderColor: active ? '#076C9E' : '#E1E8EC', background: active ? '#076C9E' : 'transparent', color: active ? '#FFFFFF' : '#5F737F', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
+                            >{o.label}</button>
+                          )
+                        })}
                       </div>
                     </div>
+                    <div style={{ height: 1, background: '#E1E8EC' }} />
+
+                    {/* Status Kerawanan */}
+                    <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Status Kerawanan</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        {['aman', 'sedang', 'kritis'].map(v => {
+                          const active = levelFilter.includes(v)
+                          return (
+                            <button key={v} onClick={() => { setLevelFilter(active ? levelFilter.filter(x => x !== v) : [...levelFilter, v]); setPage(1) }}
+                              style={{ padding: '4px 12px', borderRadius: 18, border: '1px solid', borderColor: active ? '#076C9E' : '#E1E8EC', background: active ? '#076C9E' : 'transparent', color: active ? '#FFFFFF' : '#5F737F', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s', textTransform: 'capitalize' }}
+                            >{v}</button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                    <div style={{ height: 1, background: '#E1E8EC' }} />
+
+                    {/* Progres Laporan */}
+                    <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Progres Laporan</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        {STATUS_FILTER_OPTIONS.filter(o => o.value).map(o => {
+                          const active = statusFilter.includes(o.value)
+                          return (
+                            <button key={o.value} onClick={() => { setStatusFilter(active ? statusFilter.filter(v => v !== o.value) : [...statusFilter, o.value]); setPage(1) }}
+                              style={{ padding: '4px 12px', borderRadius: 18, border: '1px solid', borderColor: active ? '#076C9E' : '#E1E8EC', background: active ? '#076C9E' : 'transparent', color: active ? '#FFFFFF' : '#5F737F', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
+                            >{o.label}</button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                    <div style={{ height: 1, background: '#E1E8EC' }} />
+
+                    {/* Rentang Waktu */}
+                    <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Rentang Waktu</span>
+                      <div style={{ display: 'flex', gap: 12 }}>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 13, color: '#1C1C1C', marginBottom: 4 }}>Tanggal Mulai</p>
+                          <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden', background: '#FFFFFF' }}>
+                            <input type="date" value={tglMulai} onChange={(e) => { setTglMulai(e.target.value); setPage(1) }} style={{ flex: 1, border: 'none', outline: 'none', padding: '8px 10px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 13, color: '#5F737F', width: '100%' }} />
+                          </div>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 13, color: '#1C1C1C', marginBottom: 4 }}>Tanggal Berakhir</p>
+                          <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden', background: '#FFFFFF' }}>
+                            <input type="date" value={tglAkhir} onChange={(e) => { setTglAkhir(e.target.value); setPage(1) }} style={{ flex: 1, border: 'none', outline: 'none', padding: '8px 10px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 13, color: '#5F737F', width: '100%' }} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ height: 1, background: '#E1E8EC' }} />
-                  {/* CTA */}
-                  <div style={{ padding: '12px 16px', display: 'flex', gap: 8 }}>
-                    <button onClick={() => setFilterOpen(false)} className="btn-primary" style={{ flex: 1, borderRadius: 22 }}>Terapkan Filter</button>
-                    <button onClick={() => { resetFilters(); setFilterOpen(false) }} style={{ padding: '10px 20px', borderRadius: 22, border: 'none', background: 'transparent', color: '#D92D20', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>Hapus Filter</button>
-                  </div>
+
+                 
                 </div>
               )}
             </div>
@@ -3290,18 +3326,57 @@ export default function GangguanPage() {
           <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2">
 
             {/* Kategori — 16px bold, chips h=36 r=18 */}
-            <p className="font-bold text-base text-[#1C1C1C] mb-3">Kategori</p>
+            <p className="font-bold text-base text-[#1C1C1C] mb-3">Jenis Kerawanan</p>
             <div className="flex flex-wrap gap-2 mb-5">
-              {JENIS_OPTIONS.filter(o => o.value).map(o => (
-                <button key={o.value}
-                  onClick={() => { setJenis(jenis === o.value ? '' : o.value); setPage(1) }}
-                  className={`h-9 px-3 rounded-[18px] border cursor-pointer font-medium text-[12px] transition-all ${
-                    jenis === o.value
-                      ? 'bg-[#076c9e] border-[#076c9e] text-white'
-                      : 'bg-transparent border-[#E1E8EC] text-[#5F737F]'
-                  }`}
-                >{o.label}</button>
-              ))}
+              {JENIS_OPTIONS.filter(o => o.value).map(o => {
+                const active = jenis.includes(o.value)
+                return (
+                  <button key={o.value}
+                    onClick={() => { setJenis(active ? jenis.filter(v => v !== o.value) : [...jenis, o.value]); setPage(1) }}
+                    className={`h-9 px-3 rounded-[18px] border cursor-pointer font-medium text-[12px] transition-all ${
+                      active
+                        ? 'bg-[#076c9e] border-[#076c9e] text-white'
+                        : 'bg-transparent border-[#E1E8EC] text-[#5F737F]'
+                    }`}
+                  >{o.label}</button>
+                )
+              })}
+            </div>
+
+            {/* Status Kerawanan */}
+            <p className="font-bold text-base text-[#1C1C1C] mb-3">Status Kerawanan</p>
+            <div className="flex flex-wrap gap-2 mb-5">
+              {['aman', 'sedang', 'kritis'].map(v => {
+                const active = levelFilter.includes(v)
+                return (
+                  <button key={v}
+                    onClick={() => { setLevelFilter(active ? levelFilter.filter(x => x !== v) : [...levelFilter, v]); setPage(1) }}
+                    className={`h-9 px-3 rounded-[18px] border cursor-pointer font-medium text-[12px] transition-all capitalize ${
+                      active
+                        ? 'bg-[#076c9e] border-[#076c9e] text-white'
+                        : 'bg-transparent border-[#E1E8EC] text-[#5F737F]'
+                    }`}
+                  >{v}</button>
+                )
+              })}
+            </div>
+
+            {/* Progres Laporan */}
+            <p className="font-bold text-base text-[#1C1C1C] mb-3">Progres Laporan</p>
+            <div className="flex flex-wrap gap-2 mb-5">
+              {STATUS_FILTER_OPTIONS.filter(o => o.value).map(o => {
+                const active = statusFilter.includes(o.value)
+                return (
+                  <button key={o.value}
+                    onClick={() => { setStatusFilter(active ? statusFilter.filter(v => v !== o.value) : [...statusFilter, o.value]); setPage(1) }}
+                    className={`h-9 px-3 rounded-[18px] border cursor-pointer font-medium text-[12px] transition-all ${
+                      active
+                        ? 'bg-[#076c9e] border-[#076c9e] text-white'
+                        : 'bg-transparent border-[#E1E8EC] text-[#5F737F]'
+                    }`}
+                  >{o.label}</button>
+                )
+              })}
             </div>
 
             {/* Periode — side-by-side date pickers, Figma: 191x44 each */}

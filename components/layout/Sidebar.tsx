@@ -26,14 +26,14 @@ type NavItem = {
 }
 
 const ALL_NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard',                   icon: IconDashboard,  href: '/dashboard' },
-  { label: 'Riwayat Kerawanan Transmisi', icon: IconRiwayat,    href: '/laporan/gangguan' },
-  { label: 'Data Aset Transmisi',         icon: IconAset,       href: '/aset',              hidden: true },
-  { label: 'Sertifikat',                  icon: IconSertifikat, href: '/sertifikat' },
-  { label: 'As Built Drawing',            icon: IconAsBuilt,    href: '/as-built-drawing',  hidden: true },
-  { label: 'Climb Up Inspection',         icon: IconClimb,      href: '/laporan/cui',       hidden: true },
-  { label: 'Clean Up Isolator',           icon: IconCleanup,    href: '/laporan/cleanup',   hidden: true },
-  { label: 'Manajemen User',              icon: IconUsers,      href: '/admin/users',       adminOnly: true },
+  { label: 'Dashboard', icon: IconDashboard, href: '/dashboard' },
+  { label: 'Riwayat Kerawanan Transmisi', icon: IconRiwayat, href: '/laporan/gangguan' },
+  { label: 'Data Aset Transmisi', icon: IconAset, href: '/aset', },
+  { label: 'Sertifikat', icon: IconSertifikat, href: '/sertifikat', hidden: true },
+  { label: 'As Built Drawing', icon: IconAsBuilt, href: '/as-built-drawing', hidden: true },
+  { label: 'Climb Up Inspection', icon: IconClimb, href: '/laporan/cui', hidden: true },
+  { label: 'Clean Up Isolator', icon: IconCleanup, href: '/laporan/cleanup', hidden: true },
+  { label: 'Manajemen User', icon: IconUsers, href: '/admin/users', adminOnly: true },
 ]
 
 // ─── Desktop NavLink ───────────────────────────────────────────────────────────
@@ -121,7 +121,7 @@ export default function Sidebar() {
 
   useEffect(() => {
     if (isMobile && mobileOpen) setMobileOpen(false)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, isMobile])
 
   const [user, setUser] = useState<ReturnType<typeof getUser>>(null)
@@ -151,9 +151,8 @@ export default function Sidebar() {
       <>
         {/* Backdrop */}
         <div
-          className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ${
-            mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-          }`}
+          className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ${mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            }`}
           onClick={() => setMobileOpen(false)}
         />
 
@@ -276,10 +275,13 @@ export default function Sidebar() {
 
   return (
     <aside
-      className="fixed left-0 top-0 bottom-0 flex flex-col z-50 transition-transform duration-300 overflow-hidden"
+      className="fixed left-0 top-0 bottom-0 flex flex-col z-50 transition-transform duration-300"
       style={{
         width, transform,
         background: 'linear-gradient(160deg, #085f8e 0%, #0a7ab5 55%, #0d8fd4 100%)',
+        borderTopRightRadius: 20,
+        borderBottomRightRadius: 20,
+        overflow: 'hidden',
       }}
     >
       {/* Top-right cyan glow */}

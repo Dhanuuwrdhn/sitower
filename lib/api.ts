@@ -38,13 +38,13 @@ export const authApi = {
 }
 
 export const towersApi = {
-  getAll:    (params?: any) => api.get('/towers', { params }),
-  getMap:    ()             => api.get('/towers/map'),
-  getDropdown: ()           => api.get('/towers/dropdown'),
-  getById:  (id: string)    => api.get(`/towers/${encodeURIComponent(id)}`),
-  create:   (data: any)     => api.post('/towers', data),
-  update:   (id: string, data: any) => api.put(`/towers/${encodeURIComponent(id)}`, data),
-  delete:   (id: string)    => api.delete(`/towers/${encodeURIComponent(id)}`),
+  getAll:    (params?: any) => api.get('/aset/towers', { params }),
+  getMap:    ()             => api.get('/aset/towers/map'),
+  getDropdown: ()           => api.get('/aset/towers/dropdown'),
+  getById:  (id: string)    => api.get(`/aset/towers/${encodeURIComponent(id)}`),
+  create:   (data: any)     => api.post('/aset/towers', data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  update:   (id: string, data: any) => api.put(`/aset/towers/${encodeURIComponent(id)}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  delete:   (id: string)    => api.delete(`/aset/towers/${encodeURIComponent(id)}`),
 }
 
 export const asetApi = {
@@ -100,27 +100,33 @@ export const laporanApi = {
 }
 
 export const sertifikatApi = {
-  // Folders
-  getFolders:   (params?: any) => api.get('/sertifikat', { params }),
-  createFolder: (data: any)    => api.post('/sertifikat', data),
-  updateFolder: (id: string, data: any) => api.put(`/sertifikat/${id}`, data),
-  deleteFolder: (id: string)   => api.delete(`/sertifikat/${id}`),
-  getFolder:    (id: string)   => api.get(`/sertifikat/${id}`),
-  // Dokumen
-  getDokumen:    (folderId: string) => api.get(`/sertifikat/${folderId}/dokumen`),
-  uploadDokumen: (folderId: string, file: File) => {
-    const form = new FormData()
-    form.append('file', file)
-    return api.post(`/sertifikat/${folderId}/dokumen`, form, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+  getByTower: (towerId: string) => api.get(`/aset/towers/${encodeURIComponent(towerId)}/sertifikat`),
+  create: (towerId: string, data: any, files?: File[]) => {
+    const fd = new FormData()
+    Object.keys(data).forEach(key => {
+      if (data[key] !== undefined && data[key] !== null) fd.append(key, data[key])
+    })
+    if (files) files.forEach(f => fd.append('files', f))
+    return api.post(`/aset/towers/${encodeURIComponent(towerId)}/sertifikat`, fd, {
+      headers: { 'Content-Type': 'multipart/form-data' }
     })
   },
-  getDokumenById: (id: string) => api.get(`/sertifikat/dokumen/${id}`),
-  deleteDokumen:  (id: string) => api.delete(`/sertifikat/dokumen/${id}`),
+  update: (id: string, data: any, files?: File[]) => {
+    const fd = new FormData()
+    Object.keys(data).forEach(key => {
+      if (data[key] !== undefined && data[key] !== null) fd.append(key, data[key])
+    })
+    if (files) files.forEach(f => fd.append('files', f))
+    return api.put(`/aset/sertifikat/${id}`, fd, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+  },
+  delete: (id: string) => api.delete(`/aset/sertifikat/${id}`),
+  deleteDokumen: (id: string) => api.delete(`/aset/sertifikat/dokumen/${id}`),
   previewDokumen: async (id: string): Promise<string> => {
     const token = Cookies.get('sitower_token')
     const base  = process.env.NEXT_PUBLIC_API_URL ?? ''
-    const res   = await fetch(`${base}/sertifikat/dokumen/${id}/preview`, {
+    const res   = await fetch(`${base}/aset/sertifikat/dokumen/${id}/preview`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     if (!res.ok) throw new Error('File tidak ditemukan')

@@ -94,6 +94,9 @@ export const laporanApi = {
     files.forEach((f) => form.append('foto', f))
     return api.post(`/laporan/${id}/foto-update`, form, { headers: { 'Content-Type': 'multipart/form-data' } })
   },
+  getRiwayat:    (id: string) => api.get(`/laporan/${id}/riwayat`),
+  addRiwayat:    (id: string, data: any) => api.post(`/laporan/${id}/riwayat`, data),
+  deleteRiwayat: (id: string, riwayatId: string) => api.delete(`/laporan/${id}/riwayat/${riwayatId}`),
 }
 
 export const sertifikatApi = {

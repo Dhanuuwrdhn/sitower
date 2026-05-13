@@ -321,20 +321,6 @@ function FilterPopover({
            </div>
         </div>
 
-        <div className="p-4 border-t border-[#E1E8EC] flex gap-3">
-           <button 
-             onClick={() => { onClose(); }}
-             className="flex-1 h-11 rounded-[22px] bg-[#076c9e] text-white font-semibold text-[14px] border-none cursor-pointer"
-           >
-             Terapkan Filter
-           </button>
-           <button 
-             onClick={onReset}
-             style={{ padding: '10px 20px', borderRadius: 22, border: 'none', background: 'transparent', color: '#D92D20', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
-           >
-             Hapus Filter
-           </button>
-        </div>
       </div>
     </>
   )

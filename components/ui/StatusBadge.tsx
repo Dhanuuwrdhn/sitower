@@ -23,8 +23,9 @@ const MAP: Record<string, string> = {
   nonaktif:    'badge-menunggu',
 }
 
-export function StatusBadge({ status }: { status: string }) {
+export function StatusBadge({ status, text }: { status: string; text?: string }) {
   const key = status?.toLowerCase?.() ?? ''
   const cls = MAP[key] ?? 'badge-menunggu'
-  return <span className={cls}>{status}</span>
+  const displayText = text ?? (status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : '')
+  return <span className={cls}>{displayText}</span>
 }

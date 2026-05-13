@@ -24,7 +24,7 @@ const JENIS_CHIPS = [
 ]
 const SERTIFIKAT_CHIPS = [
   { id: 'true', label: 'Bersertifikat' },
-  { id: 'false', label: 'Belum Ada' }
+  { id: 'false', label: 'Belum Bersertifikat' }
 ]
 
 const TIPE_OPTIONS = ['Semua', 'SUTET', 'SUTT', 'SKTT', 'Gardu Induk']
@@ -1094,7 +1094,7 @@ export default function AsetPage() {
                        ) : (
                          <div className="flex items-center gap-1.5 text-gray-400">
                             <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />
-                            <span className="text-[11px] font-bold uppercase tracking-wide">Belum Ada</span>
+                            <span className="text-[11px] font-bold uppercase tracking-wide">Belum Bersertifikat</span>
                          </div>
                        )}
                     </td>

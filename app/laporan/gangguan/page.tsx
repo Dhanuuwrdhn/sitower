@@ -1771,7 +1771,7 @@ function LaporanDrawer({
           tanggalWaktu: initial.tanggal?.slice(0, 16) ?? new Date().toISOString().slice(0, 16),
           levelRisiko:  initial.levelRisiko ?? 'sedang',
           status:       initial.status ?? 'berlangsung',
-          lokasiDetail: isPPL ? '' : (initial.lokasiDetail ?? ''),
+          lokasiDetail: initial.lokasiDetail ?? '',
           deskripsi:    initial.deskripsi ?? '',
           keterangan:   initial.keterangan ?? '',
           pihakLain:    isPPL ? (initial.teknisi ?? '') : '',
@@ -1879,9 +1879,6 @@ function LaporanDrawer({
       }
 
       const isPPL = form.jenisGangguan === 'pekerjaan_pihak_lain'
-      const spanLabel = isPPL && form.towerIdEnd
-        ? `${form.towerLabel} s/d ${form.towerLabelEnd}`
-        : form.lokasiDetail
 
       const payload = {
         towerId:      form.towerId,
@@ -1889,7 +1886,7 @@ function LaporanDrawer({
         tanggal:      form.tanggalWaktu,
         levelRisiko:  form.levelRisiko,
         status:       form.status,
-        lokasiDetail: spanLabel,
+        lokasiDetail: form.lokasiDetail || null,
         deskripsi:    form.deskripsi,
         keterangan:   form.keterangan,
         foto:         [...fotoUrls, ...uploadedUrls],
@@ -2054,35 +2051,18 @@ function LaporanDrawer({
         <p className={`text-[12px] font-medium -mt-2 ${detectedMsg.includes('⚠️') ? 'text-orange-600' : 'text-green-600'}`}>{detectedMsg}</p>
       )}
 
-      {/* Tower end (span) — only for pekerjaan_pihak_lain */}
-      {isPPL && !readOnly && (
-        <div>
-          <label className="block text-[14px] font-bold text-app-text mb-2">Tower Terdampak (End)</label>
-          {isMobile ? (
-            <button
-              type="button"
-              onClick={() => { setTowerSheetTarget('end'); setTowerSheetOpen(true) }}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                width: '100%', padding: '10px 14px',
-                background: form.towerIdEnd ? '#E1E8EC' : '#FFFFFF',
-                border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
-              }}
-            >
-              <span style={{ fontSize: 14, color: form.towerIdEnd ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
-                {form.towerLabelEnd || 'Pilih tower...'}
-              </span>
-              <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
-            </button>
-          ) : (
-            <TowerDropdown
-              options={towerOptions}
-              value={form.towerIdEnd}
-              onChange={(id, label) => setForm(f => ({ ...f, towerIdEnd: id, towerLabelEnd: label }))}
-            />
-          )}
-        </div>
-      )}
+      {/* Span — free text, optional, semua jenis laporan */}
+      <div>
+        <label className="block text-[14px] font-bold text-app-text mb-2">Span</label>
+        <input
+          type="text"
+          disabled={readOnly}
+          value={form.lokasiDetail}
+          onChange={e => set('lokasiDetail', e.target.value)}
+          placeholder="Contoh: T-23 - T-25"
+          className="form-input"
+        />
+      </div>
 
       {/* Jenis kerawanan */}
       <div>

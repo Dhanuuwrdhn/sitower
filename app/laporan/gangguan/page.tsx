@@ -105,9 +105,9 @@ const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {
   spanduk:              { bg: '#076C9E', text: '#FFFFFF' },
   brosur:               { bg: '#076C9E', text: '#FFFFFF' },
   surat:                { bg: '#076C9E', text: '#FFFFFF' },
-  sedang_berlangsung:   { bg: '#F79009', text: '#FFFFFF' },
+  sedang_berlangsung:   { bg: '#076C9E', text: '#FFFFFF' },
   selesai:              { bg: '#039855', text: '#FFFFFF' },
-  tidak_ada_aktivitas:  { bg: '#5F737F', text: '#FFFFFF' },
+  tidak_ada_aktivitas:  { bg: '#66757F', text: '#FFFFFF' },
 }
 
 const PROGRESS_TIPE_LIST = ['spanduk', 'brosur', 'laporan_baru', 'berita_acara', 'surat'] as const
@@ -1207,6 +1207,17 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
 
   const user = getUser()
 
+  async function handleDelete(id: string) {
+    try {
+      await laporanApi.delete(id)
+      toast.success('Laporan berhasil dihapus')
+      onSaved?.()
+      onClose?.()
+    } catch {
+      toast.error('Gagal menghapus laporan')
+    }
+  }
+
   useEffect(() => {
     if (autoOpenUpdate && laporan?.status !== 'selesai') setShowUpdateDrawer(true)
   }, [autoOpenUpdate, laporan?.status])
@@ -1789,31 +1800,26 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
       {/* Head — outside white card */}
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-          <span style={{ fontSize: 24, fontWeight: 700, color: '#1B1B1B' }}>Detail Kerawanan</span>
-          <LevelBadge level={laporan?.levelRisiko} />
-          {laporan?.progresLaporan && <ProgressBadge tipe={laporan.progresLaporan} />}
+          <span style={{ fontSize: 24, fontWeight: 700, color: '#1B1B1B' }}>Detail Laporan Kerawanan</span>
+          {laporan?.status === 'selesai' && <ProgressBadge tipe="selesai" />}
         </div>
         <div style={{ display: 'flex', gap: 8, fontSize: 14, fontWeight: 500, color: '#566B75' }}>
-          <span>Dibuat pada : {formatTanggal(laporan?.tanggal)}</span>
-          {laporan?.pelapor?.nama && <><span>·</span><span>Dibuat oleh : {laporan.pelapor.nama}</span></>}
+          <span>Terakhir diupdate : {formatTanggal(laporan?.updatedAt || laporan?.tanggal)}</span>
+          {laporan?.pelapor?.nama && <><span>-</span><span>Oleh : {laporan.pelapor.nama}</span></>}
         </div>
       </div>
 
-      {/* Two-column layout: Detail + Progress */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24, alignItems: 'start' }}>
-
-      {/* Left: White card */}
+      {/* Full width white card */}
       <div style={{ background: '#FFFFFF', borderRadius: 12, border: '1px solid #E1E8EC', padding: '32px' }}>
 
         {/* ── Section 1: Informasi Kerawanan ── */}
         <div style={{ marginBottom: 32 }}>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
+          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 16 }}>
             Informasi Kerawanan
           </span>
-          <div style={{ height: 1, background: '#E1E8EC', marginBottom: 20 }} />
 
           {/* 4-col info row */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0 20px', marginBottom: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0 20px', marginBottom: 24 }}>
             <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan} />
             <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
             <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama)} />
@@ -1827,12 +1833,12 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
           {(() => {
             const pihakLain = isPPL ? laporan?.teknisi : null
             const hasBoth = laporan?.deskripsi && pihakLain
-            if (!laporan?.deskripsi && !pihakLain) return null
+            if (!laporan?.deskripsi && !pihakLain && !laporan?.contactPerson) return null
             return (
-            <div style={{ display: 'grid', gridTemplateColumns: hasBoth ? '1fr 1fr' : '1fr', gap: '0 20px', marginBottom: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0 20px', marginBottom: 24 }}>
               {laporan?.deskripsi && (
                 <div>
-                  <span style={{ fontSize: 14, fontWeight: 400, color: '#5F737F', display: 'block', marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 400, color: '#97AAB3', display: 'block', marginBottom: 4 }}>
                     {isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'}
                   </span>
                   <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.deskripsi}</span>
@@ -1840,8 +1846,14 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
               )}
               {pihakLain && (
                 <div>
-                  <span style={{ fontSize: 14, fontWeight: 400, color: '#5F737F', display: 'block', marginBottom: 4 }}>Informasi Pihak Lain</span>
+                  <span style={{ fontSize: 12, fontWeight: 400, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Informasi Pihak Lain</span>
                   <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{pihakLain}</span>
+                </div>
+              )}
+              {laporan?.contactPerson && (
+                <div>
+                  <span style={{ fontSize: 12, fontWeight: 400, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Contact Person</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.contactPerson}</span>
                 </div>
               )}
             </div>
@@ -1851,7 +1863,7 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
           {/* Foto Bukti — single image 240px wide */}
           {fotoUrls.length > 0 && (
             <div>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 400, color: '#97AAB3', display: 'block', marginBottom: 8 }}>
                 Foto Bukti Terjadinya Kerawanan
               </span>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -1872,76 +1884,49 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
 
         {/* ── Section 2: Informasi Pengendalian Kerawanan ── */}
         <div>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
+          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 16 }}>
             Informasi Pengendalian Kerawanan
           </span>
-          <div style={{ height: 1, background: '#E1E8EC', marginBottom: 20 }} />
 
           {/* Upaya Pengendalian */}
           {laporan?.keterangan && (
-            <div style={{ marginBottom: 20 }}>
-              <span style={{ fontSize: 14, fontWeight: 400, color: '#5F737F', display: 'block', marginBottom: 4 }}>
+            <div style={{ marginBottom: 24 }}>
+              <span style={{ fontSize: 12, fontWeight: 400, color: '#97AAB3', display: 'block', marginBottom: 4 }}>
                 {isPPL ? 'Upaya Pengendalian' : 'Keterangan'}
               </span>
               <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.keterangan}</span>
             </div>
           )}
 
-          {/* Progress docs — show filled items + "Tambah" button for empty ones */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          {/* Progress docs — Read Only */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
             {PROGRESS_TIPE_LIST.map((tipe) => {
               const items: any[] = progress[tipe] ?? []
-              const isUp = uploading === tipe
               const latestItem = items[0]
+              if (!latestItem) return null
               return (
                 <div key={tipe}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <span style={{ fontSize: 14, fontWeight: 500, color: '#5F737F' }}>
-                      {PROGRESS_TIPE_LABEL[tipe]}
-                    </span>
-                    {latestItem && (
-                      <button type="button" onClick={() => progressRefs.current[tipe]?.click()} disabled={isUp}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#076C9E', fontSize: 12, fontWeight: 600, padding: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <Upload size={11} /> Ganti
-                      </button>
-                    )}
-                  </div>
-                  {latestItem ? (
-                    <div style={{ border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
-                      <div style={{ position: 'relative', height: 140, background: '#F6F9FC', overflow: 'hidden', cursor: 'pointer' }}
-                        onClick={() => {
-                          if (/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl))
-                            setLightbox({ urls: [resolveMediaUrl(latestItem.fileUrl)], index: 0 })
-                          else window.open(resolveMediaUrl(latestItem.fileUrl), '_blank')
-                        }}
-                      >
-                        {/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl) ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={resolveMediaUrl(latestItem.fileUrl)} alt=""
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        ) : (
-                          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <FileText size={36} style={{ color: '#5F737F' }} />
-                          </div>
-                        )}
-                      </div>
-                      <div style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <p style={{ fontSize: 12, color: '#5F737F', margin: 0 }}>
-                          {new Date(latestItem.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                        </p>
-                        <button type="button" onClick={() => handleProgressDelete(tipe, latestItem.id)}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#D92D20', display: 'flex' }}>
-                          <X size={12} />
-                        </button>
-                      </div>
+                  <span style={{ fontSize: 12, fontWeight: 400, color: '#97AAB3', display: 'block', marginBottom: 8 }}>
+                    {PROGRESS_TIPE_LABEL[tipe]}
+                  </span>
+                  <div style={{ border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
+                    <div style={{ position: 'relative', height: 160, background: '#F6F9FC', overflow: 'hidden', cursor: 'pointer' }}
+                      onClick={() => {
+                        if (/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl))
+                          setLightbox({ urls: [resolveMediaUrl(latestItem.fileUrl)], index: 0 })
+                        else window.open(resolveMediaUrl(latestItem.fileUrl), '_blank')
+                      }}
+                    >
+                      {/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl) ? (
+                        <img src={resolveMediaUrl(latestItem.fileUrl)} alt=""
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <FileText size={36} style={{ color: '#5F737F' }} />
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <button type="button" onClick={() => progressRefs.current[tipe]?.click()} disabled={isUp}
-                      style={{ width: '100%', padding: '10px 16px', border: '1px dashed #C5D3D9', borderRadius: 8, background: '#fff', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#076C9E', fontWeight: 600 }}>
-                      <Plus size={14} />
-                      {isUp ? 'Mengunggah...' : `Tambah ${PROGRESS_TIPE_LABEL[tipe]}`}
-                    </button>
-                  )}
+                  </div>
                 </div>
               )
             })}
@@ -1953,47 +1938,75 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
 
         {/* ── Section 3: Riwayat Pembaruan Laporan ── */}
         <div>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
+          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 20 }}>
             Riwayat Pembaruan Laporan
           </span>
-          <div style={{ height: 1, background: '#E1E8EC', marginBottom: 20 }} />
 
           {riwayat.length === 0 ? (
             <p style={{ fontSize: 13, color: '#97AAB3', textAlign: 'center', padding: '24px 0' }}>Belum ada riwayat pembaruan</p>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {riwayat.map((r: any) => (
-                <div key={r.id}>
-                  <div style={{ fontSize: 12, color: '#97AAB3', marginBottom: 10 }}>
-                    {new Date(r.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} · Oleh: {r.oleh}
+                <div key={r.id} style={{ border: '1px solid #E1E8EC', borderRadius: 10, padding: 20 }}>
+                  <div style={{ fontSize: 13, color: '#97AAB3', marginBottom: 16, display: 'flex', gap: 6 }}>
+                    <span>Tanggal Pembaruan: {new Date(r.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                    <span>-</span>
+                    <span>Oleh: {r.oleh}</span>
                   </div>
-                  <div style={{ border: '1px solid #E1E8EC', borderRadius: 10, padding: '16px 20px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                      <div style={{ display: 'flex', gap: 16 }}>
-                        <div>
-                          <span style={{ fontSize: 12, color: '#5F737F', display: 'block', marginBottom: 4 }}>Status Kerawanan</span>
-                          <LevelBadge level={r.statusKerawanan} />
-                        </div>
-                        <div>
-                          <span style={{ fontSize: 12, color: '#5F737F', display: 'block', marginBottom: 4 }}>Progres Laporan</span>
-                          <ProgressBadge tipe={r.progresLaporan} />
-                        </div>
-                      </div>
-                      {isSuperadmin() && (
-                        <button type="button" onClick={() => handleDeleteRiwayat(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 4, display: 'flex' }}>
-                          <X size={14} />
-                        </button>
-                      )}
+                  
+                  <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 16 }}>
+                    Detail Pembaruan
+                  </span>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px 20px', marginBottom: 20 }}>
+                    <div>
+                      <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Status Kerawanan</span>
+                      <LevelBadge level={r.statusKerawanan} />
                     </div>
-                    {(r.uraianPekerjaan || r.upayaPengendalian || r.pihakLain || r.contactPerson) && (
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 20px', marginBottom: 14 }}>
-                        {r.uraianPekerjaan && <div><span style={{ fontSize: 12, color: '#5F737F', display: 'block', marginBottom: 4 }}>Uraian Pekerjaan</span><span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.uraianPekerjaan}</span></div>}
-                        {r.upayaPengendalian && <div><span style={{ fontSize: 12, color: '#5F737F', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</span><span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.upayaPengendalian}</span></div>}
-                        {r.pihakLain && <div><span style={{ fontSize: 12, color: '#5F737F', display: 'block', marginBottom: 4 }}>Pihak Lain</span><span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.pihakLain}</span></div>}
-                        {r.contactPerson && <div><span style={{ fontSize: 12, color: '#5F737F', display: 'block', marginBottom: 4 }}>Contact Person</span><span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.contactPerson}</span></div>}
+                    <div>
+                      <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Progres Laporan</span>
+                      <ProgressBadge tipe={r.progresLaporan} />
+                    </div>
+                    
+                    {r.uraianPekerjaan && (
+                      <div>
+                        <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Uraian Pekerjaan</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.uraianPekerjaan}</span>
                       </div>
                     )}
-                    {renderRiwayatDocs(r)}
+                    {r.upayaPengendalian && (
+                      <div>
+                        <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.upayaPengendalian}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Progress Docs in Riwayat */}
+                  <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                    {PROGRESS_TIPE_LIST.map(tipe => {
+                      if (!r.files || !r.files[tipe]) return null;
+                      return (
+                        <div key={tipe} style={{ flex: '0 0 240px' }}>
+                          <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 8 }}>{PROGRESS_TIPE_LABEL[tipe]}</span>
+                          <div style={{ height: 140, borderRadius: 8, background: '#F6F9FC', overflow: 'hidden', cursor: 'pointer', border: '1px solid #E1E8EC' }}
+                            onClick={() => {
+                              if (/\.(jpe?g|png|webp)$/i.test(r.files[tipe]))
+                                setLightbox({ urls: [resolveMediaUrl(r.files[tipe])], index: 0 })
+                              else window.open(resolveMediaUrl(r.files[tipe]), '_blank')
+                            }}
+                          >
+                            {/\.(jpe?g|png|webp)$/i.test(r.files[tipe]) ? (
+                              <img src={resolveMediaUrl(r.files[tipe])} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <FileText size={32} style={{ color: '#5F737F' }} />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               ))}
@@ -2001,68 +2014,18 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
           )}
         </div>
 
+      </div>{/* end white card */}
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 24 }}>
+        <button type="button" onClick={() => {
+          if (confirm('Yakin ingin menghapus laporan ini? Semua data riwayat dan foto akan ikut terhapus.')) {
+             handleDelete(laporan!.id)
+          }
+        }}
+          style={{ height: 40, padding: '0 24px', background: '#FFFFFF', border: '1px solid #D92D20', borderRadius: 20, color: '#D92D20', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+          Hapus Laporan
+        </button>
       </div>
-
-      {/* Right: Progres Laporan panel */}
-      <div style={{ background: '#FFFFFF', borderRadius: 12, border: '1px solid #E1E8EC', overflow: 'hidden', position: 'sticky', top: 24 }}>
-        {/* Panel header */}
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid #E1E8EC', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B' }}>Progres Laporan</span>
-          <ProgressBadge tipe={laporan?.progresLaporan} />
-        </div>
-
-        {/* Timeline */}
-        <div style={{ padding: '20px' }}>
-          <div style={{ position: 'relative', paddingLeft: 28 }}>
-            {/* Vertical connector line */}
-            <div style={{ position: 'absolute', left: 7, top: 18, bottom: 18, width: 2, background: '#E1E8EC' }} />
-
-            {/* Step 1: Laporan Dibuat */}
-            <div style={{ position: 'relative', marginBottom: 20 }}>
-              <div style={{ position: 'absolute', left: -28, top: 3, width: 16, height: 16, borderRadius: '50%', background: '#076C9E', border: '2px solid #fff', boxShadow: '0 0 0 2px #076C9E' }} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#076C9E', display: 'block', marginBottom: 2 }}>Laporan Dibuat</span>
-              <span style={{ fontSize: 11, color: '#97AAB3' }}>{formatTanggal(laporan?.tanggal)}</span>
-              {laporan?.pelapor?.nama && <span style={{ fontSize: 11, color: '#97AAB3', display: 'block' }}>Oleh: {laporan.pelapor.nama}</span>}
-            </div>
-
-            {/* Riwayat steps (oldest first) */}
-            {[...riwayat].reverse().map((r: any, i: number) => {
-              const isLast = i === riwayat.length - 1 && laporan?.status !== 'selesai'
-              return (
-                <div key={r.id} style={{ position: 'relative', marginBottom: 20 }}>
-                  <div style={{ position: 'absolute', left: -28, top: 3, width: 16, height: 16, borderRadius: '50%', background: isLast ? '#076C9E' : '#E1E8EC', border: '2px solid #fff', boxShadow: `0 0 0 2px ${isLast ? '#076C9E' : '#C5D3D9'}` }} />
-                  <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 3, flexWrap: 'wrap' }}>
-                    <ProgressBadge tipe={r.progresLaporan} />
-                    <LevelBadge level={r.statusKerawanan} />
-                  </div>
-                  <span style={{ fontSize: 11, color: '#97AAB3' }}>{formatTanggal(r.tanggal)} · Oleh: {r.oleh}</span>
-                </div>
-              )
-            })}
-
-            {/* Final step: Selesai */}
-            {laporan?.status === 'selesai' && (
-              <div style={{ position: 'relative', marginBottom: 0 }}>
-                <div style={{ position: 'absolute', left: -28, top: 3, width: 16, height: 16, borderRadius: '50%', background: '#039855', border: '2px solid #fff', boxShadow: '0 0 0 2px #039855' }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#039855', display: 'block', marginBottom: 2 }}>Laporan Selesai</span>
-              </div>
-            )}
-
-            {/* Empty state */}
-            {riwayat.length === 0 && laporan?.status !== 'selesai' && (
-              <div style={{ position: 'relative', marginBottom: 0 }}>
-                <div style={{ position: 'absolute', left: -28, top: 3, width: 16, height: 16, borderRadius: '50%', background: '#F6F9FC', border: '2px solid #C5D3D9', boxShadow: '0 0 0 2px #C5D3D9' }} />
-                <span style={{ fontSize: 12, color: '#97AAB3', fontStyle: 'italic' }}>Belum ada pembaruan</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      </div>{/* end grid */}
-
-      {progressInputs}
-      {updateDrawer}
 
       {/* Lightbox */}
       {lightbox && (
@@ -2092,6 +2055,7 @@ const EMPTY_FORM = {
   deskripsi: '',        // Uraian Pekerjaan
   keterangan: '',       // Upaya Pengendalian (ppl) / notes
   pihakLain: '',        // company name for pekerjaan_pihak_lain (stored in teknisi)
+  contactPerson: '',
   // CUI / Cleanup
   teknisi: '',
   noSpk: '',
@@ -2277,7 +2241,7 @@ function LaporanDrawer({
         deskripsi:    form.deskripsi,
         keterangan:   form.keterangan,
         foto:         [...fotoUrls, ...uploadedUrls],
-        ...(isPPL && { teknisi: form.pihakLain }),
+        ...(isPPL && { teknisi: form.pihakLain, contactPerson: form.contactPerson }),
         ...(!isPPL && ['cui', 'cleanup'].includes(form.jenisGangguan) && {
           teknisi: form.teknisi,
           noSpk:   form.noSpk,
@@ -2312,12 +2276,12 @@ function LaporanDrawer({
 
       {/* GPS alert */}
       {!readOnly && alertVisible && (
-        <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
-          <AlertTriangle size={16} className="text-amber-500 shrink-0 mt-0.5" />
-          <p className="text-[12px] text-amber-700 leading-relaxed flex-1">
-            Perhatian: Jika anda memilih opsi "Gunakan lokasi saat ini". Pastikan anda sudah menghidupkan akses lokasi di handphone anda.
+        <div className="flex items-start gap-3 p-3 bg-[#FFF8E6] border border-[#FFE5A3] rounded-xl">
+          <AlertTriangle size={16} className="text-[#F79009] shrink-0 mt-0.5" />
+          <p className="text-[12px] text-[#1B1B1B] leading-relaxed flex-1">
+            <span className="font-bold text-[#F79009]">Perhatian:</span> Pastikan anda sudah menghidupkan akses lokasi di handphone anda.
           </p>
-          <button type="button" onClick={() => setAlertVisible(false)} className="text-amber-400 hover:text-amber-600 shrink-0">
+          <button type="button" onClick={() => setAlertVisible(false)} className="text-[#F79009] hover:text-[#D97706] shrink-0">
             <X size={14} />
           </button>
         </div>
@@ -2382,40 +2346,64 @@ function LaporanDrawer({
         )}
       </div>
 
-      {/* Tower terdampak — start (always) */}
-      <div>
-        <label className="block text-[14px] font-bold text-app-text mb-2">
-          {isPPL ? 'Tower Terdampak (Start)' : 'Tower Terganggu'}
-        </label>
-        {readOnly ? (
-          <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
-        ) : isMobile && gpsLocked ? (
-          <div className="form-input bg-app-bg flex items-center justify-between">
-            <span style={{ fontSize: 14, color: '#1B1B1B', fontWeight: 500 }}>{form.towerLabel || '—'}</span>
-            <span style={{ fontSize: 11, color: '#039855', fontWeight: 600 }}>📍 GPS</span>
+      {/* Tower terdampak & Span */}
+      <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>
+        <div className="flex-1 min-w-0">
+          <label className="block text-[14px] font-bold text-app-text mb-2">
+            {isPPL ? 'No. Tower' : 'Tower Terganggu'}
+          </label>
+          {readOnly ? (
+            <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
+          ) : isMobile && gpsLocked ? (
+            <div className="form-input bg-app-bg flex items-center justify-between">
+              <span style={{ fontSize: 14, color: '#1B1B1B', fontWeight: 500 }}>{form.towerLabel || '—'}</span>
+              <span style={{ fontSize: 11, color: '#039855', fontWeight: 600 }}>📍 GPS</span>
+            </div>
+          ) : isMobile ? (
+            <button
+              type="button"
+              onClick={() => { setTowerSheetTarget('start'); setTowerSheetOpen(true) }}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                width: '100%', padding: '10px 14px',
+                background: form.towerId ? '#E1E8EC' : '#FFFFFF',
+                border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+              }}
+            >
+              <span style={{ fontSize: 14, color: form.towerId ? '#5F737F' : '#97AAB3', fontWeight: 500 }}>
+                {form.towerLabel || 'Pilih tower...'}
+              </span>
+              <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+            </button>
+          ) : (
+            <TowerDropdown
+              options={towerOptions}
+              value={form.towerId}
+              onChange={(id, label) => setForm(f => ({ ...f, towerId: id, towerLabel: label }))}
+            />
+          )}
+        </div>
+
+        {/* Span — free text, optional, semua jenis laporan */}
+        {isPPL && (
+          <div className="flex-1 min-w-0">
+            <label className="block text-[14px] font-bold text-app-text mb-2">Span</label>
+            <div className="relative">
+              <input
+                type="text"
+                disabled={readOnly}
+                value={form.lokasiDetail}
+                onChange={e => set('lokasiDetail', e.target.value)}
+                placeholder="Contoh: T-23 - T-25"
+                className="form-input pr-8"
+              />
+              {form.lokasiDetail && !readOnly && (
+                <button type="button" onClick={() => set('lokasiDetail', '')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <X size={14} className="text-[#97AAB3]"/>
+                </button>
+              )}
+            </div>
           </div>
-        ) : isMobile ? (
-          <button
-            type="button"
-            onClick={() => { setTowerSheetTarget('start'); setTowerSheetOpen(true) }}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              width: '100%', padding: '10px 14px',
-              background: form.towerId ? '#E1E8EC' : '#FFFFFF',
-              border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
-            }}
-          >
-            <span style={{ fontSize: 14, color: form.towerId ? '#5F737F' : '#97AAB3', fontWeight: 500 }}>
-              {form.towerLabel || 'Pilih tower...'}
-            </span>
-            <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
-          </button>
-        ) : (
-          <TowerDropdown
-            options={towerOptions}
-            value={form.towerId}
-            onChange={(id, label) => setForm(f => ({ ...f, towerId: id, towerLabel: label }))}
-          />
         )}
       </div>
 
@@ -2424,7 +2412,7 @@ function LaporanDrawer({
         <div className="flex items-center gap-2.5">
           <div
             onClick={() => setUseGPS(v => !v)}
-            className={`w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors shrink-0 ${useGPS ? 'bg-blue-600 border-blue-600' : 'border-app-border bg-white'}`}
+            className={`w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors shrink-0 ${useGPS ? 'bg-[#076C9E] border-[#076C9E]' : 'border-app-border bg-white'}`}
           >
             {useGPS && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
           </div>
@@ -2436,92 +2424,78 @@ function LaporanDrawer({
           >
             Gunakan lokasi anda saat ini.
           </button>
-          {locating && <span className="text-[11px] text-blue-500 animate-pulse">Mendeteksi...</span>}
+          {locating && <span className="text-[11px] text-[#076C9E] animate-pulse">Mendeteksi...</span>}
         </div>
       )}
       {detectedMsg && (
         <p className={`text-[12px] font-medium -mt-2 ${detectedMsg.includes('⚠️') ? 'text-orange-600' : 'text-green-600'}`}>{detectedMsg}</p>
       )}
 
-      {/* Span — free text, optional, semua jenis laporan */}
-      {isPPL && (
-        <div>
-          <label className="block text-[14px] font-bold text-app-text mb-2">Span</label>
-          <input
-            type="text"
-            disabled={readOnly}
-            value={form.lokasiDetail}
-            onChange={e => set('lokasiDetail', e.target.value)}
-            placeholder="Contoh: T-23 - T-25"
-            className="form-input"
-          />
+      {/* Jenis & Status Kerawanan */}
+      <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>
+        <div className="flex-1 min-w-0">
+          <label className="block text-[14px] font-bold text-app-text mb-2">Jenis Kerawanan</label>
+          {isMobile && !readOnly ? (
+            <button
+              type="button"
+              onClick={() => setJenisSheetOpen(true)}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                width: '100%', padding: '10px 14px', background: '#FFFFFF',
+                border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+              }}
+            >
+              <span style={{ fontSize: 14, color: form.jenisGangguan ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }} className="truncate">
+                {JENIS_LABEL[form.jenisGangguan] || 'Pilih kategori...'}
+              </span>
+              <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+            </button>
+          ) : (
+            <select
+              disabled={readOnly}
+              value={form.jenisGangguan}
+              onChange={(e) => set('jenisGangguan', e.target.value)}
+              className="form-input truncate pr-8"
+            >
+              <option value="">Pilih kategori...</option>
+              {JENIS_OPTIONS.filter(o => o.value).map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          )}
         </div>
-      )}
 
-      {/* Jenis kerawanan */}
-      <div>
-        <label className="block text-[14px] font-bold text-app-text mb-2">Jenis Kerawanan</label>
-        {isMobile && !readOnly ? (
-          <button
-            type="button"
-            onClick={() => setJenisSheetOpen(true)}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              width: '100%', padding: '10px 14px', background: '#FFFFFF',
-              border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
-            }}
-          >
-            <span style={{ fontSize: 14, color: form.jenisGangguan ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
-              {JENIS_LABEL[form.jenisGangguan] || 'Pilih kategori...'}
-            </span>
-            <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
-          </button>
-        ) : (
-          <select
-            disabled={readOnly}
-            value={form.jenisGangguan}
-            onChange={(e) => set('jenisGangguan', e.target.value)}
-            className="form-input"
-          >
-            <option value="">Pilih kategori...</option>
-            {JENIS_OPTIONS.filter(o => o.value).map(o => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        )}
-      </div>
-
-      {/* Status Kerawanan */}
-      {isPPL && (
-        <>
-          <div>
-        <label className={`block font-semibold text-app-text mb-2 ${isMobile ? 'text-[14px]' : 'text-[12px]'}`}>Status Kerawanan</label>
-        {isMobile && !readOnly ? (
-          <button
-            type="button"
-            onClick={() => setLevelSheetOpen(true)}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              width: '100%', padding: '10px 14px', background: '#FFFFFF',
-              border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
-            }}
-          >
-            <span style={{ fontSize: 14, color: form.levelRisiko ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
-              {LEVEL_OPTIONS.find(l => l.value === form.levelRisiko)?.label || 'Pilih status...'}
-            </span>
-            <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
-          </button>
-        ) : (
-          <select
-            disabled={readOnly}
-            value={form.levelRisiko}
-            onChange={(e) => set('levelRisiko', e.target.value)}
-            className={`form-input ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
-          >
-            {LEVEL_OPTIONS.map(l => (
-              <option key={l.value} value={l.value}>{l.label}</option>
-            ))}
-          </select>
+        {isPPL && (
+          <div className="flex-1 min-w-0">
+            <label className="block text-[14px] font-bold text-app-text mb-2">Status Kerawanan</label>
+            {isMobile && !readOnly ? (
+              <button
+                type="button"
+                onClick={() => setLevelSheetOpen(true)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  width: '100%', padding: '10px 14px', background: '#FFFFFF',
+                  border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+                }}
+              >
+                <span style={{ fontSize: 14, color: form.levelRisiko ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
+                  {LEVEL_OPTIONS.find(l => l.value === form.levelRisiko)?.label || 'Pilih status...'}
+                </span>
+                <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+              </button>
+            ) : (
+              <select
+                disabled={readOnly}
+                value={form.levelRisiko}
+                onChange={(e) => set('levelRisiko', e.target.value)}
+                className={`form-input truncate pr-8 ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
+              >
+                {LEVEL_OPTIONS.map(l => (
+                  <option key={l.value} value={l.value}>{l.label}</option>
+                ))}
+              </select>
+            )}
+          </div>
         )}
       </div>
 
@@ -2544,16 +2518,23 @@ function LaporanDrawer({
       {/* Uraian Pekerjaan / Deskripsi */}
       <div>
         <label className="block text-[14px] font-bold text-app-text mb-2">
-          {isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'}
+          {isPPL ? <>Uraian Pekerjaan <span className="font-normal text-[#5F737F]">(Opsional)</span></> : 'Deskripsi'}
         </label>
-        <textarea
-          disabled={readOnly}
-          rows={4}
-          value={form.deskripsi}
-          onChange={(e) => set('deskripsi', e.target.value)}
-          className="form-input resize-none"
-          placeholder={isPPL ? 'Uraikan pekerjaan pihak lain...' : 'Deskripsi gangguan...'}
-        />
+        <div className="relative">
+          <textarea
+            disabled={readOnly}
+            rows={4}
+            value={form.deskripsi}
+            onChange={(e) => set('deskripsi', e.target.value)}
+            className="form-input resize-none w-full"
+            placeholder={isPPL ? 'Proyek renovasi gudang menggunakan alat berat crane' : 'Deskripsi gangguan...'}
+          />
+          {form.deskripsi && !readOnly && (
+            <button type="button" onClick={() => set('deskripsi', '')} className="absolute bottom-3 right-3">
+              <X size={14} className="text-[#97AAB3]"/>
+            </button>
+          )}
+        </div>
       </div>
 
       {!isPPL && (
@@ -2576,30 +2557,55 @@ function LaporanDrawer({
           {/* Figma: gray 8px divider strip + section heading 18px/700 */}
           <div style={{ margin: '8px -20px 0', height: 8, background: '#F6F9FC' }} />
           <div style={{ padding: '12px 0 4px' }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B' }}>Informasi Pihak Lain</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>Informasi Pihak Lain</h3>
           </div>
-          <div>
-            <label className="block text-[14px] font-bold text-app-text mb-2">Pihak Lain</label>
-            <input
-              disabled={readOnly}
-              type="text"
-              value={form.pihakLain}
-              onChange={(e) => set('pihakLain', e.target.value)}
-              className="form-input"
-              placeholder="Nama perusahaan / pihak lain..."
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex-1 min-w-0">
+              <label className="block text-[14px] font-bold text-app-text mb-2">Pihak Lain</label>
+              <div className="relative">
+                <input
+                  disabled={readOnly}
+                  type="text"
+                  value={form.pihakLain}
+                  onChange={(e) => set('pihakLain', e.target.value)}
+                  className="form-input pr-8"
+                  placeholder="PT. Grakindo Maju Sukses"
+                />
+                {form.pihakLain && !readOnly && (
+                  <button type="button" onClick={() => set('pihakLain', '')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <X size={14} className="text-[#97AAB3]"/>
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="block text-[14px] font-bold text-app-text mb-2">Contact Person</label>
+              <div className="relative">
+                <input
+                  disabled={readOnly}
+                  type="text"
+                  value={form.contactPerson}
+                  onChange={(e) => set('contactPerson', e.target.value)}
+                  className="form-input pr-8"
+                  placeholder="081315555271"
+                />
+                {form.contactPerson && !readOnly && (
+                  <button type="button" onClick={() => set('contactPerson', '')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <X size={14} className="text-[#97AAB3]"/>
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-          <div>
-            <label className="block text-[14px] font-bold text-app-text mb-2">Upaya Pengendalian</label>
-            <textarea
-              disabled={readOnly}
-              rows={4}
-              value={form.keterangan}
-              onChange={(e) => set('keterangan', e.target.value)}
-              className="form-input resize-none"
-              placeholder="Tindakan pengendalian yang sudah dilakukan..."
-            />
-          </div>
+          
+          {!readOnly && (
+            <>
+              <div style={{ margin: '8px -20px 0', height: 8, background: '#F6F9FC' }} />
+              <div style={{ padding: '12px 0 4px' }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>Informasi Progres Laporan</h3>
+              </div>
+            </>
+          )}
         </>
       )}
 
@@ -2624,8 +2630,6 @@ function LaporanDrawer({
           <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Penyebab</label><input disabled={readOnly} type="text" value={form.penyebab} onChange={(e) => set('penyebab', e.target.value)} className="form-input" /></div>
           <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Durasi (jam)</label><input disabled={readOnly} type="number" value={form.durasi} onChange={(e) => set('durasi', e.target.value)} className="form-input" /></div>
         </div>
-      )}
-        </>
       )}
 
       {/* Tanggal & Waktu — editable by admin, readonly for teknisi, hidden for teknisi on create */}
@@ -2714,9 +2718,14 @@ function LaporanDrawer({
             <>
               {formBody}
               <div className="px-5 py-4 border-t border-app-border shrink-0 bg-white">
-                <button type="submit" form="laporan-form" disabled={saving} className="btn-primary w-full justify-center">
-                  {saving ? 'Menyimpan...' : initial ? 'Simpan Perubahan' : 'Buat Laporan'}
-                </button>
+                <div className="flex gap-3">
+                  <button type="button" onClick={onClose} className="flex-1 h-11 rounded-[22px] bg-white border border-[#D92D20] text-[#D92D20] font-semibold text-[14px]">
+                    Batalkan
+                  </button>
+                  <button type="submit" form="laporan-form" disabled={saving} className="flex-1 h-11 rounded-[22px] bg-[#076C9E] text-white font-semibold text-[14px] border-none">
+                    {saving ? 'Menyimpan...' : initial ? 'Simpan' : 'Buat Laporan'}
+                  </button>
+                </div>
               </div>
             </>
           )}
@@ -2762,8 +2771,8 @@ function LaporanDrawer({
           </div>
           {formBody}
           <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border shrink-0 bg-white">
-            <button type="button" onClick={onClose} className="btn-outline">Batal</button>
-            <button type="submit" form="laporan-form" disabled={saving} className="btn-primary">
+            <button type="button" onClick={onClose} className="px-6 h-11 rounded-[22px] bg-white border border-[#D92D20] text-[#D92D20] font-semibold text-[14px] cursor-pointer">Batalkan</button>
+            <button type="submit" form="laporan-form" disabled={saving} className="px-6 h-11 rounded-[22px] bg-[#076C9E] text-white font-semibold text-[14px] border-none cursor-pointer">
               {saving ? 'Menyimpan...' : initial ? 'Simpan Perubahan' : 'Buat Laporan'}
             </button>
           </div>
@@ -3160,7 +3169,6 @@ export default function GangguanPage() {
               <tr>
                 <th>Tanggal</th>
                 <th>Ruas</th>
-                <th>No. Tower</th>
                 <th>Jenis Kerawanan</th>
                 <th>Teknisi</th>
                 <th>Status Kerawanan</th>
@@ -3172,14 +3180,14 @@ export default function GangguanPage() {
               {loading ? (
                 Array.from({ length: pageSize }).map((_, i) => (
                   <tr key={i}>
-                    {Array.from({ length: 8 }).map((_, j) => (
+                    {Array.from({ length: 7 }).map((_, j) => (
                       <td key={j}><div className="h-4 bg-gray-100 rounded animate-pulse" /></td>
                     ))}
                   </tr>
                 ))
               ) : rows.length === 0 ? (
                 <tr>
-                  <td colSpan={8}><EmptyState title="Belum ada data Riwayat Kerawanan Transmisi." /></td>
+                  <td colSpan={7}><EmptyState title="Belum ada data Riwayat Kerawanan Transmisi." /></td>
                 </tr>
               ) : (
                 rows.map((row) => (
@@ -3189,9 +3197,6 @@ export default function GangguanPage() {
                       <span className="block truncate" title={row.tower?.nama ?? row.towerId}>
                         {row.tower?.nama ?? row.towerId ?? '—'}
                       </span>
-                    </td>
-                    <td className="text-[14px] text-[#5f737f] whitespace-nowrap">
-                      {extractTowerNo(row.tower?.nama) ?? '—'}
                     </td>
                     <td className="text-[14px] text-[#5f737f]">{JENIS_LABEL[row.jenisGangguan] ?? row.jenisGangguan ?? '—'}</td>
                     <td className="text-[14px] text-[#5f737f]">{row.teknisi ?? row.pelapor?.nama ?? '—'}</td>

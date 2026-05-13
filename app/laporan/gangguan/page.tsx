@@ -2278,7 +2278,7 @@ function LaporanDrawer({
         deskripsi:    form.deskripsi,
         keterangan:   form.keterangan,
         foto:         [...fotoUrls, ...uploadedUrls],
-        ...(isPPL && { teknisi: form.pihakLain }),
+        ...(isPPL && { teknisi: form.pihakLain, contactPerson: form.contactPerson }),
         ...(!isPPL && ['cui', 'cleanup'].includes(form.jenisGangguan) && {
           teknisi: form.teknisi,
           noSpk:   form.noSpk,

@@ -577,7 +577,6 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
   const [selected, setSelected] = useState<FeaturedTower | null>(null)
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
   const [layerPanelOpen, setLayerPanelOpen] = useState(false)
-  const [zoom, setZoom] = useState(10)
   const [visibleLayers, setVisibleLayers] = useState<Set<string>>(new Set(['SUTT', 'SUTET']))
 
   function toggleLayer(tipe: string) {
@@ -590,13 +589,9 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
 
   const displayTowers = useMemo<FeaturedTower[]>(() => {
     const all = towers ?? []
-    const filtered = !activeFilter
-      ? all
-      : all.filter((t) => t.kerawanan.some((k) => normKat(k.kategori) === activeFilter))
-    // Hide normal towers (no kerawanan) when zoomed out — reduces clutter
-    if (zoom < 13) return filtered.filter((t) => t.kerawanan.length > 0)
-    return filtered
-  }, [towers, activeFilter, zoom])
+    if (!activeFilter) return all
+    return all.filter((t) => t.kerawanan.some((k) => normKat(k.kategori) === activeFilter))
+  }, [towers, activeFilter])
 
   // Count per filter category for tab badges
   const filterCounts = useMemo(() => {
@@ -645,7 +640,6 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
           streetViewControl={false}
           fullscreenControl={false}
         >
-          <ZoomWatcher onZoomChange={setZoom} />
           {jalurKml && jalurKml.length > 0 && <JalurKmlLines jalurKml={jalurKml} visibleTypes={visibleLayers} />}
           <TowerMarkers towers={displayTowers} onSelect={handleSelect} />
           {selected && <TowerPopup tower={selected} onClose={() => setSelected(null)} />}

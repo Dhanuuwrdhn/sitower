@@ -1404,8 +1404,8 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
             <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan} />
             <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
             <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama)} />
-            {laporan?.lokasiDetail
-              ? <InfoRow label="Span" value={laporan.lokasiDetail} />
+            {isPPL
+              ? <InfoRow label="Span" value={laporan?.lokasiDetail || '—'} />
               : <InfoRow label="Tanggal" value={formatTanggal(laporan?.tanggal)} />
             }
           </div>
@@ -1469,7 +1469,7 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
             </div>
           )}
 
-          {/* Progress docs — only show types with files, 2-col card grid */}
+          {/* Progress docs — show filled items + "Tambah" button for empty ones */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             {PROGRESS_TIPE_LIST.map((tipe) => {
               const items: any[] = progress[tipe] ?? []
@@ -1477,59 +1477,53 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
               const latestItem = items[0]
               return (
                 <div key={tipe}>
-                  <span style={{ fontSize: 14, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 8 }}>
-                    {PROGRESS_TIPE_LABEL[tipe]}
-                  </span>
-                  <div style={{ border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
-                    {latestItem ? (
-                      <>
-                        {/* Image/file preview full-width — click to lightbox */}
-                        <div style={{ position: 'relative', height: 140, background: '#F6F9FC', overflow: 'hidden', cursor: 'pointer' }}
-                          onClick={() => {
-                            if (/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl))
-                              setLightbox({ urls: [resolveMediaUrl(latestItem.fileUrl)], index: 0 })
-                            else window.open(resolveMediaUrl(latestItem.fileUrl), '_blank')
-                          }}
-                        >
-                          {/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl) ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={resolveMediaUrl(latestItem.fileUrl)} alt=""
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          ) : (
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <FileText size={36} style={{ color: '#5F737F' }} />
-                            </div>
-                          )}
-                          {/* Upload replace button */}
-                          <button type="button" onClick={(e) => { e.stopPropagation(); progressRefs.current[tipe]?.click() }}
-                            style={{ position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderRadius: '50%', background: '#076C9E', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                            <Upload size={13} style={{ color: '#FFF' }} />
-                          </button>
-                        </div>
-                        {/* Filename + size/date */}
-                        <div style={{ padding: '10px 12px' }}>
-                          <p style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {latestItem.namaFile}
-                          </p>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
-                            <p style={{ fontSize: 12, color: '#5F737F', margin: 0 }}>
-                              {new Date(latestItem.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                            </p>
-                            <button type="button" onClick={() => handleProgressDelete(tipe, latestItem.id)}
-                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#D92D20', display: 'flex' }}>
-                              <X size={12} />
-                            </button>
-                          </div>
-                        </div>
-                      </>
-                    ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span style={{ fontSize: 14, fontWeight: 500, color: '#5F737F' }}>
+                      {PROGRESS_TIPE_LABEL[tipe]}
+                    </span>
+                    {latestItem && (
                       <button type="button" onClick={() => progressRefs.current[tipe]?.click()} disabled={isUp}
-                        style={{ width: '100%', height: 140, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#F6F9FC', border: 'none', cursor: 'pointer' }}>
-                        <Upload size={22} style={{ color: '#97AAB3' }} />
-                        <span style={{ fontSize: 12, color: '#97AAB3' }}>{isUp ? 'Mengunggah...' : 'Upload file'}</span>
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#076C9E', fontSize: 12, fontWeight: 600, padding: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Upload size={11} /> Ganti
                       </button>
                     )}
                   </div>
+                  {latestItem ? (
+                    <div style={{ border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
+                      <div style={{ position: 'relative', height: 140, background: '#F6F9FC', overflow: 'hidden', cursor: 'pointer' }}
+                        onClick={() => {
+                          if (/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl))
+                            setLightbox({ urls: [resolveMediaUrl(latestItem.fileUrl)], index: 0 })
+                          else window.open(resolveMediaUrl(latestItem.fileUrl), '_blank')
+                        }}
+                      >
+                        {/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl) ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={resolveMediaUrl(latestItem.fileUrl)} alt=""
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <FileText size={36} style={{ color: '#5F737F' }} />
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <p style={{ fontSize: 12, color: '#5F737F', margin: 0 }}>
+                          {new Date(latestItem.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </p>
+                        <button type="button" onClick={() => handleProgressDelete(tipe, latestItem.id)}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#D92D20', display: 'flex' }}>
+                          <X size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button type="button" onClick={() => progressRefs.current[tipe]?.click()} disabled={isUp}
+                      style={{ width: '100%', padding: '10px 16px', border: '1px dashed #C5D3D9', borderRadius: 8, background: '#fff', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#076C9E', fontWeight: 600 }}>
+                      <Plus size={14} />
+                      {isUp ? 'Mengunggah...' : `Tambah ${PROGRESS_TIPE_LABEL[tipe]}`}
+                    </button>
+                  )}
                 </div>
               )
             })}

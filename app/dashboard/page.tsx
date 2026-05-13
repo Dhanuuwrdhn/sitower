@@ -31,8 +31,8 @@ interface RecentRow {
 }
 
 const LEVEL_BADGE: Record<string, { bg: string; text: string; label: string }> = {
-  kritis_terpenuhi:       { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis Terpenuhi'       },
-  kritis_tidak_terpenuhi: { bg: '#FEE4E2', text: '#912018', label: 'Kritis Tidak Terpenuhi'  },
+  kritis_terpenuhi:       { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis'       },
+  kritis_tidak_terpenuhi: { bg: '#FEE4E2', text: '#912018', label: 'Kritis'  },
   sedang:                 { bg: '#FFFAEB', text: '#F79009', label: 'Sedang'                  },
   aman:                   { bg: '#ECFDF3', text: '#039855', label: 'Aman'                    },
   kritis:                 { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis'                  },
@@ -113,7 +113,7 @@ const JENIS_LABEL: Record<string, string> = {
   pemanfaatan_lahan:    'Pemanfaatan Lahan',
 }
 
-// ── Donut Chart — 4 segments: Aman / Sedang / Kritis Terpenuhi / Kritis Tidak Terpenuhi ────
+// ── Donut Chart — 4 segments: Aman / Sedang / Kritis / Kritis ────
 function DonutChart({ aman, sedang, kritisTerpenuhi, kritisLdakTerpenuhi }: {
   aman: number; sedang: number; kritisTerpenuhi: number; kritisLdakTerpenuhi: number
 }) {
@@ -152,14 +152,14 @@ function DonutChart({ aman, sedang, kritisTerpenuhi, kritisLdakTerpenuhi }: {
         strokeLinecap="round"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
-      {/* Kritis Terpenuhi — #EF4444 */}
+      {/* Kritis — #EF4444 */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#EF4444" strokeWidth={strokeW}
         strokeDasharray={`${ktArc} ${circumference - ktArc}`}
         strokeDashoffset={startOffset - amanArc - sedArc}
         strokeLinecap="round"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
-      {/* Kritis Tidak Terpenuhi — #991B1B */}
+      {/* Kritis — #991B1B */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#991B1B" strokeWidth={strokeW}
         strokeDasharray={`${kntArc} ${circumference - kntArc}`}
         strokeDashoffset={startOffset - amanArc - sedArc - ktArc}
@@ -423,8 +423,7 @@ export default function DashboardPage() {
             {[
               { color: '#039855', label: 'Aman',                  count: amanTower,                 pct: amanPct   },
               { color: '#F79009', label: 'Sedang',                count: sedangTower,               pct: sedangPct },
-              { color: '#EF4444', label: 'Kritis Terpenuhi',      count: kritisTerpenuhiTower,      pct: ktPct     },
-              { color: '#991B1B', label: 'Kritis Tidak Terpenuhi', count: kritisLdakTerpenuhiTower, pct: kntPct    },
+              { color: '#EF4444', label: 'Kritis', count: kritisTerpenuhiTower + kritisLdakTerpenuhiTower, pct: ktPct + kntPct },
             ].map((row) => (
               <div key={row.label} className="dash-aset-legend-item">
                 <div className="dash-legend-header">

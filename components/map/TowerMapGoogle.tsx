@@ -449,8 +449,8 @@ function TowerMarkers({
 // ─── Info popup ───────────────────────────────────────────────────────────────
 
 const RISIKO_LABEL: Record<string, string> = {
-  kritis_tidak_terpenuhi: 'KRITIS TIDAK TERPENUHI',
-  kritis_terpenuhi:       'KRITIS TERPENUHI',
+  kritis_tidak_terpenuhi: 'KRITIS',
+  kritis_terpenuhi:       'KRITIS',
   kritis:                 'RISIKO KRITIS',
   sedang:                 'RISIKO SEDANG',
   aman:                   'AMAN',
@@ -537,8 +537,7 @@ function Legend() {
       {([
         { bg: '#22C55E', label: 'Aman' },
         { bg: '#F59E0B', label: 'Sedang' },
-        { bg: '#EF4444', label: 'Kritis Terpenuhi' },
-        { bg: '#EF4444', label: 'Kritis Tidak Terpenuhi' },
+        { bg: '#EF4444', label: 'Kritis' },
       ] as { bg: string; label: string }[]).map(({ bg, label }) => (
         <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <svg width="14" height="14" viewBox="0 0 26 26" fill="none" style={{ flexShrink: 0 }}>

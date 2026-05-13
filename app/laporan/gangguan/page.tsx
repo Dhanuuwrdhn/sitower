@@ -49,8 +49,8 @@ const STATUS_LABEL: Record<string, string> = {
 }
 
 const LEVEL_OPTIONS = [
-  { value: 'kritis_terpenuhi',      label: 'Kritis Terpenuhi',      color: 'text-red-600',    bg: 'bg-red-50 border-red-300',       dot: 'bg-red-500' },
-  { value: 'kritis_tidak_terpenuhi', label: 'Kritis Tidak Terpenuhi', color: 'text-red-700',    bg: 'bg-red-100 border-red-400',      dot: 'bg-red-700' },
+  { value: 'kritis_terpenuhi',      label: 'Kritis',      color: 'text-red-600',    bg: 'bg-red-50 border-red-300',       dot: 'bg-red-500' },
+  { value: 'kritis_tidak_terpenuhi', label: 'Kritis', color: 'text-red-700',    bg: 'bg-red-100 border-red-400',      dot: 'bg-red-700' },
   { value: 'sedang',                label: 'Sedang',                color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-300', dot: 'bg-yellow-500' },
   { value: 'aman',                  label: 'Aman',                  color: 'text-green-600',  bg: 'bg-green-50 border-green-300',   dot: 'bg-green-500' },
 ]
@@ -80,8 +80,8 @@ const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
 
 // Exact colors from Figma node 229-8374
 const LEVEL_BADGE: Record<string, { bg: string; text: string; label: string }> = {
-  kritis_terpenuhi:      { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis Terpenuhi'      },
-  kritis_tidak_terpenuhi:{ bg: '#FEE4E2', text: '#912018', label: 'Kritis Tidak Terpenuhi' },
+  kritis_terpenuhi:      { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis'      },
+  kritis_tidak_terpenuhi:{ bg: '#FEE4E2', text: '#912018', label: 'Kritis' },
   sedang:                { bg: '#FFFAEB', text: '#F79009', label: 'Sedang'                 },
   aman:                  { bg: '#ECFDF3', text: '#039855', label: 'Aman'                   },
   // legacy fallback

@@ -281,6 +281,12 @@ export default function DashboardPage() {
       asetApi.getMapOverview()
         .then((res) => {
           const overview = res.data
+          const getTipe = (name: string): 'SUTET' | 'SUTT' | 'SKTT' | 'gardu' => {
+            const n = (name ?? '').toUpperCase()
+            if (n.includes('SUTET')) return 'SUTET'
+            if (n.includes('SKTT') || n.includes('JOINT')) return 'SKTT'
+            return 'SUTT'
+          }
           // Transform aset towers to FeaturedTower format expected by TowerMapGoogle
           const mapTowers = (overview.towers ?? []).map((t: any) => {
             const types: string[] = t.kerawanan_types?.length
@@ -291,7 +297,7 @@ export default function DashboardPage() {
               nama:       t.name,
               lat:        t.lat,
               lng:        t.lng,
-              tipe:       'SUTT' as const,
+              tipe:       getTipe(t.name),
               jalur:      null,
               nomorUrut:  null,
               updatedAt:  t.updated_at ?? null,

@@ -1994,6 +1994,7 @@ const EMPTY_FORM = {
   tanggalWaktu: new Date().toISOString().slice(0, 16),
   levelRisiko: 'sedang',
   status: 'berlangsung',
+  progresLaporan: 'sedang_berlangsung',
   lokasiDetail: '',     // stores span "T-x s/d T-y" for ppl
   deskripsi: '',        // Uraian Pekerjaan
   keterangan: '',       // Upaya Pengendalian (ppl) / notes

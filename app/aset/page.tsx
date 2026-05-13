@@ -1116,7 +1116,7 @@ export default function AsetPage() {
       </div>
 
       {/* SKTT Routes Section */}
-      {skttRoutes.length > 0 && (
+      {/* {skttRoutes.length > 0 && (
         <div className="mt-10">
           <div className="flex items-center justify-between mb-4 px-2">
              <h2 className="text-[16px] font-bold text-gray-800 flex items-center gap-2">
@@ -1160,7 +1160,7 @@ export default function AsetPage() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       <AsetAddDrawer open={addOpen} onClose={() => setAddOpen(false)} onSaved={fetchData} />
       <AsetDetailDrawer 

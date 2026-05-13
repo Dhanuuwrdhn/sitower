@@ -1748,6 +1748,7 @@ function LaporanDrawer({
   const [locating, setLocating] = useState(false)
   const [useGPS, setUseGPS] = useState(false)
   const [detectedMsg, setDetectedMsg] = useState('')
+  const [gpsLocked, setGpsLocked] = useState(false)
   const [alertVisible, setAlertVisible] = useState(true)
 
   // Mobile bottom-sheet state
@@ -1791,6 +1792,7 @@ function LaporanDrawer({
         setFotoUrls([])
         setDetectedMsg('')
         setUseGPS(false)
+        setGpsLocked(false)
         if (initialFotos && initialFotos.length > 0) {
           setTimeout(() => { document.getElementById('btn-detect-location')?.click() }, 100)
         }
@@ -1815,6 +1817,7 @@ function LaporanDrawer({
         const towerRadius = nearest?.radius ?? 100
         if (nearest && min <= towerRadius) {
           setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: nearest!.nomorTower }))
+          setGpsLocked(true)
           setDetectedMsg(`📍 Tower ${nearest.nomorTower} (${Math.round(min)}m)`)
           toast.success('Tower terdekat dipilih!')
         } else if (nearest) {
@@ -2002,6 +2005,11 @@ function LaporanDrawer({
         </label>
         {readOnly ? (
           <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
+        ) : isMobile && gpsLocked ? (
+          <div className="form-input bg-app-bg flex items-center justify-between">
+            <span style={{ fontSize: 14, color: '#1B1B1B', fontWeight: 500 }}>{form.towerLabel || '—'}</span>
+            <span style={{ fontSize: 11, color: '#039855', fontWeight: 600 }}>📍 GPS</span>
+          </div>
         ) : isMobile ? (
           <button
             type="button"
@@ -2446,6 +2454,7 @@ export default function GangguanPage() {
   const [importFile, setImportFile] = useState<File | null>(null)
   const [importing, setImporting] = useState(false)
   const importInputRef = useRef<HTMLInputElement>(null)
+  const mobileAddCameraRef = useRef<HTMLInputElement>(null)
 
   // Drawer / modal state
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -2519,7 +2528,19 @@ export default function GangguanPage() {
     setPage(1)
   }
 
-  function openAdd() { setEditRow(null); setViewMode('edit'); setPendingFotos([]); setDrawerOpen(true) }
+  function openAdd() {
+    setEditRow(null); setViewMode('edit')
+    if (isMobile) {
+      mobileAddCameraRef.current?.click()
+    } else {
+      setPendingFotos([]); setDrawerOpen(true)
+    }
+  }
+  function handleMobileAddCapture(files: FileList) {
+    const arr = Array.from(files).filter(f => /\.(jpe?g|png|webp)$/i.test(f.name))
+    setPendingFotos(arr)
+    setDrawerOpen(true)
+  }
   function openEdit(row: any) { setEditRow(row); setViewMode('edit'); setDrawerOpen(true) }
   function openDetail(row: any) { setEditRow(row); setViewMode('detail'); setDrawerOpen(true) }
 
@@ -2798,6 +2819,16 @@ export default function GangguanPage() {
           </div>
         </div>
       </div>
+
+      {/* Hidden camera input for mobile add flow */}
+      <input
+        ref={mobileAddCameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={e => { if (e.target.files?.length) handleMobileAddCapture(e.target.files); e.target.value = '' }}
+      />
 
       {/* Drawer */}
       <LaporanDrawer

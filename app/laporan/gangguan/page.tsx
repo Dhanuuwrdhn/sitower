@@ -294,18 +294,6 @@ function RowActions({
             </>
           )}
 
-          <div style={{ height: 1, background: '#E1E8EC' }} />
-
-          <button
-            onClick={() => { setOpen(false); onEdit(row) }}
-            style={itemStyle}
-            onMouseEnter={(e) => (e.currentTarget.style.background = '#F6F9FC')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-          >
-            <Pencil size={16} />
-            Edit Laporan
-          </button>
-
           {showDelete && (
             <>
               <div style={{ height: 1, background: '#E1E8EC' }} />

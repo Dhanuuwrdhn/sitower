@@ -11,6 +11,8 @@ export const getUser = () => {
 
 export const getToken = () => Cookies.get('sitower_token')
 export const isAdmin = () => getUser()?.role === 'admin'
+export const isSuperadmin = () => getUser()?.role === 'superadmin'
+export const isAdminOrSuperadmin = () => isAdmin() || isSuperadmin()
 export const isTeknisi = () => getUser()?.role === 'teknisi'
 export const isLoggedIn = () => !!getToken()
 

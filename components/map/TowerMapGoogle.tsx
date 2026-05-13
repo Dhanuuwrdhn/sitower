@@ -153,9 +153,9 @@ function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', ker
     let dotColor = '#3B82F6'
     if (tipe === 'SUTET') dotColor = '#e65100'
     if (tipe === 'SKTT') dotColor = '#7c3aed'
-    const W = 12, H = 12, cx = 6, cy = 6, r = 4
+    const W = 8, H = 8, cx = 4, cy = 4, r = 3
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-      <circle cx="${cx}" cy="${cy}" r="${r}" fill="${dotColor}" stroke="#FFFFFF" stroke-width="1.5"/>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="${dotColor}" stroke="#FFFFFF" stroke-width="1"/>
     </svg>`
     return {
       url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
@@ -280,18 +280,18 @@ function JalurKmlLines({ jalurKml, visibleTypes }: {
       const color = jalur.warna ?? KML_JALUR_COLORS[jalur.tipe] ?? '#6B7280'
 
       if (path.length >= 2) {
-        const strokeWeight  = isSutet ? 4 : 3
+        const strokeWeight  = isSutet ? 2 : 1.5
         const strokeOpacity = isSktt ? 0 : 0.85
         const zIndex = isSutet ? 36 : isSktt ? 16 : 26
 
         const icons: google.maps.PolylineOptions['icons'] = isSktt
-          ? [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3, strokeColor: color }, offset: '0', repeat: '14px' }]
+          ? [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 2, strokeColor: color }, offset: '0', repeat: '18px' }]
           : undefined
 
         if (!isSktt) {
           lines.push(new window.google.maps.Polyline({
-            path, strokeColor: '#FFFFFF', strokeOpacity: 0.45,
-            strokeWeight: strokeWeight + 4, zIndex: zIndex - 1, map,
+            path, strokeColor: '#FFFFFF', strokeOpacity: 0.3,
+            strokeWeight: strokeWeight + 1, zIndex: zIndex - 1, map,
           }))
         }
 
@@ -325,11 +325,11 @@ function JalurKmlLines({ jalurKml, visibleTypes }: {
             map,
             icon: {
               path: window.google.maps.SymbolPath.CIRCLE,
-              scale: 5,
+              scale: 3,
               fillColor: '#000000',
               fillOpacity: 1,
               strokeColor: '#FFFFFF',
-              strokeWeight: 1.5,
+              strokeWeight: 1,
             },
             title: jalur.nama,
             zIndex: 20,
@@ -577,6 +577,7 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
   const [selected, setSelected] = useState<FeaturedTower | null>(null)
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
   const [layerPanelOpen, setLayerPanelOpen] = useState(false)
+  const [zoom, setZoom] = useState(10)
   const [visibleLayers, setVisibleLayers] = useState<Set<string>>(new Set(['SUTT', 'SUTET']))
 
   function toggleLayer(tipe: string) {
@@ -589,9 +590,13 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
 
   const displayTowers = useMemo<FeaturedTower[]>(() => {
     const all = towers ?? []
-    if (!activeFilter) return all
-    return all.filter((t) => t.kerawanan.some((k) => normKat(k.kategori) === activeFilter))
-  }, [towers, activeFilter])
+    const filtered = !activeFilter
+      ? all
+      : all.filter((t) => t.kerawanan.some((k) => normKat(k.kategori) === activeFilter))
+    // Hide normal towers (no kerawanan) when zoomed out — reduces clutter
+    if (zoom < 13) return filtered.filter((t) => t.kerawanan.length > 0)
+    return filtered
+  }, [towers, activeFilter, zoom])
 
   // Count per filter category for tab badges
   const filterCounts = useMemo(() => {
@@ -640,6 +645,7 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
           streetViewControl={false}
           fullscreenControl={false}
         >
+          <ZoomWatcher onZoomChange={setZoom} />
           {jalurKml && jalurKml.length > 0 && <JalurKmlLines jalurKml={jalurKml} visibleTypes={visibleLayers} />}
           <TowerMarkers towers={displayTowers} onSelect={handleSelect} />
           {selected && <TowerPopup tower={selected} onClose={() => setSelected(null)} />}

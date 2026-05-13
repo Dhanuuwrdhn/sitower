@@ -150,9 +150,9 @@ const TWEMOJI_BODIES: Record<string, string> = {
  */
 function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', kerawanan: KerawananItem[]) {
   if (topLevel === 'normal') {
-    let dotColor = '#3B82F6'
+    let dotColor = '#0288D1'
     if (tipe === 'SUTET') dotColor = '#e65100'
-    if (tipe === 'SKTT') dotColor = '#7c3aed'
+    if (tipe === 'SKTT') dotColor = '#FF00FF'
     const W = 8, H = 8, cx = 4, cy = 4, r = 3
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
       <circle cx="${cx}" cy="${cy}" r="${r}" fill="${dotColor}" stroke="#FFFFFF" stroke-width="1"/>
@@ -326,7 +326,7 @@ function JalurKmlLines({ jalurKml, visibleTypes }: {
             icon: {
               path: window.google.maps.SymbolPath.CIRCLE,
               scale: 3,
-              fillColor: '#000000',
+              fillColor: color,
               fillOpacity: 1,
               strokeColor: '#FFFFFF',
               strokeWeight: 1,
@@ -528,10 +528,18 @@ function Legend() {
       boxShadow: '0 2px 8px rgba(0,0,0,0.15)', padding: '10px 14px', fontSize: 11, lineHeight: 1.9,
     }}>
       <p style={{ fontWeight: 700, fontSize: 11.5, marginBottom: 4, color: '#0f172a' }}>Legenda</p>
-      {/* Tower Normal */}
+      {/* Tower Normal per tipe */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#3B82F6', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #3B82F6', flexShrink: 0 }} />
-        <span style={{ color: '#374151' }}>Tower (Normal)</span>
+        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#0288D1', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #0288D1', flexShrink: 0 }} />
+        <span style={{ color: '#374151' }}>Tower SUTT (Normal)</span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#e65100', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #e65100', flexShrink: 0 }} />
+        <span style={{ color: '#374151' }}>Tower SUTET (Normal)</span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FF00FF', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #FF00FF', flexShrink: 0 }} />
+        <span style={{ color: '#374151' }}>Tower SKTT (Normal)</span>
       </div>
       {/* Tower with kerawanan — status colors */}
       {([
@@ -576,7 +584,7 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
   const [selected, setSelected] = useState<FeaturedTower | null>(null)
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
   const [layerPanelOpen, setLayerPanelOpen] = useState(false)
-  const [visibleLayers, setVisibleLayers] = useState<Set<string>>(new Set(['SUTT', 'SUTET']))
+  const [visibleLayers, setVisibleLayers] = useState<Set<string>>(new Set(['SUTT', 'SUTET', 'SKTT']))
 
   function toggleLayer(tipe: string) {
     setVisibleLayers(prev => {

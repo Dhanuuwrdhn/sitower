@@ -694,7 +694,7 @@ function AsetEditDrawer({
                  ))}
                  
                  {/* Existing Files */}
-                 {certs.map(cert => cert.dokumen.map(doc => (
+                 {certs.map(cert => cert.dokumen.map((doc: any) => (
                     <div key={doc.id} className="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm opacity-60">
                         <div className="aspect-[4/3] bg-gray-50 flex items-center justify-center p-4">
                            <FileText className="text-gray-400 w-10 h-10" />

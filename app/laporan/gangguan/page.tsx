@@ -105,9 +105,9 @@ const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {
   spanduk:              { bg: '#076C9E', text: '#FFFFFF' },
   brosur:               { bg: '#076C9E', text: '#FFFFFF' },
   surat:                { bg: '#076C9E', text: '#FFFFFF' },
-  sedang_berlangsung:   { bg: '#F79009', text: '#FFFFFF' },
+  sedang_berlangsung:   { bg: '#076C9E', text: '#FFFFFF' },
   selesai:              { bg: '#039855', text: '#FFFFFF' },
-  tidak_ada_aktivitas:  { bg: '#5F737F', text: '#FFFFFF' },
+  tidak_ada_aktivitas:  { bg: '#66757F', text: '#FFFFFF' },
 }
 
 const PROGRESS_TIPE_LIST = ['spanduk', 'brosur', 'laporan_baru', 'berita_acara', 'surat'] as const

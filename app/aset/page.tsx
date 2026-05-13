@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Eye, Pencil, X, MapPin, Zap, Activity, ExternalLink, Plus } from 'lucide-react'
-import { towersApi, asetApi } from '@/lib/api'
+import { Eye, Pencil, X, MapPin, Zap, Activity, ExternalLink, Plus, Trash2 } from 'lucide-react'
+import { towersApi, asetApi, jalurKmlApi } from '@/lib/api'
 import { isAdmin } from '@/lib/auth'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { ActionMenu } from '@/components/ui/ActionMenu'
@@ -566,6 +566,14 @@ export default function AsetPage() {
   const [isAdminUser, setIsAdminUser] = useState(false)
   useEffect(() => { setIsAdminUser(isAdmin()) }, [])
 
+  const [skttRoutes, setSkttRoutes] = useState<any[]>([])
+  useEffect(() => {
+    jalurKmlApi.getAll().then((r) => {
+      const all = r.data?.data ?? []
+      setSkttRoutes(all.filter((j: any) => j.tipe === 'SKTT'))
+    }).catch(() => {})
+  }, [])
+
   // Detail drawer
   const [detailOpen, setDetailOpen] = useState(false)
   const [detailRow, setDetailRow]   = useState<any>(null)
@@ -681,6 +689,66 @@ export default function AsetPage() {
         </div>
         <Pagination total={total} page={page} limit={limit} onChange={setPage} onLimitChange={setLimit} />
       </div>
+
+      {/* SKTT Routes Section */}
+      {skttRoutes.length > 0 && (
+        <div style={{ marginTop: 24 }}>
+          <h2 style={{ fontWeight: 700, fontSize: 16, color: '#1c1c1c', marginBottom: 12 }}>
+            Data SKTT
+            <span style={{ marginLeft: 8, fontSize: 12, fontWeight: 500, color: '#97aab3' }}>{skttRoutes.length} rute</span>
+          </h2>
+          <div className="card overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th className="w-10">No</th>
+                    <th>Nama Rute</th>
+                    <th>Tipe</th>
+                    <th>Jumlah Titik Koordinat</th>
+                    <th>Diimport</th>
+                    {isAdminUser && <th className="text-right pr-5">Aksi</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {skttRoutes.map((route: any, i: number) => (
+                    <tr key={route.id}>
+                      <td className="text-app-muted text-[12px]">{i + 1}</td>
+                      <td className="font-semibold text-app-text">{route.nama}</td>
+                      <td>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#FF00FF', background: '#FF00FF15', padding: '2px 10px', borderRadius: 999 }}>
+                          SKTT
+                        </span>
+                      </td>
+                      <td className="text-app-muted text-[12px]">{Array.isArray(route.path) ? route.path.length : 0} titik</td>
+                      <td className="text-app-muted text-[12px]">{route.createdAt ? new Date(route.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                      {isAdminUser && (
+                        <td className="text-right pr-4">
+                          <button
+                            onClick={async () => {
+                              if (!confirm(`Hapus rute "${route.nama}"?`)) return
+                              try {
+                                await jalurKmlApi.remove(route.id)
+                                setSkttRoutes((prev) => prev.filter((r) => r.id !== route.id))
+                                toast.success('Rute SKTT dihapus')
+                              } catch {
+                                toast.error('Gagal menghapus rute')
+                              }
+                            }}
+                            style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid #FECACA', background: '#FEF2F2', color: '#DC2626', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12 }}
+                          >
+                            <Trash2 size={12} /> Hapus
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
 
       <AsetAddDrawer open={addOpen} onClose={() => setAddOpen(false)} onSaved={fetchData} />
       <AsetDetailDrawer towerId={detailRow?.id ?? null} open={detailOpen} onClose={() => setDetailOpen(false)} />

@@ -175,20 +175,12 @@ function FilterPopover({
   onApply: (newFilters: any) => void
   onReset: () => void
 }) {
-  const [temp, setTemp] = useState(filters)
-
-  useEffect(() => {
-    if (open) setTemp(filters)
-  }, [open, filters])
-
   const toggle = (key: string, value: any) => {
-    setTemp((prev: any) => {
-      const current = prev[key] || []
-      const next = current.includes(value)
-        ? current.filter((v: any) => v !== value)
-        : [...current, value]
-      return { ...prev, [key]: next }
-    })
+    const current = filters[key] || []
+    const next = current.includes(value)
+      ? current.filter((v: any) => v !== value)
+      : [...current, value]
+    onApply({ ...filters, [key]: next })
   }
 
   if (!open) return null
@@ -198,105 +190,149 @@ function FilterPopover({
       {/* Click-outside backdrop */}
       <div className="fixed inset-0 z-[60]" onClick={onClose} />
       
-      <div className="absolute top-full right-0 mt-2 w-[380px] z-[70] bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 origin-top-right">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50/30">
-           <div className="flex items-center gap-2">
-              <SlidersHorizontal size={16} className="text-gray-900" />
-              <h2 className="text-[14px] font-bold text-gray-900 tracking-tight">Filter Data</h2>
-           </div>
-           <button onClick={onClose} className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"><X size={16} className="text-gray-500" /></button>
+      <div className="absolute top-full right-0 mt-2 w-[400px] z-[70] bg-white rounded-lg shadow-[0px_4px_8px_0px_rgba(28,28,28,0.15)] border border-[#E1E8EC] flex flex-col overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 origin-top-right">
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#E1E8EC]">
+           <span className="font-bold text-[14px] text-[#1C1C1C]">Filter</span>
+           <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded transition-colors"><X size={16} className="text-[#5F737F]" /></button>
         </div>
 
-        <div className="max-h-[450px] overflow-y-auto p-5 space-y-6">
+        <div className="max-h-[500px] overflow-y-auto">
            {/* TIPE */}
-           <section>
-              <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">Tipe Aset</h3>
+           <div className="p-4 flex flex-col gap-3">
+              <span className="font-bold text-[14px] text-[#1C1C1C]">Tipe Aset</span>
               <div className="flex flex-wrap gap-2">
                  {TIPE_CHIPS.map(t => {
-                   const active = temp.tipe?.includes(t)
+                   const active = filters.tipe?.includes(t)
                    return (
                      <button 
                        key={t}
                        onClick={() => toggle('tipe', t)}
-                       className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all border ${active ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-600/20' : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'}`}
+                       style={{ 
+                         padding: '4px 12px', 
+                         borderRadius: 18, 
+                         border: '1px solid', 
+                         borderColor: active ? '#076C9E' : '#E1E8EC', 
+                         background: active ? '#076C9E' : 'transparent', 
+                         color: active ? '#FFFFFF' : '#5F737F', 
+                         fontWeight: 500, 
+                         fontSize: 12, 
+                         cursor: 'pointer', 
+                         transition: 'all 0.15s' 
+                       }}
                      >
                        {t}
                      </button>
                    )
                  })}
               </div>
-           </section>
+           </div>
+           <div className="h-px bg-[#E1E8EC]" />
 
            {/* STATUS KERAWANAN */}
-           <section>
-              <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">Status Kerawanan</h3>
+           <div className="p-4 flex flex-col gap-3">
+              <span className="font-bold text-[14px] text-[#1C1C1C]">Status Kerawanan</span>
               <div className="flex flex-wrap gap-2">
                  {STATUS_CHIPS.map(s => {
-                   const active = temp.status?.includes(s.toLowerCase())
+                   const active = filters.status?.includes(s.toLowerCase())
                    return (
                      <button 
                        key={s}
                        onClick={() => toggle('status', s.toLowerCase())}
-                       className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all border ${active ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-600/20' : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'}`}
+                       style={{ 
+                         padding: '4px 12px', 
+                         borderRadius: 18, 
+                         border: '1px solid', 
+                         borderColor: active ? '#076C9E' : '#E1E8EC', 
+                         background: active ? '#076C9E' : 'transparent', 
+                         color: active ? '#FFFFFF' : '#5F737F', 
+                         fontWeight: 500, 
+                         fontSize: 12, 
+                         cursor: 'pointer', 
+                         transition: 'all 0.15s' 
+                       }}
                      >
                        {s}
                      </button>
                    )
                  })}
               </div>
-           </section>
+           </div>
+           <div className="h-px bg-[#E1E8EC]" />
 
            {/* JENIS KERAWANAN */}
-           <section>
-              <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">Jenis Kerawanan</h3>
+           <div className="p-4 flex flex-col gap-3">
+              <span className="font-bold text-[14px] text-[#1C1C1C]">Jenis Kerawanan</span>
               <div className="flex flex-wrap gap-2">
                  {JENIS_CHIPS.map(j => {
-                   const active = temp.jenis?.includes(j.id)
+                   const active = filters.jenis?.includes(j.id)
                    return (
                      <button 
                        key={j.id}
                        onClick={() => toggle('jenis', j.id)}
-                       className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all border ${active ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-600/20' : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'}`}
+                       style={{ 
+                         padding: '4px 12px', 
+                         borderRadius: 18, 
+                         border: '1px solid', 
+                         borderColor: active ? '#076C9E' : '#E1E8EC', 
+                         background: active ? '#076C9E' : 'transparent', 
+                         color: active ? '#FFFFFF' : '#5F737F', 
+                         fontWeight: 500, 
+                         fontSize: 12, 
+                         cursor: 'pointer', 
+                         transition: 'all 0.15s' 
+                       }}
                      >
                        {j.label}
                      </button>
                    )
                  })}
               </div>
-           </section>
+           </div>
+           <div className="h-px bg-[#E1E8EC]" />
 
            {/* STATUS SERTIFIKAT */}
-           <section>
-              <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">Status Sertifikat</h3>
+           <div className="p-4 flex flex-col gap-3">
+              <span className="font-bold text-[14px] text-[#1C1C1C]">Status Sertifikat</span>
               <div className="flex flex-wrap gap-2">
                  {SERTIFIKAT_CHIPS.map(s => {
-                   const active = temp.certified?.includes(s.id)
+                   const active = filters.certified?.includes(s.id)
                    return (
                      <button 
                        key={s.id}
                        onClick={() => toggle('certified', s.id)}
-                       className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all border ${active ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-600/20' : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'}`}
+                       style={{ 
+                         padding: '4px 12px', 
+                         borderRadius: 18, 
+                         border: '1px solid', 
+                         borderColor: active ? '#076C9E' : '#E1E8EC', 
+                         background: active ? '#076C9E' : 'transparent', 
+                         color: active ? '#FFFFFF' : '#5F737F', 
+                         fontWeight: 500, 
+                         fontSize: 12, 
+                         cursor: 'pointer', 
+                         transition: 'all 0.15s' 
+                       }}
                      >
                        {s.label}
                      </button>
                    )
                  })}
               </div>
-           </section>
+           </div>
         </div>
 
-        <div className="p-4 border-t border-gray-100 grid grid-cols-2 gap-3 bg-gray-50/30">
+        <div className="p-4 border-t border-[#E1E8EC] flex gap-3">
            <button 
-             onClick={() => { onReset(); onClose(); }}
-             className="w-full py-2.5 rounded-xl border border-red-100 text-red-500 font-bold text-[12px] hover:bg-red-50 transition-colors bg-white"
+             onClick={() => { onClose(); }}
+             className="flex-1 h-11 rounded-[22px] bg-[#076c9e] text-white font-semibold text-[14px] border-none cursor-pointer"
            >
-             Reset
+             Terapkan Filter
            </button>
            <button 
-             onClick={() => { onApply(temp); onClose(); }}
-             className="w-full py-2.5 rounded-xl bg-blue-600 text-white font-bold text-[12px] hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+             onClick={onReset}
+             style={{ padding: '10px 20px', borderRadius: 22, border: 'none', background: 'transparent', color: '#D92D20', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
            >
-             Terapkan
+             Hapus Filter
            </button>
         </div>
       </div>
@@ -1023,19 +1059,17 @@ export default function AsetPage() {
       {/* Filters */}
       <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-6 shadow-sm flex items-center gap-4">
         <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1) }} placeholder="Cari nama aset..." />
-        <div className="h-10 w-px bg-gray-100 hidden md:block" />
-        
+     
          <div className="relative">
             <button 
               onClick={() => setFilterOpen(!filterOpen)}
-              className={`h-11 px-5 rounded-xl border-2 flex items-center gap-2.5 transition-all font-bold text-[13px] ${
+              className={`h-11 px-3 rounded-xl border-2 flex items-center gap-2.5 transition-all font-bold text-[13px] ${
                 Object.values(activeFilters).flat().length > 0 
                   ? 'border-blue-600 bg-blue-50 text-blue-600 shadow-md shadow-blue-600/5' 
                   : 'border-gray-100 hover:border-gray-200 text-gray-500 bg-gray-50/30'
               }`}
             >
                <SlidersHorizontal size={18} />
-               Filter
                {Object.values(activeFilters).flat().length > 0 && (
                  <span className="bg-blue-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">
                    {Object.values(activeFilters).flat().length}

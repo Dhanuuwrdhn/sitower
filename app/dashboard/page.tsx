@@ -284,7 +284,7 @@ export default function DashboardPage() {
           const getTipe = (name: string): 'SUTET' | 'SUTT' | 'SKTT' | 'gardu' => {
             const n = (name ?? '').toUpperCase()
             if (n.includes('SUTET')) return 'SUTET'
-            if (n.includes('SKTT') || n.includes('JOINT')) return 'SKTT'
+            if (n.includes('SKTT') || n.includes('JOINT') || n.startsWith('TRS ')) return 'SKTT'
             return 'SUTT'
           }
           // Transform aset towers to FeaturedTower format expected by TowerMapGoogle
@@ -297,9 +297,8 @@ export default function DashboardPage() {
               nama:       t.name,
               lat:        t.lat,
               lng:        t.lng,
-              tipe:       getTipe(t.name),
-              jalur:      null,
-              nomorUrut:  null,
+              tipe:       t.tipe ?? getTipe(t.name),
+              bersertifikat: t.bersertifikat ?? false,
               updatedAt:  t.updated_at ?? null,
               kerawanan:  t.status !== 'aman'
                 ? types.map((jenis: string) => ({

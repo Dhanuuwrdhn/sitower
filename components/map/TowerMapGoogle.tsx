@@ -22,8 +22,7 @@ export interface FeaturedTower {
   tegangan?: string
   kerawanan: KerawananItem[]
   updatedAt?: string
-  jalur?: string | null
-  nomorUrut?: number | null
+  bersertifikat?: boolean
 }
 
 export interface JalurKmlItem {
@@ -470,8 +469,11 @@ function TowerPopup({ tower, onClose }: { tower: FeaturedTower; onClose: () => v
           Informasi Tower
         </div>
         <div style={{ color: '#1c1c1c', fontWeight: 600, marginBottom: 2, lineHeight: 1.4 }}>{tower.nama}</div>
-        <div style={{ color: '#97aab3', fontSize: 11, marginBottom: 10 }}>
+        <div style={{ color: '#97aab3', fontSize: 11, marginBottom: 6 }}>
           {tower.tipe}{tower.tegangan ? ` · ${tower.tegangan}` : ''}
+        </div>
+        <div style={{ marginBottom: 10, fontSize: 11, fontWeight: 700, color: tower.bersertifikat ? '#16a34a' : '#dc2626' }}>
+          {tower.bersertifikat ? 'Bersertifikat' : 'Tidak Bersertifikat'}
         </div>
 
         {hasKerawanan ? (
@@ -539,7 +541,7 @@ function Legend() {
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FF00FF', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #FF00FF', flexShrink: 0 }} />
-        <span style={{ color: '#374151' }}>Tower SKTT (Normal)</span>
+        <span style={{ color: '#374151' }}>SKTT (Normal)</span>
       </div>
       {/* Tower with kerawanan — status colors */}
       {([
@@ -596,9 +598,10 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
 
   const displayTowers = useMemo<FeaturedTower[]>(() => {
     const all = towers ?? []
-    if (!activeFilter) return all
-    return all.filter((t) => t.kerawanan.some((k) => normKat(k.kategori) === activeFilter))
-  }, [towers, activeFilter])
+    const byLayer = all.filter((t) => t.tipe === 'gardu' || visibleLayers.has(t.tipe))
+    if (!activeFilter) return byLayer
+    return byLayer.filter((t) => t.kerawanan.some((k) => normKat(k.kategori) === activeFilter))
+  }, [towers, activeFilter, visibleLayers])
 
   // Count per filter category for tab badges
   const filterCounts = useMemo(() => {
@@ -619,11 +622,13 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
     onTowerClick?.(t)
   }, [onTowerClick])
 
-  // Only show layer options that have data
+  // Only show layer options that have data — from either jalur or towers
   const availableLayerTypes = useMemo(() => {
-    const types = new Set((jalurKml ?? []).map((j) => j.tipe))
+    const types = new Set<string>()
+    for (const j of jalurKml ?? []) types.add(j.tipe)
+    for (const t of towers ?? []) if (t.tipe !== 'gardu') types.add(t.tipe)
     return ALL_LAYER_TYPES.filter((t) => types.has(t))
-  }, [jalurKml])
+  }, [jalurKml, towers])
 
   if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE') {
     return (
@@ -714,12 +719,12 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
             padding: '12px 16px', minWidth: 180,
           }}>
             <div style={{ fontWeight: 700, fontSize: 12, color: '#374151', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Tampilkan Jalur
+              Tampilkan Tipe
             </div>
             {([
-              { tipe: 'SUTT',  label: 'Jalur SUTT',  color: '#0288D1', dash: false },
-              { tipe: 'SUTET', label: 'Jalur SUTET', color: '#e65100', dash: false },
-              { tipe: 'SKTT',  label: 'Jalur SKTT',  color: '#FF00FF', dash: true  },
+              { tipe: 'SUTT',  label: 'SUTT',  color: '#0288D1', dash: false },
+              { tipe: 'SUTET', label: 'SUTET', color: '#e65100', dash: false },
+              { tipe: 'SKTT',  label: 'SKTT',  color: '#FF00FF', dash: true  },
             ] as { tipe: string; label: string; color: string; dash: boolean }[])
             .filter(({ tipe }) => availableLayerTypes.includes(tipe as typeof ALL_LAYER_TYPES[number]))
             .map(({ tipe, label, color, dash }) => (
@@ -743,7 +748,7 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
         )}
         <button
           onClick={() => setLayerPanelOpen(v => !v)}
-          title="Filter Jalur"
+          title="Filter Tipe"
           style={{
             width: 40, height: 40, borderRadius: 8,
             background: layerPanelOpen ? '#076c9e' : '#fff',

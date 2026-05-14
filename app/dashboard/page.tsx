@@ -300,11 +300,11 @@ export default function DashboardPage() {
               tipe:       t.tipe ?? getTipe(t.name),
               bersertifikat: t.bersertifikat ?? false,
               updatedAt:  t.updated_at ?? null,
-              kerawanan:  t.status !== 'aman'
+              kerawanan:  types.length > 0
                 ? types.map((jenis: string) => ({
                     kategori: jenis,
-                    level:    t.status as string,
-                    status:   t.status,
+                    level:    (t.status ?? 'aman') as string,
+                    status:   t.status ?? 'aman',
                   }))
                 : [],
             }

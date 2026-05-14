@@ -9,7 +9,7 @@ import {
   ChevronDown, MoreHorizontal, Eye, Pencil,
   ArrowLeft, AlertTriangle, FileText, ImagePlus, Clock,
 } from 'lucide-react'
-import { laporanApi, towersApi, importApi } from '@/lib/api'
+import { laporanApi, towersApi, importApi, pegawaiApi } from '@/lib/api'
 import { getUser, isAdmin, isSuperadmin } from '@/lib/auth'
 import { getDistance } from '@/lib/geo'
 import { resolveMediaUrl } from '@/lib/utils'
@@ -46,6 +46,7 @@ const STATUS_LABEL: Record<string, string> = {
   berlangsung:         'Sedang Berlangsung',
   selesai:             'Selesai',
   tidak_ada_aktifitas: 'Tidak Ada Aktifitas',
+  tidak_ada_aktivitas: 'Tidak Ada Aktivitas',
 }
 
 const LEVEL_OPTIONS = [
@@ -74,6 +75,7 @@ const STATUS_CLASS: Record<string, string> = {
   berlangsung:         'badge-berlangsung badge-blink',
   selesai:             'badge-selesai',
   tidak_ada_aktifitas: 'badge-menunggu',
+  tidak_ada_aktivitas: 'badge-menunggu',
 }
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
@@ -96,6 +98,7 @@ const PROGRESS_TIPE_LABEL: Record<string, string> = {
   surat:                'Surat',
   sedang_berlangsung:   'Sedang Berlangsung',
   selesai:              'Selesai',
+  tidak_ada_aktifitas:  'Tidak Ada Aktivitas',
   tidak_ada_aktivitas:  'Tidak Ada Aktivitas',
 }
 
@@ -107,6 +110,7 @@ const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {
   surat:                { bg: '#076C9E', text: '#FFFFFF' },
   sedang_berlangsung:   { bg: '#076C9E', text: '#FFFFFF' },
   selesai:              { bg: '#039855', text: '#FFFFFF' },
+  tidak_ada_aktifitas:  { bg: '#66757F', text: '#FFFFFF' },
   tidak_ada_aktivitas:  { bg: '#66757F', text: '#FFFFFF' },
 }
 
@@ -170,6 +174,120 @@ async function compressImage(file: File, maxPx = 1920, quality = 0.75): Promise<
     img.onerror = () => { URL.revokeObjectURL(url); resolve(file) }
     img.src = url
   })
+}
+
+// ── Searchable Select Component ────────────────────────────────────────────────
+
+function SearchableSelect({
+  label,
+  placeholder,
+  options,
+  values,
+  onChange,
+  onClear,
+}: {
+  label: string
+  placeholder: string
+  options: { value: string; label: string; sub?: string }[]
+  values: string[]
+  onChange: (vals: string[]) => void
+  onClear: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const filtered = options.filter(o => 
+    o.label.toLowerCase().includes(search.toLowerCase()) || 
+    (o.sub ?? '').toLowerCase().includes(search.toLowerCase())
+  )
+
+  const toggle = (v: string) => {
+    if (values.includes(v)) onChange(values.filter(x => x !== v))
+    else onChange([...values, v])
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5" ref={ref}>
+      <div className="flex items-center justify-between">
+        <span className="font-bold text-[14px] text-[#1C1C1C]">{label}</span>
+        {values.length > 0 && (
+          <button onClick={(e) => { e.stopPropagation(); onClear() }} className="text-[11px] text-[#D92D20] font-semibold hover:underline">
+            Reset
+          </button>
+        )}
+      </div>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          className="w-full min-h-[44px] px-3 py-2 border border-[#E1E8EC] rounded-lg bg-white flex flex-wrap items-center gap-1.5 text-left transition-all hover:border-[#076C9E]"
+        >
+          {values.length === 0 ? (
+            <span className="text-[#97AAB3] text-[14px]">{placeholder}</span>
+          ) : (
+            values.map(v => {
+              const opt = options.find(o => o.value === v)
+              return (
+                <span key={v} className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#F0F9FF] text-[#076C9E] border border-[#B9E6FE] rounded text-[12px] font-medium">
+                  {opt?.label ?? v}
+                  <X size={12} className="cursor-pointer" onClick={(e) => { e.stopPropagation(); toggle(v) }} />
+                </span>
+              )
+            })
+          )}
+          <div className="ml-auto flex items-center gap-1">
+             <ChevronDown size={14} className={`text-[#5F737F] transition-transform ${open ? 'rotate-180' : ''}`} />
+          </div>
+        </button>
+
+        {open && (
+          <div className="mt-1 w-full bg-white border border-[#E1E8EC] rounded-xl shadow-sm overflow-hidden flex flex-col max-h-[280px]">
+            <div className="p-2 border-b border-[#E1E8EC]">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-[#F6F9FC] rounded-lg border border-[#E1E8EC]">
+                <Search size={14} className="text-[#5F737F]" />
+                <input
+                  autoFocus
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Cari..."
+                  className="bg-transparent border-none outline-none text-[13px] text-[#1C1C1C] w-full"
+                />
+              </div>
+            </div>
+            <div className="overflow-y-auto flex-1 py-1">
+              {filtered.map(opt => {
+                const active = values.includes(opt.value)
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => toggle(opt.value)}
+                    className={`w-full text-left px-4 py-2.5 flex flex-col transition-colors ${active ? 'bg-[#F0F9FF]' : 'hover:bg-[#F6F9FC]'}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[13px] font-medium ${active ? 'text-[#076C9E]' : 'text-[#1C1C1C]'}`}>{opt.label ?? opt.value}</span>
+                      {active && <div className="w-4 h-4 rounded-full bg-[#076C9E] flex items-center justify-center"><X size={10} color="#fff" /></div>}
+                    </div>
+                    {opt.sub && <span className="text-[11px] text-[#5F737F] leading-tight mt-0.5">{opt.sub}</span>}
+                  </button>
+                )
+              })}
+              {filtered.length === 0 && <p className="text-center py-4 text-[13px] text-[#97AAB3]">Tidak ditemukan</p>}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
 
 // ── Row action 3-dot menu ─────────────────────────────────────────────────────
@@ -260,7 +378,7 @@ function RowActions({
     <div className="inline-flex mx-auto">
       <button
         ref={btnRef}
-        onClick={handleToggle}
+        onClick={(e) => { e.stopPropagation(); handleToggle() }}
         className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted hover:text-app-text transition-colors"
         title="Aksi"
       >
@@ -338,16 +456,12 @@ interface TowerOption {
 // Parse display label and subtitle from tower nama
 function parseTowerDisplay(t: TowerOption): { label: string; sub: string } {
   const nama = t.nama ?? t.nomorTower
-  // "Tower/Span T6 - T7 (SUTET 500KV DURIKOSAMBI - KEMBANGAN)" → label="T6 - T7", sub="SUTET 500KV · DURIKOSAMBI–KEMBANGAN"
   const spanMatch = nama.match(/Tower\/Span\s+(.+?)\s+\((.+)\)/)
   if (spanMatch) {
     const span = spanMatch[1].trim()
-    const detail = spanMatch[2].trim()
-    return { label: span, sub: detail }
+    return { label: nama, sub: span }
   }
-  // "TOWER SUTET KMBGN-DKSBI 500kV #P1A" → label=id, sub=nama
-  if (nama !== t.id) return { label: t.id, sub: nama }
-  return { label: t.id, sub: '' }
+  return { label: nama, sub: (t.id && t.id !== nama) ? t.id : '' }
 }
 
 function resolveGroup(t: TowerOption): string {
@@ -418,7 +532,7 @@ function TowerDropdown({
         className="form-input flex items-center justify-between text-left"
       >
         <span className={selectedLabel ? 'text-app-text' : 'text-app-subtle'}>
-          {selectedLabel || 'Pilih tower...'}
+          {selectedLabel || 'Pilih ruas...'}
         </span>
         <ChevronDown size={14} className="text-app-muted shrink-0" />
       </button>
@@ -430,7 +544,7 @@ function TowerDropdown({
               autoFocus
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari nomor tower atau jalur..."
+              placeholder="Cari ruas atau jalur..."
               className="form-input text-[12px]"
             />
           </div>
@@ -459,7 +573,7 @@ function TowerDropdown({
               ) : null
             )}
             {groupOrder.every((g) => grouped[g].length === 0) && (
-              <p className="text-center text-[13px] text-app-muted py-6">Tower tidak ditemukan</p>
+              <p className="text-center text-[13px] text-app-muted py-6">Ruas tidak ditemukan</p>
             )}
           </div>
         </div>
@@ -1494,9 +1608,9 @@ function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan
             <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>Informasi Progres Laporan</span>
             <div>
               <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 6 }}>Progres Laporan</label>
-              <select className="form-input" value={riwayatForm.progresLaporan} onChange={e => setRiwayatForm(f => ({ ...f, progresLaporan: e.target.value }))}>
+              <select className="form-input" value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(riwayatForm.progresLaporan) ? 'tidak_ada_aktifitas' : riwayatForm.progresLaporan} onChange={e => setRiwayatForm(f => ({ ...f, progresLaporan: e.target.value }))}>
                 <option value="sedang_berlangsung">Sedang Berlangsung</option>
-                <option value="tidak_ada_aktivitas">Tidak Ada Aktivitas</option>
+                <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
                 <option value="selesai">Selesai</option>
               </select>
             </div>
@@ -2101,7 +2215,7 @@ function LaporanDrawer({
         setForm({
           ...EMPTY_FORM,
           towerId:      initial.towerId ?? '',
-          towerLabel:   initial.tower?.nomorTower ?? initial.tower?.id ?? '',
+          towerLabel:   initial.tower?.nama ?? initial.tower?.id ?? '',
           jenisGangguan: initial.jenisGangguan ?? '',
           tanggalWaktu: initial.tanggal?.slice(0, 16) ?? new Date().toISOString().slice(0, 16),
           levelRisiko:  initial.levelRisiko ?? 'sedang',
@@ -2338,7 +2452,7 @@ function LaporanDrawer({
       <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>
         <div className="flex-1 min-w-0">
           <label className="block text-[14px] font-bold text-app-text mb-2">
-            {isPPL ? 'No. Tower' : 'Tower Terganggu'}
+            {isPPL ? 'No. Ruas' : 'Ruas Terganggu'}
           </label>
           {readOnly ? (
             <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
@@ -2359,7 +2473,7 @@ function LaporanDrawer({
               }}
             >
               <span style={{ fontSize: 14, color: form.towerId ? '#5F737F' : '#97AAB3', fontWeight: 500 }}>
-                {form.towerLabel || 'Pilih tower...'}
+                {form.towerLabel || 'Pilih ruas...'}
               </span>
               <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
             </button>
@@ -2492,12 +2606,12 @@ function LaporanDrawer({
         <div>
           <label className={`block font-semibold text-app-text mb-2 ${isMobile ? 'text-[14px]' : 'text-[12px]'}`}>Progres Laporan</label>
           <select
-            value={form.progresLaporan}
+            value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(form.progresLaporan) ? 'tidak_ada_aktifitas' : form.progresLaporan}
             onChange={(e) => set('progresLaporan', e.target.value)}
             className="form-input"
           >
             <option value="sedang_berlangsung">Sedang Berlangsung</option>
-            <option value="tidak_ada_aktivitas">Tidak Ada Aktivitas</option>
+            <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
             <option value="selesai">Selesai</option>
           </select>
         </div>
@@ -2601,7 +2715,7 @@ function LaporanDrawer({
       {(isCUI || isCleanup) && (
         <div className="space-y-4 p-4 bg-app-bg rounded-xl border border-app-border">
           <p className="text-[11px] font-bold text-app-muted uppercase tracking-wider">{isCUI ? 'Detail CUI' : 'Detail Cleanup'}</p>
-          <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Teknisi</label><input disabled={readOnly} type="text" value={form.teknisi} onChange={(e) => set('teknisi', e.target.value)} className="form-input" /></div>
+          <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Line Walker</label><input disabled={readOnly} type="text" value={form.teknisi} onChange={(e) => set('teknisi', e.target.value)} className="form-input" /></div>
           <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">No. SPK</label><input disabled={readOnly} type="text" value={form.noSpk} onChange={(e) => set('noSpk', e.target.value)} className="form-input" /></div>
           {isCUI && (
             <>
@@ -2843,8 +2957,11 @@ export default function GangguanPage() {
   const [jenis, setJenis] = useState<string[]>([])
   const [statusFilter, setStatusFilter] = useState<string[]>([])
   const [levelFilter, setLevelFilter] = useState<string[]>([])
+  const [teknisiFilter, setTeknisiFilter] = useState<string[]>([])
+  const [towerFilter, setTowerFilter] = useState<string[]>([])
   const [tglMulai, setTglMulai] = useState('')
   const [tglAkhir, setTglAkhir] = useState('')
+  const [pegawaiOptions, setPegawaiOptions] = useState<any[]>([])
 
   // Pagination
   const [page, setPage] = useState(1)
@@ -2882,7 +2999,7 @@ export default function GangguanPage() {
   }, [filterOpen])
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
-  const hasActiveFilters = Boolean(search.trim() || jenis.length || statusFilter.length || levelFilter.length || tglMulai || tglAkhir)
+  const hasActiveFilters = Boolean(search.trim() || jenis.length || statusFilter.length || levelFilter.length || teknisiFilter.length || towerFilter.length || tglMulai || tglAkhir)
   const { isMobile } = useSidebar()
 
   const fetchData = useCallback(async () => {
@@ -2895,6 +3012,8 @@ export default function GangguanPage() {
         jenisGangguan: jenis.length ? jenis.join(',') : undefined,
         status: statusFilter.length ? statusFilter.join(',') : undefined,
         levelRisiko: levelFilter.length ? levelFilter.join(',') : undefined,
+        towerId: towerFilter.length ? towerFilter.join(',') : undefined,
+        teknisi: teknisiFilter.length ? teknisiFilter.join(',') : undefined,
         tglMulai: tglMulai || undefined,
         tglAkhir: tglAkhir || undefined,
       })
@@ -2912,7 +3031,7 @@ export default function GangguanPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize, search, jenis, statusFilter, levelFilter, tglMulai, tglAkhir])
+  }, [page, pageSize, search, jenis, statusFilter, levelFilter, towerFilter, teknisiFilter, tglMulai, tglAkhir])
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -2920,8 +3039,18 @@ export default function GangguanPage() {
   useEffect(() => { setIsAdminUser(isAdmin() || isSuperadmin()) }, [])
 
   useEffect(() => {
-    towersApi.getDropdown()
-      .then((res) => setTowerOptions(res.data ?? []))
+    towersApi.getAll({ page: 1, limit: 500 })
+      .then((res) => {
+        const payload = res.data
+        setTowerOptions(Array.isArray(payload) ? payload : (payload.data ?? []))
+      })
+      .catch(() => {})
+    
+    pegawaiApi.getAll()
+      .then((res) => {
+        const payload = res.data
+        setPegawaiOptions(Array.isArray(payload) ? payload : (payload.data ?? []))
+      })
       .catch(() => {})
   }, [])
 
@@ -2930,6 +3059,8 @@ export default function GangguanPage() {
     setJenis([])
     setStatusFilter([])
     setLevelFilter([])
+    setTeknisiFilter([])
+    setTowerFilter([])
     setTglMulai('')
     setTglAkhir('')
     setPage(1)
@@ -3092,7 +3223,10 @@ export default function GangguanPage() {
                       <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Progres Laporan</span>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                         {STATUS_FILTER_OPTIONS.filter(o => o.value).map(o => {
-                          const active = statusFilter.includes(o.value)
+                          const isTidakAda = o.value === 'tidak_ada_aktifitas'
+                          const active = isTidakAda
+                            ? (statusFilter.includes('tidak_ada_aktifitas') || statusFilter.includes('tidak_ada_aktivitas'))
+                            : statusFilter.includes(o.value)
                           return (
                             <button key={o.value} onClick={() => { setStatusFilter(active ? statusFilter.filter(v => v !== o.value) : [...statusFilter, o.value]); setPage(1) }}
                               style={{ padding: '4px 12px', borderRadius: 18, border: '1px solid', borderColor: active ? '#076C9E' : '#E1E8EC', background: active ? '#076C9E' : 'transparent', color: active ? '#FFFFFF' : '#5F737F', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
@@ -3100,6 +3234,35 @@ export default function GangguanPage() {
                           )
                         })}
                       </div>
+                    </div>
+                    <div style={{ height: 1, background: '#E1E8EC' }} />
+
+                    {/* Teknisi / Line Walker */}
+                    <div style={{ padding: '12px 16px' }}>
+                      <SearchableSelect
+                        label="Line Walker / Teknisi"
+                        placeholder="Pilih petugas..."
+                        options={pegawaiOptions.map(p => ({ value: p.nama, label: p.nama, sub: `${p.jabatan} · ${p.unit}` }))}
+                        values={teknisiFilter}
+                        onChange={(vals) => { setTeknisiFilter(vals); setPage(1) }}
+                        onClear={() => { setTeknisiFilter([]); setPage(1) }}
+                      />
+                    </div>
+                    <div style={{ height: 1, background: '#E1E8EC' }} />
+
+                    {/* Tower Name */}
+                    <div style={{ padding: '12px 16px' }}>
+                      <SearchableSelect
+                        label="Ruas"
+                        placeholder="Pilih ruas..."
+                        options={towerOptions.map(t => {
+                          const { label, sub } = parseTowerDisplay(t)
+                          return { value: t.id, label, sub }
+                        })}
+                        values={towerFilter}
+                        onChange={(vals) => { setTowerFilter(vals); setPage(1) }}
+                        onClear={() => { setTowerFilter([]); setPage(1) }}
+                      />
                     </div>
                     <div style={{ height: 1, background: '#E1E8EC' }} />
 
@@ -3158,7 +3321,7 @@ export default function GangguanPage() {
                 <th>Tanggal</th>
                 <th>Ruas</th>
                 <th>Jenis Kerawanan</th>
-                <th>Teknisi</th>
+                <th>Line Walker</th>
                 <th>Status Kerawanan</th>
                 <th>Progres Laporan</th>
                 <th style={{ textAlign: 'center' }}>Aksi</th>
@@ -3179,7 +3342,7 @@ export default function GangguanPage() {
                 </tr>
               ) : (
                 rows.map((row) => (
-                  <tr key={row.id}>
+                  <tr key={row.id} onClick={() => openDetail(row)} style={{ cursor: 'pointer' }}>
                     <td className="text-[14px] text-[#5f737f] whitespace-nowrap">{formatTanggal(row.tanggal)}</td>
                     <td className="text-[14px] text-[#5f737f] max-w-[220px]">
                       <span className="block truncate" title={row.tower?.nama ?? row.towerId}>
@@ -3187,7 +3350,7 @@ export default function GangguanPage() {
                       </span>
                     </td>
                     <td className="text-[14px] text-[#5f737f]">{JENIS_LABEL[row.jenisGangguan] ?? row.jenisGangguan ?? '—'}</td>
-                    <td className="text-[14px] text-[#5f737f]">{row.teknisi ?? row.pelapor?.nama ?? '—'}</td>
+                    <td className="text-[14px] text-[#5f737f]">{row.pelapor?.nama ?? '—'}</td>
                     <td><LevelBadge level={row.levelRisiko} /></td>
                     <td><ProgressBadge tipe={row.progresLaporan} /></td>
                     <td className="text-center">
@@ -3358,7 +3521,10 @@ export default function GangguanPage() {
             <p className="font-bold text-base text-[#1C1C1C] mb-3">Progres Laporan</p>
             <div className="flex flex-wrap gap-2 mb-5">
               {STATUS_FILTER_OPTIONS.filter(o => o.value).map(o => {
-                const active = statusFilter.includes(o.value)
+                const isTidakAda = o.value === 'tidak_ada_aktifitas'
+                const active = isTidakAda
+                  ? (statusFilter.includes('tidak_ada_aktifitas') || statusFilter.includes('tidak_ada_aktivitas'))
+                  : statusFilter.includes(o.value)
                 return (
                   <button key={o.value}
                     onClick={() => { setStatusFilter(active ? statusFilter.filter(v => v !== o.value) : [...statusFilter, o.value]); setPage(1) }}
@@ -3370,6 +3536,33 @@ export default function GangguanPage() {
                   >{o.label}</button>
                 )
               })}
+            </div>
+
+            {/* Teknisi / Line Walker (Mobile) */}
+            <div className="mb-5">
+              <SearchableSelect
+                label="Line Walker / Teknisi"
+                placeholder="Pilih petugas..."
+                options={pegawaiOptions.map(p => ({ value: p.nama, label: p.nama, sub: `${p.jabatan} · ${p.unit}` }))}
+                values={teknisiFilter}
+                onChange={(vals) => { setTeknisiFilter(vals); setPage(1) }}
+                onClear={() => { setTeknisiFilter([]); setPage(1) }}
+              />
+            </div>
+
+            {/* Tower Name (Mobile) */}
+            <div className="mb-5">
+              <SearchableSelect
+                label="Ruas"
+                placeholder="Pilih ruas..."
+                options={towerOptions.map(t => {
+                  const { label, sub } = parseTowerDisplay(t)
+                  return { value: t.id, label, sub }
+                })}
+                values={towerFilter}
+                onChange={(vals) => { setTowerFilter(vals); setPage(1) }}
+                onClear={() => { setTowerFilter([]); setPage(1) }}
+              />
             </div>
 
             {/* Periode — side-by-side date pickers, Figma: 191x44 each */}

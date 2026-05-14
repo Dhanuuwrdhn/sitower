@@ -1297,6 +1297,7 @@ function PhotoLightbox({
 
 function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }: { laporan: any; onSaved?: () => void; onClose?: () => void; onDelete?: (l: any) => void; autoOpenUpdate?: boolean }) {
   const { isMobile } = useSidebar()
+  const [detailLaporan, setDetailLaporan] = useState(laporan)
   const [progress, setProgress] = useState<Record<string, any[]>>({ spanduk: [], brosur: [], laporan_baru: [], berita_acara: [], surat: [] })
   const [riwayat, setRiwayat] = useState<any[]>([])
   const [uploading, setUploading] = useState<string | null>(null)
@@ -1309,7 +1310,20 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   const riwayatFileRefs = useRef<{ foto: HTMLInputElement | null; beritaAcara: HTMLInputElement | null; spanduk: HTMLInputElement | null; surat: HTMLInputElement | null }>({ foto: null, beritaAcara: null, spanduk: null, surat: null })
   const progressRefs = useRef<Record<string, HTMLInputElement | null>>({})
   const user = getUser()
-  const isPPL = laporan?.jenisGangguan === 'pekerjaan_pihak_lain'
+  const activeLaporan = detailLaporan ?? laporan
+  const isPPL = activeLaporan?.jenisGangguan === 'pekerjaan_pihak_lain'
+
+  async function reloadDetailData() {
+    if (!activeLaporan?.id) return
+    const [laporanRes, progressRes, riwayatRes] = await Promise.all([
+      laporanApi.getById(activeLaporan.id),
+      laporanApi.getProgress(activeLaporan.id),
+      laporanApi.getRiwayat(activeLaporan.id),
+    ])
+    setDetailLaporan(laporanRes.data)
+    setProgress(progressRes.data)
+    setRiwayat(riwayatRes.data ?? [])
+  }
 
   async function handleDelete(id: string) {
     try {
@@ -1323,18 +1337,21 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   }
 
   useEffect(() => {
-    if (autoOpenUpdate && laporan?.status !== 'selesai') setShowUpdateDrawer(true)
-  }, [autoOpenUpdate, laporan?.status])
+    setDetailLaporan(laporan)
+  }, [laporan])
 
   useEffect(() => {
-    if (!laporan?.id) return
-    laporanApi.getProgress(laporan.id).then(r => setProgress(r.data)).catch(() => { })
-    laporanApi.getRiwayat(laporan.id).then(r => setRiwayat(r.data ?? [])).catch(() => { })
-  }, [laporan?.id])
+    if (autoOpenUpdate && activeLaporan?.status !== 'selesai') setShowUpdateDrawer(true)
+  }, [autoOpenUpdate, activeLaporan?.status])
+
+  useEffect(() => {
+    if (!activeLaporan?.id) return
+    reloadDetailData().catch(() => { })
+  }, [activeLaporan?.id])
 
   async function handleAddRiwayat(e?: React.FormEvent) {
     e?.preventDefault()
-    if (!laporan?.id) return
+    if (!activeLaporan?.id) return
     setSavingRiwayat(true)
     try {
       const fd = new FormData()
@@ -1349,8 +1366,8 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
       riwayatFiles.beritaAcara.forEach(f => fd.append('beritaAcara', f))
       riwayatFiles.spanduk.forEach(f => fd.append('spanduk', f))
       riwayatFiles.surat.forEach(f => fd.append('surat', f))
-      const res = await laporanApi.addRiwayat(laporan.id, fd)
-      setRiwayat(prev => [res.data, ...prev])
+      await laporanApi.addRiwayat(activeLaporan.id, fd)
+      await reloadDetailData()
       setShowUpdateDrawer(false)
       setRiwayatForm({ statusKerawanan: 'aman', progresLaporan: 'sedang_berlangsung', uraianPekerjaan: '', upayaPengendalian: '', pihakLain: '', contactPerson: '' })
       setRiwayatFiles({ foto: [], beritaAcara: [], spanduk: [], surat: [] })
@@ -1359,18 +1376,18 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   }
 
   async function handleDeleteRiwayat(riwayatId: string) {
-    if (!laporan?.id || !confirm('Hapus riwayat ini?')) return
+    if (!activeLaporan?.id || !confirm('Hapus riwayat ini?')) return
     try {
-      await laporanApi.deleteRiwayat(laporan.id, riwayatId)
+      await laporanApi.deleteRiwayat(activeLaporan.id, riwayatId)
       setRiwayat(prev => prev.filter(r => r.id !== riwayatId))
     } catch { toast.error('Gagal menghapus riwayat') }
   }
 
   async function handleSelesaikan() {
-    if (!laporan?.id) return
+    if (!activeLaporan?.id) return
     setSelesaiLoading(true)
     try {
-      await laporanApi.update(laporan.id, { status: 'selesai' })
+      await laporanApi.update(activeLaporan.id, { status: 'selesai' })
       toast.success('Laporan berhasil diselesaikan')
       onSaved?.()
       onClose?.()
@@ -1381,8 +1398,8 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     setUploading(tipe)
     try {
       const toUpload = /\.(jpe?g|png|webp)$/i.test(file.name) ? await compressImage(file) : file
-      await laporanApi.uploadProgress(laporan.id, tipe, toUpload)
-      const r = await laporanApi.getProgress(laporan.id)
+      await laporanApi.uploadProgress(activeLaporan.id, tipe, toUpload)
+      const r = await laporanApi.getProgress(activeLaporan.id)
       setProgress(r.data)
       toast.success('Dokumen berhasil diunggah')
     } catch { toast.error('Gagal mengunggah') } finally { setUploading(null) }
@@ -1390,13 +1407,13 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
 
   async function handleProgressDelete(tipe: string, progressId: string) {
     try {
-      await laporanApi.deleteProgress(laporan.id, progressId)
+      await laporanApi.deleteProgress(activeLaporan.id, progressId)
       setProgress(prev => ({ ...prev, [tipe]: prev[tipe].filter(p => p.id !== progressId) }))
       toast.success('Dokumen dihapus')
     } catch { toast.error('Gagal menghapus') }
   }
 
-  const fotoUrls: string[] = laporan?.foto ?? []
+  const fotoUrls: string[] = activeLaporan?.foto ?? []
 
   // ── shared progress hidden inputs
   const progressInputs = PROGRESS_TIPE_LIST.map((tipe) => (
@@ -1662,10 +1679,10 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   // MOBILE — synced with desktop
   // ══════════════════════════════════════════════════
   if (isMobile) {
-    const pihakLainMobile = isPPL ? laporan?.teknisi : null
+    const pihakLainMobile = isPPL ? activeLaporan?.teknisi : null
     const lastUpdateM = riwayat[0]
-    const lastUpdatedAtM = lastUpdateM?.tanggal ?? laporan?.updatedAt ?? laporan?.tanggal
-    const canPerbarui = (isAdmin() || isSuperadmin() || isTeknisi()) && laporan?.status !== 'selesai'
+    const lastUpdatedAtM = lastUpdateM?.tanggal ?? activeLaporan?.updatedAt ?? activeLaporan?.tanggal
+    const canPerbarui = (isAdmin() || isSuperadmin() || isTeknisi()) && activeLaporan?.status !== 'selesai'
 
     // File attachment row: [thumb] [Label / filename] [eye]
     const FileRow = ({ label, url }: { label: string; url: string }) => {
@@ -1730,9 +1747,9 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           <div style={{ background: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, border: '1px solid #E1E8EC' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>
-                {JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan ?? '—'}
+                {JENIS_LABEL[activeLaporan?.jenisGangguan] ?? activeLaporan?.jenisGangguan ?? '—'}
               </span>
-              {laporan?.status && <StatusPill status={laporan.status} />}
+              {activeLaporan?.status && <StatusPill status={activeLaporan.status} />}
             </div>
             <div style={{ marginTop: 6, fontSize: 12, color: '#5F737F' }}>
               Terakhir Diperbarui: {formatTanggal(lastUpdatedAtM)}
@@ -1742,15 +1759,15 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           {/* ── Informasi Kerawanan (no header) ────────────────── */}
           <div style={{ background: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, border: '1px solid #E1E8EC', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <InfoRow label="Ruas" value={laporan?.tower?.nama ?? '—'} />
-              <InfoRow label="Span" value={laporan?.lokasiDetail || '—'} />
+              <InfoRow label="Ruas" value={activeLaporan?.tower?.nama ?? '—'} />
+              <InfoRow label="Span" value={activeLaporan?.lokasiDetail || '—'} />
             </div>
-            <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
+            <InfoRow label="Status Kerawanan" value={<LevelBadge level={activeLaporan?.levelRisiko} />} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <InfoRow label="Informasi Pihak Lain" value={pihakLainMobile || '—'} />
-              <InfoRow label="Contact Person" value={laporan?.contactPerson || '—'} />
+              <InfoRow label="Contact Person" value={activeLaporan?.contactPerson || '—'} />
             </div>
-            <InfoRow label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'} value={laporan?.deskripsi || '—'} />
+            <InfoRow label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'} value={activeLaporan?.deskripsi || '—'} />
 
             {fotoUrls.length > 0 && (
               <FileGroup label="Bukti Kerawanan" urls={fotoUrls} />
@@ -1763,7 +1780,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
               Informasi Pengendalian
             </span>
             <div style={{ marginBottom: 12 }}>
-              <InfoRow label="Deskripsi Pengendalian" value={laporan?.keterangan || '—'} />
+              <InfoRow label="Deskripsi Pengendalian" value={activeLaporan?.keterangan || '—'} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <FileGroup label="Berita Acara" urls={(progress?.berita_acara ?? []).map((d: any) => d.fileUrl)} />
@@ -1858,8 +1875,8 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   }
   // ─── Desktop readOnly detail view ────────────────────────────────────────
   const lastUpdate = riwayat[0]
-  const lastUpdatedAt = lastUpdate?.tanggal ?? laporan?.updatedAt ?? laporan?.tanggal
-  const lastUpdatedBy = lastUpdate?.oleh ?? laporan?.pelapor?.nama ?? '-'
+  const lastUpdatedAt = lastUpdate?.tanggal ?? activeLaporan?.updatedAt ?? activeLaporan?.tanggal
+  const lastUpdatedBy = lastUpdate?.oleh ?? activeLaporan?.pelapor?.nama ?? '-'
 
   const beritaAcaraDoc = (progress?.berita_acara ?? [])[0]
   const suratDoc       = (progress?.surat ?? [])[0]
@@ -1908,7 +1925,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
               Kembali
             </button>
             <span style={{ fontSize: 24, fontWeight: 700, color: '#1B1B1B' }}>Detail Laporan Kerawanan</span>
-            {laporan?.status && <StatusPill status={laporan.status} />}
+            {activeLaporan?.status && <StatusPill status={activeLaporan.status} />}
           </div>
           <div style={{ display: 'flex', gap: 8, fontSize: 14, fontWeight: 500, color: '#566B75', flexWrap: 'wrap' }}>
             <span>Terakhir diupdate : {formatTanggal(lastUpdatedAt)}</span>
@@ -1916,7 +1933,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             <span>Oleh : {lastUpdatedBy}</span>
           </div>
         </div>
-        {laporan?.status !== 'selesai' && (
+        {activeLaporan?.status !== 'selesai' && (
           <button
             onClick={() => setShowUpdateDrawer(true)}
             style={{ height: 44, padding: '0 24px', background: '#076C9E', border: 'none', borderRadius: 8, color: '#FFFFFF', fontSize: 14, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
@@ -1934,25 +1951,25 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
 
           {/* Row 1 */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, marginBottom: 20 }}>
-            <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan ?? '—'} />
-            <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
-            <InfoRow label="Ruas" value={laporan?.tower?.nama ?? '—'} />
-            <InfoRow label="Span" value={laporan?.lokasiDetail || '—'} />
+            <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[activeLaporan?.jenisGangguan] ?? activeLaporan?.jenisGangguan ?? '—'} />
+            <InfoRow label="Status Kerawanan" value={<LevelBadge level={activeLaporan?.levelRisiko} />} />
+            <InfoRow label="Ruas" value={activeLaporan?.tower?.nama ?? '—'} />
+            <InfoRow label="Span" value={activeLaporan?.lokasiDetail || '—'} />
           </div>
 
           {/* Row 2 */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, marginBottom: 20 }}>
             <InfoRow
               label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'}
-              value={laporan?.deskripsi || '—'}
+              value={activeLaporan?.deskripsi || '—'}
             />
             <InfoRow
               label="Informasi Pihak Lain"
-              value={(isPPL ? laporan?.teknisi : null) || '—'}
+              value={(isPPL ? activeLaporan?.teknisi : null) || '—'}
             />
             <InfoRow
               label="Contact Person"
-              value={laporan?.contactPerson || '—'}
+              value={activeLaporan?.contactPerson || '—'}
             />
             <div />
           </div>
@@ -1987,7 +2004,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
 
           <div style={{ marginBottom: 20 }}>
             <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan?.keterangan || '—'}</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{activeLaporan?.keterangan || '—'}</span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, maxWidth: 640 }}>

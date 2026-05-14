@@ -3,7 +3,9 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useLayoutEffect, useState } from 'react'
-import { X } from 'lucide-react'
+import { X, KeyRound, LogOut } from 'lucide-react'
+import toast from 'react-hot-toast'
+import { authApi } from '@/lib/api'
 import {
   IconDashboard, IconRiwayat, IconAset, IconSertifikat,
   IconAsBuilt, IconClimb, IconCleanup, IconUsers, IconToggle, IconLightning,
@@ -126,6 +128,8 @@ export default function Sidebar() {
 
   const [user, setUser] = useState<ReturnType<typeof getUser>>(null)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [showChangePassword, setShowChangePassword] = useState(false)
   useLayoutEffect(() => {
     const u = getUser()
     setUser(u)
@@ -261,6 +265,40 @@ export default function Sidebar() {
             ))}
           </nav>
 
+          {/* Bottom action items */}
+          <div style={{
+            borderTop: '1px solid rgba(255,255,255,0.10)',
+            padding: '8px 0',
+            flexShrink: 0,
+          }}>
+            <button
+              type="button"
+              onClick={() => setShowChangePassword(true)}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                padding: '12px 20px', background: 'transparent', border: 'none',
+                color: '#FFFFFF', fontSize: 14, fontWeight: 500, cursor: 'pointer',
+                minHeight: 44,
+              }}
+            >
+              <KeyRound size={18} />
+              Request Ganti Password
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowLogoutConfirm(true)}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                padding: '12px 20px', background: 'transparent', border: 'none',
+                color: '#FCA5A5', fontSize: 14, fontWeight: 500, cursor: 'pointer',
+                minHeight: 44,
+              }}
+            >
+              <LogOut size={18} />
+              Keluar
+            </button>
+          </div>
+
           {/* Footer */}
           <div style={{
             borderTop: '1px solid rgba(255,255,255,0.10)',
@@ -276,6 +314,16 @@ export default function Sidebar() {
             </p>
           </div>
         </aside>
+
+        {showLogoutConfirm && (
+          <LogoutConfirmModal
+            onCancel={() => setShowLogoutConfirm(false)}
+            onConfirm={logout}
+          />
+        )}
+        {showChangePassword && (
+          <RequestPasswordModal onClose={() => setShowChangePassword(false)} />
+        )}
       </>
     )
   }
@@ -386,5 +434,88 @@ export default function Sidebar() {
         )}
       </div>
     </aside>
+  )
+}
+
+// ─── Logout confirmation modal ────────────────────────────────────────────
+function LogoutConfirmModal({ onCancel, onConfirm }: { onCancel: () => void; onConfirm: () => void }) {
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)' }} onClick={onCancel} />
+      <div style={{ position: 'relative', background: '#fff', borderRadius: 16, padding: 20, width: '100%', maxWidth: 360 }}>
+        <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B', marginBottom: 8 }}>Keluar</h3>
+        <p style={{ fontSize: 14, color: '#5F737F', marginBottom: 20 }}>Apakah anda yakin ingin keluar?</p>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={onCancel}
+            style={{ flex: 1, height: 44, borderRadius: 22, background: '#fff', border: '1px solid #E1E8EC', color: '#374151', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+            Batal
+          </button>
+          <button onClick={onConfirm}
+            style={{ flex: 1, height: 44, borderRadius: 22, background: '#D92D20', border: 'none', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+            Ya
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Request password change modal ────────────────────────────────────────
+function RequestPasswordModal({ onClose }: { onClose: () => void }) {
+  const [form, setForm] = useState({ passwordLama: '', passwordBaru: '', konfirmasiPasswordBaru: '' })
+  const [submitting, setSubmitting] = useState(false)
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!form.passwordLama || !form.passwordBaru) { toast.error('Semua field wajib diisi'); return }
+    if (form.passwordBaru !== form.konfirmasiPasswordBaru) { toast.error('Konfirmasi password tidak cocok'); return }
+    setSubmitting(true)
+    try {
+      await authApi.requestChangePassword(form)
+      toast.success('Permintaan ganti password dikirim')
+      onClose()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'Gagal mengirim permintaan')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)' }} onClick={onClose} />
+      <form onSubmit={submit} style={{ position: 'relative', background: '#fff', borderRadius: 16, padding: 20, width: '100%', maxWidth: 400 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>Request Ganti Password</h3>
+          <button type="button" onClick={onClose} style={{ background: 'none', border: 'none', padding: 4, cursor: 'pointer', color: '#64748b' }}>
+            <X size={20} />
+          </button>
+        </div>
+        {(['passwordLama','passwordBaru','konfirmasiPasswordBaru'] as const).map((k, i) => (
+          <div key={k} style={{ marginBottom: 12 }}>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
+              {k === 'passwordLama' ? 'Password Lama' : k === 'passwordBaru' ? 'Password Baru' : 'Konfirmasi Password Baru'}
+            </label>
+            <input type="password" value={form[k]}
+              onChange={(e) => setForm({ ...form, [k]: e.target.value })}
+              autoFocus={i === 0}
+              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #E1E8EC', fontSize: 14, minHeight: 44 }} />
+          </div>
+        ))}
+        <p style={{ fontSize: 11, color: '#97AAB3', marginBottom: 16 }}>
+          Min. 8 karakter, 1 huruf kapital, 1 karakter spesial.
+        </p>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button type="button" onClick={onClose}
+            style={{ flex: 1, height: 44, borderRadius: 22, background: '#fff', border: '1px solid #E1E8EC', color: '#374151', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+            Batal
+          </button>
+          <button type="submit" disabled={submitting}
+            style={{ flex: 1, height: 44, borderRadius: 22, background: '#076C9E', border: 'none', color: '#fff', fontSize: 14, fontWeight: 600, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1 }}>
+            {submitting ? 'Mengirim...' : 'Kirim Permintaan'}
+          </button>
+        </div>
+      </form>
+    </div>
   )
 }

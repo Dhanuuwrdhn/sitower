@@ -7,7 +7,7 @@ import { X, KeyRound, LogOut } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { authApi } from '@/lib/api'
 import {
-  IconDashboard, IconRiwayat, IconAset, IconSertifikat,
+  IconDashboard, IconRiwayat, IconAset,
   IconAsBuilt, IconClimb, IconCleanup, IconUsers, IconToggle, IconLightning,
 } from '@/components/icons/SpektraIcons'
 import { getUser, logout } from '@/lib/auth'
@@ -31,7 +31,6 @@ const ALL_NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', icon: IconDashboard, href: '/dashboard' },
   { label: 'Riwayat Kerawanan Transmisi', icon: IconRiwayat, href: '/laporan/gangguan' },
   { label: 'Data Aset Transmisi', icon: IconAset, href: '/aset', },
-  { label: 'Sertifikat', icon: IconSertifikat, href: '/sertifikat', hidden: true },
   { label: 'As Built Drawing', icon: IconAsBuilt, href: '/as-built-drawing', hidden: true },
   { label: 'Climb Up Inspection', icon: IconClimb, href: '/laporan/cui', hidden: true },
   { label: 'Clean Up Isolator', icon: IconCleanup, href: '/laporan/cleanup', hidden: true },

@@ -1901,10 +1901,6 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
       <div style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>
-            <button onClick={onClose} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: 6, color: '#076C9E', fontWeight: 600, fontSize: 14 }}>
-              <ArrowLeft size={18} />
-              Kembali
-            </button>
             <span style={{ fontSize: 24, fontWeight: 700, color: '#1B1B1B' }}>Detail Laporan Kerawanan</span>
             {laporan?.status && <StatusPill status={laporan.status} />}
           </div>

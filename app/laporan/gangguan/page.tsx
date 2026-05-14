@@ -3099,14 +3099,8 @@ export default function GangguanPage() {
               {hasActiveFilters && <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#D92D20]" />}
             </button>
           </div>
-          {/* Row 2: Import + Tambah Laporan Baru */}
+          {/* Row 2: Tambah Laporan Baru */}
           <div className="flex gap-2">
-            <button
-              onClick={() => setImportOpen(true)}
-              className="flex-1 h-11 rounded-[22px] bg-white border border-[#076c9e] text-[#076c9e] font-semibold text-[14px] cursor-pointer flex items-center justify-center gap-2"
-            >
-              <Upload size={16} /> Import Excel
-            </button>
             <button
               onClick={openAdd}
               className="flex-1 h-11 rounded-[22px] bg-[#076c9e] text-white font-semibold text-[14px] border-none cursor-pointer flex items-center justify-center gap-2"
@@ -3258,14 +3252,8 @@ export default function GangguanPage() {
             </div>
           </div>
 
-          {/* Right: Import + Add buttons */}
+          {/* Right: Add button */}
           <div style={{ display: 'flex', gap: 8 }}>
-            <button
-              onClick={() => setImportOpen(true)}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', height: 44, borderRadius: 22, background: '#FFFFFF', border: '1px solid #076c9e', color: '#076c9e', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14, cursor: 'pointer', whiteSpace: 'nowrap' }}
-            >
-              <Upload size={16} /> Import Excel
-            </button>
             <button
               onClick={openAdd}
               style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', height: 44, borderRadius: 22, background: '#076c9e', border: 'none', color: '#FFFFFF', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14, cursor: 'pointer', whiteSpace: 'nowrap' }}

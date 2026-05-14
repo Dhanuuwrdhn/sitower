@@ -2,6 +2,7 @@
 
 import { APIProvider, Map, InfoWindow, useMap } from '@vis.gl/react-google-maps'
 import { useEffect, useRef, useState, useMemo } from 'react'
+import { SlidersHorizontal, X as XIcon } from 'lucide-react'
 import { JALUR_COLORS } from '@/lib/geodata'
 import { TwIcon } from '@/components/ui/TwIcon'
 
@@ -565,13 +566,12 @@ function Legend() {
 
 // ─── Filter config ────────────────────────────────────────────────────────────
 
-const FILTER_OPTIONS = [
-  { key: null,                    label: 'Semua Kerawanan',   emoji: null },
-  { key: 'pekerjaan_pihak_lain',  label: 'PPL',               emoji: '🚧' },
-  { key: 'kebakaran',             label: 'Kebakaran',          emoji: '🔥' },
-  { key: 'layangan',              label: 'Layangan',           emoji: '🪁' },
-  { key: 'pencurian',             label: 'Pencurian',          emoji: '☠️' },
-  { key: 'pemanfaatan_lahan',     label: 'Pemanfaatan Lahan', emoji: '🏡' },
+const JENIS_FILTER_OPTIONS = [
+  { key: 'pekerjaan_pihak_lain', label: 'Pekerjaan Pihak Lain (PPL)' },
+  { key: 'kebakaran',            label: 'Kebakaran' },
+  { key: 'layangan',             label: 'Layang-layang' },
+  { key: 'pemanfaatan_lahan',    label: 'Pemanfaatan Lahan' },
+  { key: 'pencurian',            label: 'Pencurian' },
 ] as const
 
 // ─── Main component ───────────────────────────────────────────────────────────
@@ -584,14 +584,26 @@ type LayerType = typeof ALL_LAYER_TYPES[number]
 
 export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props) {
   const [selected, setSelected] = useState<FeaturedTower | null>(null)
-  const [activeFilter, setActiveFilter] = useState<string | null>(null)
-  const [layerPanelOpen, setLayerPanelOpen] = useState(false)
+  const [activeJenis, setActiveJenis] = useState<string[]>([])
   const [visibleLayers, setVisibleLayers] = useState<Set<string>>(new Set(['SUTT', 'SUTET', 'SKTT']))
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [draftJenis, setDraftJenis] = useState<string[]>([])
+  const [draftLayers, setDraftLayers] = useState<Set<string>>(new Set(['SUTT', 'SUTET', 'SKTT']))
 
-  function toggleLayer(tipe: string) {
-    setVisibleLayers(prev => {
+  // When opening popover, sync draft from applied
+  function openFilter() {
+    setDraftJenis(activeJenis)
+    setDraftLayers(new Set(visibleLayers))
+    setFilterOpen(true)
+  }
+
+  function toggleDraftJenis(k: string) {
+    setDraftJenis(prev => prev.includes(k) ? prev.filter(x => x !== k) : [...prev, k])
+  }
+  function toggleDraftLayer(k: string) {
+    setDraftLayers(prev => {
       const next = new Set(prev)
-      if (next.has(tipe)) next.delete(tipe); else next.add(tipe)
+      if (next.has(k)) next.delete(k); else next.add(k)
       return next
     })
   }
@@ -599,23 +611,11 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
   const displayTowers = useMemo<FeaturedTower[]>(() => {
     const all = towers ?? []
     const byLayer = all.filter((t) => t.tipe === 'gardu' || visibleLayers.has(t.tipe))
-    if (!activeFilter) return byLayer
-    return byLayer.filter((t) => t.kerawanan.some((k) => normKat(k.kategori) === activeFilter))
-  }, [towers, activeFilter, visibleLayers])
+    if (activeJenis.length === 0) return byLayer
+    return byLayer.filter((t) => t.kerawanan.some((k) => activeJenis.includes(normKat(k.kategori))))
+  }, [towers, activeJenis, visibleLayers])
 
-  // Count per filter category for tab badges
-  const filterCounts = useMemo(() => {
-    const all = towers ?? []
-    const counts: Record<string, number> = {
-      '__semua': all.filter((t) => t.kerawanan.length > 0).length,
-    }
-    for (const opt of FILTER_OPTIONS) {
-      if (opt.key) {
-        counts[opt.key] = all.filter((t) => t.kerawanan.some((k) => normKat(k.kategori) === opt.key)).length
-      }
-    }
-    return counts
-  }, [towers])
+  const hasActiveFilter = activeJenis.length > 0 || visibleLayers.size < ALL_LAYER_TYPES.length
 
   const handleSelect = useMemo(() => (t: FeaturedTower) => {
     setSelected(t)
@@ -658,113 +658,129 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
         </Map>
       </APIProvider>
 
-      {/* Filter tabs — top center, horizontally scrollable */}
-      <div style={{
-        position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)',
-        zIndex: 10, maxWidth: 'calc(100% - 24px)',
-        background: 'rgba(255,255,255,0.97)',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
-        borderRadius: 999, padding: '5px 8px',
-        backdropFilter: 'blur(8px)',
-        display: 'flex', gap: 4, alignItems: 'center',
-        overflowX: 'auto', flexWrap: 'nowrap', whiteSpace: 'nowrap',
-        scrollbarWidth: 'none',
-      }}>
-        {FILTER_OPTIONS.map((opt) => {
-          const isActive = activeFilter === opt.key
-          const count = opt.key ? (filterCounts[opt.key] ?? 0) : (filterCounts['__semua'] ?? 0)
-          return (
-            <button
-              key={String(opt.key)}
-              onClick={() => setActiveFilter(opt.key ?? null)}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                padding: '4px 12px', borderRadius: 999, flexShrink: 0,
-                fontSize: 11, fontWeight: 600, cursor: 'pointer', lineHeight: 1.5,
-                border: isActive ? 'none' : '1px solid #E5E7EB',
-                outline: 'none',
-                background: isActive ? '#005DAA' : '#fff',
-                color: isActive ? '#fff' : '#374151',
-                transition: 'background 0.15s, color 0.15s, border-color 0.15s',
-              }}
-            >
-              {opt.emoji && (
-                <TwIcon emoji={opt.emoji} size={13} />
-              )}
-              <span>{opt.label}</span>
-              {count > 0 && (
-                <span style={{
-                  background: isActive ? 'rgba(255,255,255,0.25)' : '#F3F4F6',
-                  color: isActive ? '#fff' : '#6B7280',
-                  borderRadius: 999, fontSize: 10, fontWeight: 700,
-                  padding: '0px 5px', lineHeight: '16px',
-                  minWidth: 16, textAlign: 'center',
-                }}>
-                  {count}
-                </span>
-              )}
-            </button>
-          )
-        })}
+      {/* Filter button — top right of map */}
+      <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 20 }}>
+        <button
+          onClick={() => filterOpen ? setFilterOpen(false) : openFilter()}
+          aria-label="Filter"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            padding: '0 14px', height: 40, borderRadius: 8,
+            background: filterOpen ? '#076c9e' : '#fff',
+            color: filterOpen ? '#fff' : '#374151',
+            border: '1px solid #E1E8EC',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+            fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            position: 'relative',
+          }}
+        >
+          <SlidersHorizontal size={16} />
+          Filter
+          {hasActiveFilter && !filterOpen && (
+            <span style={{
+              position: 'absolute', top: 6, right: 6,
+              width: 8, height: 8, borderRadius: '50%',
+              background: '#D92D20',
+            }} />
+          )}
+        </button>
+
+        {filterOpen && (
+          <div style={{
+            position: 'absolute', top: 48, right: 0,
+            background: '#fff', borderRadius: 12,
+            boxShadow: '0 12px 32px rgba(0,0,0,0.18)',
+            border: '1px solid #E1E8EC',
+            padding: 16, width: 320, maxWidth: '90vw',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: '#1C1C1C' }}>Filter</h3>
+              <button onClick={() => setFilterOpen(false)} style={{ padding: 4, background: 'transparent', border: 'none', cursor: 'pointer', color: '#64748b' }}>
+                <XIcon size={18} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#1C1C1C', marginBottom: 8 }}>Jenis Kerawanan</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
+              {JENIS_FILTER_OPTIONS.map(({ key, label }) => {
+                const active = draftJenis.includes(key)
+                return (
+                  <button
+                    key={key}
+                    onClick={() => toggleDraftJenis(key)}
+                    style={{
+                      padding: '6px 12px', borderRadius: 18, fontSize: 12, fontWeight: 500,
+                      cursor: 'pointer', minHeight: 32,
+                      border: active ? '1px solid #076C9E' : '1px solid #E1E8EC',
+                      background: active ? '#076C9E' : '#fff',
+                      color: active ? '#FFFFFF' : '#5F737F',
+                    }}
+                  >
+                    {label}
+                  </button>
+                )
+              })}
+            </div>
+
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#1C1C1C', marginBottom: 8 }}>Jalur</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 18 }}>
+              {(['SKTT', 'SUTET', 'SUTT'] as const)
+                .filter((t) => availableLayerTypes.length === 0 || availableLayerTypes.includes(t))
+                .map((t) => {
+                  const active = draftLayers.has(t)
+                  return (
+                    <button
+                      key={t}
+                      onClick={() => toggleDraftLayer(t)}
+                      style={{
+                        padding: '6px 14px', borderRadius: 18, fontSize: 12, fontWeight: 500,
+                        cursor: 'pointer', minHeight: 32,
+                        border: active ? '1px solid #076C9E' : '1px solid #E1E8EC',
+                        background: active ? '#076C9E' : '#fff',
+                        color: active ? '#FFFFFF' : '#5F737F',
+                      }}
+                    >
+                      {t}
+                    </button>
+                  )
+                })}
+            </div>
+
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={() => {
+                  setActiveJenis(draftJenis)
+                  setVisibleLayers(new Set(draftLayers))
+                  setFilterOpen(false)
+                }}
+                style={{
+                  flex: 1, padding: '10px 0', borderRadius: 22, fontSize: 13, fontWeight: 600,
+                  background: '#076C9E', color: '#fff', border: 'none', cursor: 'pointer', minHeight: 40,
+                }}
+              >
+                Terapkan Filter
+              </button>
+              <button
+                onClick={() => {
+                  setDraftJenis([])
+                  setDraftLayers(new Set(['SUTT', 'SUTET', 'SKTT']))
+                  setActiveJenis([])
+                  setVisibleLayers(new Set(['SUTT', 'SUTET', 'SKTT']))
+                  setFilterOpen(false)
+                }}
+                style={{
+                  flex: 1, padding: '10px 0', borderRadius: 22, fontSize: 13, fontWeight: 600,
+                  background: '#fff', color: '#dc2626', border: '1px solid #fecaca', cursor: 'pointer', minHeight: 40,
+                }}
+              >
+                Hapus Filter
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <Legend />
-
-      {/* Layer filter — bottom right, only shown when there are jalur to toggle */}
-      {availableLayerTypes.length > 0 && <div style={{ position: 'absolute', bottom: 90, right: 12, zIndex: 20 }}>
-        {layerPanelOpen && (
-          <div style={{
-            marginBottom: 8, background: '#fff', borderRadius: 10,
-            boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
-            padding: '12px 16px', minWidth: 180,
-          }}>
-            <div style={{ fontWeight: 700, fontSize: 12, color: '#374151', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Tampilkan Tipe
-            </div>
-            {([
-              { tipe: 'SUTT',  label: 'SUTT',  color: '#0288D1', dash: false },
-              { tipe: 'SUTET', label: 'SUTET', color: '#e65100', dash: false },
-              { tipe: 'SKTT',  label: 'SKTT',  color: '#FF00FF', dash: true  },
-            ] as { tipe: string; label: string; color: string; dash: boolean }[])
-            .filter(({ tipe }) => availableLayerTypes.includes(tipe as typeof ALL_LAYER_TYPES[number]))
-            .map(({ tipe, label, color, dash }) => (
-              <label key={tipe} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '5px 0', userSelect: 'none' }}>
-                <input
-                  type="checkbox"
-                  checked={visibleLayers.has(tipe)}
-                  onChange={() => toggleLayer(tipe)}
-                  style={{ width: 15, height: 15, accentColor: color, cursor: 'pointer' }}
-                />
-                <svg width="24" height="10" viewBox="0 0 24 10">
-                  {dash
-                    ? <line x1="0" y1="5" x2="24" y2="5" stroke={color} strokeWidth="2.5" strokeDasharray="5,3" />
-                    : <line x1="0" y1="5" x2="24" y2="5" stroke={color} strokeWidth="2.5" />
-                  }
-                </svg>
-                <span style={{ fontSize: 13, color: '#1C1C1C', fontWeight: 500 }}>{label}</span>
-              </label>
-            ))}
-          </div>
-        )}
-        <button
-          onClick={() => setLayerPanelOpen(v => !v)}
-          title="Filter Tipe"
-          style={{
-            width: 40, height: 40, borderRadius: 8,
-            background: layerPanelOpen ? '#076c9e' : '#fff',
-            border: '1px solid #E1E8EC',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={layerPanelOpen ? '#fff' : '#5F737F'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-            <polyline points="2 17 12 22 22 17"/>
-            <polyline points="2 12 12 17 22 12"/>
-          </svg>
-        </button>
-      </div>}
     </div>
   )
 }

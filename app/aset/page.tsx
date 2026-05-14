@@ -999,6 +999,12 @@ export default function AsetPage() {
     loading: false
   })
 
+  const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; tower: any | null; loading: boolean }>({
+    open: false,
+    tower: null,
+    loading: false
+  })
+
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [q, setQ] = useState('')
   useEffect(() => {
@@ -1123,6 +1129,7 @@ export default function AsetPage() {
                         <ActionMenu items={[
                           { label: 'Lihat Detail', icon: <Eye size={14} />, onClick: () => { setDetailRow(row); setDetailOpen(true) } },
                           { label: 'Edit', icon: <Pencil size={14} />, onClick: () => { setEditRow(row); setEditOpen(true) } },
+                          { label: 'Hapus', icon: <Trash2 size={14} />, onClick: () => setDeleteConfirm({ open: true, tower: row, loading: false }), danger: true, dividerBefore: true },
                         ]} />
                       </td>
                     )}
@@ -1208,6 +1215,27 @@ export default function AsetPage() {
           } catch {
             toast.error('Gagal menghapus rute')
             setConfirm({ ...confirm, loading: false })
+          }
+        }}
+      />
+
+      <ConfirmModal 
+        open={deleteConfirm.open}
+        title="Hapus Aset Transmisi"
+        message={`Apakah Anda yakin ingin menghapus aset "${deleteConfirm.tower?.nama}"? Seluruh data terkait aset ini akan hilang.`}
+        isLoading={deleteConfirm.loading}
+        onClose={() => setDeleteConfirm({ ...deleteConfirm, open: false })}
+        onConfirm={async () => {
+          if (!deleteConfirm.tower) return
+          setDeleteConfirm({ ...deleteConfirm, loading: true })
+          try {
+            await towersApi.delete(deleteConfirm.tower.id)
+            toast.success('Aset berhasil dihapus')
+            setDeleteConfirm({ open: false, tower: null, loading: false })
+            fetchData()
+          } catch {
+            toast.error('Gagal menghapus aset')
+            setDeleteConfirm({ ...deleteConfirm, loading: false })
           }
         }}
       />

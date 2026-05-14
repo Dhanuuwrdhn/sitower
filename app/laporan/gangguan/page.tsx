@@ -2140,11 +2140,17 @@ function LaporanDrawer({
   onClose: () => void
   onSaved: () => void
 }) {
+  type SubmitErrors = {
+    foto?: string
+    towerId?: string
+  }
+
   const user = getUser()
   const { isMobile, sidebarWidth } = useSidebar()
   const [form, setForm] = useState(EMPTY_FORM)
   const [fotos, setFotos] = useState<File[]>([])
   const [fotoUrls, setFotoUrls] = useState<string[]>([])
+  const [submitErrors, setSubmitErrors] = useState<SubmitErrors>({})
   const [saving, setSaving] = useState(false)
   const [locating, setLocating] = useState(false)
   const [useGPS, setUseGPS] = useState(false)
@@ -2200,10 +2206,26 @@ function LaporanDrawer({
           setTimeout(() => { document.getElementById('btn-detect-location')?.click() }, 100)
         }
       }
+      setSubmitErrors({})
     }
   }, [open, initial, initialFotos])
 
-  const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }))
+  const set = (k: string, v: string) => {
+    setForm((f) => ({ ...f, [k]: v }))
+    if (k === 'towerId' && v) {
+      setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
+    }
+  }
+
+  function validateRequiredFields() {
+    const nextErrors: SubmitErrors = {}
+    if (!form.towerId) nextErrors.towerId = 'Ruas wajib diisi'
+    if (!initial && fotos.length === 0 && fotoUrls.length === 0) {
+      nextErrors.foto = 'Foto Bukti Terjadinya Kerawanan wajib diisi'
+    }
+    setSubmitErrors(nextErrors)
+    return Object.keys(nextErrors).length === 0
+  }
 
   const handleDetectLocation = () => {
     if (readOnly || locating) return
@@ -2220,6 +2242,7 @@ function LaporanDrawer({
         const towerRadius = nearest?.radius ?? 100
         if (nearest && min <= towerRadius) {
           setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: nearest!.nomorTower }))
+          setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
           setGpsLocked(true)
           setDetectedMsg(`📍 Tower ${nearest.nomorTower} (${Math.round(min)}m)`)
           toast.success('Tower terdekat dipilih!')
@@ -2246,6 +2269,7 @@ function LaporanDrawer({
             const towerRadius = nearest?.radius ?? 100
             if (nearest && min <= towerRadius) {
               setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: nearest!.nomorTower }))
+              setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
               setDetectedMsg(`📍 Tower ${nearest.nomorTower} (${Math.round(min)}m)`)
               toast.success('Tower terdekat dipilih!')
             } else if (nearest) {
@@ -2273,7 +2297,7 @@ function LaporanDrawer({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (readOnly) { onClose(); return }
-    if (!form.towerId) { toast.error('Pilih Ruas terlebih dahulu'); return }
+    if (!validateRequiredFields()) return
     if (!form.jenisGangguan) { toast.error('Pilih kategori kerawanan'); return }
     setSaving(true)
     try {
@@ -2345,7 +2369,9 @@ function LaporanDrawer({
 
       {/* Foto bukti */}
       <div>
-        <label className="block text-[14px] font-bold text-app-text mb-2">Foto Bukti Terjadinya Kerawanan</label>
+        <label className="block text-[14px] font-bold text-app-text mb-2">
+          Foto Bukti Terjadinya Kerawanan <span className="text-[#EF4444]">*</span>
+        </label>
         {/* Desktop: grid preview of existing foto URLs — click to lightbox */}
         {!isMobile && fotoUrls.length > 0 && (
           <div className="grid grid-cols-4 gap-2 mb-2">
@@ -2395,10 +2421,18 @@ function LaporanDrawer({
         {!readOnly && !isMobile && (
           <FotoUpload
             fotos={fotos}
-            onChange={setFotos}
+            onChange={(nextFotos) => {
+              setFotos(nextFotos)
+              if (nextFotos.length > 0) {
+                setSubmitErrors((prev) => ({ ...prev, foto: undefined }))
+              }
+            }}
             onPhotoAdded={handleDetectLocation}
             onPreview={(i) => setLightbox({ urls: fotos.map((f) => URL.createObjectURL(f)), index: i })}
           />
+        )}
+        {submitErrors.foto && (
+          <p className="mt-2 text-[12px] font-medium text-[#EF4444]">{submitErrors.foto}</p>
         )}
       </div>
 
@@ -2406,7 +2440,7 @@ function LaporanDrawer({
       <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>
         <div className="flex-1 min-w-0">
           <label className="block text-[14px] font-bold text-app-text mb-2">
-            Ruas
+            Ruas <span className="text-[#EF4444]">*</span>
           </label>
           {readOnly ? (
             <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
@@ -2435,8 +2469,16 @@ function LaporanDrawer({
             <TowerDropdown
               options={towerOptions}
               value={form.towerId}
-              onChange={(id, label) => setForm(f => ({ ...f, towerId: id, towerLabel: label }))}
+              onChange={(id, label) => {
+                setForm(f => ({ ...f, towerId: id, towerLabel: label }))
+                if (id) {
+                  setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
+                }
+              }}
             />
+          )}
+          {submitErrors.towerId && (
+            <p className="mt-2 text-[12px] font-medium text-[#EF4444]">{submitErrors.towerId}</p>
           )}
         </div>
 
@@ -2701,7 +2743,12 @@ function LaporanDrawer({
         value={towerSheetTarget === 'end' ? form.towerIdEnd : form.towerId}
         onSelect={(id, label) => {
           if (towerSheetTarget === 'end') setForm(f => ({ ...f, towerIdEnd: id, towerLabelEnd: label }))
-          else setForm(f => ({ ...f, towerId: id, towerLabel: label }))
+          else {
+            setForm(f => ({ ...f, towerId: id, towerLabel: label }))
+            if (id) {
+              setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
+            }
+          }
         }}
         onClose={() => setTowerSheetOpen(false)}
       />
@@ -2714,6 +2761,9 @@ function LaporanDrawer({
           )
           const next = [...fotos, ...valid].slice(0, 10)
           setFotos(next)
+          if (next.length > 0) {
+            setSubmitErrors((prev) => ({ ...prev, foto: undefined }))
+          }
           if (valid.length > 0) handleDetectLocation()
         }}
       />

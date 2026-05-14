@@ -148,28 +148,28 @@ function DonutChart({ aman, sedang, kritisTerpenuhi, kritisLdakTerpenuhi }: {
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#039855" strokeWidth={strokeW}
         strokeDasharray={`${amanArc} ${circumference - amanArc}`}
         strokeDashoffset={startOffset}
-        strokeLinecap="round"
+        strokeLinecap="butt"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
       {/* Sedang — #F79009 */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#F79009" strokeWidth={strokeW}
         strokeDasharray={`${sedArc} ${circumference - sedArc}`}
         strokeDashoffset={startOffset - amanArc}
-        strokeLinecap="round"
+        strokeLinecap="butt"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
       {/* Kritis — #EF4444 */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#EF4444" strokeWidth={strokeW}
         strokeDasharray={`${ktArc} ${circumference - ktArc}`}
         strokeDashoffset={startOffset - amanArc - sedArc}
-        strokeLinecap="round"
+        strokeLinecap="butt"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
       {/* Kritis — #991B1B */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#991B1B" strokeWidth={strokeW}
         strokeDasharray={`${kntArc} ${circumference - kntArc}`}
         strokeDashoffset={startOffset - amanArc - sedArc - ktArc}
-        strokeLinecap="round"
+        strokeLinecap="butt"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
       {/* Center total */}
@@ -456,21 +456,6 @@ export default function DashboardPage() {
         <div className="dash-riwayat-head">
           <h2 className="dash-section-title">Riwayat Kerawanan Transmisi Terbaru</h2>
           <div className="dash-riwayat-actions">
-            {/* Import Button */}
-            <input 
-              type="file" 
-              accept=".xlsx, .xls" 
-              className="hidden" 
-              ref={fileInputRef} 
-              onChange={handleImport} 
-            />
-            <button 
-              onClick={() => fileInputRef.current?.click()}
-              className="dash-import-btn"
-            >
-              <CloudUpload size={14} />
-              Import Data Excel
-            </button>
             <a href="/laporan/gangguan" className="dash-see-all-btn">
               Lihat Semua Riwayat Kerawanan Transmisi
             </a>

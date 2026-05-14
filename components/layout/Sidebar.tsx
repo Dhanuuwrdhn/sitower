@@ -183,12 +183,13 @@ export default function Sidebar() {
                 ⚡SPEKTRA
               </span>
               <span style={{
-                fontSize: 10.5, fontWeight: 500,
-                color: 'rgba(255,255,255,0.7)',
-                letterSpacing: '0.02em',
+                fontSize: 12, fontWeight: 400,
+                color: 'rgba(255,255,255,0.85)',
+                letterSpacing: '0.01em',
+                lineHeight: 1.35,
                 userSelect: 'none',
               }}>
-                Sistem Pemantauan Kabel dan Tower Transmisi
+                Sistem Pemantauan Kabel<br />dan Tower Transmisi
               </span>
             </div>
             <button

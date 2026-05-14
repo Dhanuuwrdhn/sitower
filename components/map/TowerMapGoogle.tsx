@@ -711,7 +711,7 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
       <Legend />
 
       {/* Layer filter — bottom right, only shown when there are jalur to toggle */}
-      {availableLayerTypes.length > 0 && <div style={{ position: 'absolute', bottom: 36, right: 12, zIndex: 20 }}>
+      {availableLayerTypes.length > 0 && <div style={{ position: 'absolute', bottom: 90, right: 12, zIndex: 20 }}>
         {layerPanelOpen && (
           <div style={{
             marginBottom: 8, background: '#fff', borderRadius: 10,

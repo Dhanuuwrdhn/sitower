@@ -103,7 +103,6 @@ export default function Sidebar() {
           )}
         </div>
 
-        {navItem("/sertifikat", "Sertifikat", FileText)}
         {navItem("/aset", "Data Aset", Database)}
       </nav>
 

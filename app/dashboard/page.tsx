@@ -31,25 +31,31 @@ interface RecentRow {
 }
 
 const LEVEL_BADGE: Record<string, { bg: string; text: string; label: string }> = {
-  kritis_terpenuhi:       { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis Terpenuhi'       },
-  kritis_tidak_terpenuhi: { bg: '#FEE4E2', text: '#912018', label: 'Kritis Tidak Terpenuhi'  },
+  kritis_terpenuhi:       { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis'       },
+  kritis_tidak_terpenuhi: { bg: '#FEE4E2', text: '#912018', label: 'Kritis'  },
   sedang:                 { bg: '#FFFAEB', text: '#F79009', label: 'Sedang'                  },
   aman:                   { bg: '#ECFDF3', text: '#039855', label: 'Aman'                    },
   kritis:                 { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis'                  },
 }
 
 const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {
-  laporan_baru: { bg: '#076C9E', text: '#FFFFFF' },
-  berita_acara: { bg: '#076C9E', text: '#FFFFFF' },
-  spanduk:      { bg: '#076C9E', text: '#FFFFFF' },
-  brosur:       { bg: '#076C9E', text: '#FFFFFF' },
+  laporan_baru:        { bg: '#076C9E', text: '#FFFFFF' },
+  berita_acara:        { bg: '#076C9E', text: '#FFFFFF' },
+  spanduk:             { bg: '#076C9E', text: '#FFFFFF' },
+  brosur:              { bg: '#076C9E', text: '#FFFFFF' },
+  sedang_berlangsung:  { bg: '#FFFAEB', text: '#F79009' },
+  selesai:             { bg: '#ECFDF3', text: '#039855' },
+  tidak_ada_aktifitas: { bg: '#F1F5F9', text: '#475569' },
 }
 
 const PROGRESS_TIPE_LABEL: Record<string, string> = {
-  spanduk:      'Spanduk',
-  brosur:       'Brosur',
-  laporan_baru: 'Laporan Baru',
-  berita_acara: 'Berita Acara',
+  spanduk:             'Spanduk',
+  brosur:              'Brosur',
+  laporan_baru:        'Laporan Baru',
+  berita_acara:        'Berita Acara',
+  sedang_berlangsung:  'Sedang Berlangsung',
+  selesai:             'Selesai',
+  tidak_ada_aktifitas: 'Tidak Ada Aktifitas',
 }
 
 function extractTowerNo(nama?: string | null): string {
@@ -113,7 +119,7 @@ const JENIS_LABEL: Record<string, string> = {
   pemanfaatan_lahan:    'Pemanfaatan Lahan',
 }
 
-// ── Donut Chart — 4 segments: Aman / Sedang / Kritis Terpenuhi / Kritis Tidak Terpenuhi ────
+// ── Donut Chart — 4 segments: Aman / Sedang / Kritis / Kritis ────
 function DonutChart({ aman, sedang, kritisTerpenuhi, kritisLdakTerpenuhi }: {
   aman: number; sedang: number; kritisTerpenuhi: number; kritisLdakTerpenuhi: number
 }) {
@@ -152,14 +158,14 @@ function DonutChart({ aman, sedang, kritisTerpenuhi, kritisLdakTerpenuhi }: {
         strokeLinecap="round"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
-      {/* Kritis Terpenuhi — #EF4444 */}
+      {/* Kritis — #EF4444 */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#EF4444" strokeWidth={strokeW}
         strokeDasharray={`${ktArc} ${circumference - ktArc}`}
         strokeDashoffset={startOffset - amanArc - sedArc}
         strokeLinecap="round"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
-      {/* Kritis Tidak Terpenuhi — #991B1B */}
+      {/* Kritis — #991B1B */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#991B1B" strokeWidth={strokeW}
         strokeDasharray={`${kntArc} ${circumference - kntArc}`}
         strokeDashoffset={startOffset - amanArc - sedArc - ktArc}
@@ -254,7 +260,7 @@ export default function DashboardPage() {
             jenisGangguan: JENIS_LABEL[r.jenisGangguan] ?? r.jenisGangguan ?? '—',
             teknisi: r.teknisi ?? r.pelapor?.nama ?? '—',
             levelRisiko: r.levelRisiko ?? '—',
-            latestProgressTipe: r.latestProgressTipe ?? null,
+            latestProgressTipe: r.progresLaporan ?? r.latestProgressTipe ?? null,
           })))
         })
         .catch(() => {}),
@@ -281,6 +287,12 @@ export default function DashboardPage() {
       asetApi.getMapOverview()
         .then((res) => {
           const overview = res.data
+          const getTipe = (name: string): 'SUTET' | 'SUTT' | 'SKTT' | 'gardu' => {
+            const n = (name ?? '').toUpperCase()
+            if (n.includes('SUTET')) return 'SUTET'
+            if (n.includes('SKTT') || n.includes('JOINT') || n.startsWith('TRS ')) return 'SKTT'
+            return 'SUTT'
+          }
           // Transform aset towers to FeaturedTower format expected by TowerMapGoogle
           const mapTowers = (overview.towers ?? []).map((t: any) => {
             const types: string[] = t.kerawanan_types?.length
@@ -291,15 +303,14 @@ export default function DashboardPage() {
               nama:       t.name,
               lat:        t.lat,
               lng:        t.lng,
-              tipe:       'SUTT' as const,
-              jalur:      null,
-              nomorUrut:  null,
+              tipe:       t.tipe ?? getTipe(t.name),
+              bersertifikat: t.bersertifikat ?? false,
               updatedAt:  t.updated_at ?? null,
-              kerawanan:  t.status !== 'aman'
+              kerawanan:  types.length > 0
                 ? types.map((jenis: string) => ({
                     kategori: jenis,
-                    level:    t.status as string,
-                    status:   t.status,
+                    level:    (t.status ?? 'aman') as string,
+                    status:   t.status ?? 'aman',
                   }))
                 : [],
             }
@@ -332,15 +343,7 @@ export default function DashboardPage() {
 
   return (
     <div className="dash-container">
-      {/* Alert banner — Figma: #FEF3F2 bg, #D92D20 text/border */}
-      {alertCount > 0 && (
-        <div className="dash-alert">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M9 1.5C4.86 1.5 1.5 4.86 1.5 9C1.5 13.14 4.86 16.5 9 16.5C13.14 16.5 16.5 13.14 16.5 9C16.5 4.86 13.14 1.5 9 1.5ZM8.25 5.25H9.75V9.75H8.25V5.25ZM9 13.5C8.5875 13.5 8.25 13.1625 8.25 12.75C8.25 12.3375 8.5875 12 9 12C9.4125 12 9.75 12.3375 9.75 12.75C9.75 13.1625 9.4125 13.5 9 13.5Z" fill="#D92D20"/>
-          </svg>
-          <span>{alertCount} tower dalam kondisi gangguan aktif — segera tindaklanjuti</span>
-        </div>
-      )}
+      {/* Alert banner — Removed as requested */}
 
       {/* Title */}
       <h1 className="dash-title">Dashboard</h1>
@@ -417,8 +420,7 @@ export default function DashboardPage() {
             {[
               { color: '#039855', label: 'Aman',                  count: amanTower,                 pct: amanPct   },
               { color: '#F79009', label: 'Sedang',                count: sedangTower,               pct: sedangPct },
-              { color: '#EF4444', label: 'Kritis Terpenuhi',      count: kritisTerpenuhiTower,      pct: ktPct     },
-              { color: '#991B1B', label: 'Kritis Tidak Terpenuhi', count: kritisLdakTerpenuhiTower, pct: kntPct    },
+              { color: '#EF4444', label: 'Kritis', count: kritisTerpenuhiTower + kritisLdakTerpenuhiTower, pct: ktPct + kntPct },
             ].map((row) => (
               <div key={row.label} className="dash-aset-legend-item">
                 <div className="dash-legend-header">
@@ -444,7 +446,6 @@ export default function DashboardPage() {
           <div className="dash-map-container">
             <TowerMap
               towers={towerKerawanan.length > 0 ? towerKerawanan : undefined}
-              jalurKml={jalurKmlData.length > 0 ? jalurKmlData : undefined}
             />
           </div>
         </div>
@@ -484,7 +485,6 @@ export default function DashboardPage() {
               <tr>
                 <th>Tanggal</th>
                 <th>Ruas</th>
-                <th>No. Tower</th>
                 <th>Jenis Kerawanan</th>
                 <th>Teknisi</th>
                 <th>Status Kerawanan</th>
@@ -498,7 +498,6 @@ export default function DashboardPage() {
                   <td className="text-[14px] text-[#5f737f]" style={{ maxWidth: 220 }}>
                     <span className="block truncate" title={row.towerNama}>{row.towerNama}</span>
                   </td>
-                  <td className="text-[14px] text-[#5f737f] whitespace-nowrap">{row.towerNo}</td>
                   <td className="text-[14px] text-[#5f737f]">{row.jenisGangguan}</td>
                   <td className="text-[14px] text-[#5f737f]">{row.teknisi}</td>
                   <td><LevelBadge level={row.levelRisiko} /></td>
@@ -507,7 +506,7 @@ export default function DashboardPage() {
               ))}
               {recent.length === 0 && (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', color: '#5F737F', padding: '32px 16px' }}>
+                  <td colSpan={6} style={{ textAlign: 'center', color: '#5F737F', padding: '32px 16px' }}>
                     Belum ada data riwayat kerawanan transmisi
                   </td>
                 </tr>

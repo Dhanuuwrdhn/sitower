@@ -9,8 +9,8 @@ import {
   ChevronDown, MoreHorizontal, Eye, Pencil,
   ArrowLeft, AlertTriangle, FileText, ImagePlus, Clock,
 } from 'lucide-react'
-import { laporanApi, towersApi, importApi } from '@/lib/api'
-import { getUser, isAdmin } from '@/lib/auth'
+import { laporanApi, towersApi, importApi, pegawaiApi } from '@/lib/api'
+import { getUser, isAdmin, isSuperadmin } from '@/lib/auth'
 import { getDistance } from '@/lib/geo'
 import { resolveMediaUrl } from '@/lib/utils'
 import { useSidebar } from '@/components/layout/SidebarContext'
@@ -46,11 +46,12 @@ const STATUS_LABEL: Record<string, string> = {
   berlangsung:         'Sedang Berlangsung',
   selesai:             'Selesai',
   tidak_ada_aktifitas: 'Tidak Ada Aktifitas',
+  tidak_ada_aktivitas: 'Tidak Ada Aktivitas',
 }
 
 const LEVEL_OPTIONS = [
-  { value: 'kritis_terpenuhi',      label: 'Kritis Terpenuhi',      color: 'text-red-600',    bg: 'bg-red-50 border-red-300',       dot: 'bg-red-500' },
-  { value: 'kritis_tidak_terpenuhi', label: 'Kritis Tidak Terpenuhi', color: 'text-red-700',    bg: 'bg-red-100 border-red-400',      dot: 'bg-red-700' },
+  { value: 'kritis_terpenuhi',      label: 'Kritis',      color: 'text-red-600',    bg: 'bg-red-50 border-red-300',       dot: 'bg-red-500' },
+  { value: 'kritis_tidak_terpenuhi', label: 'Kritis', color: 'text-red-700',    bg: 'bg-red-100 border-red-400',      dot: 'bg-red-700' },
   { value: 'sedang',                label: 'Sedang',                color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-300', dot: 'bg-yellow-500' },
   { value: 'aman',                  label: 'Aman',                  color: 'text-green-600',  bg: 'bg-green-50 border-green-300',   dot: 'bg-green-500' },
 ]
@@ -74,14 +75,15 @@ const STATUS_CLASS: Record<string, string> = {
   berlangsung:         'badge-berlangsung badge-blink',
   selesai:             'badge-selesai',
   tidak_ada_aktifitas: 'badge-menunggu',
+  tidak_ada_aktivitas: 'badge-menunggu',
 }
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
 
 // Exact colors from Figma node 229-8374
 const LEVEL_BADGE: Record<string, { bg: string; text: string; label: string }> = {
-  kritis_terpenuhi:      { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis Terpenuhi'      },
-  kritis_tidak_terpenuhi:{ bg: '#FEE4E2', text: '#912018', label: 'Kritis Tidak Terpenuhi' },
+  kritis_terpenuhi:      { bg: '#FEE4E2', text: '#D92D20', label: 'Kritis'      },
+  kritis_tidak_terpenuhi:{ bg: '#FEE4E2', text: '#912018', label: 'Kritis' },
   sedang:                { bg: '#FFFAEB', text: '#F79009', label: 'Sedang'                 },
   aman:                  { bg: '#ECFDF3', text: '#039855', label: 'Aman'                   },
   // legacy fallback
@@ -89,20 +91,30 @@ const LEVEL_BADGE: Record<string, { bg: string; text: string; label: string }> =
 }
 
 const PROGRESS_TIPE_LABEL: Record<string, string> = {
-  spanduk:      'Spanduk',
-  brosur:       'Brosur',
-  laporan_baru: 'Laporan Baru',
-  berita_acara: 'Berita Acara',
+  spanduk:              'Spanduk',
+  brosur:               'Brosur',
+  laporan_baru:         'Laporan Baru',
+  berita_acara:         'Berita Acara',
+  surat:                'Surat',
+  sedang_berlangsung:   'Sedang Berlangsung',
+  selesai:              'Selesai',
+  tidak_ada_aktifitas:  'Tidak Ada Aktivitas',
+  tidak_ada_aktivitas:  'Tidak Ada Aktivitas',
 }
 
 const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {
-  laporan_baru: { bg: '#076C9E', text: '#FFFFFF' },
-  berita_acara: { bg: '#076C9E', text: '#FFFFFF' },
-  spanduk:      { bg: '#076C9E', text: '#FFFFFF' },
-  brosur:       { bg: '#076C9E', text: '#FFFFFF' },
+  laporan_baru:         { bg: '#076C9E', text: '#FFFFFF' },
+  berita_acara:         { bg: '#076C9E', text: '#FFFFFF' },
+  spanduk:              { bg: '#076C9E', text: '#FFFFFF' },
+  brosur:               { bg: '#076C9E', text: '#FFFFFF' },
+  surat:                { bg: '#076C9E', text: '#FFFFFF' },
+  sedang_berlangsung:   { bg: '#076C9E', text: '#FFFFFF' },
+  selesai:              { bg: '#039855', text: '#FFFFFF' },
+  tidak_ada_aktifitas:  { bg: '#66757F', text: '#FFFFFF' },
+  tidak_ada_aktivitas:  { bg: '#66757F', text: '#FFFFFF' },
 }
 
-const PROGRESS_TIPE_LIST = ['spanduk', 'brosur', 'laporan_baru', 'berita_acara'] as const
+const PROGRESS_TIPE_LIST = ['spanduk', 'brosur', 'laporan_baru', 'berita_acara', 'surat'] as const
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -164,17 +176,133 @@ async function compressImage(file: File, maxPx = 1920, quality = 0.75): Promise<
   })
 }
 
+// ── Searchable Select Component ────────────────────────────────────────────────
+
+function SearchableSelect({
+  label,
+  placeholder,
+  options,
+  values,
+  onChange,
+  onClear,
+}: {
+  label: string
+  placeholder: string
+  options: { value: string; label: string; sub?: string }[]
+  values: string[]
+  onChange: (vals: string[]) => void
+  onClear: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const filtered = options.filter(o => 
+    o.label.toLowerCase().includes(search.toLowerCase()) || 
+    (o.sub ?? '').toLowerCase().includes(search.toLowerCase())
+  )
+
+  const toggle = (v: string) => {
+    if (values.includes(v)) onChange(values.filter(x => x !== v))
+    else onChange([...values, v])
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5" ref={ref}>
+      <div className="flex items-center justify-between">
+        <span className="font-bold text-[14px] text-[#1C1C1C]">{label}</span>
+        {values.length > 0 && (
+          <button onClick={(e) => { e.stopPropagation(); onClear() }} className="text-[11px] text-[#D92D20] font-semibold hover:underline">
+            Reset
+          </button>
+        )}
+      </div>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          className="w-full min-h-[44px] px-3 py-2 border border-[#E1E8EC] rounded-lg bg-white flex flex-wrap items-center gap-1.5 text-left transition-all hover:border-[#076C9E]"
+        >
+          {values.length === 0 ? (
+            <span className="text-[#97AAB3] text-[14px]">{placeholder}</span>
+          ) : (
+            values.map(v => {
+              const opt = options.find(o => o.value === v)
+              return (
+                <span key={v} className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#F0F9FF] text-[#076C9E] border border-[#B9E6FE] rounded text-[12px] font-medium">
+                  {opt?.label ?? v}
+                  <X size={12} className="cursor-pointer" onClick={(e) => { e.stopPropagation(); toggle(v) }} />
+                </span>
+              )
+            })
+          )}
+          <div className="ml-auto flex items-center gap-1">
+             <ChevronDown size={14} className={`text-[#5F737F] transition-transform ${open ? 'rotate-180' : ''}`} />
+          </div>
+        </button>
+
+        {open && (
+          <div className="mt-1 w-full bg-white border border-[#E1E8EC] rounded-xl shadow-sm overflow-hidden flex flex-col max-h-[280px]">
+            <div className="p-2 border-b border-[#E1E8EC]">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-[#F6F9FC] rounded-lg border border-[#E1E8EC]">
+                <Search size={14} className="text-[#5F737F]" />
+                <input
+                  autoFocus
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Cari..."
+                  className="bg-transparent border-none outline-none text-[13px] text-[#1C1C1C] w-full"
+                />
+              </div>
+            </div>
+            <div className="overflow-y-auto flex-1 py-1">
+              {filtered.map(opt => {
+                const active = values.includes(opt.value)
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => toggle(opt.value)}
+                    className={`w-full text-left px-4 py-2.5 flex flex-col transition-colors ${active ? 'bg-[#F0F9FF]' : 'hover:bg-[#F6F9FC]'}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[13px] font-medium ${active ? 'text-[#076C9E]' : 'text-[#1C1C1C]'}`}>{opt.label ?? opt.value}</span>
+                      {active && <div className="w-4 h-4 rounded-full bg-[#076C9E] flex items-center justify-center"><X size={10} color="#fff" /></div>}
+                    </div>
+                    {opt.sub && <span className="text-[11px] text-[#5F737F] leading-tight mt-0.5">{opt.sub}</span>}
+                  </button>
+                )
+              })}
+              {filtered.length === 0 && <p className="text-center py-4 text-[13px] text-[#97AAB3]">Tidak ditemukan</p>}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ── Row action 3-dot menu ─────────────────────────────────────────────────────
 
 function RowActions({
   row,
   onDetail,
+  onUpdate,
   onEdit,
   onDelete,
   showDelete,
 }: {
   row: any
   onDetail: (row: any) => void
+  onUpdate: (row: any) => void
   onEdit: (row: any) => void
   onDelete: (row: any) => void
   showDelete: boolean
@@ -250,7 +378,7 @@ function RowActions({
     <div className="inline-flex mx-auto">
       <button
         ref={btnRef}
-        onClick={handleToggle}
+        onClick={(e) => { e.stopPropagation(); handleToggle() }}
         className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted hover:text-app-text transition-colors"
         title="Aksi"
       >
@@ -269,17 +397,20 @@ function RowActions({
             Lihat Detail Laporan
           </button>
 
-          <div style={{ height: 1, background: '#E1E8EC' }} />
-
-          <button
-            onClick={() => { setOpen(false); onEdit(row) }}
-            style={itemStyle}
-            onMouseEnter={(e) => (e.currentTarget.style.background = '#F6F9FC')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-          >
-            <Pencil size={16} />
-            Edit Laporan
-          </button>
+          {row.status !== 'selesai' && (
+            <>
+              <div style={{ height: 1, background: '#E1E8EC' }} />
+              <button
+                onClick={() => { setOpen(false); onUpdate(row) }}
+                style={itemStyle}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#F6F9FC')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <Clock size={16} />
+                Update Riwayat Laporan
+              </button>
+            </>
+          )}
 
           {showDelete && (
             <>
@@ -325,16 +456,12 @@ interface TowerOption {
 // Parse display label and subtitle from tower nama
 function parseTowerDisplay(t: TowerOption): { label: string; sub: string } {
   const nama = t.nama ?? t.nomorTower
-  // "Tower/Span T6 - T7 (SUTET 500KV DURIKOSAMBI - KEMBANGAN)" → label="T6 - T7", sub="SUTET 500KV · DURIKOSAMBI–KEMBANGAN"
   const spanMatch = nama.match(/Tower\/Span\s+(.+?)\s+\((.+)\)/)
   if (spanMatch) {
     const span = spanMatch[1].trim()
-    const detail = spanMatch[2].trim()
-    return { label: span, sub: detail }
+    return { label: nama, sub: span }
   }
-  // "TOWER SUTET KMBGN-DKSBI 500kV #P1A" → label=id, sub=nama
-  if (nama !== t.id) return { label: t.id, sub: nama }
-  return { label: t.id, sub: '' }
+  return { label: nama, sub: (t.id && t.id !== nama) ? t.id : '' }
 }
 
 function resolveGroup(t: TowerOption): string {
@@ -405,7 +532,7 @@ function TowerDropdown({
         className="form-input flex items-center justify-between text-left"
       >
         <span className={selectedLabel ? 'text-app-text' : 'text-app-subtle'}>
-          {selectedLabel || 'Pilih tower...'}
+          {selectedLabel || 'Pilih ruas...'}
         </span>
         <ChevronDown size={14} className="text-app-muted shrink-0" />
       </button>
@@ -417,7 +544,7 @@ function TowerDropdown({
               autoFocus
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari nomor tower atau jalur..."
+              placeholder="Cari ruas atau jalur..."
               className="form-input text-[12px]"
             />
           </div>
@@ -446,7 +573,7 @@ function TowerDropdown({
               ) : null
             )}
             {groupOrder.every((g) => grouped[g].length === 0) && (
-              <p className="text-center text-[13px] text-app-muted py-6">Tower tidak ditemukan</p>
+              <p className="text-center text-[13px] text-app-muted py-6">Ruas tidak ditemukan</p>
             )}
           </div>
         </div>
@@ -1166,22 +1293,76 @@ function PhotoLightbox({
   )
 }
 
-function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?: () => void; onClose?: () => void }) {
+function DetailReadView({ laporan, onSaved, onClose, autoOpenUpdate }: { laporan: any; onSaved?: () => void; onClose?: () => void; autoOpenUpdate?: boolean }) {
   const { isMobile } = useSidebar()
-  const [progress, setProgress] = useState<Record<string, any[]>>({ spanduk: [], brosur: [], laporan_baru: [], berita_acara: [] })
-  const [fotoHistory, setFotoHistory] = useState<any[]>([])
+  const [progress, setProgress] = useState<Record<string, any[]>>({ spanduk: [], brosur: [], laporan_baru: [], berita_acara: [], surat: [] })
+  const [riwayat, setRiwayat] = useState<any[]>([])
   const [uploading, setUploading] = useState<string | null>(null)
-  const [uploadingFoto, setUploadingFoto] = useState(false)
   const [selesaiLoading, setSelesaiLoading] = useState(false)
   const [lightbox, setLightbox] = useState<{ urls: string[]; index: number } | null>(null)
-  const fotoUpdateRef = useRef<HTMLInputElement>(null)
+  const [showUpdateDrawer, setShowUpdateDrawer] = useState(false)
+  const [riwayatForm, setRiwayatForm] = useState({ statusKerawanan: 'aman', progresLaporan: 'sedang_berlangsung', uraianPekerjaan: '', upayaPengendalian: '', pihakLain: '', contactPerson: '' })
+  const [riwayatFiles, setRiwayatFiles] = useState<{ foto: File[]; beritaAcara: File[]; spanduk: File[]; surat: File[] }>({ foto: [], beritaAcara: [], spanduk: [], surat: [] })
+  const [savingRiwayat, setSavingRiwayat] = useState(false)
+  const riwayatFileRefs = useRef<{ foto: HTMLInputElement | null; beritaAcara: HTMLInputElement | null; spanduk: HTMLInputElement | null; surat: HTMLInputElement | null }>({ foto: null, beritaAcara: null, spanduk: null, surat: null })
   const progressRefs = useRef<Record<string, HTMLInputElement | null>>({})
+
+  const user = getUser()
+
+  async function handleDelete(id: string) {
+    try {
+      await laporanApi.delete(id)
+      toast.success('Laporan berhasil dihapus')
+      onSaved?.()
+      onClose?.()
+    } catch {
+      toast.error('Gagal menghapus laporan')
+    }
+  }
+
+  useEffect(() => {
+    if (autoOpenUpdate && laporan?.status !== 'selesai') setShowUpdateDrawer(true)
+  }, [autoOpenUpdate, laporan?.status])
 
   useEffect(() => {
     if (!laporan?.id) return
     laporanApi.getProgress(laporan.id).then(r => setProgress(r.data)).catch(() => {})
-    laporanApi.getFotoHistory(laporan.id).then(r => setFotoHistory(r.data ?? [])).catch(() => {})
+    laporanApi.getRiwayat(laporan.id).then(r => setRiwayat(r.data ?? [])).catch(() => {})
   }, [laporan?.id])
+
+  async function handleAddRiwayat(e?: React.FormEvent) {
+    e?.preventDefault()
+    if (!laporan?.id) return
+    setSavingRiwayat(true)
+    try {
+      const fd = new FormData()
+      fd.append('oleh', user?.nama ?? 'Unknown')
+      fd.append('statusKerawanan', riwayatForm.statusKerawanan)
+      fd.append('progresLaporan', riwayatForm.progresLaporan)
+      if (riwayatForm.uraianPekerjaan) fd.append('uraianPekerjaan', riwayatForm.uraianPekerjaan)
+      if (riwayatForm.upayaPengendalian) fd.append('upayaPengendalian', riwayatForm.upayaPengendalian)
+      if (riwayatForm.pihakLain) fd.append('pihakLain', riwayatForm.pihakLain)
+      if (riwayatForm.contactPerson) fd.append('contactPerson', riwayatForm.contactPerson)
+      riwayatFiles.foto.forEach(f => fd.append('foto', f))
+      riwayatFiles.beritaAcara.forEach(f => fd.append('beritaAcara', f))
+      riwayatFiles.spanduk.forEach(f => fd.append('spanduk', f))
+      riwayatFiles.surat.forEach(f => fd.append('surat', f))
+      const res = await laporanApi.addRiwayat(laporan.id, fd)
+      setRiwayat(prev => [res.data, ...prev])
+      setShowUpdateDrawer(false)
+      setRiwayatForm({ statusKerawanan: 'aman', progresLaporan: 'sedang_berlangsung', uraianPekerjaan: '', upayaPengendalian: '', pihakLain: '', contactPerson: '' })
+      setRiwayatFiles({ foto: [], beritaAcara: [], spanduk: [], surat: [] })
+      toast.success('Riwayat pembaruan ditambahkan')
+    } catch { toast.error('Gagal menyimpan riwayat') } finally { setSavingRiwayat(false) }
+  }
+
+  async function handleDeleteRiwayat(riwayatId: string) {
+    if (!laporan?.id || !confirm('Hapus riwayat ini?')) return
+    try {
+      await laporanApi.deleteRiwayat(laporan.id, riwayatId)
+      setRiwayat(prev => prev.filter(r => r.id !== riwayatId))
+    } catch { toast.error('Gagal menghapus riwayat') }
+  }
 
   async function handleSelesaikan() {
     if (!laporan?.id) return
@@ -1213,18 +1394,6 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
     } catch { toast.error('Gagal menghapus') }
   }
 
-  async function handleFotoUpdate(files: FileList) {
-    const raw = Array.from(files).filter(f => /\.(jpe?g|png|webp)$/i.test(f.name)).slice(0, 10)
-    if (!raw.length) { toast.error('Hanya JPG/PNG/WEBP'); return }
-    setUploadingFoto(true)
-    try {
-      const compressed = await Promise.all(raw.map(f => compressImage(f)))
-      await laporanApi.uploadFotoUpdate(laporan.id, compressed)
-      toast.success(`${compressed.length} foto diunggah`)
-      laporanApi.getFotoHistory(laporan.id).then(r => setFotoHistory(r.data ?? [])).catch(() => {})
-    } catch { toast.error('Gagal upload foto') } finally { setUploadingFoto(false) }
-  }
-
   const fotoUrls: string[] = laporan?.foto ?? []
   const isPPL = laporan?.jenisGangguan === 'pekerjaan_pihak_lain'
 
@@ -1240,111 +1409,487 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
     />
   ))
 
+  // ── Shared riwayat file attachment renderer
+  function renderRiwayatDocs(r: any) {
+    const fields: Array<{ key: string; label: string }> = [
+      { key: 'foto',        label: 'Foto Bukti' },
+      { key: 'beritaAcara', label: 'Berita Acara' },
+      { key: 'spanduk',     label: 'Spanduk' },
+      { key: 'surat',       label: 'Surat Pemberitahuan' },
+    ]
+    const hasAny = fields.some(f => (r[f.key] ?? []).length > 0)
+    if (!hasAny) return null
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 10 }}>
+        {fields.map(({ key, label }) => {
+          const urls: string[] = r[key] ?? []
+          if (!urls.length) return null
+          const imgs = urls.filter(u => /\.(jpe?g|png|webp)$/i.test(u))
+          const pdfs = urls.filter(u => /\.pdf$/i.test(u))
+          return (
+            <div key={key}>
+              <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 4 }}>{label}</span>
+              {imgs.length > 0 && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 4, marginBottom: pdfs.length ? 4 : 0 }}>
+                  {imgs.map((url, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img key={i} src={resolveMediaUrl(url)} alt=""
+                      style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 6, border: '1px solid #E1E8EC', cursor: 'pointer' }}
+                      onClick={() => setLightbox({ urls: imgs.map(resolveMediaUrl), index: i })} />
+                  ))}
+                </div>
+              )}
+              {pdfs.map((url, i) => (
+                <a key={i} href={resolveMediaUrl(url)} target="_blank" rel="noreferrer"
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 8px', border: '1px solid #E1E8EC', borderRadius: 6, marginBottom: 4, textDecoration: 'none' }}>
+                  <FileText size={13} style={{ color: '#D92D20', flexShrink: 0 }} />
+                  <span style={{ fontSize: 11, color: '#1B1B1B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url.split('/').pop()}</span>
+                </a>
+              ))}
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
+  // ── "Perbarui Laporan" side drawer (portal, shared mobile + desktop)
+  const updateDrawer = showUpdateDrawer && typeof window !== 'undefined' && createPortal(
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', justifyContent: 'flex-end' }}>
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)' }} onClick={() => setShowUpdateDrawer(false)} />
+      <div style={{ position: 'relative', width: isMobile ? '100%' : 420, background: '#fff', height: '100%', display: 'flex', flexDirection: 'column', zIndex: 1, boxShadow: '-4px 0 24px rgba(0,0,0,0.12)' }}>
+        {/* Drawer header */}
+        <div style={{ padding: '20px 20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B' }}>Perbarui Laporan</span>
+          <button type="button" onClick={() => setShowUpdateDrawer(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 4 }}>
+            <X size={20} color="#1B1B1B" />
+          </button>
+        </div>
+        <div style={{ height: 1, background: '#E1E8EC', flexShrink: 0 }} />
+
+        {/* Scrollable form */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Alert */}
+          <div style={{ background: '#FFF9EC', border: '1px solid #F9C840', borderRadius: 8, padding: '10px 14px', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+            <AlertTriangle size={15} style={{ color: '#B54708', flexShrink: 0, marginTop: 1 }} />
+            <span style={{ fontSize: 13, color: '#B54708', fontWeight: 500 }}>Perhatian: Pastikan anda sudah menghidupkan akses lokasi di handphone anda.</span>
+          </div>
+
+          {/* Foto Bukti */}
+          <div>
+            <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 8 }}>Foto Bukti Terjadinya Kerawanan</label>
+            <button type="button" onClick={() => riwayatFileRefs.current.foto?.click()}
+              style={{ width: '100%', padding: '12px', border: '1px dashed #C5D3D9', borderRadius: 8, background: riwayatFiles.foto.length > 0 ? '#EBF5FB' : '#fff', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: riwayatFiles.foto.length > 0 ? '#076C9E' : '#5F737F' }}>
+              <ImagePlus size={16} />
+              {riwayatFiles.foto.length > 0 ? `${riwayatFiles.foto.length} foto dipilih` : 'Pilih foto bukti'}
+            </button>
+            {riwayatFiles.foto.length > 0 && (
+              <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                {riwayatFiles.foto.map((f, i) => (
+                  <span key={i} style={{ fontSize: 11, color: '#5F737F', background: '#F6F9FC', border: '1px solid #E1E8EC', borderRadius: 4, padding: '2px 8px' }}>{f.name}</span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Status Kerawanan */}
+          <div>
+            <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 6 }}>Status Kerawanan</label>
+            <select className="form-input" value={riwayatForm.statusKerawanan} onChange={e => setRiwayatForm(f => ({ ...f, statusKerawanan: e.target.value }))}>
+              <option value="aman">Aman</option>
+              <option value="sedang">Sedang</option>
+              <option value="kritis_terpenuhi">Kritis</option>
+            </select>
+          </div>
+
+          {/* Uraian Pekerjaan */}
+          <div>
+            <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 6 }}>
+              Uraian Pekerjaan <span style={{ fontWeight: 400, color: '#97AAB3', fontSize: 12 }}>(Opsional)</span>
+            </label>
+            <div style={{ position: 'relative' }}>
+              <textarea className="form-input" rows={3} value={riwayatForm.uraianPekerjaan}
+                onChange={e => setRiwayatForm(f => ({ ...f, uraianPekerjaan: e.target.value }))}
+                placeholder="Uraian pekerjaan..." style={{ resize: 'vertical' }} />
+              {riwayatForm.uraianPekerjaan && (
+                <button type="button" onClick={() => setRiwayatForm(f => ({ ...f, uraianPekerjaan: '' }))}
+                  style={{ position: 'absolute', right: 8, top: 8, background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                  <X size={14} color="#97AAB3" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* ─── Informasi Pihak Lain ─── */}
+          <div style={{ height: 1, background: '#E1E8EC' }} />
+          <div>
+            <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>Informasi Pihak Lain</span>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 6 }}>Pihak Lain</label>
+                <div style={{ position: 'relative' }}>
+                  <input className="form-input" type="text" value={riwayatForm.pihakLain}
+                    onChange={e => setRiwayatForm(f => ({ ...f, pihakLain: e.target.value }))}
+                    placeholder="Nama perusahaan..." />
+                  {riwayatForm.pihakLain && (
+                    <button type="button" onClick={() => setRiwayatForm(f => ({ ...f, pihakLain: '' }))}
+                      style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                      <X size={13} color="#97AAB3" />
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 6 }}>Contact Person</label>
+                <div style={{ position: 'relative' }}>
+                  <input className="form-input" type="text" value={riwayatForm.contactPerson}
+                    onChange={e => setRiwayatForm(f => ({ ...f, contactPerson: e.target.value }))}
+                    placeholder="08xxx..." />
+                  {riwayatForm.contactPerson && (
+                    <button type="button" onClick={() => setRiwayatForm(f => ({ ...f, contactPerson: '' }))}
+                      style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                      <X size={13} color="#97AAB3" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ─── Informasi Pengendalian ─── */}
+          <div style={{ height: 1, background: '#E1E8EC' }} />
+          <div>
+            <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>Informasi Pengendalian</span>
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 6 }}>
+                Upaya Pengendalian <span style={{ fontWeight: 400, color: '#97AAB3', fontSize: 12 }}>(Opsional)</span>
+              </label>
+              <div style={{ position: 'relative' }}>
+                <textarea className="form-input" rows={3} value={riwayatForm.upayaPengendalian}
+                  onChange={e => setRiwayatForm(f => ({ ...f, upayaPengendalian: e.target.value }))}
+                  placeholder="Upaya pengendalian..." style={{ resize: 'vertical' }} />
+                {riwayatForm.upayaPengendalian && (
+                  <button type="button" onClick={() => setRiwayatForm(f => ({ ...f, upayaPengendalian: '' }))}
+                    style={{ position: 'absolute', right: 8, top: 8, background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                    <X size={14} color="#97AAB3" />
+                  </button>
+                )}
+              </div>
+            </div>
+            {/* Berita Acara + Spanduk */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+              {(['beritaAcara', 'spanduk'] as const).map(field => (
+                <div key={field}>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 6 }}>
+                    {field === 'beritaAcara' ? 'Berita Acara' : 'Spanduk'}
+                  </label>
+                  <button type="button" onClick={() => riwayatFileRefs.current[field]?.click()}
+                    style={{ width: '100%', padding: '10px 12px', border: '1px dashed #C5D3D9', borderRadius: 8, background: riwayatFiles[field].length > 0 ? '#EBF5FB' : '#fff', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: riwayatFiles[field].length > 0 ? '#076C9E' : '#5F737F' }}>
+                    <Upload size={14} />
+                    {riwayatFiles[field].length > 0 ? `${riwayatFiles[field].length} file` : 'Pilih file'}
+                  </button>
+                </div>
+              ))}
+            </div>
+            {/* Surat Pemberitahuan */}
+            <div>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 6 }}>Surat Pemberitahuan</label>
+              <button type="button" onClick={() => riwayatFileRefs.current.surat?.click()}
+                style={{ width: '100%', padding: '10px 12px', border: '1px dashed #C5D3D9', borderRadius: 8, background: riwayatFiles.surat.length > 0 ? '#EBF5FB' : '#fff', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: riwayatFiles.surat.length > 0 ? '#076C9E' : '#5F737F' }}>
+                <Upload size={14} />
+                {riwayatFiles.surat.length > 0 ? `${riwayatFiles.surat.length} file` : 'Pilih file'}
+              </button>
+            </div>
+          </div>
+
+          {/* ─── Informasi Progres Laporan ─── */}
+          <div style={{ height: 1, background: '#E1E8EC' }} />
+          <div>
+            <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>Informasi Progres Laporan</span>
+            <div>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 6 }}>Progres Laporan</label>
+              <select className="form-input" value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(riwayatForm.progresLaporan) ? 'tidak_ada_aktifitas' : riwayatForm.progresLaporan} onChange={e => setRiwayatForm(f => ({ ...f, progresLaporan: e.target.value }))}>
+                <option value="sedang_berlangsung">Sedang Berlangsung</option>
+                <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
+                <option value="selesai">Selesai</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Drawer footer */}
+        <div style={{ height: 1, background: '#E1E8EC', flexShrink: 0 }} />
+        <div style={{ padding: '16px 20px', display: 'flex', gap: 12, flexShrink: 0 }}>
+          <button type="button" onClick={() => setShowUpdateDrawer(false)}
+            style={{ flex: 1, padding: '10px', borderRadius: 8, border: '1px solid #E1E8EC', background: '#fff', color: '#1B1B1B', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+            Batalkan
+          </button>
+          <button type="button" disabled={savingRiwayat} onClick={() => handleAddRiwayat()}
+            style={{ flex: 2, padding: '10px', borderRadius: 8, border: 'none', background: '#076C9E', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', opacity: savingRiwayat ? 0.7 : 1 }}>
+            {savingRiwayat ? 'Menyimpan...' : 'Perbarui Laporan'}
+          </button>
+        </div>
+
+        {/* Hidden file inputs */}
+        {(['foto', 'beritaAcara', 'spanduk', 'surat'] as const).map(field => (
+          <input key={field} ref={el => { riwayatFileRefs.current[field] = el }}
+            type="file" accept="image/*,.pdf" multiple className="hidden"
+            onChange={e => { if (e.target.files?.length) setRiwayatFiles(f => ({ ...f, [field]: Array.from(e.target.files!) })); e.target.value = '' }} />
+        ))}
+      </div>
+    </div>,
+    document.body
+  )
+
   // ══════════════════════════════════════════════════
-  // MOBILE — Figma 315-2798
+  // MOBILE — synced with desktop
   // ══════════════════════════════════════════════════
   if (isMobile) {
+    const pihakLainMobile = isPPL ? laporan?.teknisi : null
     return (
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto" style={{ padding: '0 16px' }}>
 
-          {/* Header: jenis name + progress badge + date */}
+          {/* Header */}
           <div style={{ paddingTop: 16, paddingBottom: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-              <span style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B', flex: 1 }}>
-                {JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan ?? '—'}
-              </span>
-              <ProgressBadge tipe={laporan?.latestProgressTipe} />
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+              <div style={{ flex: 1 }}>
+                <span style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 4 }}>
+                  {JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan ?? '—'}
+                </span>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <LevelBadge level={laporan?.levelRisiko} />
+                  {laporan?.progresLaporan && <ProgressBadge tipe={laporan.progresLaporan} />}
+                </div>
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: 4, marginTop: 4, fontSize: 12, color: '#5F737F' }}>
-              <span>Tanggal Laporan Dibuat:</span>
+            <div style={{ display: 'flex', gap: 4, marginTop: 6, fontSize: 12, color: '#5F737F' }}>
+              <span>Dibuat pada:</span>
               <span style={{ color: '#1B1B1B' }}>{formatTanggal(laporan?.tanggal)}</span>
             </div>
           </div>
 
           <div style={{ height: 1, background: '#E1E8EC', margin: '0 -16px' }} />
 
-          {/* 2-col info grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px', padding: '16px 0' }}>
-            {isPPL && <InfoRow label="Informasi Pihak Lain" value={laporan?.teknisi} />}
-            <InfoRow label="Jenis Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
-            <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama)} />
-            {laporan?.lokasiDetail && <InfoRow label="Span" value={laporan.lokasiDetail} />}
-            {!isPPL && laporan?.pelapor?.nama && <InfoRow label="Dilaporkan Oleh" value={laporan.pelapor.nama} />}
+          {/* ── Section 1: Informasi Kerawanan ── */}
+          <div style={{ paddingTop: 16, paddingBottom: 8 }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
+              Informasi Kerawanan
+            </span>
+
+            {/* 2-col info grid — Jenis, Status, Tower, Span */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px', marginBottom: 12 }}>
+              <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan} />
+              <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
+              <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama)} />
+              {isPPL
+                ? <InfoRow label="Span" value={laporan?.lokasiDetail || '—'} />
+                : <InfoRow label="Tanggal" value={formatTanggal(laporan?.tanggal)} />
+              }
+            </div>
+
+            {/* Uraian + Pihak Lain */}
+            {(laporan?.deskripsi || pihakLainMobile) && (
+              <div style={{ display: 'grid', gridTemplateColumns: laporan?.deskripsi && pihakLainMobile ? '1fr 1fr' : '1fr', gap: '12px 16px', marginBottom: 12 }}>
+                {laporan?.deskripsi && (
+                  <InfoRow label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'} value={laporan.deskripsi} />
+                )}
+                {pihakLainMobile && (
+                  <InfoRow label="Informasi Pihak Lain" value={pihakLainMobile} />
+                )}
+              </div>
+            )}
+
+            {/* Foto bukti */}
+            {fotoUrls.length > 0 && (
+              <div style={{ marginBottom: 8 }}>
+                <span style={{ fontSize: 12, color: '#5F737F', display: 'block', marginBottom: 6 }}>
+                  Foto Bukti Terjadinya Kerawanan
+                </span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                  {fotoUrls.map((url, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img key={i} src={resolveMediaUrl(url)} alt=""
+                      style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 6, border: '1px solid #E1E8EC', cursor: 'pointer' }}
+                      onClick={() => setLightbox({ urls: fotoUrls.map(resolveMediaUrl), index: i })} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Uraian / Deskripsi */}
-          {laporan?.deskripsi && (
-            <div style={{ paddingBottom: 16 }}>
-              <InfoRow label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'} value={laporan.deskripsi} />
-            </div>
-          )}
+          <div style={{ height: 1, background: '#E1E8EC', margin: '8px -16px 16px' }} />
 
-          {/* Foto bukti as file row */}
-          {fotoUrls.length > 0 && (
-            <>
-              <div style={{ height: 1, background: '#E1E8EC', margin: '0 -16px' }} />
-              {fotoUrls.map((url, i) => (
-                <MobileFileRow
-                  key={i}
-                  thumbnailUrl={resolveMediaUrl(url)}
-                  typeLabel="Bukti Kerawanan"
-                  fileName={`Foto Bukti ${i + 1}`}
-                  fileUrl={resolveMediaUrl(url)}
-                />
-              ))}
-            </>
-          )}
+          {/* ── Section 2: Informasi Pengendalian ── */}
+          <div style={{ paddingBottom: 8 }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
+              Informasi Pengendalian Kerawanan
+            </span>
 
-          {/* Divider before pengendalian */}
-          <div style={{ height: 1, background: '#E1E8EC', margin: '4px -16px 16px' }} />
-
-          {/* Informasi Pengendalian heading */}
-          <span style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 8 }}>
-            Informasi Pengendalian
-          </span>
-
-          {/* Upaya pengendalian */}
-          {laporan?.keterangan && (
-            <div style={{ marginBottom: 12 }}>
-              <InfoRow label={isPPL ? 'Deskripsi Pengendalian' : 'Keterangan'} value={laporan.keterangan} />
-            </div>
-          )}
-
-          {/* Progress file rows — only show types that have files */}
-          {PROGRESS_TIPE_LIST.map((tipe) => {
-            const items: any[] = progress[tipe] ?? []
-            const latest = items[0]
-            if (!latest) return null
-            return (
-              <div key={tipe}>
-                <div style={{ height: 1, background: '#E1E8EC', margin: '0 -16px' }} />
-                <MobileFileRow
-                  thumbnailUrl={latest.fileUrl}
-                  typeLabel={PROGRESS_TIPE_LABEL[tipe]}
-                  fileName={latest.namaFile}
-                  fileUrl={latest.fileUrl}
-                />
+            {laporan?.keterangan && (
+              <div style={{ marginBottom: 12 }}>
+                <InfoRow label={isPPL ? 'Upaya Pengendalian' : 'Keterangan'} value={laporan.keterangan} />
               </div>
-            )
-          })}
+            )}
 
-          <div style={{ height: 24 }} />
+            {/* Progress docs */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              {PROGRESS_TIPE_LIST.map((tipe) => {
+                const items: any[] = progress[tipe] ?? []
+                const latest = items[0]
+                const isUp = uploading === tipe
+                return (
+                  <div key={tipe}>
+                    <span style={{ fontSize: 12, color: '#5F737F', display: 'block', marginBottom: 4 }}>
+                      {PROGRESS_TIPE_LABEL[tipe]}
+                    </span>
+                    {latest ? (
+                      <div style={{ border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}
+                        onClick={() => {
+                          if (/\.(jpe?g|png|webp)$/i.test(latest.fileUrl))
+                            setLightbox({ urls: [resolveMediaUrl(latest.fileUrl)], index: 0 })
+                          else window.open(resolveMediaUrl(latest.fileUrl), '_blank')
+                        }}
+                      >
+                        {/\.(jpe?g|png|webp)$/i.test(latest.fileUrl) ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={resolveMediaUrl(latest.fileUrl)} alt=""
+                            style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block' }} />
+                        ) : (
+                          <div style={{ width: '100%', aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F9FC' }}>
+                            <FileText size={28} style={{ color: '#5F737F' }} />
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <button type="button" onClick={() => progressRefs.current[tipe]?.click()} disabled={isUp}
+                        style={{ width: '100%', padding: '8px 10px', border: '1px dashed #C5D3D9', borderRadius: 8, background: '#fff', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 12, color: '#076C9E', fontWeight: 600 }}>
+                        <Plus size={12} />
+                        {isUp ? 'Upload...' : `Tambah`}
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          <div style={{ height: 1, background: '#E1E8EC', margin: '16px -16px' }} />
+
+          {/* ── Section 3: Riwayat Pembaruan Laporan ── */}
+          <div style={{ paddingBottom: 16 }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
+              Riwayat Pembaruan
+            </span>
+
+            {riwayat.length === 0 ? (
+              <p style={{ fontSize: 13, color: '#97AAB3', textAlign: 'center', padding: '16px 0' }}>Belum ada riwayat pembaruan</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {riwayat.map((r: any) => (
+                  <div key={r.id} style={{ border: '1px solid #E1E8EC', borderRadius: 10, padding: 14 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                      <span style={{ fontSize: 12, color: '#97AAB3' }}>
+                        {new Date(r.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} · {r.oleh}
+                      </span>
+                      {isSuperadmin() && (
+                        <button type="button" onClick={() => handleDeleteRiwayat(r.id)}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 2 }}>
+                          <X size={13} />
+                        </button>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
+                      <div>
+                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 3 }}>Status</span>
+                        <LevelBadge level={r.statusKerawanan} />
+                      </div>
+                      <div>
+                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 3 }}>Progres</span>
+                        <ProgressBadge tipe={r.progresLaporan} />
+                      </div>
+                    </div>
+                    {(r.uraianPekerjaan || r.upayaPengendalian || r.pihakLain || r.contactPerson) && (
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 12px', marginBottom: 8 }}>
+                        {r.uraianPekerjaan && <div><span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Uraian Pekerjaan</span><span style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B' }}>{r.uraianPekerjaan}</span></div>}
+                        {r.upayaPengendalian && <div><span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Upaya Pengendalian</span><span style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B' }}>{r.upayaPengendalian}</span></div>}
+                        {r.pihakLain && <div><span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Pihak Lain</span><span style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B' }}>{r.pihakLain}</span></div>}
+                        {r.contactPerson && <div><span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Contact Person</span><span style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B' }}>{r.contactPerson}</span></div>}
+                      </div>
+                    )}
+                    {renderRiwayatDocs(r)}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div style={{ height: 1, background: '#E1E8EC', margin: '16px -16px' }} />
+
+          {/* ── Progres Laporan timeline (mobile) ── */}
+          <div style={{ paddingBottom: 16 }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
+              Progres Laporan
+            </span>
+            <div style={{ position: 'relative', paddingLeft: 24 }}>
+              <div style={{ position: 'absolute', left: 6, top: 16, bottom: 16, width: 2, background: '#E1E8EC' }} />
+
+              {/* Laporan Dibuat */}
+              <div style={{ position: 'relative', marginBottom: 16 }}>
+                <div style={{ position: 'absolute', left: -24, top: 2, width: 14, height: 14, borderRadius: '50%', background: '#076C9E', border: '2px solid #fff', boxShadow: '0 0 0 2px #076C9E' }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#076C9E', display: 'block' }}>Laporan Dibuat</span>
+                <span style={{ fontSize: 11, color: '#97AAB3' }}>{formatTanggal(laporan?.tanggal)}</span>
+              </div>
+
+              {/* Riwayat steps */}
+              {[...riwayat].reverse().map((r: any, i: number) => {
+                const isLast = i === riwayat.length - 1 && laporan?.status !== 'selesai'
+                return (
+                  <div key={r.id} style={{ position: 'relative', marginBottom: 16 }}>
+                    <div style={{ position: 'absolute', left: -24, top: 2, width: 14, height: 14, borderRadius: '50%', background: isLast ? '#076C9E' : '#E1E8EC', border: '2px solid #fff', boxShadow: `0 0 0 2px ${isLast ? '#076C9E' : '#C5D3D9'}` }} />
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 2 }}>
+                      <ProgressBadge tipe={r.progresLaporan} />
+                      <LevelBadge level={r.statusKerawanan} />
+                    </div>
+                    <span style={{ fontSize: 11, color: '#97AAB3' }}>{formatTanggal(r.tanggal)} · {r.oleh}</span>
+                  </div>
+                )
+              })}
+
+              {laporan?.status === 'selesai' && (
+                <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', left: -24, top: 2, width: 14, height: 14, borderRadius: '50%', background: '#039855', border: '2px solid #fff', boxShadow: '0 0 0 2px #039855' }} />
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#039855' }}>Laporan Selesai</span>
+                </div>
+              )}
+
+              {riwayat.length === 0 && laporan?.status !== 'selesai' && (
+                <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', left: -24, top: 2, width: 14, height: 14, borderRadius: '50%', background: '#F6F9FC', border: '2px solid #C5D3D9' }} />
+                  <span style={{ fontSize: 12, color: '#97AAB3', fontStyle: 'italic' }}>Belum ada pembaruan</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div style={{ height: 16 }} />
         </div>
 
-        {/* Bottom CTA — "Selesaikan Laporan" */}
+        {/* Bottom CTA */}
         {laporan?.status !== 'selesai' && (
-          <div style={{ padding: '16px', borderTop: '1px solid #E1E8EC', flexShrink: 0 }}>
-            <button
-              type="button"
-              onClick={handleSelesaikan}
-              disabled={selesaiLoading}
-              style={{ width: '100%', height: 44, background: '#076C9E', border: 'none', borderRadius: 8, color: '#FFFFFF', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
-            >
+          <div style={{ padding: '12px 16px', borderTop: '1px solid #E1E8EC', flexShrink: 0 }}>
+            <button type="button" onClick={handleSelesaikan} disabled={selesaiLoading}
+              style={{ width: '100%', height: 44, background: '#076C9E', border: 'none', borderRadius: 8, color: '#FFFFFF', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
               {selesaiLoading ? 'Menyimpan...' : 'Selesaikan Laporan'}
             </button>
           </div>
         )}
+
+        {/* Lightbox */}
+        {lightbox && (
+          <PhotoLightbox urls={lightbox.urls} startIndex={lightbox.index} onClose={() => setLightbox(null)} />
+        )}
+        {updateDrawer}
       </div>
     )
   }
@@ -1357,60 +1902,70 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
       {/* Head — outside white card */}
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-          <span style={{ fontSize: 24, fontWeight: 700, color: '#1B1B1B' }}>Detail Kerawanan</span>
-          <ProgressBadge tipe={laporan?.latestProgressTipe} />
+          <span style={{ fontSize: 24, fontWeight: 700, color: '#1B1B1B' }}>Detail Laporan Kerawanan</span>
+          {laporan?.status === 'selesai' && <ProgressBadge tipe="selesai" />}
         </div>
         <div style={{ display: 'flex', gap: 8, fontSize: 14, fontWeight: 500, color: '#566B75' }}>
-          <span>Dibuat pada : {formatTanggal(laporan?.tanggal)}</span>
-          {laporan?.pelapor?.nama && <><span>·</span><span>Dibuat oleh : {laporan.pelapor.nama}</span></>}
+          <span>Terakhir diupdate : {formatTanggal(laporan?.updatedAt || laporan?.tanggal)}</span>
+          {laporan?.pelapor?.nama && <><span>-</span><span>Oleh : {laporan.pelapor.nama}</span></>}
         </div>
       </div>
 
-      {/* White card */}
+      {/* Full width white card */}
       <div style={{ background: '#FFFFFF', borderRadius: 12, border: '1px solid #E1E8EC', padding: '32px' }}>
 
         {/* ── Section 1: Informasi Kerawanan ── */}
         <div style={{ marginBottom: 32 }}>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
+          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 16 }}>
             Informasi Kerawanan
           </span>
-          <div style={{ height: 1, background: '#E1E8EC', marginBottom: 20 }} />
 
           {/* 4-col info row */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0 20px', marginBottom: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0 20px', marginBottom: 24 }}>
             <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan} />
             <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
             <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama)} />
-            {laporan?.lokasiDetail
-              ? <InfoRow label="Span" value={laporan.lokasiDetail} />
+            {isPPL
+              ? <InfoRow label="Span" value={laporan?.lokasiDetail || '—'} />
               : <InfoRow label="Tanggal" value={formatTanggal(laporan?.tanggal)} />
             }
           </div>
 
           {/* Description + Pihak Lain side by side */}
-          {(laporan?.deskripsi || (isPPL && laporan?.teknisi)) && (
-            <div style={{ display: 'grid', gridTemplateColumns: laporan?.deskripsi && isPPL && laporan?.teknisi ? '1fr 1fr' : '1fr', gap: '0 20px', marginBottom: 20 }}>
+          {(() => {
+            const pihakLain = isPPL ? laporan?.teknisi : null
+            const hasBoth = laporan?.deskripsi && pihakLain
+            if (!laporan?.deskripsi && !pihakLain && !laporan?.contactPerson) return null
+            return (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0 20px', marginBottom: 24 }}>
               {laporan?.deskripsi && (
                 <div>
-                  <span style={{ fontSize: 14, fontWeight: 400, color: '#5F737F', display: 'block', marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 400, color: '#97AAB3', display: 'block', marginBottom: 4 }}>
                     {isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'}
                   </span>
                   <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.deskripsi}</span>
                 </div>
               )}
-              {isPPL && laporan?.teknisi && (
+              {pihakLain && (
                 <div>
-                  <span style={{ fontSize: 14, fontWeight: 400, color: '#5F737F', display: 'block', marginBottom: 4 }}>Informasi Pihak Lain</span>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.teknisi}</span>
+                  <span style={{ fontSize: 12, fontWeight: 400, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Informasi Pihak Lain</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{pihakLain}</span>
+                </div>
+              )}
+              {laporan?.contactPerson && (
+                <div>
+                  <span style={{ fontSize: 12, fontWeight: 400, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Contact Person</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.contactPerson}</span>
                 </div>
               )}
             </div>
-          )}
+            )
+          })()}
 
           {/* Foto Bukti — single image 240px wide */}
           {fotoUrls.length > 0 && (
             <div>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 400, color: '#97AAB3', display: 'block', marginBottom: 8 }}>
                 Foto Bukti Terjadinya Kerawanan
               </span>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -1431,81 +1986,48 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
 
         {/* ── Section 2: Informasi Pengendalian Kerawanan ── */}
         <div>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
+          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 16 }}>
             Informasi Pengendalian Kerawanan
           </span>
-          <div style={{ height: 1, background: '#E1E8EC', marginBottom: 20 }} />
 
           {/* Upaya Pengendalian */}
           {laporan?.keterangan && (
-            <div style={{ marginBottom: 20 }}>
-              <span style={{ fontSize: 14, fontWeight: 400, color: '#5F737F', display: 'block', marginBottom: 4 }}>
+            <div style={{ marginBottom: 24 }}>
+              <span style={{ fontSize: 12, fontWeight: 400, color: '#97AAB3', display: 'block', marginBottom: 4 }}>
                 {isPPL ? 'Upaya Pengendalian' : 'Keterangan'}
               </span>
               <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan.keterangan}</span>
             </div>
           )}
 
-          {/* Progress docs — only show types with files, 2-col card grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          {/* Progress docs — Read Only */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
             {PROGRESS_TIPE_LIST.map((tipe) => {
               const items: any[] = progress[tipe] ?? []
-              const isUp = uploading === tipe
               const latestItem = items[0]
+              if (!latestItem) return null
               return (
                 <div key={tipe}>
-                  <span style={{ fontSize: 14, fontWeight: 500, color: '#5F737F', display: 'block', marginBottom: 8 }}>
+                  <span style={{ fontSize: 12, fontWeight: 400, color: '#97AAB3', display: 'block', marginBottom: 8 }}>
                     {PROGRESS_TIPE_LABEL[tipe]}
                   </span>
                   <div style={{ border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
-                    {latestItem ? (
-                      <>
-                        {/* Image/file preview full-width — click to lightbox */}
-                        <div style={{ position: 'relative', height: 140, background: '#F6F9FC', overflow: 'hidden', cursor: 'pointer' }}
-                          onClick={() => {
-                            if (/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl))
-                              setLightbox({ urls: [resolveMediaUrl(latestItem.fileUrl)], index: 0 })
-                            else window.open(resolveMediaUrl(latestItem.fileUrl), '_blank')
-                          }}
-                        >
-                          {/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl) ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={resolveMediaUrl(latestItem.fileUrl)} alt=""
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          ) : (
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <FileText size={36} style={{ color: '#5F737F' }} />
-                            </div>
-                          )}
-                          {/* Upload replace button */}
-                          <button type="button" onClick={(e) => { e.stopPropagation(); progressRefs.current[tipe]?.click() }}
-                            style={{ position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderRadius: '50%', background: '#076C9E', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                            <Upload size={13} style={{ color: '#FFF' }} />
-                          </button>
+                    <div style={{ position: 'relative', height: 160, background: '#F6F9FC', overflow: 'hidden', cursor: 'pointer' }}
+                      onClick={() => {
+                        if (/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl))
+                          setLightbox({ urls: [resolveMediaUrl(latestItem.fileUrl)], index: 0 })
+                        else window.open(resolveMediaUrl(latestItem.fileUrl), '_blank')
+                      }}
+                    >
+                      {/\.(jpe?g|png|webp)$/i.test(latestItem.fileUrl) ? (
+                        <img src={resolveMediaUrl(latestItem.fileUrl)} alt=""
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <FileText size={36} style={{ color: '#5F737F' }} />
                         </div>
-                        {/* Filename + size/date */}
-                        <div style={{ padding: '10px 12px' }}>
-                          <p style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {latestItem.namaFile}
-                          </p>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
-                            <p style={{ fontSize: 12, color: '#5F737F', margin: 0 }}>
-                              {new Date(latestItem.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                            </p>
-                            <button type="button" onClick={() => handleProgressDelete(tipe, latestItem.id)}
-                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#D92D20', display: 'flex' }}>
-                              <X size={12} />
-                            </button>
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <button type="button" onClick={() => progressRefs.current[tipe]?.click()} disabled={isUp}
-                        style={{ width: '100%', height: 140, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#F6F9FC', border: 'none', cursor: 'pointer' }}>
-                        <Upload size={22} style={{ color: '#97AAB3' }} />
-                        <span style={{ fontSize: 12, color: '#97AAB3' }}>{isUp ? 'Mengunggah...' : 'Upload file'}</span>
-                      </button>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               )
@@ -1513,46 +2035,99 @@ function DetailReadView({ laporan, onSaved, onClose }: { laporan: any; onSaved?:
           </div>
         </div>
 
-        {/* ── Section 3: Foto Update ── */}
-        <div style={{ marginTop: 32 }}>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
-            Foto Update
+        {/* Divider */}
+        <div style={{ height: 1, background: '#E1E8EC', margin: '32px 0' }} />
+
+        {/* ── Section 3: Riwayat Pembaruan Laporan ── */}
+        <div>
+          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 20 }}>
+            Riwayat Pembaruan Laporan
           </span>
-          <div style={{ height: 1, background: '#E1E8EC', marginBottom: 16 }} />
-          <button type="button" onClick={() => fotoUpdateRef.current?.click()} disabled={uploadingFoto}
-            style={{ width: '100%', padding: 12, border: '2px dashed #E1E8EC', borderRadius: 8, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', marginBottom: 16 }}>
-            <ImagePlus size={18} style={{ color: '#5F737F' }} />
-            <span style={{ fontSize: 13, color: '#5F737F', fontWeight: 500 }}>
-              {uploadingFoto ? 'Mengunggah...' : 'Upload Foto Update (maks 10, auto-compress)'}
-            </span>
-          </button>
-          <input ref={fotoUpdateRef} type="file" accept=".jpg,.jpeg,.png,.webp" multiple className="hidden"
-            onChange={e => { if (e.target.files?.length) { handleFotoUpdate(e.target.files); e.target.value = '' } }} />
-          {fotoHistory.map(entry => (
-            <div key={entry.id} style={{ marginBottom: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <Clock size={12} style={{ color: '#97AAB3' }} />
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#97AAB3' }}>
-                  {new Date(entry.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                </span>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-                {(entry.urls as string[]).map((url, i) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img key={i} src={resolveMediaUrl(url)} alt="" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 6, border: '1px solid #E1E8EC', cursor: 'pointer' }}
-                    onClick={() => setLightbox({ urls: (entry.urls as string[]).map(resolveMediaUrl), index: i })} />
-                ))}
-              </div>
+
+          {riwayat.length === 0 ? (
+            <p style={{ fontSize: 13, color: '#97AAB3', textAlign: 'center', padding: '24px 0' }}>Belum ada riwayat pembaruan</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {riwayat.map((r: any) => (
+                <div key={r.id} style={{ border: '1px solid #E1E8EC', borderRadius: 10, padding: 20 }}>
+                  <div style={{ fontSize: 13, color: '#97AAB3', marginBottom: 16, display: 'flex', gap: 6 }}>
+                    <span>Tanggal Pembaruan: {new Date(r.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                    <span>-</span>
+                    <span>Oleh: {r.oleh}</span>
+                  </div>
+                  
+                  <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 16 }}>
+                    Detail Pembaruan
+                  </span>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px 20px', marginBottom: 20 }}>
+                    <div>
+                      <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Status Kerawanan</span>
+                      <LevelBadge level={r.statusKerawanan} />
+                    </div>
+                    <div>
+                      <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Progres Laporan</span>
+                      <ProgressBadge tipe={r.progresLaporan} />
+                    </div>
+                    
+                    {r.uraianPekerjaan && (
+                      <div>
+                        <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Uraian Pekerjaan</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.uraianPekerjaan}</span>
+                      </div>
+                    )}
+                    {r.upayaPengendalian && (
+                      <div>
+                        <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.upayaPengendalian}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Progress Docs in Riwayat */}
+                  <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                    {PROGRESS_TIPE_LIST.map(tipe => {
+                      if (!r.files || !r.files[tipe]) return null;
+                      return (
+                        <div key={tipe} style={{ flex: '0 0 240px' }}>
+                          <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 8 }}>{PROGRESS_TIPE_LABEL[tipe]}</span>
+                          <div style={{ height: 140, borderRadius: 8, background: '#F6F9FC', overflow: 'hidden', cursor: 'pointer', border: '1px solid #E1E8EC' }}
+                            onClick={() => {
+                              if (/\.(jpe?g|png|webp)$/i.test(r.files[tipe]))
+                                setLightbox({ urls: [resolveMediaUrl(r.files[tipe])], index: 0 })
+                              else window.open(resolveMediaUrl(r.files[tipe]), '_blank')
+                            }}
+                          >
+                            {/\.(jpe?g|png|webp)$/i.test(r.files[tipe]) ? (
+                              <img src={resolveMediaUrl(r.files[tipe])} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <FileText size={32} style={{ color: '#5F737F' }} />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-          {fotoHistory.length === 0 && (
-            <p style={{ fontSize: 12, color: '#97AAB3', textAlign: 'center', padding: '16px 0' }}>Belum ada foto update</p>
           )}
         </div>
 
-      </div>
+      </div>{/* end white card */}
 
-      {progressInputs}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 24 }}>
+        <button type="button" onClick={() => {
+          if (confirm('Yakin ingin menghapus laporan ini? Semua data riwayat dan foto akan ikut terhapus.')) {
+             handleDelete(laporan!.id)
+          }
+        }}
+          style={{ height: 40, padding: '0 24px', background: '#FFFFFF', border: '1px solid #D92D20', borderRadius: 20, color: '#D92D20', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+          Hapus Laporan
+        </button>
+      </div>
 
       {/* Lightbox */}
       {lightbox && (
@@ -1577,10 +2152,12 @@ const EMPTY_FORM = {
   tanggalWaktu: new Date().toISOString().slice(0, 16),
   levelRisiko: 'sedang',
   status: 'berlangsung',
+  progresLaporan: 'sedang_berlangsung',
   lokasiDetail: '',     // stores span "T-x s/d T-y" for ppl
   deskripsi: '',        // Uraian Pekerjaan
   keterangan: '',       // Upaya Pengendalian (ppl) / notes
   pihakLain: '',        // company name for pekerjaan_pihak_lain (stored in teknisi)
+  contactPerson: '',
   // CUI / Cleanup
   teknisi: '',
   noSpk: '',
@@ -1595,6 +2172,7 @@ function LaporanDrawer({
   open,
   initial,
   readOnly = false,
+  autoOpenUpdate = false,
   towerOptions,
   initialFotos,
   onClose,
@@ -1604,6 +2182,7 @@ function LaporanDrawer({
   initial: any | null
   initialFotos?: File[]
   readOnly?: boolean
+  autoOpenUpdate?: boolean
   towerOptions: TowerOption[]
   onClose: () => void
   onSaved: () => void
@@ -1617,6 +2196,7 @@ function LaporanDrawer({
   const [locating, setLocating] = useState(false)
   const [useGPS, setUseGPS] = useState(false)
   const [detectedMsg, setDetectedMsg] = useState('')
+  const [gpsLocked, setGpsLocked] = useState(false)
   const [alertVisible, setAlertVisible] = useState(true)
 
   // Mobile bottom-sheet state
@@ -1635,12 +2215,13 @@ function LaporanDrawer({
         setForm({
           ...EMPTY_FORM,
           towerId:      initial.towerId ?? '',
-          towerLabel:   initial.tower?.nomorTower ?? initial.tower?.id ?? '',
+          towerLabel:   initial.tower?.nama ?? initial.tower?.id ?? '',
           jenisGangguan: initial.jenisGangguan ?? '',
           tanggalWaktu: initial.tanggal?.slice(0, 16) ?? new Date().toISOString().slice(0, 16),
           levelRisiko:  initial.levelRisiko ?? 'sedang',
           status:       initial.status ?? 'berlangsung',
-          lokasiDetail: isPPL ? '' : (initial.lokasiDetail ?? ''),
+          progresLaporan: initial.progresLaporan ?? 'sedang_berlangsung',
+          lokasiDetail: initial.lokasiDetail ?? '',
           deskripsi:    initial.deskripsi ?? '',
           keterangan:   initial.keterangan ?? '',
           pihakLain:    isPPL ? (initial.teknisi ?? '') : '',
@@ -1660,6 +2241,7 @@ function LaporanDrawer({
         setFotoUrls([])
         setDetectedMsg('')
         setUseGPS(false)
+        setGpsLocked(false)
         if (initialFotos && initialFotos.length > 0) {
           setTimeout(() => { document.getElementById('btn-detect-location')?.click() }, 100)
         }
@@ -1684,6 +2266,7 @@ function LaporanDrawer({
         const towerRadius = nearest?.radius ?? 100
         if (nearest && min <= towerRadius) {
           setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: nearest!.nomorTower }))
+          setGpsLocked(true)
           setDetectedMsg(`📍 Tower ${nearest.nomorTower} (${Math.round(min)}m)`)
           toast.success('Tower terdekat dipilih!')
         } else if (nearest) {
@@ -1748,9 +2331,6 @@ function LaporanDrawer({
       }
 
       const isPPL = form.jenisGangguan === 'pekerjaan_pihak_lain'
-      const spanLabel = isPPL && form.towerIdEnd
-        ? `${form.towerLabel} s/d ${form.towerLabelEnd}`
-        : form.lokasiDetail
 
       const payload = {
         towerId:      form.towerId,
@@ -1758,11 +2338,12 @@ function LaporanDrawer({
         tanggal:      form.tanggalWaktu,
         levelRisiko:  form.levelRisiko,
         status:       form.status,
-        lokasiDetail: spanLabel,
+        progresLaporan: form.progresLaporan,
+        lokasiDetail: form.lokasiDetail || null,
         deskripsi:    form.deskripsi,
         keterangan:   form.keterangan,
         foto:         [...fotoUrls, ...uploadedUrls],
-        ...(isPPL && { teknisi: form.pihakLain }),
+        ...(isPPL && { teknisi: form.pihakLain, contactPerson: form.contactPerson }),
         ...(!isPPL && ['cui', 'cleanup'].includes(form.jenisGangguan) && {
           teknisi: form.teknisi,
           noSpk:   form.noSpk,
@@ -1797,12 +2378,12 @@ function LaporanDrawer({
 
       {/* GPS alert */}
       {!readOnly && alertVisible && (
-        <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
-          <AlertTriangle size={16} className="text-amber-500 shrink-0 mt-0.5" />
-          <p className="text-[12px] text-amber-700 leading-relaxed flex-1">
-            Perhatian: Jika anda memilih opsi "Gunakan lokasi saat ini". Pastikan anda sudah menghidupkan akses lokasi di handphone anda.
+        <div className="flex items-start gap-3 p-3 bg-[#FFF8E6] border border-[#FFE5A3] rounded-xl">
+          <AlertTriangle size={16} className="text-[#F79009] shrink-0 mt-0.5" />
+          <p className="text-[12px] text-[#1B1B1B] leading-relaxed flex-1">
+            <span className="font-bold text-[#F79009]">Perhatian:</span> Pastikan anda sudah menghidupkan akses lokasi di handphone anda.
           </p>
-          <button type="button" onClick={() => setAlertVisible(false)} className="text-amber-400 hover:text-amber-600 shrink-0">
+          <button type="button" onClick={() => setAlertVisible(false)} className="text-[#F79009] hover:text-[#D97706] shrink-0">
             <X size={14} />
           </button>
         </div>
@@ -1867,35 +2448,64 @@ function LaporanDrawer({
         )}
       </div>
 
-      {/* Tower terdampak — start (always) */}
-      <div>
-        <label className="block text-[14px] font-bold text-app-text mb-2">
-          {isPPL ? 'Tower Terdampak (Start)' : 'Tower Terganggu'}
-        </label>
-        {readOnly ? (
-          <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
-        ) : isMobile ? (
-          <button
-            type="button"
-            onClick={() => { setTowerSheetTarget('start'); setTowerSheetOpen(true) }}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              width: '100%', padding: '10px 14px',
-              background: form.towerId ? '#E1E8EC' : '#FFFFFF',
-              border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
-            }}
-          >
-            <span style={{ fontSize: 14, color: form.towerId ? '#5F737F' : '#97AAB3', fontWeight: 500 }}>
-              {form.towerLabel || 'Pilih tower...'}
-            </span>
-            <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
-          </button>
-        ) : (
-          <TowerDropdown
-            options={towerOptions}
-            value={form.towerId}
-            onChange={(id, label) => setForm(f => ({ ...f, towerId: id, towerLabel: label }))}
-          />
+      {/* Tower terdampak & Span */}
+      <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>
+        <div className="flex-1 min-w-0">
+          <label className="block text-[14px] font-bold text-app-text mb-2">
+            {isPPL ? 'No. Ruas' : 'Ruas Terganggu'}
+          </label>
+          {readOnly ? (
+            <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
+          ) : isMobile && gpsLocked ? (
+            <div className="form-input bg-app-bg flex items-center justify-between">
+              <span style={{ fontSize: 14, color: '#1B1B1B', fontWeight: 500 }}>{form.towerLabel || '—'}</span>
+              <span style={{ fontSize: 11, color: '#039855', fontWeight: 600 }}>📍 GPS</span>
+            </div>
+          ) : isMobile ? (
+            <button
+              type="button"
+              onClick={() => { setTowerSheetTarget('start'); setTowerSheetOpen(true) }}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                width: '100%', padding: '10px 14px',
+                background: form.towerId ? '#E1E8EC' : '#FFFFFF',
+                border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+              }}
+            >
+              <span style={{ fontSize: 14, color: form.towerId ? '#5F737F' : '#97AAB3', fontWeight: 500 }}>
+                {form.towerLabel || 'Pilih ruas...'}
+              </span>
+              <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+            </button>
+          ) : (
+            <TowerDropdown
+              options={towerOptions}
+              value={form.towerId}
+              onChange={(id, label) => setForm(f => ({ ...f, towerId: id, towerLabel: label }))}
+            />
+          )}
+        </div>
+
+        {/* Span — free text, optional, semua jenis laporan */}
+        {isPPL && (
+          <div className="flex-1 min-w-0">
+            <label className="block text-[14px] font-bold text-app-text mb-2">Span</label>
+            <div className="relative">
+              <input
+                type="text"
+                disabled={readOnly}
+                value={form.lokasiDetail}
+                onChange={e => set('lokasiDetail', e.target.value)}
+                placeholder="Contoh: T-23 - T-25"
+                className="form-input pr-8"
+              />
+              {form.lokasiDetail && !readOnly && (
+                <button type="button" onClick={() => set('lokasiDetail', '')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <X size={14} className="text-[#97AAB3]"/>
+                </button>
+              )}
+            </div>
+          </div>
         )}
       </div>
 
@@ -1904,7 +2514,7 @@ function LaporanDrawer({
         <div className="flex items-center gap-2.5">
           <div
             onClick={() => setUseGPS(v => !v)}
-            className={`w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors shrink-0 ${useGPS ? 'bg-blue-600 border-blue-600' : 'border-app-border bg-white'}`}
+            className={`w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors shrink-0 ${useGPS ? 'bg-[#076C9E] border-[#076C9E]' : 'border-app-border bg-white'}`}
           >
             {useGPS && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
           </div>
@@ -1916,121 +2526,117 @@ function LaporanDrawer({
           >
             Gunakan lokasi anda saat ini.
           </button>
-          {locating && <span className="text-[11px] text-blue-500 animate-pulse">Mendeteksi...</span>}
+          {locating && <span className="text-[11px] text-[#076C9E] animate-pulse">Mendeteksi...</span>}
         </div>
       )}
       {detectedMsg && (
         <p className={`text-[12px] font-medium -mt-2 ${detectedMsg.includes('⚠️') ? 'text-orange-600' : 'text-green-600'}`}>{detectedMsg}</p>
       )}
 
-      {/* Tower end (span) — only for pekerjaan_pihak_lain */}
-      {isPPL && !readOnly && (
-        <div>
-          <label className="block text-[14px] font-bold text-app-text mb-2">Tower Terdampak (End)</label>
-          {isMobile ? (
+      {/* Jenis & Status Kerawanan */}
+      <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>
+        <div className="flex-1 min-w-0">
+          <label className="block text-[14px] font-bold text-app-text mb-2">Jenis Kerawanan</label>
+          {isMobile && !readOnly ? (
             <button
               type="button"
-              onClick={() => { setTowerSheetTarget('end'); setTowerSheetOpen(true) }}
+              onClick={() => setJenisSheetOpen(true)}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                width: '100%', padding: '10px 14px',
-                background: form.towerIdEnd ? '#E1E8EC' : '#FFFFFF',
+                width: '100%', padding: '10px 14px', background: '#FFFFFF',
                 border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
               }}
             >
-              <span style={{ fontSize: 14, color: form.towerIdEnd ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
-                {form.towerLabelEnd || 'Pilih tower...'}
+              <span style={{ fontSize: 14, color: form.jenisGangguan ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }} className="truncate">
+                {JENIS_LABEL[form.jenisGangguan] || 'Pilih kategori...'}
               </span>
               <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
             </button>
           ) : (
-            <TowerDropdown
-              options={towerOptions}
-              value={form.towerIdEnd}
-              onChange={(id, label) => setForm(f => ({ ...f, towerIdEnd: id, towerLabelEnd: label }))}
-            />
+            <select
+              disabled={readOnly}
+              value={form.jenisGangguan}
+              onChange={(e) => set('jenisGangguan', e.target.value)}
+              className="form-input truncate pr-8"
+            >
+              <option value="">Pilih kategori...</option>
+              {JENIS_OPTIONS.filter(o => o.value).map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
           )}
         </div>
-      )}
 
-      {/* Jenis kerawanan */}
-      <div>
-        <label className="block text-[14px] font-bold text-app-text mb-2">Jenis Kerawanan</label>
-        {isMobile && !readOnly ? (
-          <button
-            type="button"
-            onClick={() => setJenisSheetOpen(true)}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              width: '100%', padding: '10px 14px', background: '#FFFFFF',
-              border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
-            }}
-          >
-            <span style={{ fontSize: 14, color: form.jenisGangguan ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
-              {JENIS_LABEL[form.jenisGangguan] || 'Pilih kategori...'}
-            </span>
-            <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
-          </button>
-        ) : (
+        {isPPL && (
+          <div className="flex-1 min-w-0">
+            <label className="block text-[14px] font-bold text-app-text mb-2">Status Kerawanan</label>
+            {isMobile && !readOnly ? (
+              <button
+                type="button"
+                onClick={() => setLevelSheetOpen(true)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  width: '100%', padding: '10px 14px', background: '#FFFFFF',
+                  border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+                }}
+              >
+                <span style={{ fontSize: 14, color: form.levelRisiko ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
+                  {LEVEL_OPTIONS.find(l => l.value === form.levelRisiko)?.label || 'Pilih status...'}
+                </span>
+                <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+              </button>
+            ) : (
+              <select
+                disabled={readOnly}
+                value={form.levelRisiko}
+                onChange={(e) => set('levelRisiko', e.target.value)}
+                className={`form-input truncate pr-8 ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
+              >
+                {LEVEL_OPTIONS.map(l => (
+                  <option key={l.value} value={l.value}>{l.label}</option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Progres Laporan */}
+      {!readOnly && (
+        <div>
+          <label className={`block font-semibold text-app-text mb-2 ${isMobile ? 'text-[14px]' : 'text-[12px]'}`}>Progres Laporan</label>
           <select
-            disabled={readOnly}
-            value={form.jenisGangguan}
-            onChange={(e) => set('jenisGangguan', e.target.value)}
+            value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(form.progresLaporan) ? 'tidak_ada_aktifitas' : form.progresLaporan}
+            onChange={(e) => set('progresLaporan', e.target.value)}
             className="form-input"
           >
-            <option value="">Pilih kategori...</option>
-            {JENIS_OPTIONS.filter(o => o.value).map(o => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
+            <option value="sedang_berlangsung">Sedang Berlangsung</option>
+            <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
+            <option value="selesai">Selesai</option>
           </select>
-        )}
-      </div>
-
-      {/* Status Kerawanan */}
-      <div>
-        <label className={`block font-semibold text-app-text mb-2 ${isMobile ? 'text-[14px]' : 'text-[12px]'}`}>Status Kerawanan</label>
-        {isMobile && !readOnly ? (
-          <button
-            type="button"
-            onClick={() => setLevelSheetOpen(true)}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              width: '100%', padding: '10px 14px', background: '#FFFFFF',
-              border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
-            }}
-          >
-            <span style={{ fontSize: 14, color: form.levelRisiko ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
-              {LEVEL_OPTIONS.find(l => l.value === form.levelRisiko)?.label || 'Pilih status...'}
-            </span>
-            <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
-          </button>
-        ) : (
-          <select
-            disabled={readOnly}
-            value={form.levelRisiko}
-            onChange={(e) => set('levelRisiko', e.target.value)}
-            className={`form-input ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
-          >
-            {LEVEL_OPTIONS.map(l => (
-              <option key={l.value} value={l.value}>{l.label}</option>
-            ))}
-          </select>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Uraian Pekerjaan / Deskripsi */}
       <div>
         <label className="block text-[14px] font-bold text-app-text mb-2">
-          {isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'}
+          {isPPL ? <>Uraian Pekerjaan <span className="font-normal text-[#5F737F]">(Opsional)</span></> : 'Deskripsi'}
         </label>
-        <textarea
-          disabled={readOnly}
-          rows={4}
-          value={form.deskripsi}
-          onChange={(e) => set('deskripsi', e.target.value)}
-          className="form-input resize-none"
-          placeholder={isPPL ? 'Uraikan pekerjaan pihak lain...' : 'Deskripsi gangguan...'}
-        />
+        <div className="relative">
+          <textarea
+            disabled={readOnly}
+            rows={4}
+            value={form.deskripsi}
+            onChange={(e) => set('deskripsi', e.target.value)}
+            className="form-input resize-none w-full"
+            placeholder={isPPL ? 'Proyek renovasi gudang menggunakan alat berat crane' : 'Deskripsi gangguan...'}
+          />
+          {form.deskripsi && !readOnly && (
+            <button type="button" onClick={() => set('deskripsi', '')} className="absolute bottom-3 right-3">
+              <X size={14} className="text-[#97AAB3]"/>
+            </button>
+          )}
+        </div>
       </div>
 
       {!isPPL && (
@@ -2053,30 +2659,55 @@ function LaporanDrawer({
           {/* Figma: gray 8px divider strip + section heading 18px/700 */}
           <div style={{ margin: '8px -20px 0', height: 8, background: '#F6F9FC' }} />
           <div style={{ padding: '12px 0 4px' }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B' }}>Informasi Pihak Lain</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>Informasi Pihak Lain</h3>
           </div>
-          <div>
-            <label className="block text-[14px] font-bold text-app-text mb-2">Pihak Lain</label>
-            <input
-              disabled={readOnly}
-              type="text"
-              value={form.pihakLain}
-              onChange={(e) => set('pihakLain', e.target.value)}
-              className="form-input"
-              placeholder="Nama perusahaan / pihak lain..."
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex-1 min-w-0">
+              <label className="block text-[14px] font-bold text-app-text mb-2">Pihak Lain</label>
+              <div className="relative">
+                <input
+                  disabled={readOnly}
+                  type="text"
+                  value={form.pihakLain}
+                  onChange={(e) => set('pihakLain', e.target.value)}
+                  className="form-input pr-8"
+                  placeholder="PT. Grakindo Maju Sukses"
+                />
+                {form.pihakLain && !readOnly && (
+                  <button type="button" onClick={() => set('pihakLain', '')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <X size={14} className="text-[#97AAB3]"/>
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="block text-[14px] font-bold text-app-text mb-2">Contact Person</label>
+              <div className="relative">
+                <input
+                  disabled={readOnly}
+                  type="text"
+                  value={form.contactPerson}
+                  onChange={(e) => set('contactPerson', e.target.value)}
+                  className="form-input pr-8"
+                  placeholder="081315555271"
+                />
+                {form.contactPerson && !readOnly && (
+                  <button type="button" onClick={() => set('contactPerson', '')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <X size={14} className="text-[#97AAB3]"/>
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-          <div>
-            <label className="block text-[14px] font-bold text-app-text mb-2">Upaya Pengendalian</label>
-            <textarea
-              disabled={readOnly}
-              rows={4}
-              value={form.keterangan}
-              onChange={(e) => set('keterangan', e.target.value)}
-              className="form-input resize-none"
-              placeholder="Tindakan pengendalian yang sudah dilakukan..."
-            />
-          </div>
+          
+          {!readOnly && (
+            <>
+              <div style={{ margin: '8px -20px 0', height: 8, background: '#F6F9FC' }} />
+              <div style={{ padding: '12px 0 4px' }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>Informasi Progres Laporan</h3>
+              </div>
+            </>
+          )}
         </>
       )}
 
@@ -2084,7 +2715,7 @@ function LaporanDrawer({
       {(isCUI || isCleanup) && (
         <div className="space-y-4 p-4 bg-app-bg rounded-xl border border-app-border">
           <p className="text-[11px] font-bold text-app-muted uppercase tracking-wider">{isCUI ? 'Detail CUI' : 'Detail Cleanup'}</p>
-          <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Teknisi</label><input disabled={readOnly} type="text" value={form.teknisi} onChange={(e) => set('teknisi', e.target.value)} className="form-input" /></div>
+          <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Line Walker</label><input disabled={readOnly} type="text" value={form.teknisi} onChange={(e) => set('teknisi', e.target.value)} className="form-input" /></div>
           <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">No. SPK</label><input disabled={readOnly} type="text" value={form.noSpk} onChange={(e) => set('noSpk', e.target.value)} className="form-input" /></div>
           {isCUI && (
             <>
@@ -2103,16 +2734,16 @@ function LaporanDrawer({
         </div>
       )}
 
-      {/* Tanggal & Waktu — hidden on create (auto = now), editable on edit, disabled on detail */}
-      {(readOnly || !!initial) && (
+      {/* Tanggal & Waktu — editable by admin, readonly for teknisi, hidden for teknisi on create */}
+      {(readOnly || !!initial || isAdmin() || isSuperadmin()) && (
         <div>
-          <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tanggal & Waktu</label>
+          <label className="block text-[12px] font-semibold text-app-text mb-1.5">Dibuat pada</label>
           <input
-            disabled={readOnly}
+            disabled={readOnly || (!isAdmin() && !isSuperadmin())}
             type="datetime-local"
             value={form.tanggalWaktu}
             onChange={(e) => set('tanggalWaktu', e.target.value)}
-            className={`form-input ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
+            className={`form-input ${(readOnly || (!isAdmin() && !isSuperadmin())) ? 'bg-app-bg text-app-muted' : ''}`}
           />
         </div>
       )}
@@ -2184,14 +2815,19 @@ function LaporanDrawer({
             </p>
           </div>
           {readOnly && initial ? (
-            <DetailReadView laporan={initial} onSaved={onSaved} onClose={onClose} />
+            <DetailReadView laporan={initial} onSaved={onSaved} onClose={onClose} autoOpenUpdate={autoOpenUpdate} />
           ) : (
             <>
               {formBody}
               <div className="px-5 py-4 border-t border-app-border shrink-0 bg-white">
-                <button type="submit" form="laporan-form" disabled={saving} className="btn-primary w-full justify-center">
-                  {saving ? 'Menyimpan...' : initial ? 'Simpan Perubahan' : 'Buat Laporan'}
-                </button>
+                <div className="flex gap-3">
+                  <button type="button" onClick={onClose} className="flex-1 h-11 rounded-[22px] bg-white border border-[#D92D20] text-[#D92D20] font-semibold text-[14px]">
+                    Batalkan
+                  </button>
+                  <button type="submit" form="laporan-form" disabled={saving} className="flex-1 h-11 rounded-[22px] bg-[#076C9E] text-white font-semibold text-[14px] border-none">
+                    {saving ? 'Menyimpan...' : initial ? 'Simpan' : 'Buat Laporan'}
+                  </button>
+                </div>
               </div>
             </>
           )}
@@ -2220,7 +2856,7 @@ function LaporanDrawer({
           >
             <X size={16} style={{ color: '#5F737F' }} />
           </button>
-          <DetailReadView laporan={initial} onSaved={onSaved} onClose={onClose} />
+          <DetailReadView laporan={initial} onSaved={onSaved} onClose={onClose} autoOpenUpdate={autoOpenUpdate} />
         </div>
       )}
 
@@ -2237,8 +2873,8 @@ function LaporanDrawer({
           </div>
           {formBody}
           <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border shrink-0 bg-white">
-            <button type="button" onClick={onClose} className="btn-outline">Batal</button>
-            <button type="submit" form="laporan-form" disabled={saving} className="btn-primary">
+            <button type="button" onClick={onClose} className="px-6 h-11 rounded-[22px] bg-white border border-[#D92D20] text-[#D92D20] font-semibold text-[14px] cursor-pointer">Batalkan</button>
+            <button type="submit" form="laporan-form" disabled={saving} className="px-6 h-11 rounded-[22px] bg-[#076C9E] text-white font-semibold text-[14px] border-none cursor-pointer">
               {saving ? 'Menyimpan...' : initial ? 'Simpan Perubahan' : 'Buat Laporan'}
             </button>
           </div>
@@ -2318,10 +2954,14 @@ export default function GangguanPage() {
 
   // Filters
   const [search, setSearch] = useState('')
-  const [jenis, setJenis] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
+  const [jenis, setJenis] = useState<string[]>([])
+  const [statusFilter, setStatusFilter] = useState<string[]>([])
+  const [levelFilter, setLevelFilter] = useState<string[]>([])
+  const [teknisiFilter, setTeknisiFilter] = useState<string[]>([])
+  const [towerFilter, setTowerFilter] = useState<string[]>([])
   const [tglMulai, setTglMulai] = useState('')
   const [tglAkhir, setTglAkhir] = useState('')
+  const [pegawaiOptions, setPegawaiOptions] = useState<any[]>([])
 
   // Pagination
   const [page, setPage] = useState(1)
@@ -2335,6 +2975,7 @@ export default function GangguanPage() {
   const [importFile, setImportFile] = useState<File | null>(null)
   const [importing, setImporting] = useState(false)
   const importInputRef = useRef<HTMLInputElement>(null)
+  const mobileAddCameraRef = useRef<HTMLInputElement>(null)
 
   // Drawer / modal state
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -2342,6 +2983,7 @@ export default function GangguanPage() {
   const [editRow, setEditRow] = useState<any | null>(null)
   const [deleteRow, setDeleteRow] = useState<any | null>(null)
   const [viewMode, setViewMode] = useState<'edit' | 'detail' | null>(null)
+  const [autoOpenUpdate, setAutoOpenUpdate] = useState(false)
   const [filterOpen, setFilterOpen] = useState(false)
   const filterRef = useRef<HTMLDivElement>(null)
   const [calendarOpen, setCalendarOpen] = useState(false)
@@ -2357,7 +2999,7 @@ export default function GangguanPage() {
   }, [filterOpen])
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
-  const hasActiveFilters = Boolean(search.trim() || jenis || statusFilter || tglMulai || tglAkhir)
+  const hasActiveFilters = Boolean(search.trim() || jenis.length || statusFilter.length || levelFilter.length || teknisiFilter.length || towerFilter.length || tglMulai || tglAkhir)
   const { isMobile } = useSidebar()
 
   const fetchData = useCallback(async () => {
@@ -2367,8 +3009,11 @@ export default function GangguanPage() {
         page,
         limit: pageSize,
         search: search.trim() || undefined,
-        jenisGangguan: jenis || undefined,
-        status: statusFilter || undefined,
+        jenisGangguan: jenis.length ? jenis.join(',') : undefined,
+        status: statusFilter.length ? statusFilter.join(',') : undefined,
+        levelRisiko: levelFilter.length ? levelFilter.join(',') : undefined,
+        towerId: towerFilter.length ? towerFilter.join(',') : undefined,
+        teknisi: teknisiFilter.length ? teknisiFilter.join(',') : undefined,
         tglMulai: tglMulai || undefined,
         tglAkhir: tglAkhir || undefined,
       })
@@ -2386,31 +3031,57 @@ export default function GangguanPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize, search, jenis, statusFilter, tglMulai, tglAkhir])
+  }, [page, pageSize, search, jenis, statusFilter, levelFilter, towerFilter, teknisiFilter, tglMulai, tglAkhir])
 
   useEffect(() => { fetchData() }, [fetchData])
 
   // Set role setelah mount agar tidak mismatch SSR/CSR
-  useEffect(() => { setIsAdminUser(isAdmin()) }, [])
+  useEffect(() => { setIsAdminUser(isAdmin() || isSuperadmin()) }, [])
 
   useEffect(() => {
-    towersApi.getDropdown()
-      .then((res) => setTowerOptions(res.data ?? []))
+    towersApi.getAll({ page: 1, limit: 500 })
+      .then((res) => {
+        const payload = res.data
+        setTowerOptions(Array.isArray(payload) ? payload : (payload.data ?? []))
+      })
+      .catch(() => {})
+    
+    pegawaiApi.getAll()
+      .then((res) => {
+        const payload = res.data
+        setPegawaiOptions(Array.isArray(payload) ? payload : (payload.data ?? []))
+      })
       .catch(() => {})
   }, [])
 
   function resetFilters() {
     setSearch('')
-    setJenis('')
-    setStatusFilter('')
+    setJenis([])
+    setStatusFilter([])
+    setLevelFilter([])
+    setTeknisiFilter([])
+    setTowerFilter([])
     setTglMulai('')
     setTglAkhir('')
     setPage(1)
   }
 
-  function openAdd() { setEditRow(null); setViewMode('edit'); setPendingFotos([]); setDrawerOpen(true) }
-  function openEdit(row: any) { setEditRow(row); setViewMode('edit'); setDrawerOpen(true) }
-  function openDetail(row: any) { setEditRow(row); setViewMode('detail'); setDrawerOpen(true) }
+  function openAdd() {
+    setEditRow(null); setViewMode('edit')
+    if (isMobile) {
+      mobileAddCameraRef.current?.click()
+    } else {
+      setPendingFotos([]); setDrawerOpen(true)
+    }
+  }
+  function handleMobileAddCapture(files: FileList) {
+    const arr = Array.from(files).filter(f => /\.(jpe?g|png|webp)$/i.test(f.name))
+    setPendingFotos(arr)
+    setDrawerOpen(true)
+  }
+  function openEdit(row: any) { setAutoOpenUpdate(false); setEditRow(row); setViewMode('edit'); setDrawerOpen(true) }
+  function openDetail(row: any) { setAutoOpenUpdate(false); setEditRow(row); setViewMode('detail'); setDrawerOpen(true) }
+  function openUpdate(row: any) { setAutoOpenUpdate(true); setEditRow(row); setViewMode('detail'); setDrawerOpen(true) }
 
   async function handleImport() {
     if (!importFile) return
@@ -2505,7 +3176,7 @@ export default function GangguanPage() {
 
               {/* Desktop filter popup — Figma Popup Filter 401x388 */}
               {filterOpen && (
-                <div style={{ position: 'absolute', left: 0, top: '100%', marginTop: 8, zIndex: 50, width: 401, background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, boxShadow: '0px 4px 8px 0px rgba(28,28,28,0.15)' }}>
+                <div style={{ position: 'absolute', left: 0, top: '100%', marginTop: 8, zIndex: 50, width: 420, background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8, boxShadow: '0px 4px 8px 0px rgba(28,28,28,0.15)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 16px' }}>
                     <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Filter</span>
                     <button onClick={() => setFilterOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
@@ -2513,44 +3184,109 @@ export default function GangguanPage() {
                     </button>
                   </div>
                   <div style={{ height: 1, background: '#E1E8EC' }} />
-                  {/* Kategori */}
-                  <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Kategori</span>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                      {JENIS_OPTIONS.filter(o => o.value).map(o => (
-                        <button key={o.value} onClick={() => { setJenis(jenis === o.value ? '' : o.value); setPage(1) }}
-                          style={{ padding: '4px 12px', borderRadius: 18, border: '1px solid', borderColor: jenis === o.value ? '#076C9E' : '#E1E8EC', background: jenis === o.value ? '#076C9E' : 'transparent', color: jenis === o.value ? '#FFFFFF' : '#5F737F', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
-                        >{o.label}</button>
-                      ))}
-                    </div>
-                  </div>
-                  <div style={{ height: 1, background: '#E1E8EC' }} />
-                  {/* Rentang Waktu */}
-                  <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Rentang Waktu</span>
-                    <div style={{ display: 'flex', gap: 16 }}>
-                      <div style={{ flex: 1 }}>
-                        <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C', marginBottom: 4 }}>Tanggal Mulai</p>
-                        <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
-                          <input type="date" value={tglMulai} onChange={(e) => { setTglMulai(e.target.value); setPage(1) }} style={{ flex: 1, border: 'none', outline: 'none', padding: '10px 12px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#5F737F' }} />
-                          <div style={{ padding: '10px 12px', background: '#F6F9FC', borderLeft: '1px solid #E1E8EC', display: 'flex', alignItems: 'center' }}><Calendar size={16} style={{ color: '#5F737F' }} /></div>
-                        </div>
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C', marginBottom: 4 }}>Tanggal Berakhir</p>
-                        <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}>
-                          <input type="date" value={tglAkhir} onChange={(e) => { setTglAkhir(e.target.value); setPage(1) }} style={{ flex: 1, border: 'none', outline: 'none', padding: '10px 12px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#5F737F' }} />
-                          <div style={{ padding: '10px 12px', background: '#F6F9FC', borderLeft: '1px solid #E1E8EC', display: 'flex', alignItems: 'center' }}><Calendar size={16} style={{ color: '#5F737F' }} /></div>
-                        </div>
+                  
+                  <div style={{ maxHeight: 450, overflowY: 'auto' }}>
+                    {/* Jenis Kerawanan */}
+                    <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Jenis Kerawanan</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        {JENIS_OPTIONS.filter(o => o.value).map(o => {
+                          const active = jenis.includes(o.value)
+                          return (
+                            <button key={o.value} onClick={() => { setJenis(active ? jenis.filter(v => v !== o.value) : [...jenis, o.value]); setPage(1) }}
+                              style={{ padding: '4px 12px', borderRadius: 18, border: '1px solid', borderColor: active ? '#076C9E' : '#E1E8EC', background: active ? '#076C9E' : 'transparent', color: active ? '#FFFFFF' : '#5F737F', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
+                            >{o.label}</button>
+                          )
+                        })}
                       </div>
                     </div>
+                    <div style={{ height: 1, background: '#E1E8EC' }} />
+
+                    {/* Status Kerawanan */}
+                    <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Status Kerawanan</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        {['aman', 'sedang', 'kritis'].map(v => {
+                          const active = levelFilter.includes(v)
+                          return (
+                            <button key={v} onClick={() => { setLevelFilter(active ? levelFilter.filter(x => x !== v) : [...levelFilter, v]); setPage(1) }}
+                              style={{ padding: '4px 12px', borderRadius: 18, border: '1px solid', borderColor: active ? '#076C9E' : '#E1E8EC', background: active ? '#076C9E' : 'transparent', color: active ? '#FFFFFF' : '#5F737F', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s', textTransform: 'capitalize' }}
+                            >{v}</button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                    <div style={{ height: 1, background: '#E1E8EC' }} />
+
+                    {/* Progres Laporan */}
+                    <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Progres Laporan</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        {STATUS_FILTER_OPTIONS.filter(o => o.value).map(o => {
+                          const isTidakAda = o.value === 'tidak_ada_aktifitas'
+                          const active = isTidakAda
+                            ? (statusFilter.includes('tidak_ada_aktifitas') || statusFilter.includes('tidak_ada_aktivitas'))
+                            : statusFilter.includes(o.value)
+                          return (
+                            <button key={o.value} onClick={() => { setStatusFilter(active ? statusFilter.filter(v => v !== o.value) : [...statusFilter, o.value]); setPage(1) }}
+                              style={{ padding: '4px 12px', borderRadius: 18, border: '1px solid', borderColor: active ? '#076C9E' : '#E1E8EC', background: active ? '#076C9E' : 'transparent', color: active ? '#FFFFFF' : '#5F737F', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
+                            >{o.label}</button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                    <div style={{ height: 1, background: '#E1E8EC' }} />
+
+                    {/* Teknisi / Line Walker */}
+                    <div style={{ padding: '12px 16px' }}>
+                      <SearchableSelect
+                        label="Line Walker / Teknisi"
+                        placeholder="Pilih petugas..."
+                        options={pegawaiOptions.map(p => ({ value: p.nama, label: p.nama, sub: `${p.jabatan} · ${p.unit}` }))}
+                        values={teknisiFilter}
+                        onChange={(vals) => { setTeknisiFilter(vals); setPage(1) }}
+                        onClear={() => { setTeknisiFilter([]); setPage(1) }}
+                      />
+                    </div>
+                    <div style={{ height: 1, background: '#E1E8EC' }} />
+
+                    {/* Tower Name */}
+                    <div style={{ padding: '12px 16px' }}>
+                      <SearchableSelect
+                        label="Ruas"
+                        placeholder="Pilih ruas..."
+                        options={towerOptions.map(t => {
+                          const { label, sub } = parseTowerDisplay(t)
+                          return { value: t.id, label, sub }
+                        })}
+                        values={towerFilter}
+                        onChange={(vals) => { setTowerFilter(vals); setPage(1) }}
+                        onClear={() => { setTowerFilter([]); setPage(1) }}
+                      />
+                    </div>
+                    <div style={{ height: 1, background: '#E1E8EC' }} />
+
+                    {/* Rentang Waktu */}
+                    <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#1C1C1C' }}>Rentang Waktu</span>
+                      <div style={{ display: 'flex', gap: 12 }}>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 13, color: '#1C1C1C', marginBottom: 4 }}>Tanggal Mulai</p>
+                          <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden', background: '#FFFFFF' }}>
+                            <input type="date" value={tglMulai} onChange={(e) => { setTglMulai(e.target.value); setPage(1) }} style={{ flex: 1, border: 'none', outline: 'none', padding: '8px 10px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 13, color: '#5F737F', width: '100%' }} />
+                          </div>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 13, color: '#1C1C1C', marginBottom: 4 }}>Tanggal Berakhir</p>
+                          <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden', background: '#FFFFFF' }}>
+                            <input type="date" value={tglAkhir} onChange={(e) => { setTglAkhir(e.target.value); setPage(1) }} style={{ flex: 1, border: 'none', outline: 'none', padding: '8px 10px', fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 13, color: '#5F737F', width: '100%' }} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ height: 1, background: '#E1E8EC' }} />
-                  {/* CTA */}
-                  <div style={{ padding: '12px 16px', display: 'flex', gap: 8 }}>
-                    <button onClick={() => setFilterOpen(false)} className="btn-primary" style={{ flex: 1, borderRadius: 22 }}>Terapkan Filter</button>
-                    <button onClick={() => { resetFilters(); setFilterOpen(false) }} style={{ padding: '10px 20px', borderRadius: 22, border: 'none', background: 'transparent', color: '#D92D20', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>Hapus Filter</button>
-                  </div>
+
+                 
                 </div>
               )}
             </div>
@@ -2584,9 +3320,8 @@ export default function GangguanPage() {
               <tr>
                 <th>Tanggal</th>
                 <th>Ruas</th>
-                <th>No. Tower</th>
                 <th>Jenis Kerawanan</th>
-                <th>Teknisi</th>
+                <th>Line Walker</th>
                 <th>Status Kerawanan</th>
                 <th>Progres Laporan</th>
                 <th style={{ textAlign: 'center' }}>Aksi</th>
@@ -2596,35 +3331,33 @@ export default function GangguanPage() {
               {loading ? (
                 Array.from({ length: pageSize }).map((_, i) => (
                   <tr key={i}>
-                    {Array.from({ length: 8 }).map((_, j) => (
+                    {Array.from({ length: 7 }).map((_, j) => (
                       <td key={j}><div className="h-4 bg-gray-100 rounded animate-pulse" /></td>
                     ))}
                   </tr>
                 ))
               ) : rows.length === 0 ? (
                 <tr>
-                  <td colSpan={8}><EmptyState title="Belum ada data Riwayat Kerawanan Transmisi." /></td>
+                  <td colSpan={7}><EmptyState title="Belum ada data Riwayat Kerawanan Transmisi." /></td>
                 </tr>
               ) : (
                 rows.map((row) => (
-                  <tr key={row.id}>
+                  <tr key={row.id} onClick={() => openDetail(row)} style={{ cursor: 'pointer' }}>
                     <td className="text-[14px] text-[#5f737f] whitespace-nowrap">{formatTanggal(row.tanggal)}</td>
                     <td className="text-[14px] text-[#5f737f] max-w-[220px]">
                       <span className="block truncate" title={row.tower?.nama ?? row.towerId}>
                         {row.tower?.nama ?? row.towerId ?? '—'}
                       </span>
                     </td>
-                    <td className="text-[14px] text-[#5f737f] whitespace-nowrap">
-                      {extractTowerNo(row.tower?.nama) ?? '—'}
-                    </td>
                     <td className="text-[14px] text-[#5f737f]">{JENIS_LABEL[row.jenisGangguan] ?? row.jenisGangguan ?? '—'}</td>
-                    <td className="text-[14px] text-[#5f737f]">{row.teknisi ?? row.pelapor?.nama ?? '—'}</td>
+                    <td className="text-[14px] text-[#5f737f]">{row.pelapor?.nama ?? '—'}</td>
                     <td><LevelBadge level={row.levelRisiko} /></td>
-                    <td><ProgressBadge tipe={row.latestProgressTipe} /></td>
+                    <td><ProgressBadge tipe={row.progresLaporan} /></td>
                     <td className="text-center">
                       <RowActions
                         row={row}
                         onDetail={openDetail}
+                        onUpdate={openUpdate}
                         onEdit={openEdit}
                         onDelete={setDeleteRow}
                         showDelete={isAdminUser}
@@ -2688,14 +3421,25 @@ export default function GangguanPage() {
         </div>
       </div>
 
+      {/* Hidden camera input for mobile add flow */}
+      <input
+        ref={mobileAddCameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={e => { if (e.target.files?.length) handleMobileAddCapture(e.target.files); e.target.value = '' }}
+      />
+
       {/* Drawer */}
       <LaporanDrawer
         open={drawerOpen}
         initial={editRow}
         initialFotos={pendingFotos}
         readOnly={viewMode === 'detail'}
+        autoOpenUpdate={autoOpenUpdate}
         towerOptions={towerOptions}
-        onClose={() => setDrawerOpen(false)}
+        onClose={() => { setDrawerOpen(false); setAutoOpenUpdate(false) }}
         onSaved={fetchData}
       />
 
@@ -2738,18 +3482,87 @@ export default function GangguanPage() {
           <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2">
 
             {/* Kategori — 16px bold, chips h=36 r=18 */}
-            <p className="font-bold text-base text-[#1C1C1C] mb-3">Kategori</p>
+            <p className="font-bold text-base text-[#1C1C1C] mb-3">Jenis Kerawanan</p>
             <div className="flex flex-wrap gap-2 mb-5">
-              {JENIS_OPTIONS.filter(o => o.value).map(o => (
-                <button key={o.value}
-                  onClick={() => { setJenis(jenis === o.value ? '' : o.value); setPage(1) }}
-                  className={`h-9 px-3 rounded-[18px] border cursor-pointer font-medium text-[12px] transition-all ${
-                    jenis === o.value
-                      ? 'bg-[#076c9e] border-[#076c9e] text-white'
-                      : 'bg-transparent border-[#E1E8EC] text-[#5F737F]'
-                  }`}
-                >{o.label}</button>
-              ))}
+              {JENIS_OPTIONS.filter(o => o.value).map(o => {
+                const active = jenis.includes(o.value)
+                return (
+                  <button key={o.value}
+                    onClick={() => { setJenis(active ? jenis.filter(v => v !== o.value) : [...jenis, o.value]); setPage(1) }}
+                    className={`h-9 px-3 rounded-[18px] border cursor-pointer font-medium text-[12px] transition-all ${
+                      active
+                        ? 'bg-[#076c9e] border-[#076c9e] text-white'
+                        : 'bg-transparent border-[#E1E8EC] text-[#5F737F]'
+                    }`}
+                  >{o.label}</button>
+                )
+              })}
+            </div>
+
+            {/* Status Kerawanan */}
+            <p className="font-bold text-base text-[#1C1C1C] mb-3">Status Kerawanan</p>
+            <div className="flex flex-wrap gap-2 mb-5">
+              {['aman', 'sedang', 'kritis'].map(v => {
+                const active = levelFilter.includes(v)
+                return (
+                  <button key={v}
+                    onClick={() => { setLevelFilter(active ? levelFilter.filter(x => x !== v) : [...levelFilter, v]); setPage(1) }}
+                    className={`h-9 px-3 rounded-[18px] border cursor-pointer font-medium text-[12px] transition-all capitalize ${
+                      active
+                        ? 'bg-[#076c9e] border-[#076c9e] text-white'
+                        : 'bg-transparent border-[#E1E8EC] text-[#5F737F]'
+                    }`}
+                  >{v}</button>
+                )
+              })}
+            </div>
+
+            {/* Progres Laporan */}
+            <p className="font-bold text-base text-[#1C1C1C] mb-3">Progres Laporan</p>
+            <div className="flex flex-wrap gap-2 mb-5">
+              {STATUS_FILTER_OPTIONS.filter(o => o.value).map(o => {
+                const isTidakAda = o.value === 'tidak_ada_aktifitas'
+                const active = isTidakAda
+                  ? (statusFilter.includes('tidak_ada_aktifitas') || statusFilter.includes('tidak_ada_aktivitas'))
+                  : statusFilter.includes(o.value)
+                return (
+                  <button key={o.value}
+                    onClick={() => { setStatusFilter(active ? statusFilter.filter(v => v !== o.value) : [...statusFilter, o.value]); setPage(1) }}
+                    className={`h-9 px-3 rounded-[18px] border cursor-pointer font-medium text-[12px] transition-all ${
+                      active
+                        ? 'bg-[#076c9e] border-[#076c9e] text-white'
+                        : 'bg-transparent border-[#E1E8EC] text-[#5F737F]'
+                    }`}
+                  >{o.label}</button>
+                )
+              })}
+            </div>
+
+            {/* Teknisi / Line Walker (Mobile) */}
+            <div className="mb-5">
+              <SearchableSelect
+                label="Line Walker / Teknisi"
+                placeholder="Pilih petugas..."
+                options={pegawaiOptions.map(p => ({ value: p.nama, label: p.nama, sub: `${p.jabatan} · ${p.unit}` }))}
+                values={teknisiFilter}
+                onChange={(vals) => { setTeknisiFilter(vals); setPage(1) }}
+                onClear={() => { setTeknisiFilter([]); setPage(1) }}
+              />
+            </div>
+
+            {/* Tower Name (Mobile) */}
+            <div className="mb-5">
+              <SearchableSelect
+                label="Ruas"
+                placeholder="Pilih ruas..."
+                options={towerOptions.map(t => {
+                  const { label, sub } = parseTowerDisplay(t)
+                  return { value: t.id, label, sub }
+                })}
+                values={towerFilter}
+                onChange={(vals) => { setTowerFilter(vals); setPage(1) }}
+                onClear={() => { setTowerFilter([]); setPage(1) }}
+              />
             </div>
 
             {/* Periode — side-by-side date pickers, Figma: 191x44 each */}

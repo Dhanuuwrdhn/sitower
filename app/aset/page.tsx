@@ -16,7 +16,7 @@ import { CustomSelect } from '@/components/ui/CustomSelect'
 const TIPE_CHIPS = ['SUTET', 'SUTT', 'SKTT', 'Gardu Induk']
 const STATUS_CHIPS = ['Aman', 'Sedang', 'Kritis']
 const JENIS_CHIPS = [
-  { id: 'ppl', label: 'Pekerjaan Pihak Lain (PPL)' },
+  { id: 'pekerjaan_pihak_lain', label: 'Pekerjaan Pihak Lain (PPL)' },
   { id: 'layangan', label: 'Layangan' },
   { id: 'kebakaran', label: 'Kebakaran' },
   { id: 'pencurian', label: 'Pencurian' },

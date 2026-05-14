@@ -50,8 +50,7 @@ const STATUS_LABEL: Record<string, string> = {
 }
 
 const LEVEL_OPTIONS = [
-  { value: 'kritis_terpenuhi', label: 'Kritis', color: 'text-red-600', bg: 'bg-red-50 border-red-300', dot: 'bg-red-500' },
-  { value: 'kritis_tidak_terpenuhi', label: 'Kritis', color: 'text-red-700', bg: 'bg-red-100 border-red-400', dot: 'bg-red-700' },
+  { value: 'kritis', label: 'Kritis', color: 'text-red-600', bg: 'bg-red-50 border-red-300', dot: 'bg-red-500' },
   { value: 'sedang', label: 'Sedang', color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-300', dot: 'bg-yellow-500' },
   { value: 'aman', label: 'Aman', color: 'text-green-600', bg: 'bg-green-50 border-green-300', dot: 'bg-green-500' },
 ]
@@ -123,6 +122,11 @@ function formatTanggal(iso: string) {
   return new Date(iso).toLocaleDateString('id-ID', {
     day: 'numeric', month: 'long', year: 'numeric',
   })
+}
+
+function normalizeLevelValue(level?: string) {
+  if (!level) return ''
+  return ['kritis', 'kritis_terpenuhi', 'kritis_tidak_terpenuhi'].includes(level) ? 'kritis' : level
 }
 
 function StatusPill({ status }: { status: string }) {
@@ -1549,7 +1553,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             <select className="form-input" value={riwayatForm.statusKerawanan} onChange={e => setRiwayatForm(f => ({ ...f, statusKerawanan: e.target.value }))}>
               <option value="aman">Aman</option>
               <option value="sedang">Sedang</option>
-              <option value="kritis_terpenuhi">Kritis</option>
+              <option value="kritis">Kritis</option>
             </select>
           </div>
 
@@ -2197,7 +2201,7 @@ function LaporanDrawer({
           towerLabel: initial.tower?.nama ?? initial.tower?.id ?? '',
           jenisGangguan: initial.jenisGangguan ?? '',
           tanggalWaktu: initial.tanggal?.slice(0, 16) ?? new Date().toISOString().slice(0, 16),
-          levelRisiko: initial.levelRisiko ?? 'sedang',
+          levelRisiko: normalizeLevelValue(initial.levelRisiko) || 'sedang',
           status: initial.status ?? 'berlangsung',
           progresLaporan: initial.progresLaporan ?? 'sedang_berlangsung',
           lokasiDetail: initial.lokasiDetail ?? '',

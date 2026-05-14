@@ -2274,7 +2274,7 @@ function LaporanDrawer({
     e.preventDefault()
     if (readOnly) { onClose(); return }
     if (!form.towerId) { toast.error('Pilih tower terlebih dahulu'); return }
-    if (!form.jenisGangguan) { toast.error('Pilih kategori gangguan'); return }
+    if (!form.jenisGangguan) { toast.error('Pilih kategori kerawanan'); return }
     setSaving(true)
     try {
       let uploadedUrls: string[] = []

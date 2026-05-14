@@ -6,7 +6,7 @@ import { useEffect, useLayoutEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import {
   IconDashboard, IconRiwayat, IconAset, IconSertifikat,
-  IconAsBuilt, IconClimb, IconCleanup, IconUsers, IconToggle,
+  IconAsBuilt, IconClimb, IconCleanup, IconUsers, IconToggle, IconLightning,
 } from '@/components/icons/SpektraIcons'
 import { getUser, logout } from '@/lib/auth'
 import { useSidebar } from './SidebarContext'
@@ -174,13 +174,16 @@ export default function Sidebar() {
             position: 'relative',
           }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <span style={{
-                fontFamily: 'Orbitron, sans-serif',
-                fontWeight: 800, fontSize: 22,
-                color: '#ffffff', letterSpacing: '0.05em',
-                userSelect: 'none', lineHeight: 1.1,
-              }}>
-                ⚡SPEKTRA
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <IconLightning size={26} />
+                <span style={{
+                  fontFamily: 'Orbitron, sans-serif',
+                  fontWeight: 800, fontSize: 22,
+                  color: '#ffffff', letterSpacing: '0.05em',
+                  userSelect: 'none', lineHeight: 1.1,
+                }}>
+                  SPEKTRA
+                </span>
               </span>
               <span style={{
                 fontSize: 12, fontWeight: 400,
@@ -313,7 +316,7 @@ export default function Sidebar() {
         {!isCollapsed && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2, userSelect: 'none', flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: 22, lineHeight: 1 }}>⚡</span>
+              <IconLightning size={22} />
               <span style={{
                 fontFamily: 'Orbitron, sans-serif', fontWeight: 800,
                 fontSize: 18, color: '#FFFFFF', letterSpacing: '0.06em', lineHeight: 1.1,

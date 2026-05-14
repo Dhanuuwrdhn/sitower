@@ -2657,13 +2657,6 @@ function LaporanDrawer({
         </div>
       )}
 
-      {isGangg && (
-        <div className="space-y-4 p-4 bg-app-bg rounded-xl border border-app-border">
-          <p className="text-[11px] font-bold text-app-muted uppercase tracking-wider">Detail Gangguan Teknis</p>
-          <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Penyebab</label><input disabled={readOnly} type="text" value={form.penyebab} onChange={(e) => set('penyebab', e.target.value)} className="form-input" /></div>
-          <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Durasi (jam)</label><input disabled={readOnly} type="number" value={form.durasi} onChange={(e) => set('durasi', e.target.value)} className="form-input" /></div>
-        </div>
-      )}
 
       {/* Tanggal & Waktu — editable by admin, readonly for teknisi, hidden for teknisi on create */}
       {(readOnly || !!initial || isAdmin() || isSuperadmin()) && (

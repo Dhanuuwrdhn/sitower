@@ -2120,10 +2120,10 @@ const EMPTY_FORM = {
   towerLabelEnd: '',
   jenisGangguan: '',
   tanggalWaktu: new Date().toISOString().slice(0, 16),
-  levelRisiko: 'sedang',
+  levelRisiko: '',
   status: 'berlangsung',
   progresLaporan: 'sedang_berlangsung',
-  lokasiDetail: '',     // stores span "T-x s/d T-y" for ppl
+  lokasiDetail: '',
   deskripsi: '',        // Uraian Pekerjaan
   keterangan: '',       // Upaya Pengendalian (ppl) / notes
   pihakLain: '',        // company name for pekerjaan_pihak_lain (stored in teknisi)
@@ -2160,6 +2160,8 @@ function LaporanDrawer({
   type SubmitErrors = {
     foto?: string
     towerId?: string
+    lokasiDetail?: string
+    levelRisiko?: string
   }
 
   const user = getUser()
@@ -2232,11 +2234,19 @@ function LaporanDrawer({
     if (k === 'towerId' && v) {
       setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
     }
+    if (k === 'lokasiDetail' && v.trim()) {
+      setSubmitErrors((prev) => ({ ...prev, lokasiDetail: undefined }))
+    }
+    if (k === 'levelRisiko' && v) {
+      setSubmitErrors((prev) => ({ ...prev, levelRisiko: undefined }))
+    }
   }
 
   function validateRequiredFields() {
     const nextErrors: SubmitErrors = {}
     if (!form.towerId) nextErrors.towerId = 'Ruas wajib diisi'
+    if (!form.lokasiDetail.trim()) nextErrors.lokasiDetail = 'Span wajib diisi'
+    if (!form.levelRisiko) nextErrors.levelRisiko = 'Status Kerawanan wajib diisi'
     if (!initial && fotos.length === 0 && fotoUrls.length === 0) {
       nextErrors.foto = 'Foto Bukti Terjadinya Kerawanan wajib diisi'
     }
@@ -2499,31 +2509,32 @@ function LaporanDrawer({
           )}
         </div>
 
-        {/* Span — free text, optional, semua jenis laporan */}
-        {isPPL && (
-          <div className="flex-1 min-w-0">
-            <label className="block text-[14px] font-bold text-app-text mb-2">Span</label>
-            <div className="relative">
-              <input
-                type="text"
-                disabled={readOnly}
-                value={form.lokasiDetail}
-                onChange={e => set('lokasiDetail', e.target.value)}
-                placeholder="Contoh: T-23 - T-25"
-                className="form-input pr-8"
-              />
-              {form.lokasiDetail && !readOnly && (
-                <button type="button" onClick={() => set('lokasiDetail', '')} className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <X size={14} className="text-[#97AAB3]" />
-                </button>
-              )}
-            </div>
+        {/* Span */}
+        <div className="flex-1 min-w-0">
+          <label className="block text-[14px] font-bold text-app-text mb-2">Span</label>
+          <div className="relative">
+            <input
+              type="text"
+              disabled={readOnly}
+              value={form.lokasiDetail}
+              onChange={e => set('lokasiDetail', e.target.value)}
+              placeholder="Contoh: T-23 - T-25"
+              className="form-input pr-8"
+            />
+            {form.lokasiDetail && !readOnly && (
+              <button type="button" onClick={() => set('lokasiDetail', '')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                <X size={14} className="text-[#97AAB3]" />
+              </button>
+            )}
           </div>
-        )}
+          {submitErrors.lokasiDetail && (
+            <p className="mt-2 text-[12px] font-medium text-[#EF4444]">{submitErrors.lokasiDetail}</p>
+          )}
+        </div>
       </div>
 
       {/* Jenis & Status Kerawanan */}
-      <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>
+      <div className="grid grid-cols-2 gap-4">
         <div className="flex-1 min-w-0">
           <label className="block text-[14px] font-bold text-app-text mb-2">Jenis Kerawanan</label>
           {isMobile && !readOnly ? (
@@ -2556,38 +2567,40 @@ function LaporanDrawer({
           )}
         </div>
 
-        {isPPL && (
-          <div className="flex-1 min-w-0">
-            <label className="block text-[14px] font-bold text-app-text mb-2">Status Kerawanan</label>
-            {isMobile && !readOnly ? (
-              <button
-                type="button"
-                onClick={() => setLevelSheetOpen(true)}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  width: '100%', padding: '10px 14px', background: '#FFFFFF',
-                  border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
-                }}
-              >
-                <span style={{ fontSize: 14, color: form.levelRisiko ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
-                  {LEVEL_OPTIONS.find(l => l.value === form.levelRisiko)?.label || 'Pilih status...'}
-                </span>
-                <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
-              </button>
-            ) : (
-              <select
-                disabled={readOnly}
-                value={form.levelRisiko}
-                onChange={(e) => set('levelRisiko', e.target.value)}
-                className={`form-input truncate pr-8 ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
-              >
-                {LEVEL_OPTIONS.map(l => (
-                  <option key={l.value} value={l.value}>{l.label}</option>
-                ))}
-              </select>
-            )}
-          </div>
-        )}
+        <div className="flex-1 min-w-0">
+          <label className="block text-[14px] font-bold text-app-text mb-2">Status Kerawanan</label>
+          {isMobile && !readOnly ? (
+            <button
+              type="button"
+              onClick={() => setLevelSheetOpen(true)}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                width: '100%', padding: '10px 14px', background: '#FFFFFF',
+                border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+              }}
+            >
+              <span style={{ fontSize: 14, color: form.levelRisiko ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
+                {LEVEL_OPTIONS.find(l => l.value === form.levelRisiko)?.label || 'Pilih status...'}
+              </span>
+              <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+            </button>
+          ) : (
+            <select
+              disabled={readOnly}
+              value={form.levelRisiko}
+              onChange={(e) => set('levelRisiko', e.target.value)}
+              className={`form-input truncate pr-8 ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
+            >
+              <option value="">Pilih status...</option>
+              {LEVEL_OPTIONS.map(l => (
+                <option key={l.value} value={l.value}>{l.label}</option>
+              ))}
+            </select>
+          )}
+          {submitErrors.levelRisiko && (
+            <p className="mt-2 text-[12px] font-medium text-[#EF4444]">{submitErrors.levelRisiko}</p>
+          )}
+        </div>
       </div>
 
       {/* Uraian Pekerjaan / Deskripsi */}

@@ -2555,22 +2555,6 @@ function LaporanDrawer({
         )}
       </div>
 
-      {/* Progres Laporan */}
-      {!readOnly && (
-        <div>
-          <label className={`block font-bold text-app-text mb-2 text-[14px]`}>Progres Laporan</label>
-          <select
-            value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(form.progresLaporan) ? 'tidak_ada_aktifitas' : form.progresLaporan}
-            onChange={(e) => set('progresLaporan', e.target.value)}
-            className="form-input"
-          >
-            <option value="sedang_berlangsung">Sedang Berlangsung</option>
-            <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
-            <option value="selesai">Selesai</option>
-          </select>
-        </div>
-      )}
-
       {/* Uraian Pekerjaan / Deskripsi */}
       <div>
         <label className="block text-[14px] font-bold text-app-text mb-2">
@@ -2592,20 +2576,6 @@ function LaporanDrawer({
           )}
         </div>
       </div>
-
-      {!isPPL && (
-        <div>
-          <label className="block text-[14px] font-bold text-app-text mb-2">Keterangan</label>
-          <textarea
-            disabled={readOnly}
-            rows={4}
-            value={form.keterangan}
-            onChange={(e) => set('keterangan', e.target.value)}
-            className="form-input resize-none"
-            placeholder="Catatan tambahan laporan..."
-          />
-        </div>
-      )}
 
       {/* Pekerjaan Pihak Lain section */}
       {isPPL && (
@@ -2654,14 +2624,45 @@ function LaporanDrawer({
             </div>
           </div>
 
-          {!readOnly && (
-            <>
-              <div style={{ margin: '8px -20px 0', height: 8, background: '#F6F9FC' }} />
-              <div style={{ padding: '12px 0 4px' }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>Informasi Progres Laporan</h3>
-              </div>
-            </>
-          )}
+        </>
+      )}
+
+      {/* Upaya Pengendalian (Opsional) — common (PPL + non-PPL) */}
+      {!readOnly && (
+        <div>
+          <label className="block text-[14px] font-bold text-app-text mb-2">
+            Upaya Pengendalian <span className="font-normal text-[#5F737F]">(Opsional)</span>
+          </label>
+          <textarea
+            disabled={readOnly}
+            rows={4}
+            value={form.keterangan}
+            onChange={(e) => set('keterangan', e.target.value)}
+            className="form-input resize-none w-full"
+            placeholder="sudah di lakukan pemasangan banner, sudah di sosialisasikan dan sudah dibuatkan (BA)"
+          />
+        </div>
+      )}
+
+      {/* Informasi Progres Laporan section */}
+      {!readOnly && (
+        <>
+          <div style={{ margin: '8px -20px 0', height: 8, background: '#F6F9FC' }} />
+          <div style={{ padding: '12px 0 4px' }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>Informasi Progres Laporan</h3>
+          </div>
+          <div>
+            <label className="block text-[14px] font-bold text-app-text mb-2">Progres Laporan</label>
+            <select
+              value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(form.progresLaporan) ? 'tidak_ada_aktifitas' : form.progresLaporan}
+              onChange={(e) => set('progresLaporan', e.target.value)}
+              className="form-input"
+            >
+              <option value="sedang_berlangsung">Sedang Berlangsung</option>
+              <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
+              <option value="selesai">Selesai</option>
+            </select>
+          </div>
         </>
       )}
 

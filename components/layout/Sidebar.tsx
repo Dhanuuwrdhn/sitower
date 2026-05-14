@@ -165,23 +165,32 @@ export default function Sidebar() {
             transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
           }}
         >
-          {/* Header — ⚡SPEKTRA + close button */}
+          {/* Header — ⚡SPEKTRA + subtitle + close button */}
           <div style={{
-            height: 64,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '0 16px',
+            display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+            padding: '12px 16px',
             borderBottom: '1px solid rgba(255,255,255,0.12)',
             flexShrink: 0,
             position: 'relative',
           }}>
-            <span style={{
-              fontFamily: 'Orbitron, sans-serif',
-              fontWeight: 800, fontSize: 22,
-              color: '#ffffff', letterSpacing: '0.05em',
-              userSelect: 'none',
-            }}>
-              ⚡SPEKTRA
-            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span style={{
+                fontFamily: 'Orbitron, sans-serif',
+                fontWeight: 800, fontSize: 22,
+                color: '#ffffff', letterSpacing: '0.05em',
+                userSelect: 'none', lineHeight: 1.1,
+              }}>
+                ⚡SPEKTRA
+              </span>
+              <span style={{
+                fontSize: 10.5, fontWeight: 500,
+                color: 'rgba(255,255,255,0.7)',
+                letterSpacing: '0.02em',
+                userSelect: 'none',
+              }}>
+                Sistem Pemantauan Kabel dan Tower Transmisi
+              </span>
+            </div>
             <button
               onClick={() => setMobileOpen(false)}
               style={{
@@ -293,19 +302,29 @@ export default function Sidebar() {
 
       {/* Header */}
       <div style={{
-        height: 64, display: 'flex', alignItems: 'center',
-        padding: isCollapsed ? '0 14px' : '0 16px',
+        display: 'flex', alignItems: isCollapsed ? 'center' : 'flex-start',
+        padding: isCollapsed ? '20px 14px' : '12px 16px',
+        minHeight: 64,
         justifyContent: isCollapsed ? 'center' : 'space-between',
         borderBottom: '1px solid rgba(255,255,255,0.1)',
         flexShrink: 0, position: 'relative',
       }}>
         {!isCollapsed && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, userSelect: 'none' }}>
-            <span style={{ fontSize: 22, lineHeight: 1 }}>⚡</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, userSelect: 'none', flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 22, lineHeight: 1 }}>⚡</span>
+              <span style={{
+                fontFamily: 'Orbitron, sans-serif', fontWeight: 800,
+                fontSize: 18, color: '#FFFFFF', letterSpacing: '0.06em', lineHeight: 1.1,
+              }}>SPEKTRA</span>
+            </div>
             <span style={{
-              fontFamily: 'Orbitron, sans-serif', fontWeight: 800,
-              fontSize: 18, color: '#FFFFFF', letterSpacing: '0.06em',
-            }}>SPEKTRA</span>
+              fontSize: 10.5, fontWeight: 500,
+              color: 'rgba(255,255,255,0.7)',
+              letterSpacing: '0.02em',
+            }}>
+              Sistem Pemantauan Kabel dan Tower Transmisi
+            </span>
           </div>
         )}
         <button

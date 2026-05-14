@@ -72,7 +72,7 @@ const STATUS_FILTER_OPTIONS = [
 ]
 
 const STATUS_CLASS: Record<string, string> = {
-  berlangsung: 'badge-berlangsung badge-blink',
+  berlangsung: 'badge-berlangsung',
   selesai: 'badge-selesai',
   tidak_ada_aktifitas: 'badge-menunggu',
   tidak_ada_aktivitas: 'badge-menunggu',
@@ -1708,27 +1708,28 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
 
     return (
       <div className="flex-1 flex flex-col overflow-hidden" style={{ background: '#F6F9FC' }}>
-        {/* ── Sticky top nav ───────────────────────────────────────── */}
+        {/* ── Sticky top nav (white, light border) ─────────────── */}
         <div style={{
           position: 'sticky', top: 0, zIndex: 20,
-          background: '#076C9E', color: '#fff',
-          display: 'flex', alignItems: 'center', gap: 12,
-          padding: '12px 16px', minHeight: 56, flexShrink: 0,
+          background: '#fff',
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '8px 12px', minHeight: 52, flexShrink: 0,
+          borderBottom: '1px solid #E1E8EC',
         }}>
           <button onClick={onClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 6, color: '#fff', minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 6, color: '#1B1B1B', minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}
             aria-label="Kembali">
             <ArrowLeft size={22} />
           </button>
-          <span style={{ fontSize: 16, fontWeight: 700 }}>Detail Laporan Kerawanan</span>
+          <span style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>Detail Laporan Kerawanan</span>
         </div>
 
-        <div className="flex-1 overflow-y-auto" style={{ padding: '12px 16px', paddingBottom: canPerbarui ? 88 : 16 }}>
+        <div className="flex-1 overflow-y-auto" style={{ padding: '12px 12px', paddingBottom: canPerbarui ? 88 : 16 }}>
 
           {/* ── Summary card ───────────────────────────────────── */}
-          <div style={{ background: '#fff', borderRadius: 12, padding: 14, marginBottom: 12, border: '1px solid #E1E8EC' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-              <span style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B', flex: 1 }}>
+          <div style={{ background: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, border: '1px solid #E1E8EC' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>
                 {JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan ?? '—'}
               </span>
               {laporan?.status && <StatusPill status={laporan.status} />}
@@ -1739,7 +1740,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           </div>
 
           {/* ── Informasi Kerawanan (no header) ────────────────── */}
-          <div style={{ background: '#fff', borderRadius: 12, padding: 14, marginBottom: 12, border: '1px solid #E1E8EC', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ background: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, border: '1px solid #E1E8EC', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama) ?? '—'} />
               <InfoRow label="Span" value={laporan?.lokasiDetail || '—'} />
@@ -1901,6 +1902,11 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
       <div style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>
+            <button onClick={onClose}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: 6, color: '#076C9E', fontWeight: 600, fontSize: 14 }}>
+              <ArrowLeft size={18} />
+              Kembali
+            </button>
             <span style={{ fontSize: 24, fontWeight: 700, color: '#1B1B1B' }}>Detail Laporan Kerawanan</span>
             {laporan?.status && <StatusPill status={laporan.status} />}
           </div>

@@ -207,6 +207,12 @@ function UserModal({ open, initial, onClose, onSaved }: { open: boolean; initial
     e.preventDefault()
     if (!form.nik || !form.nama) { toast.error('NIK dan Nama wajib diisi'); return }
     if (!initial && !form.password) { toast.error('Password wajib diisi untuk user baru'); return }
+    if (form.password) {
+      const p = form.password
+      if (p.length < 8) { toast.error('Password minimal 8 karakter'); return }
+      if (!/[A-Z]/.test(p)) { toast.error('Password harus mengandung 1 huruf kapital'); return }
+      if (!/[^A-Za-z0-9]/.test(p)) { toast.error('Password harus mengandung 1 karakter spesial'); return }
+    }
     setSaving(true)
     try {
       const payload: any = { nik: form.nik, nama: form.nama, jabatan: form.jabatan, unit: form.unit, role: form.role }
@@ -292,7 +298,7 @@ function UserModal({ open, initial, onClose, onSaved }: { open: boolean; initial
                 value={form.password}
                 onChange={(e) => set('password', e.target.value)}
                 className="form-input pr-16"
-                placeholder="Min. 8 karakter"
+                placeholder="Min. 8 karakter, 1 kapital, 1 spesial"
               />
               <button
                 type="button"
@@ -302,6 +308,7 @@ function UserModal({ open, initial, onClose, onSaved }: { open: boolean; initial
                 {showPass ? 'Sembunyikan' : 'Tampilkan'}
               </button>
             </div>
+            <p className="text-[11px] text-app-muted mt-1">Min. 8 karakter, harus ada 1 huruf kapital dan 1 karakter spesial (mis. <code>!@#$%</code>).</p>
           </div>
         </form>
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border">

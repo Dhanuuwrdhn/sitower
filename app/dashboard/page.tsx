@@ -39,17 +39,23 @@ const LEVEL_BADGE: Record<string, { bg: string; text: string; label: string }> =
 }
 
 const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {
-  laporan_baru: { bg: '#076C9E', text: '#FFFFFF' },
-  berita_acara: { bg: '#076C9E', text: '#FFFFFF' },
-  spanduk:      { bg: '#076C9E', text: '#FFFFFF' },
-  brosur:       { bg: '#076C9E', text: '#FFFFFF' },
+  laporan_baru:        { bg: '#076C9E', text: '#FFFFFF' },
+  berita_acara:        { bg: '#076C9E', text: '#FFFFFF' },
+  spanduk:             { bg: '#076C9E', text: '#FFFFFF' },
+  brosur:              { bg: '#076C9E', text: '#FFFFFF' },
+  sedang_berlangsung:  { bg: '#FFFAEB', text: '#F79009' },
+  selesai:             { bg: '#ECFDF3', text: '#039855' },
+  tidak_ada_aktifitas: { bg: '#F1F5F9', text: '#475569' },
 }
 
 const PROGRESS_TIPE_LABEL: Record<string, string> = {
-  spanduk:      'Spanduk',
-  brosur:       'Brosur',
-  laporan_baru: 'Laporan Baru',
-  berita_acara: 'Berita Acara',
+  spanduk:             'Spanduk',
+  brosur:              'Brosur',
+  laporan_baru:        'Laporan Baru',
+  berita_acara:        'Berita Acara',
+  sedang_berlangsung:  'Sedang Berlangsung',
+  selesai:             'Selesai',
+  tidak_ada_aktifitas: 'Tidak Ada Aktifitas',
 }
 
 function extractTowerNo(nama?: string | null): string {
@@ -254,7 +260,7 @@ export default function DashboardPage() {
             jenisGangguan: JENIS_LABEL[r.jenisGangguan] ?? r.jenisGangguan ?? '—',
             teknisi: r.teknisi ?? r.pelapor?.nama ?? '—',
             levelRisiko: r.levelRisiko ?? '—',
-            latestProgressTipe: r.latestProgressTipe ?? null,
+            latestProgressTipe: r.progresLaporan ?? r.latestProgressTipe ?? null,
           })))
         })
         .catch(() => {}),

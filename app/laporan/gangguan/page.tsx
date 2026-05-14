@@ -2326,7 +2326,7 @@ function LaporanDrawer({
   const isCUI = form.jenisGangguan === 'cui'
   const isCleanup = form.jenisGangguan === 'cleanup'
   const isGangg = !isPPL && !isCUI && !isCleanup && !!form.jenisGangguan
-  const title = readOnly ? 'Detail Laporan' : initial ? 'Edit Laporan' : 'Buat Laporan Gangguan'
+  const title = readOnly ? 'Detail Laporan' : initial ? 'Edit Laporan' : 'Buat Laporan Baru'
   const formBody = (
     <form id="laporan-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
 

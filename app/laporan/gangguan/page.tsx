@@ -2406,7 +2406,7 @@ function LaporanDrawer({
       <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>
         <div className="flex-1 min-w-0">
           <label className="block text-[14px] font-bold text-app-text mb-2">
-            {isPPL ? 'No. Ruas' : 'Ruas'}
+            Ruas
           </label>
           {readOnly ? (
             <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
@@ -2462,30 +2462,6 @@ function LaporanDrawer({
           </div>
         )}
       </div>
-
-      {/* GPS checkbox */}
-      {!readOnly && (
-        <div className="flex items-center gap-2.5">
-          <div
-            onClick={() => setUseGPS(v => !v)}
-            className={`w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors shrink-0 ${useGPS ? 'bg-[#076C9E] border-[#076C9E]' : 'border-app-border bg-white'}`}
-          >
-            {useGPS && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-          </div>
-          <button
-            id="btn-detect-location"
-            type="button"
-            onClick={() => { setUseGPS(true); if (!locating) handleDetectLocation() }}
-            className="text-[13px] text-app-text"
-          >
-            Gunakan lokasi anda saat ini.
-          </button>
-          {locating && <span className="text-[11px] text-[#076C9E] animate-pulse">Mendeteksi...</span>}
-        </div>
-      )}
-      {detectedMsg && (
-        <p className={`text-[12px] font-medium -mt-2 ${detectedMsg.includes('⚠️') ? 'text-orange-600' : 'text-green-600'}`}>{detectedMsg}</p>
-      )}
 
       {/* Jenis & Status Kerawanan */}
       <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>

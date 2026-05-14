@@ -1742,7 +1742,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           {/* ── Informasi Kerawanan (no header) ────────────────── */}
           <div style={{ background: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, border: '1px solid #E1E8EC', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama) ?? '—'} />
+              <InfoRow label="Ruas" value={laporan?.tower?.nama ?? '—'} />
               <InfoRow label="Span" value={laporan?.lokasiDetail || '—'} />
             </div>
             <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
@@ -1936,7 +1936,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, marginBottom: 20 }}>
             <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan ?? '—'} />
             <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
-            <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama) ?? '—'} />
+            <InfoRow label="Ruas" value={laporan?.tower?.nama ?? '—'} />
             <InfoRow label="Span" value={laporan?.lokasiDetail || '—'} />
           </div>
 

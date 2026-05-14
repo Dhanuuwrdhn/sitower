@@ -2619,7 +2619,7 @@ function LaporanDrawer({
             value={form.deskripsi}
             onChange={(e) => set('deskripsi', e.target.value)}
             className="form-input resize-none w-full"
-            placeholder={isPPL ? 'Proyek renovasi gudang menggunakan alat berat crane' : 'Deskripsi gangguan...'}
+            placeholder={isPPL ? 'Proyek renovasi gudang menggunakan alat berat crane' : 'Deskripsi Kerawanan...'}
           />
           {form.deskripsi && !readOnly && (
             <button type="button" onClick={() => set('deskripsi', '')} className="absolute bottom-3 right-3">

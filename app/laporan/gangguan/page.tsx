@@ -2464,7 +2464,7 @@ function LaporanDrawer({
       </div>
 
       {/* Tower terdampak & Span */}
-      <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>
+      <div className="grid grid-cols-2 gap-4">
         <div className="flex-1 min-w-0">
           <label className="block text-[14px] font-bold text-app-text mb-2">
             Ruas <span className="text-[#EF4444]">*</span>

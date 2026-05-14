@@ -324,7 +324,7 @@ export default function Sidebar() {
               color: 'rgba(255,255,255,0.7)',
               letterSpacing: '0.02em',
             }}>
-              Sistem Pemantauan Kabel dan Tower Transmisi
+              Sistem Pemantauan Kabel<br />dan Tower Transmisi
             </span>
           </div>
         )}

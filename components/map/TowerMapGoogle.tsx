@@ -587,25 +587,20 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
   const [activeJenis, setActiveJenis] = useState<string[]>([])
   const [visibleLayers, setVisibleLayers] = useState<Set<string>>(new Set(['SUTT', 'SUTET', 'SKTT']))
   const [filterOpen, setFilterOpen] = useState(false)
-  const [draftJenis, setDraftJenis] = useState<string[]>([])
-  const [draftLayers, setDraftLayers] = useState<Set<string>>(new Set(['SUTT', 'SUTET', 'SKTT']))
 
-  // When opening popover, sync draft from applied
-  function openFilter() {
-    setDraftJenis(activeJenis)
-    setDraftLayers(new Set(visibleLayers))
-    setFilterOpen(true)
+  function toggleJenis(k: string) {
+    setActiveJenis(prev => prev.includes(k) ? prev.filter(x => x !== k) : [...prev, k])
   }
-
-  function toggleDraftJenis(k: string) {
-    setDraftJenis(prev => prev.includes(k) ? prev.filter(x => x !== k) : [...prev, k])
-  }
-  function toggleDraftLayer(k: string) {
-    setDraftLayers(prev => {
+  function toggleLayer(k: string) {
+    setVisibleLayers(prev => {
       const next = new Set(prev)
       if (next.has(k)) next.delete(k); else next.add(k)
       return next
     })
+  }
+  function clearFilters() {
+    setActiveJenis([])
+    setVisibleLayers(new Set(['SUTT', 'SUTET', 'SKTT']))
   }
 
   const displayTowers = useMemo<FeaturedTower[]>(() => {
@@ -661,11 +656,11 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
       {/* Filter button — top right of map */}
       <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 20 }}>
         <button
-          onClick={() => filterOpen ? setFilterOpen(false) : openFilter()}
+          onClick={() => setFilterOpen(v => !v)}
           aria-label="Filter"
           style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            padding: '0 14px', height: 40, borderRadius: 8,
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            padding: '0 12px', height: 36, borderRadius: 8,
             background: filterOpen ? '#076c9e' : '#fff',
             color: filterOpen ? '#fff' : '#374151',
             border: '1px solid #E1E8EC',
@@ -674,12 +669,12 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
             position: 'relative',
           }}
         >
-          <SlidersHorizontal size={16} />
+          <SlidersHorizontal size={15} />
           Filter
           {hasActiveFilter && !filterOpen && (
             <span style={{
-              position: 'absolute', top: 6, right: 6,
-              width: 8, height: 8, borderRadius: '50%',
+              position: 'absolute', top: 4, right: 4,
+              width: 7, height: 7, borderRadius: '50%',
               background: '#D92D20',
             }} />
           )}
@@ -687,30 +682,30 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
 
         {filterOpen && (
           <div style={{
-            position: 'absolute', top: 48, right: 0,
-            background: '#fff', borderRadius: 12,
-            boxShadow: '0 12px 32px rgba(0,0,0,0.18)',
+            position: 'absolute', top: 42, right: 0,
+            background: '#fff', borderRadius: 10,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
             border: '1px solid #E1E8EC',
-            padding: 16, width: 320, maxWidth: '90vw',
+            padding: 12, width: 240, maxWidth: '85vw',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: '#1C1C1C' }}>Filter</h3>
-              <button onClick={() => setFilterOpen(false)} style={{ padding: 4, background: 'transparent', border: 'none', cursor: 'pointer', color: '#64748b' }}>
-                <XIcon size={18} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, color: '#1C1C1C' }}>Filter</h3>
+              <button onClick={() => setFilterOpen(false)} style={{ padding: 2, background: 'transparent', border: 'none', cursor: 'pointer', color: '#64748b' }}>
+                <XIcon size={16} />
               </button>
             </div>
 
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#1C1C1C', marginBottom: 8 }}>Jenis Kerawanan</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#5F737F', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>Jenis Kerawanan</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 12 }}>
               {JENIS_FILTER_OPTIONS.map(({ key, label }) => {
-                const active = draftJenis.includes(key)
+                const active = activeJenis.includes(key)
                 return (
                   <button
                     key={key}
-                    onClick={() => toggleDraftJenis(key)}
+                    onClick={() => toggleJenis(key)}
                     style={{
-                      padding: '6px 12px', borderRadius: 18, fontSize: 12, fontWeight: 500,
-                      cursor: 'pointer', minHeight: 32,
+                      padding: '4px 10px', borderRadius: 16, fontSize: 11, fontWeight: 500,
+                      cursor: 'pointer',
                       border: active ? '1px solid #076C9E' : '1px solid #E1E8EC',
                       background: active ? '#076C9E' : '#fff',
                       color: active ? '#FFFFFF' : '#5F737F',
@@ -722,19 +717,19 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
               })}
             </div>
 
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#1C1C1C', marginBottom: 8 }}>Jalur</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 18 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#5F737F', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>Jalur</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 12 }}>
               {(['SKTT', 'SUTET', 'SUTT'] as const)
                 .filter((t) => availableLayerTypes.length === 0 || availableLayerTypes.includes(t))
                 .map((t) => {
-                  const active = draftLayers.has(t)
+                  const active = visibleLayers.has(t)
                   return (
                     <button
                       key={t}
-                      onClick={() => toggleDraftLayer(t)}
+                      onClick={() => toggleLayer(t)}
                       style={{
-                        padding: '6px 14px', borderRadius: 18, fontSize: 12, fontWeight: 500,
-                        cursor: 'pointer', minHeight: 32,
+                        padding: '4px 12px', borderRadius: 16, fontSize: 11, fontWeight: 500,
+                        cursor: 'pointer',
                         border: active ? '1px solid #076C9E' : '1px solid #E1E8EC',
                         background: active ? '#076C9E' : '#fff',
                         color: active ? '#FFFFFF' : '#5F737F',
@@ -746,36 +741,17 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
                 })}
             </div>
 
-            <div style={{ display: 'flex', gap: 8 }}>
+            {hasActiveFilter && (
               <button
-                onClick={() => {
-                  setActiveJenis(draftJenis)
-                  setVisibleLayers(new Set(draftLayers))
-                  setFilterOpen(false)
-                }}
+                onClick={clearFilters}
                 style={{
-                  flex: 1, padding: '10px 0', borderRadius: 22, fontSize: 13, fontWeight: 600,
-                  background: '#076C9E', color: '#fff', border: 'none', cursor: 'pointer', minHeight: 40,
-                }}
-              >
-                Terapkan Filter
-              </button>
-              <button
-                onClick={() => {
-                  setDraftJenis([])
-                  setDraftLayers(new Set(['SUTT', 'SUTET', 'SKTT']))
-                  setActiveJenis([])
-                  setVisibleLayers(new Set(['SUTT', 'SUTET', 'SKTT']))
-                  setFilterOpen(false)
-                }}
-                style={{
-                  flex: 1, padding: '10px 0', borderRadius: 22, fontSize: 13, fontWeight: 600,
-                  background: '#fff', color: '#dc2626', border: '1px solid #fecaca', cursor: 'pointer', minHeight: 40,
+                  width: '100%', padding: '7px 0', borderRadius: 16, fontSize: 12, fontWeight: 600,
+                  background: '#fff', color: '#dc2626', border: '1px solid #fecaca', cursor: 'pointer',
                 }}
               >
                 Hapus Filter
               </button>
-            </div>
+            )}
           </div>
         )}
       </div>

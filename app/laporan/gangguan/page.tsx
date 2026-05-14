@@ -2273,7 +2273,7 @@ function LaporanDrawer({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (readOnly) { onClose(); return }
-    if (!form.towerId) { toast.error('Pilih tower terlebih dahulu'); return }
+    if (!form.towerId) { toast.error('Pilih Ruas terlebih dahulu'); return }
     if (!form.jenisGangguan) { toast.error('Pilih kategori kerawanan'); return }
     setSaving(true)
     try {

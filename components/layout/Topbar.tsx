@@ -11,7 +11,6 @@ import { useSidebar } from './SidebarContext'
 const PAGE_TITLES: Record<string, string> = {
   '/laporan/gangguan': 'Riwayat Kerawanan Transmisi',
   '/aset':             'Data Aset Transmisi',
-  '/sertifikat':       'Sertifikat',
   '/as-built-drawing': 'As Built Drawing',
   '/laporan/cui':      'Climb Up Inspection',
   '/laporan/cleanup':  'Clean Up Isolator',
@@ -182,23 +181,20 @@ export default function Topbar() {
     )
   }
 
-  /* ── Desktop topbar — Figma 20:2425 flat header ── */
+  /* ── Desktop topbar — Redesign Card Style ── */
   return (
     <>
-      <div
-        className="sticky top-0 z-30 bg-white flex items-center justify-end px-8"
-        style={{
-          height: 82,
-          borderBottom: '1px solid #E1E8EC',
-          boxShadow: '0 1px 2px rgba(16,24,40,0.06), 0 1px 3px rgba(16,24,40,0.10)',
-        }}
-      >
+      <div className="sticky top-0 z-30 bg-app-bg px-7 pt-7 pb-2">
+        <div 
+          className="bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-end px-8 transition-all duration-300"
+          style={{ height: 82 }}
+        >
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <p className="text-[18px] font-bold text-app-text leading-tight">
+              <p className="text-[17px] font-bold text-[#1C1C1C] leading-tight">
                 {user?.nama ?? '—'}
               </p>
-              <p className="text-[14px] font-medium leading-tight mt-0.5" style={{ color: '#5F7380' }}>
+              <p className="text-[13px] font-medium leading-tight mt-0.5 text-[#5F737F]">
                 {user?.jabatan} · {user?.unit}
               </p>
             </div>
@@ -206,7 +202,7 @@ export default function Topbar() {
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={() => setDropdownOpen((v) => !v)}
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 hover:opacity-80 transition-opacity"
+                className="w-12 h-12 rounded-full flex items-center justify-center text-white text-base font-bold shrink-0 hover:opacity-90 transition-all shadow-sm overflow-hidden"
                 style={{ background: 'linear-gradient(135deg, #2563eb, #0891b2)' }}
               >
                 {user?.nama ? getInitials(user.nama) : '?'}
@@ -257,6 +253,7 @@ export default function Topbar() {
               )}
             </div>
           </div>
+        </div>
       </div>
 
       {showChangePassword && (

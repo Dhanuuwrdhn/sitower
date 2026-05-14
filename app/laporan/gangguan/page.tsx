@@ -1917,22 +1917,63 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
       </div>
     )
   }
+  // ─── Desktop readOnly detail view ────────────────────────────────────────
+  const lastUpdate = riwayat[0]
+  const lastUpdatedAt = lastUpdate?.tanggal ?? laporan?.updatedAt ?? laporan?.tanggal
+  const lastUpdatedBy = lastUpdate?.oleh ?? laporan?.pelapor?.nama ?? '-'
+
+  const beritaAcaraDoc = (progress?.berita_acara ?? [])[0]
+  const suratDoc       = (progress?.surat ?? [])[0]
+
+  function renderDocPreview(doc: any, emptyLabel: string) {
+    if (!doc) {
+      return (
+        <div style={{
+          width: '100%', aspectRatio: '4/3', borderRadius: 8,
+          border: '1px dashed #C5D3D9', background: '#F6F9FC',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 12, color: '#97AAB3',
+        }}>
+          {emptyLabel}
+        </div>
+      )
+    }
+    const url = resolveMediaUrl(doc.fileUrl)
+    const isImg = /\.(jpe?g|png|webp)$/i.test(doc.fileUrl)
+    return (
+      <div
+        onClick={() => isImg ? setLightbox({ urls: [url], index: 0 }) : window.open(url, '_blank')}
+        style={{ width: '100%', aspectRatio: '4/3', borderRadius: 8, overflow: 'hidden', border: '1px solid #E1E8EC', cursor: 'pointer' }}
+      >
+        {isImg ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        ) : (
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F9FC' }}>
+            <FileText size={36} style={{ color: '#5F737F' }} />
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div style={{ minHeight: '100%', padding: '10px' }}>
-      <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      {/* ── Header ──────────────────────────────────────────────────────── */}
+      <div style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>
             <button onClick={onClose} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: 6, color: '#076C9E', fontWeight: 600, fontSize: 14 }}>
               <ArrowLeft size={18} />
               Kembali
             </button>
-            <span style={{ fontSize: 24, fontWeight: 700, color: '#1B1B1B' }}>Detail Kerawanan</span>
-            <ProgressBadge tipe={laporan?.progresLaporan} />
+            <span style={{ fontSize: 24, fontWeight: 700, color: '#1B1B1B' }}>Detail Laporan Kerawanan</span>
+            {laporan?.status && <StatusPill status={laporan.status} />}
           </div>
-          <div style={{ display: 'flex', gap: 8, fontSize: 14, fontWeight: 500, color: '#566B75' }}>
-            <span>Dibuat pada : {formatTanggal(laporan?.tanggal)}</span>
+          <div style={{ display: 'flex', gap: 8, fontSize: 14, fontWeight: 500, color: '#566B75', flexWrap: 'wrap' }}>
+            <span>Terakhir diupdate : {formatTanggal(lastUpdatedAt)}</span>
             <span>-</span>
-            <span>Dibuat oleh : {laporan?.pelapor?.nama || '-'}</span>
+            <span>Oleh : {lastUpdatedBy}</span>
           </div>
         </div>
         {laporan?.status !== 'selesai' && (
@@ -1946,31 +1987,97 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
       </div>
 
       <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 32, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-        <div style={{ marginBottom: 40 }}>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 24 }}>Informasi Kerawanan</span>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32 }}>
-            <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan} />
+
+        {/* ── Section 1: Informasi Kerawanan ──────────────────────────── */}
+        <div style={{ marginBottom: 32 }}>
+          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 20 }}>Informasi Kerawanan</span>
+
+          {/* Row 1 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, marginBottom: 20 }}>
+            <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan ?? '—'} />
             <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
-            <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama)} />
-            <InfoRow label="Span" value={laporan?.lokasiDetail || '-'} />
+            <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama) ?? '—'} />
+            <InfoRow label="Span" value={laporan?.lokasiDetail || '—'} />
+          </div>
+
+          {/* Row 2 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, marginBottom: 20 }}>
+            <InfoRow
+              label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'}
+              value={laporan?.deskripsi || '—'}
+            />
+            <InfoRow
+              label="Informasi Pihak Lain"
+              value={(isPPL ? laporan?.teknisi : null) || '—'}
+            />
+            <InfoRow
+              label="Contact Person"
+              value={laporan?.contactPerson || '—'}
+            />
+            <div />
+          </div>
+
+          {/* Foto Bukti */}
+          {fotoUrls.length > 0 && (
+            <div>
+              <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 8 }}>
+                Foto Bukti Terjadinya Kerawanan
+              </span>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                {fotoUrls.map((url, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={i}
+                    src={resolveMediaUrl(url)}
+                    alt=""
+                    style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: 8, border: '1px solid #E1E8EC', cursor: 'pointer' }}
+                    onClick={() => setLightbox({ urls: fotoUrls.map(resolveMediaUrl), index: i })}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div style={{ height: 1, background: '#E1E8EC', marginBottom: 32 }} />
+
+        {/* ── Section 2: Informasi Pengendalian Kerawanan ──────────────── */}
+        <div style={{ marginBottom: 32 }}>
+          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 20 }}>Informasi Pengendalian Kerawanan</span>
+
+          <div style={{ marginBottom: 20 }}>
+            <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan?.keterangan || '—'}</span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, maxWidth: 640 }}>
+            <div>
+              <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 8 }}>Berita Acara</span>
+              {renderDocPreview(beritaAcaraDoc, 'Tidak ada dokumen')}
+            </div>
+            <div>
+              <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 8 }}>Surat</span>
+              {renderDocPreview(suratDoc, 'Tidak ada dokumen')}
+            </div>
           </div>
         </div>
 
-        <div style={{ height: 1, background: '#E1E8EC', marginBottom: 40 }} />
+        <div style={{ height: 1, background: '#E1E8EC', marginBottom: 32 }} />
 
+        {/* ── Section 3: Riwayat Pembaruan Laporan ────────────────────── */}
         <div>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 24 }}>Riwayat Pembaruan Laporan</span>
+          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 20 }}>Riwayat Pembaruan Laporan</span>
           {riwayat.length === 0 ? (
             <div style={{ padding: '40px 0', textAlign: 'center', color: '#97AAB3' }}>
               Belum ada riwayat pembaruan
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               {riwayat.map((r: any) => (
-                <div key={r.id} style={{ padding: 24, border: '1px solid #E1E8EC', borderRadius: 12, background: '#F9FAFB' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-                    <span style={{ fontSize: 14, color: '#566B75', fontWeight: 500 }}>
-                      {new Date(r.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} · Diupdate oleh: {r.oleh}
+                <div key={r.id} style={{ padding: 20, border: '1px solid #E1E8EC', borderRadius: 12, background: '#FFFFFF' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                    <span style={{ fontSize: 13, color: '#566B75', fontWeight: 500 }}>
+                      Tanggal Pembaruan: {formatTanggal(r.tanggal)} · Oleh: {r.oleh}
                     </span>
                     {isSuperadmin() && (
                       <button onClick={() => handleDeleteRiwayat(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 4 }}>
@@ -1978,7 +2085,10 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                       </button>
                     )}
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 24, marginBottom: 20 }}>
+
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#1B1B1B', marginBottom: 14 }}>Detail Pembaruan</div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 14 }}>
                     <div>
                       <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Status Kerawanan</span>
                       <LevelBadge level={r.statusKerawanan} />
@@ -1988,18 +2098,19 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                       <ProgressBadge tipe={r.progresLaporan} />
                     </div>
                     {r.uraianPekerjaan && (
-                      <div style={{ gridColumn: 'span 2' }}>
+                      <div>
                         <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Uraian Pekerjaan</span>
                         <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.uraianPekerjaan}</span>
                       </div>
                     )}
                     {r.upayaPengendalian && (
-                      <div style={{ gridColumn: 'span 2' }}>
+                      <div>
                         <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</span>
                         <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.upayaPengendalian}</span>
                       </div>
                     )}
                   </div>
+
                   {renderRiwayatDocs(r)}
                 </div>
               ))}
@@ -2009,7 +2120,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
 
         {/* Hapus Laporan Button (Only for Admins/Superadmins) */}
         {(isAdmin() || isSuperadmin()) && (
-          <div style={{ marginTop: 48, display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ marginTop: 32, display: 'flex', justifyContent: 'flex-end' }}>
             <button
               onClick={() => {
                 if (window.confirm('Apakah Anda yakin ingin menghapus laporan ini? Semua data riwayat dan foto akan ikut terhapus.')) {
@@ -2027,6 +2138,11 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           <PhotoLightbox urls={lightbox.urls} startIndex={lightbox.index} onClose={() => setLightbox(null)} />
         )}
         {updateDrawer}
+      </div>
+
+      {/* Footer copyright */}
+      <div style={{ textAlign: 'center', fontSize: 12, color: '#97AAB3', padding: '20px 0 8px' }}>
+        © 2026, PT PLN (Persero)
       </div>
     </div>
   )

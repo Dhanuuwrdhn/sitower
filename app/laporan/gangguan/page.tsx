@@ -10,7 +10,7 @@ import {
   ArrowLeft, AlertTriangle, FileText, ImagePlus, Clock,
 } from 'lucide-react'
 import { laporanApi, towersApi, importApi, pegawaiApi } from '@/lib/api'
-import { getUser, isAdmin, isSuperadmin } from '@/lib/auth'
+import { getUser, isAdmin, isSuperadmin, isTeknisi } from '@/lib/auth'
 import { getDistance } from '@/lib/geo'
 import { resolveMediaUrl } from '@/lib/utils'
 import { useSidebar } from '@/components/layout/SidebarContext'
@@ -1663,248 +1663,186 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   // ══════════════════════════════════════════════════
   if (isMobile) {
     const pihakLainMobile = isPPL ? laporan?.teknisi : null
+    const lastUpdateM = riwayat[0]
+    const lastUpdatedAtM = lastUpdateM?.tanggal ?? laporan?.updatedAt ?? laporan?.tanggal
+    const canPerbarui = (isAdmin() || isSuperadmin() || isTeknisi()) && laporan?.status !== 'selesai'
+
+    // File attachment row: [thumb] [Label / filename] [eye]
+    const FileRow = ({ label, url }: { label: string; url: string }) => {
+      const resolved = resolveMediaUrl(url)
+      const isImg = /\.(jpe?g|png|webp)$/i.test(url)
+      const filename = url.split('/').pop() ?? ''
+      const open = () => isImg ? setLightbox({ urls: [resolved], index: 0 }) : window.open(resolved, '_blank')
+      return (
+        <div onClick={open}
+          style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 10, border: '1px solid #E1E8EC', borderRadius: 10, background: '#fff', cursor: 'pointer', minHeight: 44 }}>
+          <div style={{ width: 44, height: 44, flexShrink: 0, borderRadius: 6, overflow: 'hidden', background: '#F6F9FC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {isImg ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={resolved} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <FileText size={20} style={{ color: '#5F737F' }} />
+            )}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B' }}>{label}</div>
+            <div style={{ fontSize: 11, color: '#97AAB3', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{filename}</div>
+          </div>
+          <button type="button" onClick={(e) => { e.stopPropagation(); open() }}
+            style={{ width: 36, height: 36, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: '#076C9E', cursor: 'pointer' }}
+            aria-label={`Lihat ${label}`}>
+            <Eye size={18} />
+          </button>
+        </div>
+      )
+    }
+
+    const FileGroup = ({ label, urls }: { label: string; urls: string[] }) => {
+      if (!urls?.length) return null
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {urls.map((u, i) => <FileRow key={i} label={urls.length > 1 ? `${label} ${i + 1}` : label} url={u} />)}
+        </div>
+      )
+    }
+
     return (
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 overflow-y-auto" style={{ padding: '0 16px' }}>
-          {/* Header with Back button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 16 }}>
-            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 4 }}>
-              <ArrowLeft size={20} color="#1B1B1B" />
-            </button>
-            <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B' }}>Detail Laporan Kerawanan</span>
-          </div>
+      <div className="flex-1 flex flex-col overflow-hidden" style={{ background: '#F6F9FC' }}>
+        {/* ── Sticky top nav ───────────────────────────────────────── */}
+        <div style={{
+          position: 'sticky', top: 0, zIndex: 20,
+          background: '#076C9E', color: '#fff',
+          display: 'flex', alignItems: 'center', gap: 12,
+          padding: '12px 16px', minHeight: 56, flexShrink: 0,
+        }}>
+          <button onClick={onClose}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 6, color: '#fff', minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}
+            aria-label="Kembali">
+            <ArrowLeft size={22} />
+          </button>
+          <span style={{ fontSize: 16, fontWeight: 700 }}>Detail Laporan Kerawanan</span>
+        </div>
 
-          {/* Existing content */}
-          <div style={{ paddingTop: 12, paddingBottom: 12 }}>
+        <div className="flex-1 overflow-y-auto" style={{ padding: '12px 16px', paddingBottom: canPerbarui ? 88 : 16 }}>
+
+          {/* ── Summary card ───────────────────────────────────── */}
+          <div style={{ background: '#fff', borderRadius: 12, padding: 14, marginBottom: 12, border: '1px solid #E1E8EC' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-              <div style={{ flex: 1 }}>
-                <span style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 4 }}>
-                  {JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan ?? '—'}
-                </span>
-                <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <LevelBadge level={laporan?.levelRisiko} />
-                  {laporan?.progresLaporan && <ProgressBadge tipe={laporan.progresLaporan} />}
-                </div>
-              </div>
+              <span style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B', flex: 1 }}>
+                {JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan ?? '—'}
+              </span>
+              {laporan?.status && <StatusPill status={laporan.status} />}
             </div>
-            <div style={{ display: 'flex', gap: 4, marginTop: 6, fontSize: 12, color: '#5F737F' }}>
-              <span>Dibuat pada:</span>
-              <span style={{ color: '#1B1B1B' }}>{formatTanggal(laporan?.tanggal)}</span>
+            <div style={{ marginTop: 6, fontSize: 12, color: '#5F737F' }}>
+              Terakhir Diperbarui: {formatTanggal(lastUpdatedAtM)}
             </div>
           </div>
 
-          <div style={{ height: 1, background: '#E1E8EC', margin: '0 -16px' }} />
-
-          {/* ── Section 1: Informasi Kerawanan ── */}
-          <div style={{ paddingTop: 16, paddingBottom: 8 }}>
-            <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
-              Informasi Kerawanan
-            </span>
-
-            {/* 2-col info grid — Jenis, Status, Tower, Span */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px', marginBottom: 12 }}>
-              <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan} />
-              <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
-              <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama)} />
-              {isPPL
-                ? <InfoRow label="Span" value={laporan?.lokasiDetail || '—'} />
-                : <InfoRow label="Tanggal" value={formatTanggal(laporan?.tanggal)} />
-              }
+          {/* ── Informasi Kerawanan (no header) ────────────────── */}
+          <div style={{ background: '#fff', borderRadius: 12, padding: 14, marginBottom: 12, border: '1px solid #E1E8EC', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama) ?? '—'} />
+              <InfoRow label="Span" value={laporan?.lokasiDetail || '—'} />
             </div>
+            <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <InfoRow label="Informasi Pihak Lain" value={pihakLainMobile || '—'} />
+              <InfoRow label="Contact Person" value={laporan?.contactPerson || '—'} />
+            </div>
+            <InfoRow label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'} value={laporan?.deskripsi || '—'} />
 
-            {/* Uraian + Pihak Lain */}
-            {(laporan?.deskripsi || pihakLainMobile) && (
-              <div style={{ display: 'grid', gridTemplateColumns: laporan?.deskripsi && pihakLainMobile ? '1fr 1fr' : '1fr', gap: '12px 16px', marginBottom: 12 }}>
-                {laporan?.deskripsi && (
-                  <InfoRow label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'} value={laporan.deskripsi} />
-                )}
-                {pihakLainMobile && (
-                  <InfoRow label="Informasi Pihak Lain" value={pihakLainMobile} />
-                )}
-              </div>
-            )}
-
-            {/* Foto bukti */}
             {fotoUrls.length > 0 && (
-              <div style={{ marginBottom: 8 }}>
-                <span style={{ fontSize: 12, color: '#5F737F', display: 'block', marginBottom: 6 }}>
-                  Foto Bukti Terjadinya Kerawanan
-                </span>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
-                  {fotoUrls.map((url, i) => (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img key={i} src={resolveMediaUrl(url)} alt=""
-                      style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 6, border: '1px solid #E1E8EC', cursor: 'pointer' }}
-                      onClick={() => setLightbox({ urls: fotoUrls.map(resolveMediaUrl), index: i })} />
-                  ))}
-                </div>
-              </div>
+              <FileGroup label="Bukti Kerawanan" urls={fotoUrls} />
             )}
           </div>
 
-          <div style={{ height: 1, background: '#E1E8EC', margin: '8px -16px 16px' }} />
-
-          {/* ── Section 2: Informasi Pengendalian ── */}
-          <div style={{ paddingBottom: 8 }}>
+          {/* ── Informasi Pengendalian ─────────────────────────── */}
+          <div style={{ background: '#fff', borderRadius: 12, padding: 14, marginBottom: 12, border: '1px solid #E1E8EC' }}>
             <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
-              Informasi Pengendalian Kerawanan
+              Informasi Pengendalian
             </span>
-
-            {laporan?.keterangan && (
-              <div style={{ marginBottom: 12 }}>
-                <InfoRow label={isPPL ? 'Upaya Pengendalian' : 'Keterangan'} value={laporan.keterangan} />
-              </div>
-            )}
-
-            {/* Progress docs */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {PROGRESS_TIPE_LIST.map((tipe) => {
-                const items: any[] = progress[tipe] ?? []
-                const latest = items[0]
-                const isUp = uploading === tipe
-                return (
-                  <div key={tipe}>
-                    <span style={{ fontSize: 12, color: '#5F737F', display: 'block', marginBottom: 4 }}>
-                      {PROGRESS_TIPE_LABEL[tipe]}
-                    </span>
-                    {latest ? (
-                      <div style={{ border: '1px solid #E1E8EC', borderRadius: 8, overflow: 'hidden' }}
-                        onClick={() => {
-                          if (/\.(jpe?g|png|webp)$/i.test(latest.fileUrl))
-                            setLightbox({ urls: [resolveMediaUrl(latest.fileUrl)], index: 0 })
-                          else window.open(resolveMediaUrl(latest.fileUrl), '_blank')
-                        }}
-                      >
-                        {/\.(jpe?g|png|webp)$/i.test(latest.fileUrl) ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={resolveMediaUrl(latest.fileUrl)} alt=""
-                            style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block' }} />
-                        ) : (
-                          <div style={{ width: '100%', aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F9FC' }}>
-                            <FileText size={28} style={{ color: '#5F737F' }} />
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <button type="button" onClick={() => progressRefs.current[tipe]?.click()} disabled={isUp}
-                        style={{ width: '100%', padding: '8px 10px', border: '1px dashed #C5D3D9', borderRadius: 8, background: '#fff', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 12, color: '#076C9E', fontWeight: 600 }}>
-                        <Plus size={12} />
-                        {isUp ? 'Upload...' : `Tambah`}
-                      </button>
-                    )}
-                  </div>
-                )
-              })}
+            <div style={{ marginBottom: 12 }}>
+              <InfoRow label="Deskripsi Pengendalian" value={laporan?.keterangan || '—'} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <FileGroup label="Berita Acara" urls={(progress?.berita_acara ?? []).map((d: any) => d.fileUrl)} />
+              <FileGroup label="Spanduk" urls={(progress?.spanduk ?? []).map((d: any) => d.fileUrl)} />
+              <FileGroup label="Surat Pemberitahuan" urls={(progress?.surat ?? []).map((d: any) => d.fileUrl)} />
+              {!(progress?.berita_acara?.length || progress?.spanduk?.length || progress?.surat?.length) && (
+                <span style={{ fontSize: 12, color: '#97AAB3', textAlign: 'center', padding: '8px 0' }}>Belum ada lampiran</span>
+              )}
             </div>
           </div>
 
-          <div style={{ height: 1, background: '#E1E8EC', margin: '16px -16px' }} />
-
-          {/* ── Section 3: Riwayat Pembaruan Laporan ── */}
-          <div style={{ paddingBottom: 16 }}>
+          {/* ── Riwayat Pembaruan Laporan ──────────────────────── */}
+          <div style={{ background: '#fff', borderRadius: 12, padding: 14, marginBottom: 12, border: '1px solid #E1E8EC' }}>
             <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
-              Riwayat Pembaruan
+              Riwayat Pembaruan Laporan
             </span>
 
             {riwayat.length === 0 ? (
-              <p style={{ fontSize: 13, color: '#97AAB3', textAlign: 'center', padding: '16px 0' }}>Belum ada riwayat pembaruan</p>
+              <p style={{ fontSize: 13, color: '#97AAB3', textAlign: 'center', padding: '12px 0' }}>Belum ada riwayat pembaruan</p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {riwayat.map((r: any) => (
-                  <div key={r.id} style={{ border: '1px solid #E1E8EC', borderRadius: 10, padding: 14 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                      <span style={{ fontSize: 12, color: '#97AAB3' }}>
-                        {new Date(r.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} · {r.oleh}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {riwayat.map((r: any, idx: number) => (
+                  <div key={r.id} style={{ paddingTop: idx > 0 ? 14 : 0, borderTop: idx > 0 ? '1px solid #E1E8EC' : 'none' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <span style={{ fontSize: 11, color: '#97AAB3' }}>
+                        Tanggal Pembaruan: {formatTanggal(r.tanggal)}
                       </span>
                       {isSuperadmin() && (
                         <button type="button" onClick={() => handleDeleteRiwayat(r.id)}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 2 }}>
-                          <X size={13} />
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 4, minWidth: 32, minHeight: 32 }}>
+                          <X size={14} />
                         </button>
                       )}
                     </div>
-                    <div style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1B1B1B', marginBottom: 10 }}>Detail Pembaruan</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
                       <div>
-                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 3 }}>Status</span>
+                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 4 }}>Status Kerawanan</span>
                         <LevelBadge level={r.statusKerawanan} />
                       </div>
                       <div>
-                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 3 }}>Progres</span>
+                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 4 }}>Progres Laporan</span>
                         <ProgressBadge tipe={r.progresLaporan} />
                       </div>
                     </div>
-                    {(r.uraianPekerjaan || r.upayaPengendalian || r.pihakLain || r.contactPerson) && (
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 12px', marginBottom: 8 }}>
-                        {r.uraianPekerjaan && <div><span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Uraian Pekerjaan</span><span style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B' }}>{r.uraianPekerjaan}</span></div>}
-                        {r.upayaPengendalian && <div><span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Upaya Pengendalian</span><span style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B' }}>{r.upayaPengendalian}</span></div>}
-                        {r.pihakLain && <div><span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Pihak Lain</span><span style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B' }}>{r.pihakLain}</span></div>}
-                        {r.contactPerson && <div><span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Contact Person</span><span style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B' }}>{r.contactPerson}</span></div>}
+                    {r.uraianPekerjaan && (
+                      <div style={{ marginBottom: 10 }}>
+                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Uraian Pekerjaan</span>
+                        <span style={{ fontSize: 13, color: '#1B1B1B' }}>{r.uraianPekerjaan}</span>
                       </div>
                     )}
-                    {renderRiwayatDocs(r)}
+                    {r.upayaPengendalian && (
+                      <div style={{ marginBottom: 10 }}>
+                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Upaya Pengendalian</span>
+                        <span style={{ fontSize: 13, color: '#1B1B1B' }}>{r.upayaPengendalian}</span>
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <FileGroup label="Berita Acara" urls={r.beritaAcara ?? []} />
+                      <FileGroup label="Surat Pemberitahuan" urls={r.surat ?? []} />
+                      <FileGroup label="Foto Bukti" urls={r.foto ?? []} />
+                    </div>
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          <div style={{ height: 1, background: '#E1E8EC', margin: '16px -16px' }} />
-
-          {/* ── Progres Laporan timeline (mobile) ── */}
-          <div style={{ paddingBottom: 16 }}>
-            <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
-              Progres Laporan
-            </span>
-            <div style={{ position: 'relative', paddingLeft: 24 }}>
-              <div style={{ position: 'absolute', left: 6, top: 16, bottom: 16, width: 2, background: '#E1E8EC' }} />
-
-              {/* Laporan Dibuat */}
-              <div style={{ position: 'relative', marginBottom: 16 }}>
-                <div style={{ position: 'absolute', left: -24, top: 2, width: 14, height: 14, borderRadius: '50%', background: '#076C9E', border: '2px solid #fff', boxShadow: '0 0 0 2px #076C9E' }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#076C9E', display: 'block' }}>Laporan Dibuat</span>
-                <span style={{ fontSize: 11, color: '#97AAB3' }}>{formatTanggal(laporan?.tanggal)}</span>
-              </div>
-
-              {/* Riwayat steps */}
-              {[...riwayat].reverse().map((r: any, i: number) => {
-                const isLast = i === riwayat.length - 1 && laporan?.status !== 'selesai'
-                return (
-                  <div key={r.id} style={{ position: 'relative', marginBottom: 16 }}>
-                    <div style={{ position: 'absolute', left: -24, top: 2, width: 14, height: 14, borderRadius: '50%', background: isLast ? '#076C9E' : '#E1E8EC', border: '2px solid #fff', boxShadow: `0 0 0 2px ${isLast ? '#076C9E' : '#C5D3D9'}` }} />
-                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 2 }}>
-                      <ProgressBadge tipe={r.progresLaporan} />
-                      <LevelBadge level={r.statusKerawanan} />
-                    </div>
-                    <span style={{ fontSize: 11, color: '#97AAB3' }}>{formatTanggal(r.tanggal)} · {r.oleh}</span>
-                  </div>
-                )
-              })}
-
-              {laporan?.status === 'selesai' && (
-                <div style={{ position: 'relative' }}>
-                  <div style={{ position: 'absolute', left: -24, top: 2, width: 14, height: 14, borderRadius: '50%', background: '#039855', border: '2px solid #fff', boxShadow: '0 0 0 2px #039855' }} />
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#039855' }}>Laporan Selesai</span>
-                </div>
-              )}
-
-              {riwayat.length === 0 && laporan?.status !== 'selesai' && (
-                <div style={{ position: 'relative' }}>
-                  <div style={{ position: 'absolute', left: -24, top: 2, width: 14, height: 14, borderRadius: '50%', background: '#F6F9FC', border: '2px solid #C5D3D9' }} />
-                  <span style={{ fontSize: 12, color: '#97AAB3', fontStyle: 'italic' }}>Belum ada pembaruan</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div style={{ height: 16 }} />
         </div>
 
-        {/* Bottom CTA */}
-        {laporan?.status !== 'selesai' && (
-          <div style={{ padding: '12px 16px', borderTop: '1px solid #E1E8EC', flexShrink: 0 }}>
-            <button type="button" onClick={handleSelesaikan} disabled={selesaiLoading}
-              style={{ width: '100%', height: 44, background: '#076C9E', border: 'none', borderRadius: 8, color: '#FFFFFF', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
-              {selesaiLoading ? 'Menyimpan...' : 'Selesaikan Laporan'}
+        {/* ── Sticky bottom: Perbarui Laporan ──────────────────── */}
+        {canPerbarui && (
+          <div style={{
+            position: 'sticky', bottom: 0, zIndex: 20,
+            padding: '12px 16px', background: '#fff',
+            borderTop: '1px solid #E1E8EC', flexShrink: 0,
+          }}>
+            <button type="button" onClick={() => setShowUpdateDrawer(true)}
+              style={{ width: '100%', height: 48, background: '#076C9E', border: 'none', borderRadius: 8, color: '#FFFFFF', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+              Perbarui Laporan
             </button>
           </div>
         )}

@@ -2406,7 +2406,7 @@ function LaporanDrawer({
       <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>
         <div className="flex-1 min-w-0">
           <label className="block text-[14px] font-bold text-app-text mb-2">
-            {isPPL ? 'No. Ruas' : 'Ruas Terganggu'}
+            {isPPL ? 'No. Ruas' : 'Ruas'}
           </label>
           {readOnly ? (
             <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />

@@ -1311,7 +1311,13 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   const [riwayatForm, setRiwayatForm] = useState({ statusKerawanan: 'aman', progresLaporan: 'sedang_berlangsung', uraianPekerjaan: '', upayaPengendalian: '', pihakLain: '', contactPerson: '' })
   const [riwayatFiles, setRiwayatFiles] = useState<{ foto: File[]; beritaAcara: File[]; spanduk: File[]; surat: File[] }>({ foto: [], beritaAcara: [], spanduk: [], surat: [] })
   const [savingRiwayat, setSavingRiwayat] = useState(false)
-  const riwayatFileRefs = useRef<{ foto: HTMLInputElement | null; beritaAcara: HTMLInputElement | null; spanduk: HTMLInputElement | null; surat: HTMLInputElement | null }>({ foto: null, beritaAcara: null, spanduk: null, surat: null })
+  const fotoInputRef = useRef<HTMLInputElement | null>(null)
+  const beritaInputRef = useRef<HTMLInputElement | null>(null)
+  const spandukInputRef = useRef<HTMLInputElement | null>(null)
+  const suratInputRef = useRef<HTMLInputElement | null>(null)
+  const riwayatFileRefs: Record<'foto' | 'beritaAcara' | 'spanduk' | 'surat', React.MutableRefObject<HTMLInputElement | null>> = {
+    foto: fotoInputRef, beritaAcara: beritaInputRef, spanduk: spandukInputRef, surat: suratInputRef,
+  }
   const progressRefs = useRef<Record<string, HTMLInputElement | null>>({})
   const user = getUser()
   const activeLaporan = detailLaporan ?? laporan
@@ -1341,12 +1347,31 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   }
 
   useEffect(() => {
-    setDetailLaporan(laporan)
+    // Only re-sync from prop when the underlying report changed (different id).
+    // Prevents stale parent re-renders from overwriting freshly-fetched detail
+    // right after Perbarui Laporan submits.
+    if (!detailLaporan || detailLaporan.id !== laporan?.id) setDetailLaporan(laporan)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [laporan])
 
   useEffect(() => {
     if (autoOpenUpdate && activeLaporan?.status !== 'selesai') setShowUpdateDrawer(true)
   }, [autoOpenUpdate, activeLaporan?.status])
+
+  // Prefill the Perbarui Laporan form with current laporan values so that
+  // unchanged fields are NOT recorded as changes in riwayat (Bug 3).
+  useEffect(() => {
+    if (!showUpdateDrawer || !activeLaporan) return
+    setRiwayatForm({
+      statusKerawanan: activeLaporan.levelRisiko ?? 'aman',
+      progresLaporan:  activeLaporan.progresLaporan ?? 'sedang_berlangsung',
+      uraianPekerjaan: activeLaporan.deskripsi ?? '',
+      upayaPengendalian: activeLaporan.keterangan ?? '',
+      pihakLain: activeLaporan.jenisGangguan === 'pekerjaan_pihak_lain' ? (activeLaporan.teknisi ?? '') : '',
+      contactPerson: activeLaporan.contactPerson ?? '',
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showUpdateDrawer, activeLaporan?.id])
 
   useEffect(() => {
     if (!activeLaporan?.id) return
@@ -1370,12 +1395,16 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
       riwayatFiles.beritaAcara.forEach(f => fd.append('beritaAcara', f))
       riwayatFiles.spanduk.forEach(f => fd.append('spanduk', f))
       riwayatFiles.surat.forEach(f => fd.append('surat', f))
-      await laporanApi.addRiwayat(activeLaporan.id, fd)
+      const res = await laporanApi.addRiwayat(activeLaporan.id, fd)
+      // Apply server-returned updated laporan immediately so the
+      // "Informasi Kerawanan" section reflects new values without flicker.
+      if (res?.data?.laporan) setDetailLaporan((prev: any) => ({ ...(prev ?? {}), ...res.data.laporan }))
       await reloadDetailData()
       setShowUpdateDrawer(false)
       setRiwayatForm({ statusKerawanan: 'aman', progresLaporan: 'sedang_berlangsung', uraianPekerjaan: '', upayaPengendalian: '', pihakLain: '', contactPerson: '' })
       setRiwayatFiles({ foto: [], beritaAcara: [], spanduk: [], surat: [] })
       toast.success('Riwayat pembaruan ditambahkan')
+      onSaved?.()
     } catch { toast.error('Gagal menyimpan riwayat') } finally { setSavingRiwayat(false) }
   }
 
@@ -1439,13 +1468,13 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
       { key: 'spanduk', label: 'Spanduk' },
       { key: 'surat', label: 'Surat Pemberitahuan' },
     ]
-    const hasAny = fields.some(f => (r[f.key] ?? []).length > 0)
+    const hasAny = fields.some(f => showField(r, f.key) && (r[f.key] ?? []).length > 0)
     if (!hasAny) return null
     return (
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 10 }}>
         {fields.map(({ key, label }) => {
           const urls: string[] = r[key] ?? []
-          if (!urls.length) return null
+          if (!urls.length || !showField(r, key)) return null
           const imgs = urls.filter(u => /\.(jpe?g|png|webp)$/i.test(u))
           const pdfs = urls.filter(u => /\.pdf$/i.test(u))
           return (
@@ -1475,14 +1504,44 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     )
   }
 
+  // ── Riwayat field visibility helper.
+  // Legacy rows (no changedFields, pre-migration) → show everything to avoid
+  // hiding historical data. New rows → show only the fields that actually
+  // changed in that update (Bug 3).
+  const showField = (r: any, key: string) => {
+    const cf = r?.changedFields
+    if (!Array.isArray(cf) || cf.length === 0) return true
+    return cf.includes(key)
+  }
+  const hasAnyChange = (r: any) =>
+    !Array.isArray(r?.changedFields) || r.changedFields.length > 0
+
   // ── Helper for rendering file cards in update form
   function renderRiwayatUpload(field: keyof typeof riwayatFiles, label: string, icon?: React.ReactNode) {
     const files = riwayatFiles[field]
+    const inputRef = riwayatFileRefs[field]
+    const triggerPick = () => inputRef.current?.click()
     return (
       <div style={{ flex: 1 }}>
         <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 8 }}>{label}</label>
+        {/* Hidden file input colocated with its trigger button so the ref is
+            guaranteed mounted at the same time. Inline display:none for safety
+            (no reliance on global '.hidden' utility class). */}
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*,.pdf"
+          multiple
+          style={{ display: 'none' }}
+          onChange={e => {
+            if (e.target.files?.length) {
+              setRiwayatFiles(f => ({ ...f, [field]: Array.from(e.target.files!) }))
+            }
+            e.target.value = ''
+          }}
+        />
         {files.length === 0 ? (
-          <button type="button" onClick={() => riwayatFileRefs.current[field]?.click()}
+          <button type="button" onClick={triggerPick}
             style={{ width: '100%', padding: '12px', border: '1px dashed #C5D3D9', borderRadius: 8, background: '#fff', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#5F737F' }}>
             {icon || <Upload size={16} />}
             Pilih file
@@ -1513,7 +1572,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                 </div>
               )
             })}
-            <button type="button" onClick={() => riwayatFileRefs.current[field]?.click()} style={{ fontSize: 12, color: '#076C9E', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '4px 0', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <button type="button" onClick={triggerPick} style={{ fontSize: 12, color: '#076C9E', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '4px 0', display: 'flex', alignItems: 'center', gap: 4 }}>
               <Plus size={14} /> Tambah file lain
             </button>
           </div>
@@ -1668,12 +1727,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           </button>
         </div>
 
-        {/* Hidden file inputs */}
-        {(['foto', 'beritaAcara', 'spanduk', 'surat'] as const).map(field => (
-          <input key={field} ref={el => { riwayatFileRefs.current[field] = el }}
-            type="file" accept="image/*,.pdf" multiple className="hidden"
-            onChange={e => { if (e.target.files?.length) setRiwayatFiles(f => ({ ...f, [field]: Array.from(e.target.files!) })); e.target.value = '' }} />
-        ))}
+        {/* Hidden file inputs are colocated inside renderRiwayatUpload */}
       </div>
     </div>,
     document.body
@@ -1820,32 +1874,54 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                       )}
                     </div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: '#1B1B1B', marginBottom: 10 }}>Detail Pembaruan</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-                      <div>
-                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 4 }}>Status Kerawanan</span>
-                        <LevelBadge level={r.statusKerawanan} />
+                    {!hasAnyChange(r) && (
+                      <div style={{ fontSize: 12, color: '#97AAB3', fontStyle: 'italic' }}>Tidak ada perubahan tercatat</div>
+                    )}
+                    {(showField(r, 'statusKerawanan') || showField(r, 'progresLaporan')) && (
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                        {showField(r, 'statusKerawanan') && (
+                          <div>
+                            <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 4 }}>Status Kerawanan</span>
+                            <LevelBadge level={r.statusKerawanan} />
+                          </div>
+                        )}
+                        {showField(r, 'progresLaporan') && (
+                          <div>
+                            <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 4 }}>Progres Laporan</span>
+                            <ProgressBadge tipe={r.progresLaporan} />
+                          </div>
+                        )}
                       </div>
-                      <div>
-                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 4 }}>Progres Laporan</span>
-                        <ProgressBadge tipe={r.progresLaporan} />
-                      </div>
-                    </div>
-                    {r.uraianPekerjaan && (
+                    )}
+                    {showField(r, 'uraianPekerjaan') && r.uraianPekerjaan && (
                       <div style={{ marginBottom: 10 }}>
                         <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Uraian Pekerjaan</span>
                         <span style={{ fontSize: 13, color: '#1B1B1B' }}>{r.uraianPekerjaan}</span>
                       </div>
                     )}
-                    {r.upayaPengendalian && (
+                    {showField(r, 'upayaPengendalian') && r.upayaPengendalian && (
                       <div style={{ marginBottom: 10 }}>
                         <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Upaya Pengendalian</span>
                         <span style={{ fontSize: 13, color: '#1B1B1B' }}>{r.upayaPengendalian}</span>
                       </div>
                     )}
+                    {showField(r, 'pihakLain') && r.pihakLain && (
+                      <div style={{ marginBottom: 10 }}>
+                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Pihak Lain</span>
+                        <span style={{ fontSize: 13, color: '#1B1B1B' }}>{r.pihakLain}</span>
+                      </div>
+                    )}
+                    {showField(r, 'contactPerson') && r.contactPerson && (
+                      <div style={{ marginBottom: 10 }}>
+                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Contact Person</span>
+                        <span style={{ fontSize: 13, color: '#1B1B1B' }}>{r.contactPerson}</span>
+                      </div>
+                    )}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <FileGroup label="Berita Acara" urls={r.beritaAcara ?? []} />
-                      <FileGroup label="Surat Pemberitahuan" urls={r.surat ?? []} />
-                      <FileGroup label="Foto Bukti" urls={r.foto ?? []} />
+                      {showField(r, 'beritaAcara') && <FileGroup label="Berita Acara" urls={r.beritaAcara ?? []} />}
+                      {showField(r, 'spanduk') && <FileGroup label="Spanduk" urls={r.spanduk ?? []} />}
+                      {showField(r, 'surat') && <FileGroup label="Surat Pemberitahuan" urls={r.surat ?? []} />}
+                      {showField(r, 'foto') && <FileGroup label="Foto Bukti" urls={r.foto ?? []} />}
                     </div>
                   </div>
                 ))}
@@ -2049,25 +2125,45 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
 
                   <div style={{ fontSize: 14, fontWeight: 700, color: '#1B1B1B', marginBottom: 14 }}>Detail Pembaruan</div>
 
+                  {!hasAnyChange(r) && (
+                    <div style={{ fontSize: 13, color: '#97AAB3', fontStyle: 'italic', marginBottom: 8 }}>Tidak ada perubahan tercatat</div>
+                  )}
+
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 14 }}>
-                    <div>
-                      <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Status Kerawanan</span>
-                      <LevelBadge level={r.statusKerawanan} />
-                    </div>
-                    <div>
-                      <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Progres Laporan</span>
-                      <ProgressBadge tipe={r.progresLaporan} />
-                    </div>
-                    {r.uraianPekerjaan && (
+                    {showField(r, 'statusKerawanan') && (
+                      <div>
+                        <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Status Kerawanan</span>
+                        <LevelBadge level={r.statusKerawanan} />
+                      </div>
+                    )}
+                    {showField(r, 'progresLaporan') && (
+                      <div>
+                        <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Progres Laporan</span>
+                        <ProgressBadge tipe={r.progresLaporan} />
+                      </div>
+                    )}
+                    {showField(r, 'uraianPekerjaan') && r.uraianPekerjaan && (
                       <div>
                         <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Uraian Pekerjaan</span>
                         <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.uraianPekerjaan}</span>
                       </div>
                     )}
-                    {r.upayaPengendalian && (
+                    {showField(r, 'upayaPengendalian') && r.upayaPengendalian && (
                       <div>
                         <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</span>
                         <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.upayaPengendalian}</span>
+                      </div>
+                    )}
+                    {showField(r, 'pihakLain') && r.pihakLain && (
+                      <div>
+                        <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Pihak Lain</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.pihakLain}</span>
+                      </div>
+                    )}
+                    {showField(r, 'contactPerson') && r.contactPerson && (
+                      <div>
+                        <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Contact Person</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.contactPerson}</span>
                       </div>
                     )}
                   </div>

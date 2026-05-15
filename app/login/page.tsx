@@ -24,7 +24,7 @@ export default function LoginPage() {
       saveAuth(res.data.access_token, res.data.pegawai)
       router.push('/dashboard')
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login gagal. Periksa NIK/NIP/NRP dan password.')
+      setError(err.response?.data?.message || 'Login gagal. Periksa NIP dan password.')
     } finally {
       setLoading(false)
     }
@@ -54,14 +54,14 @@ export default function LoginPage() {
           {/* Fields */}
           <div className="login-fields">
             <div className="login-field-group">
-              <label className="login-label" htmlFor="login-nik">NIK/Username</label>
+              <label className="login-label" htmlFor="login-nip">NIP</label>
               <div className="login-input-container">
                 <input
-                  id="login-nik"
+                  id="login-nip"
                   type="text"
                   value={nik}
                   onChange={(e) => setNik(e.target.value)}
-                  placeholder="Masukkan NIK/Username"
+                  placeholder="Masukkan NIP"
                   required
                   className="login-input"
                 />

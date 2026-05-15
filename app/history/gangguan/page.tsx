@@ -48,12 +48,14 @@ const STATUS_LABEL: Record<string, string> = {
   berlangsung:         'Berlangsung',
   selesai:             'Selesai',
   tidak_ada_aktifitas: 'Tdk Ada Aktivitas',
+  tidak_ada_aktivitas: 'Tdk Ada Aktivitas',
 }
 
 const STATUS_CLASS: Record<string, string> = {
   berlangsung:         'badge-berlangsung badge-blink',
   selesai:             'badge-selesai',
   tidak_ada_aktifitas: 'badge-menunggu',
+  tidak_ada_aktivitas: 'badge-menunggu',
 }
 
 const LEVEL_OPTIONS = [

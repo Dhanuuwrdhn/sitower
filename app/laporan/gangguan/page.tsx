@@ -146,10 +146,20 @@ function LevelBadge({ level }: { level: string }) {
   )
 }
 
+// Normalize legacy/typo variants (aktifitas vs aktivitas, whitespace, casing)
+// so a single mapping covers every spelling that appears in the DB.
+function normalizeProgresValue(v: string | null | undefined): string {
+  if (!v) return ''
+  const t = String(v).toLowerCase().trim().replace(/\s+/g, '_')
+  if (t === 'tidak_ada_aktivitas') return 'tidak_ada_aktifitas'
+  return t
+}
+
 function ProgressBadge({ tipe }: { tipe: string | null | undefined }) {
   if (!tipe) return <span className="text-app-subtle text-[12px]">—</span>
-  const label = PROGRESS_TIPE_LABEL[tipe] ?? tipe
-  const color = PROGRESS_BADGE_COLOR[tipe] ?? { bg: '#5F737F', text: '#FFFFFF' }
+  const key = normalizeProgresValue(tipe)
+  const label = PROGRESS_TIPE_LABEL[key] ?? PROGRESS_TIPE_LABEL[tipe] ?? tipe
+  const color = PROGRESS_BADGE_COLOR[key] ?? PROGRESS_BADGE_COLOR[tipe] ?? { bg: '#5F737F', text: '#FFFFFF' }
   return (
     <span style={{ background: color.bg, color: color.text, display: 'inline-flex', alignItems: 'center', padding: '2px 10px', borderRadius: 99, fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>
       {label}

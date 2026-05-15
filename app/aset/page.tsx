@@ -14,7 +14,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonRow } from '@/components/ui/SkeletonRow'
 import { CustomSelect } from '@/components/ui/CustomSelect'
 
-const TIPE_CHIPS = ['SUTET', 'SUTT', 'SKTT', 'Gardu Induk']
+const TIPE_CHIPS = ['SUTET', 'SUTT', 'SKTT']
 const STATUS_CHIPS = ['Aman', 'Sedang', 'Kritis']
 const JENIS_CHIPS = [
   { id: 'pekerjaan_pihak_lain', label: 'Pekerjaan Pihak Lain (PPL)' },
@@ -54,7 +54,7 @@ function ProgresChip({ progres }: { progres?: string }) {
   return <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-semibold bg-blue-50 text-blue-700">{PROGRES_LABEL[progres] ?? progres}</span>
 }
 
-const TIPE_OPTIONS = ['Semua', 'SUTET', 'SUTT', 'SKTT', 'Gardu Induk']
+const TIPE_OPTIONS = ['Semua', 'SUTET', 'SUTT', 'SKTT']
 const KATEGORI_OPTIONS = ['Kelayakan', 'Grounding', 'Konstruksi', 'K3', 'Lingkungan']
 const STATUS_OPTIONS    = ['berlaku', 'expired']
 
@@ -568,7 +568,7 @@ function AsetDetailDrawer({
 
 // ── Edit Drawer ───────────────────────────────────────────────────────────────
 
-const TIPE_EDIT_OPTIONS    = ['SUTET', 'SUTT', 'SKTT', 'garduInduk']
+const TIPE_EDIT_OPTIONS    = ['SUTET', 'SUTT', 'SKTT']
 
 function AsetEditDrawer({
   tower,

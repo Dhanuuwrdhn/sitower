@@ -14,8 +14,9 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401 || err.response?.status === 403) {
-      // Only redirect to login if not already on login page
+    // Only treat 401 (invalid/expired token) as session-end.
+    // 403 (forbidden) means the role lacks permission for THIS resource — keep session.
+    if (err.response?.status === 401) {
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
         Cookies.remove('sitower_token')
         Cookies.remove('sitower_user')

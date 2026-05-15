@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { authApi } from '@/lib/api'
 import { saveAuth } from '@/lib/auth'
+import { IconLightning } from '@/components/icons/SpektraIcons'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -43,21 +44,24 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="login-form-wrapper">
           {/* Logo */}
           <div className="login-logo">
-            <h1 className="login-logo-title">⚡SPEKTRA</h1>
+            <h1 className="login-logo-title" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <IconLightning size={28} />
+              SPEKTRA
+            </h1>
             <p className="login-logo-subtitle">Sistem Pemantauan Kabel dan Tower Transmisi</p>
           </div>
 
           {/* Fields */}
           <div className="login-fields">
             <div className="login-field-group">
-              <label className="login-label" htmlFor="login-nik">NIK/NPWP/NIP</label>
+              <label className="login-label" htmlFor="login-nik">NIK/Username</label>
               <div className="login-input-container">
                 <input
                   id="login-nik"
                   type="text"
                   value={nik}
                   onChange={(e) => setNik(e.target.value)}
-                  placeholder="Masukkan NIK/NPWP/NIP"
+                  placeholder="Masukkan NIK/Username"
                   required
                   className="login-input"
                 />

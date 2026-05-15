@@ -27,6 +27,32 @@ const SERTIFIKAT_CHIPS = [
   { id: 'false', label: 'Belum Bersertifikat' }
 ]
 
+const JENIS_LABEL_MAP: Record<string, string> = Object.fromEntries(JENIS_CHIPS.map(c => [c.id, c.label]))
+const formatJenis = (j?: string | null) => j ? (JENIS_LABEL_MAP[j] ?? j) : '—'
+
+const LEVEL_COLOR: Record<string, { bg: string; text: string; label: string }> = {
+  aman:                    { bg: 'bg-green-50',  text: 'text-green-700', label: 'Aman' },
+  sedang:                  { bg: 'bg-yellow-50', text: 'text-yellow-700', label: 'Sedang' },
+  kritis_terpenuhi:        { bg: 'bg-red-50',    text: 'text-red-700',   label: 'Kritis Terpenuhi' },
+  kritis_tidak_terpenuhi:  { bg: 'bg-red-100',   text: 'text-red-800',   label: 'Kritis Tidak Terpenuhi' },
+}
+const PROGRES_LABEL: Record<string, string> = {
+  sedang_berlangsung: 'Sedang Berlangsung',
+  selesai: 'Selesai',
+  tidak_ada_aktifitas: 'Tidak Ada Aktivitas',
+  tidak_ada_aktivitas: 'Tidak Ada Aktivitas',
+}
+
+function LevelChip({ level }: { level?: string }) {
+  if (!level) return null
+  const cfg = LEVEL_COLOR[level] ?? { bg: 'bg-gray-50', text: 'text-gray-600', label: level }
+  return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-semibold ${cfg.bg} ${cfg.text}`}>{cfg.label}</span>
+}
+function ProgresChip({ progres }: { progres?: string }) {
+  if (!progres) return null
+  return <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-semibold bg-blue-50 text-blue-700">{PROGRES_LABEL[progres] ?? progres}</span>
+}
+
 const TIPE_OPTIONS = ['Semua', 'SUTET', 'SUTT', 'SKTT', 'Gardu Induk']
 const KATEGORI_OPTIONS = ['Kelayakan', 'Grounding', 'Konstruksi', 'K3', 'Lingkungan']
 const STATUS_OPTIONS    = ['berlaku', 'expired']
@@ -392,12 +418,6 @@ function AsetDetailDrawer({
                     <LabelValue label="Tipe" value={tower.tipe} weight="bold" />
                     <LabelValue label="Tegangan" value={tower.tegangan} weight="bold" />
                     <LabelValue label="Radius Deteksi (m)" value={tower.radius} weight="bold" />
-                                         <div className="flex flex-col gap-0.5">
-                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Kondisi</span>
-                        <div className="mt-1">
-                           <StatusBadge status={tower.kondisi} />
-                        </div>
-                     </div>
                     <div className="flex flex-col gap-0.5">
                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Status Sertifikat</span>
                        <div className="mt-1">
@@ -410,7 +430,7 @@ function AsetDetailDrawer({
                <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
                  <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">Informasi Kerawanan</h3>
                  <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-                    <LabelValue label="Jenis Kerawanan" value={tower.jenisKerawanan ?? 'Tidak Ada'} weight="bold" />
+                    <LabelValue label="Jenis Kerawanan" value={tower.jenisKerawanan ? formatJenis(tower.jenisKerawanan) : 'Tidak Ada'} weight="bold" />
                     <div>
                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1.5">Status Kerawanan</p>
                        <StatusBadge status={tower.statusKerawanan} />
@@ -478,6 +498,53 @@ function AsetDetailDrawer({
                     </div>
                   )}
                </div>
+
+               {/* Riwayat Kerawanan Section */}
+               <div className="flex flex-col gap-3">
+                  <h3 className="text-[14px] font-bold text-gray-800">Riwayat Kerawanan</h3>
+                  {(tower.laporan ?? []).length === 0 ? (
+                    <div className="bg-white rounded-xl border border-dashed border-gray-200 p-6 text-center">
+                       <p className="text-[13px] text-gray-400">Belum ada riwayat kerawanan</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Summary chips per jenis */}
+                      <div className="flex flex-wrap gap-2 mb-1">
+                         {Object.entries(
+                           (tower.laporan as any[]).reduce((acc: Record<string, number>, l: any) => {
+                             acc[l.jenisGangguan] = (acc[l.jenisGangguan] ?? 0) + 1
+                             return acc
+                           }, {})
+                         ).map(([jenis, count]) => (
+                           <span key={jenis} className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[11px] font-semibold">
+                             {formatJenis(jenis)} · {count as number}
+                           </span>
+                         ))}
+                      </div>
+                      {/* Top-5 entry terbaru */}
+                      <div className="flex flex-col gap-2">
+                         {(tower.laporan as any[]).slice(0, 5).map((l: any) => (
+                           <div key={l.id} className="bg-white border border-gray-100 rounded-lg p-3">
+                              <div className="flex items-center justify-between gap-2 mb-1.5">
+                                 <span className="text-[12px] font-bold text-gray-800">{formatJenis(l.jenisGangguan)}</span>
+                                 <span className="text-[11px] text-gray-400">{formatTanggal(l.tanggal)}</span>
+                              </div>
+                              <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                                 <LevelChip level={l.levelRisiko} />
+                                 <ProgresChip progres={l.progresLaporan} />
+                              </div>
+                              {l.deskripsi && (
+                                <p className="text-[12px] text-gray-600 line-clamp-2">{l.deskripsi}</p>
+                              )}
+                           </div>
+                         ))}
+                      </div>
+                      {(tower.laporan as any[]).length > 5 && (
+                         <p className="text-[11px] text-gray-400 text-center">+{(tower.laporan as any[]).length - 5} riwayat lainnya</p>
+                      )}
+                    </>
+                  )}
+               </div>
              </>
            )}
         </div>
@@ -521,7 +588,6 @@ function AsetDetailDrawer({
 
 // ── Edit Drawer ───────────────────────────────────────────────────────────────
 
-const KONDISI_EDIT_OPTIONS = ['normal', 'waspada', 'gangguan', 'maintenance']
 const TIPE_EDIT_OPTIONS    = ['SUTET', 'SUTT', 'SKTT', 'garduInduk']
 
 function AsetEditDrawer({
@@ -556,7 +622,6 @@ function AsetEditDrawer({
         nama:      tower.nama     ?? '',
         tegangan:  tower.tegangan ?? '',
         tipe:      tower.tipe     ?? '',
-        kondisi:   tower.kondisi  ?? 'normal',
         lokasi:    tower.lokasi   ?? '',
         lat:       tower.lat      ?? '',
         lng:       tower.lng      ?? '',
@@ -627,12 +692,12 @@ function AsetEditDrawer({
                 </div>
              </div>
 
-             <div className="grid grid-cols-2 gap-4">
+             <div className="grid grid-cols-1 gap-4">
                 <div className="flex flex-col gap-1.5">
                    <label className="text-[12px] font-bold text-gray-700">Radius Deteksi (m)</label>
                    <input className="form-input rounded-xl" type="number" value={form.radius} onChange={e => set('radius', Number(e.target.value))} />
                 </div>
-                <CustomSelect label="Kondisi" value={form.kondisi} onChange={v => set('kondisi', v)} options={KONDISI_EDIT_OPTIONS} />             </div>
+             </div>
            </div>
 
            {/* LOKASI */}
@@ -762,7 +827,6 @@ function AsetAddDrawer({
     nama: '',
     tipe: 'SUTT',
     tegangan: '150kV',
-    kondisi: 'normal',
     lat: '',
     lng: '',
     lokasi: '',
@@ -792,7 +856,7 @@ function AsetAddDrawer({
       onSaved()
       onClose()
       setForm({
-        nama: '', tipe: 'SUTT', tegangan: '150kV', kondisi: 'normal',
+        nama: '', tipe: 'SUTT', tegangan: '150kV',
         lat: '', lng: '', lokasi: '', radius: 100, jalur: '', nomorUrut: '',
         hasCertificate: false
       })
@@ -837,12 +901,11 @@ function AsetAddDrawer({
                 </div>
              </div>
 
-             <div className="grid grid-cols-2 gap-4">
+             <div className="grid grid-cols-1 gap-4">
                 <div className="flex flex-col gap-1.5">
                    <label className="text-[12px] font-bold text-gray-700">Radius Deteksi (m)</label>
                    <input className="form-input rounded-xl" type="number" value={form.radius} onChange={e => set('radius', Number(e.target.value))} />
                 </div>
-                <CustomSelect label="Kondisi" value={form.kondisi} onChange={v => set('kondisi', v)} options={KONDISI_EDIT_OPTIONS} />
              </div>
            </div>
 

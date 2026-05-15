@@ -1539,10 +1539,12 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
         multiple
         style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
         onChange={e => {
-          if (e.target.files?.length) {
-            setRiwayatFiles(f => ({ ...f, [field]: Array.from(e.target.files!) }))
-          }
+          // Capture FileList eagerly — by the time React's functional setState
+          // runs, e.target.files may already be reset (line below) and the
+          // closure would read an empty list.
+          const picked = e.target.files ? Array.from(e.target.files) : []
           e.target.value = ''
+          if (picked.length) setRiwayatFiles(f => ({ ...f, [field]: picked }))
         }}
       />
     )

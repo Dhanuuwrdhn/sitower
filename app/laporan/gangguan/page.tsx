@@ -95,7 +95,7 @@ const PROGRESS_TIPE_LABEL: Record<string, string> = {
   brosur: 'Brosur',
   laporan_baru: 'Laporan Baru',
   berita_acara: 'Berita Acara',
-  surat: 'Surat',
+  surat: 'Surat Pemberitahuan',
   sedang_berlangsung: 'Sedang Berlangsung',
   selesai: 'Selesai',
   tidak_ada_aktifitas: 'Tidak Ada Aktivitas',
@@ -1983,6 +1983,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   const lastUpdatedBy = lastUpdate?.oleh ?? activeLaporan?.pelapor?.nama ?? '-'
 
   const beritaAcaraDoc = (progress?.berita_acara ?? [])[0]
+  const spandukDoc     = (progress?.spanduk ?? [])[0]
   const suratDoc       = (progress?.surat ?? [])[0]
 
   function renderDocPreview(doc: any, emptyLabel: string) {
@@ -2119,7 +2120,11 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
               {renderDocPreview(beritaAcaraDoc, 'Tidak ada dokumen')}
             </div>
             <div>
-              <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 8 }}>Surat</span>
+              <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 8 }}>Spanduk</span>
+              {renderDocPreview(spandukDoc, 'Tidak ada dokumen')}
+            </div>
+            <div>
+              <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 8 }}>Surat Pemberitahuan</span>
               {renderDocPreview(suratDoc, 'Tidak ada dokumen')}
             </div>
           </div>

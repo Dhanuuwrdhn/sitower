@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import toast from 'react-hot-toast'
+import Swal from 'sweetalert2'
 import {
   Search, Plus, Calendar, SlidersHorizontal, RotateCcw,
   Trash2, X, Upload, ChevronLeft, ChevronRight,
@@ -1403,9 +1404,22 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
       setShowUpdateDrawer(false)
       setRiwayatForm({ statusKerawanan: 'aman', progresLaporan: 'sedang_berlangsung', uraianPekerjaan: '', upayaPengendalian: '', pihakLain: '', contactPerson: '' })
       setRiwayatFiles({ foto: [], beritaAcara: [], spanduk: [], surat: [] })
-      toast.success('Riwayat pembaruan ditambahkan')
       onSaved?.()
-    } catch { toast.error('Gagal menyimpan riwayat') } finally { setSavingRiwayat(false) }
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil',
+        text: 'Laporan berhasil diperbarui.',
+        confirmButtonColor: '#076C9E',
+        confirmButtonText: 'OK',
+      })
+    } catch {
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal',
+        text: 'Gagal menyimpan pembaruan laporan.',
+        confirmButtonColor: '#d33',
+      })
+    } finally { setSavingRiwayat(false) }
   }
 
   async function handleDeleteRiwayat(riwayatId: string) {

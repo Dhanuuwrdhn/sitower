@@ -1597,7 +1597,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   const updateDrawer = showUpdateDrawer && typeof window !== 'undefined' && createPortal(
     <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', justifyContent: 'flex-end' }}>
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)' }} onClick={() => setShowUpdateDrawer(false)} />
-      <div style={{ position: 'relative', width: isMobile ? '100%' : 420, background: '#fff', height: '100%', display: 'flex', flexDirection: 'column', zIndex: 1, boxShadow: '-4px 0 24px rgba(0,0,0,0.12)' }}>
+      <div style={{ position: 'relative', width: isMobile ? '100%' : 560, background: '#fff', height: '100%', display: 'flex', flexDirection: 'column', zIndex: 1, boxShadow: '-4px 0 24px rgba(0,0,0,0.12)' }}>
         {/* Drawer header */}
         <div style={{ padding: '20px 20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B' }}>Perbarui Laporan</span>

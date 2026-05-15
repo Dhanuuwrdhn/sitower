@@ -455,6 +455,7 @@ interface TowerOption {
   garduInduk: string
   tipe: string
   nama?: string
+  jalur?: string
   lat?: number
   lng?: number
   radius?: number
@@ -3163,7 +3164,7 @@ export default function GangguanPage() {
         jenisGangguan: jenis.length ? jenis.join(',') : undefined,
         status: statusFilter.length ? statusFilter.join(',') : undefined,
         levelRisiko: levelFilter.length ? levelFilter.join(',') : undefined,
-        towerId: towerFilter.length ? towerFilter.join(',') : undefined,
+        jalur: towerFilter.length ? towerFilter.join(',') : undefined,
         teknisi: teknisiFilter.length ? teknisiFilter.join(',') : undefined,
         tglMulai: tglMulai || undefined,
         tglAkhir: tglAkhir || undefined,
@@ -3205,12 +3206,43 @@ export default function GangguanPage() {
       .catch(() => { })
   }, [])
 
+  // Filter the Line Walker dropdown to teknisi-role users only.
+  const teknisiOptions = pegawaiOptions.filter(p => (p?.role ?? '').toLowerCase() === 'teknisi')
+
+  // Distinct ruas (jalur) for the Ruas filter dropdown.
+  const jalurOptions = (() => {
+    const seen = new Set<string>()
+    const out: { value: string; label: string }[] = []
+    for (const t of towerOptions) {
+      const j = (t.jalur ?? '').trim()
+      if (!j || seen.has(j)) continue
+      seen.add(j)
+      out.push({ value: j, label: j })
+    }
+    return out.sort((a, b) => a.label.localeCompare(b.label))
+  })()
+
+  // For teknisi role: lock the Line Walker filter to themselves so they
+  // only ever see their own laporan. The filter UI is hidden below.
+  useEffect(() => {
+    if (isTeknisi()) {
+      const me = getUser()?.nama
+      if (me) setTeknisiFilter([me])
+    }
+  }, [])
+
   function resetFilters() {
     setSearch('')
     setJenis([])
     setStatusFilter([])
     setLevelFilter([])
-    setTeknisiFilter([])
+    // Teknisi role: keep locked to own name even after reset.
+    if (isTeknisi()) {
+      const me = getUser()?.nama
+      setTeknisiFilter(me ? [me] : [])
+    } else {
+      setTeknisiFilter([])
+    }
     setTowerFilter([])
     setTglMulai('')
     setTglAkhir('')
@@ -3394,28 +3426,29 @@ export default function GangguanPage() {
                     </div>
                     <div style={{ height: 1, background: '#E1E8EC' }} />
 
-                    {/* Teknisi / Line Walker */}
-                    <div style={{ padding: '12px 16px' }}>
-                      <SearchableSelect
-                        label="Line Walker / Teknisi"
-                        placeholder="Pilih petugas..."
-                        options={pegawaiOptions.map(p => ({ value: p.nama, label: p.nama, sub: `${p.jabatan} · ${p.unit}` }))}
-                        values={teknisiFilter}
-                        onChange={(vals) => { setTeknisiFilter(vals); setPage(1) }}
-                        onClear={() => { setTeknisiFilter([]); setPage(1) }}
-                      />
-                    </div>
-                    <div style={{ height: 1, background: '#E1E8EC' }} />
+                    {/* Teknisi / Line Walker — hidden for teknisi role (auto-filtered to themselves) */}
+                    {!isTeknisi() && (
+                      <>
+                        <div style={{ padding: '12px 16px' }}>
+                          <SearchableSelect
+                            label="Line Walker / Teknisi"
+                            placeholder="Pilih petugas..."
+                            options={teknisiOptions.map(p => ({ value: p.nama, label: p.nama, sub: `${p.jabatan} · ${p.unit}` }))}
+                            values={teknisiFilter}
+                            onChange={(vals) => { setTeknisiFilter(vals); setPage(1) }}
+                            onClear={() => { setTeknisiFilter([]); setPage(1) }}
+                          />
+                        </div>
+                        <div style={{ height: 1, background: '#E1E8EC' }} />
+                      </>
+                    )}
 
-                    {/* Tower Name */}
+                    {/* Ruas (jalur) */}
                     <div style={{ padding: '12px 16px' }}>
                       <SearchableSelect
                         label="Ruas"
                         placeholder="Pilih ruas..."
-                        options={towerOptions.map(t => {
-                          const { label, sub } = parseTowerDisplay(t)
-                          return { value: t.id, label, sub }
-                        })}
+                        options={jalurOptions}
                         values={towerFilter}
                         onChange={(vals) => { setTowerFilter(vals); setPage(1) }}
                         onClear={() => { setTowerFilter([]); setPage(1) }}
@@ -3686,27 +3719,26 @@ export default function GangguanPage() {
               })}
             </div>
 
-            {/* Teknisi / Line Walker (Mobile) */}
-            <div className="mb-5">
-              <SearchableSelect
-                label="Line Walker / Teknisi"
-                placeholder="Pilih petugas..."
-                options={pegawaiOptions.map(p => ({ value: p.nama, label: p.nama, sub: `${p.jabatan} · ${p.unit}` }))}
-                values={teknisiFilter}
-                onChange={(vals) => { setTeknisiFilter(vals); setPage(1) }}
-                onClear={() => { setTeknisiFilter([]); setPage(1) }}
-              />
-            </div>
+            {/* Teknisi / Line Walker — hidden for teknisi role */}
+            {!isTeknisi() && (
+              <div className="mb-5">
+                <SearchableSelect
+                  label="Line Walker / Teknisi"
+                  placeholder="Pilih petugas..."
+                  options={teknisiOptions.map(p => ({ value: p.nama, label: p.nama, sub: `${p.jabatan} · ${p.unit}` }))}
+                  values={teknisiFilter}
+                  onChange={(vals) => { setTeknisiFilter(vals); setPage(1) }}
+                  onClear={() => { setTeknisiFilter([]); setPage(1) }}
+                />
+              </div>
+            )}
 
-            {/* Tower Name (Mobile) */}
+            {/* Ruas (jalur) */}
             <div className="mb-5">
               <SearchableSelect
                 label="Ruas"
                 placeholder="Pilih ruas..."
-                options={towerOptions.map(t => {
-                  const { label, sub } = parseTowerDisplay(t)
-                  return { value: t.id, label, sub }
-                })}
+                options={jalurOptions}
                 values={towerFilter}
                 onChange={(vals) => { setTowerFilter(vals); setPage(1) }}
                 onClear={() => { setTowerFilter([]); setPage(1) }}

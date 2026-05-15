@@ -438,21 +438,7 @@ function FilterPopover({
           <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded transition-colors"><X size={16} className="text-[#5F737F]" /></button>
         </div>
         <div className="max-h-[500px] overflow-y-auto">{sections}</div>
-        <div className="px-4 pt-3 pb-4 border-t border-[#E1E8EC] flex items-center gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 h-11 rounded-[22px] border-none bg-[#076c9e] text-white font-semibold text-[14px] cursor-pointer hover:bg-[#065a84] transition-colors"
-          >
-            Terapkan
-          </button>
-          <button
-            onClick={onReset}
-            title="Reset filter"
-            className="w-11 h-11 rounded-full border border-[#D92D20] bg-white flex items-center justify-center cursor-pointer shrink-0 hover:bg-red-50 transition-colors"
-          >
-            <RotateCcw size={18} className="text-[#D92D20]" />
-          </button>
-        </div>
+
       </div>
     </>
   )

@@ -22,12 +22,11 @@ interface Stats {
 interface RecentRow {
   id: string
   tanggal: string
-  towerNama: string
-  towerNo: string
+  ruas: string
   jenisGangguan: string
   teknisi: string
   levelRisiko: string
-  latestProgressTipe: string | null
+  progresLaporan: string | null
 }
 
 const LEVEL_BADGE: Record<string, { bg: string; text: string; label: string }> = {
@@ -67,12 +66,6 @@ function normalizeProgresValue(v: string | null | undefined): string {
   // Treat aktifitas/aktivitas as the same value.
   if (t === 'tidak_ada_aktivitas') return 'tidak_ada_aktifitas'
   return t
-}
-
-function extractTowerNo(nama?: string | null): string {
-  if (!nama) return '—'
-  const m = nama.match(/#(\d+)/)
-  return m ? `#${m[1]}` : '—'
 }
 
 function LevelBadge({ level }: { level: string }) {
@@ -267,12 +260,11 @@ export default function DashboardPage() {
           setRecent(rows.slice(0, 5).map((r: any) => ({
             id: r.id,
             tanggal: r.tanggal ?? '—',
-            towerNama: r.tower?.nama ?? r.tower?.id ?? r.towerId ?? '—',
-            towerNo: extractTowerNo(r.tower?.nama),
+            ruas: r.tower?.nama ?? r.tower?.id ?? r.towerId ?? '—',
             jenisGangguan: JENIS_LABEL[r.jenisGangguan] ?? r.jenisGangguan ?? '—',
             teknisi: r.teknisi ?? r.pelapor?.nama ?? '—',
             levelRisiko: r.levelRisiko ?? '—',
-            latestProgressTipe: r.progresLaporan ?? r.latestProgressTipe ?? null,
+            progresLaporan: r.progresLaporan ?? r.latestProgressTipe ?? null,
           })))
         })
         .catch(() => {}),
@@ -479,7 +471,7 @@ export default function DashboardPage() {
         <div className="dash-table-wrap">
           <table className="dash-table">
             <thead>
-              <tr>
+                <tr>
                 <th>Tanggal</th>
                 <th>Ruas</th>
                 <th>Jenis Kerawanan</th>
@@ -493,12 +485,12 @@ export default function DashboardPage() {
                 <tr key={row.id}>
                   <td className="text-[14px] text-[#5f737f] whitespace-nowrap">{formatTanggal(row.tanggal)}</td>
                   <td className="text-[14px] text-[#5f737f]" style={{ maxWidth: 220 }}>
-                    <span className="block truncate" title={row.towerNama}>{row.towerNama}</span>
+                    <span className="block truncate" title={row.ruas}>{row.ruas}</span>
                   </td>
                   <td className="text-[14px] text-[#5f737f]">{row.jenisGangguan}</td>
                   <td className="text-[14px] text-[#5f737f]">{row.teknisi}</td>
                   <td><LevelBadge level={row.levelRisiko} /></td>
-                  <td><ProgressBadge tipe={row.latestProgressTipe} /></td>
+                  <td><ProgressBadge tipe={row.progresLaporan} /></td>
                 </tr>
               ))}
               {recent.length === 0 && (
@@ -518,15 +510,15 @@ export default function DashboardPage() {
             <div key={row.id} className="dash-mobile-card">
               <div className="dash-mobile-card-top">
                 <div>
-                  <p className="dash-mobile-tower">{row.towerNama}</p>
-                  <p className="dash-mobile-date">{formatTanggal(row.tanggal)} · {row.towerNo}</p>
+                  <p className="dash-mobile-tower">{row.ruas}</p>
+                  <p className="dash-mobile-date">{formatTanggal(row.tanggal)}</p>
                 </div>
                 <LevelBadge level={row.levelRisiko} />
               </div>
               <p className="dash-mobile-jenis">{row.jenisGangguan}</p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
                 <p className="dash-mobile-pelapor">Teknisi: <span>{row.teknisi}</span></p>
-                <ProgressBadge tipe={row.latestProgressTipe} />
+                <ProgressBadge tipe={row.progresLaporan} />
               </div>
             </div>
           ))}

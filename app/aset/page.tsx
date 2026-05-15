@@ -14,7 +14,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonRow } from '@/components/ui/SkeletonRow'
 import { CustomSelect } from '@/components/ui/CustomSelect'
 
-const TIPE_CHIPS = ['SUTET', 'SUTT', 'SKTT']
+const TIPE_CHIPS = ['SUTET', 'SUTT', 'SKTT', 'Gardu Induk']
 const STATUS_CHIPS = ['Aman', 'Sedang', 'Kritis']
 const JENIS_CHIPS = [
   { id: 'pekerjaan_pihak_lain', label: 'Pekerjaan Pihak Lain (PPL)' },
@@ -54,7 +54,7 @@ function ProgresChip({ progres }: { progres?: string }) {
   return <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-semibold bg-blue-50 text-blue-700">{PROGRES_LABEL[progres] ?? progres}</span>
 }
 
-const TIPE_OPTIONS = ['Semua', 'SUTET', 'SUTT', 'SKTT']
+const TIPE_OPTIONS = ['Semua', 'SUTET', 'SUTT', 'SKTT', 'Gardu Induk']
 const KATEGORI_OPTIONS = ['Kelayakan', 'Grounding', 'Konstruksi', 'K3', 'Lingkungan']
 const STATUS_OPTIONS    = ['berlaku', 'expired']
 
@@ -528,8 +528,9 @@ function AsetDetailDrawer({
                     <LabelValue label="Radius Deteksi (m)" value={tower.radius} weight="bold" />
                     <div className="flex flex-col gap-0.5">
                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Status Sertifikat</span>
-                       <div className="mt-1">
-                          <StatusBadge status={tower.hasCertificate ? 'Bersertifikat' : 'Tidak Bersertifikat'} text={tower.hasCertificate ? 'Bersertifikat' : 'Tidak Bersertifikat'} />
+                       <div className={`mt-1 flex items-center gap-1.5 ${tower.hasCertificate ? 'text-emerald-600' : 'text-gray-400'}`}>
+                          <div className={`w-1.5 h-1.5 rounded-full ${tower.hasCertificate ? 'bg-emerald-500 animate-pulse' : 'bg-gray-300'}`} />
+                          <span className="text-[11px] font-bold uppercase tracking-wide">{tower.hasCertificate ? 'Bersertifikat' : 'Belum Bersertifikat'}</span>
                        </div>
                     </div>
                  </div>
@@ -700,7 +701,7 @@ function AsetDetailDrawer({
 
 // ── Edit Drawer ───────────────────────────────────────────────────────────────
 
-const TIPE_EDIT_OPTIONS    = ['SUTET', 'SUTT', 'SKTT']
+const TIPE_EDIT_OPTIONS    = ['SUTET', 'SUTT', 'SKTT', 'Gardu Induk']
 
 function AsetEditDrawer({
   tower,
@@ -970,7 +971,7 @@ function AsetAddDrawer({
       setForm({
         nama: '', tipe: 'SUTT', tegangan: '150kV',
         lat: '', lng: '', lokasi: '', radius: 100, jalur: '', nomorUrut: '',
-        hasCertificate: false
+        hasCertificate: false,
       })
       setFiles([])
     } catch (err: any) {
@@ -1144,7 +1145,7 @@ export default function AsetPage() {
     tipe: [],
     status: [],
     jenis: [],
-    certified: []
+    certified: [],
   })
 
   const [isAdminUser, setIsAdminUser] = useState(false)
@@ -1198,7 +1199,7 @@ export default function AsetPage() {
         tipe: activeFilters.tipe.length ? activeFilters.tipe.join(',') : undefined,
         status: activeFilters.status.length ? activeFilters.status.join(',') : undefined,
         kerawanan_type: activeFilters.jenis.length ? activeFilters.jenis.join(',') : undefined,
-        hasCertificate: activeFilters.certified.length === 1 ? activeFilters.certified[0] : undefined
+        hasCertificate: activeFilters.certified.length === 1 ? activeFilters.certified[0] : undefined,
       })
       const p = res.data
       if (Array.isArray(p)) { setRows(p); setTotal(p.length) }

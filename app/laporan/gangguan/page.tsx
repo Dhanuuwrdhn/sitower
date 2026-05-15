@@ -3558,7 +3558,7 @@ export default function GangguanPage() {
                 </tr>
               ) : (
                 rows.map((row) => (
-                  <tr key={row.id} onClick={() => openDetail(row)} style={{ cursor: 'pointer' }}>
+                  <tr key={row.id}>
                     <td className="text-[14px] text-[#5f737f] whitespace-nowrap">{formatTanggal(row.tanggal)}</td>
                     <td className="text-[14px] text-[#5f737f] max-w-[220px]">
                       <span className="block truncate" title={row.tower?.nama ?? row.towerId}>

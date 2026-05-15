@@ -1,13 +1,13 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import toast from 'react-hot-toast'
 import { Eye, Pencil, X, MapPin, Zap, Activity, ExternalLink, Plus, Trash2, FileText, Upload, MoreHorizontal, ZoomIn, ZoomOut, Maximize2, SlidersHorizontal, Check, RotateCcw } from 'lucide-react'
 import { towersApi, asetApi, jalurKmlApi, sertifikatApi } from '@/lib/api'
 import { isAdminOrSuperadmin } from '@/lib/auth'
 import { useSidebar } from '@/components/layout/SidebarContext'
 import { StatusBadge } from '@/components/ui/StatusBadge'
-import { ActionMenu } from '@/components/ui/ActionMenu'
 import { Pagination } from '@/components/ui/Pagination'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -57,6 +57,138 @@ function ProgresChip({ progres }: { progres?: string }) {
 const TIPE_OPTIONS = ['Semua', 'SUTET', 'SUTT', 'SKTT']
 const KATEGORI_OPTIONS = ['Kelayakan', 'Grounding', 'Konstruksi', 'K3', 'Lingkungan']
 const STATUS_OPTIONS    = ['berlaku', 'expired']
+
+// ── Row action menu ───────────────────────────────────────────────────────────
+
+function RowActions({
+  row,
+  onDetail,
+  onEdit,
+  onDelete,
+  showEdit,
+}: {
+  row: any
+  onDetail: (row: any) => void
+  onEdit: (row: any) => void
+  onDelete: (row: any) => void
+  showEdit: boolean
+}) {
+  const [open, setOpen] = useState(false)
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 })
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handler(e: MouseEvent) {
+      if (
+        btnRef.current && !btnRef.current.contains(e.target as Node) &&
+        menuRef.current && !menuRef.current.contains(e.target as Node)
+      ) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+    const onScroll = () => setOpen(false)
+    window.addEventListener('scroll', onScroll, true)
+    return () => window.removeEventListener('scroll', onScroll, true)
+  }, [open])
+
+  function handleToggle(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      setMenuPos({ top: rect.bottom + 4, left: rect.right - 200 })
+    }
+    setOpen((v) => !v)
+  }
+
+  const menuStyle: React.CSSProperties = {
+    position: 'fixed',
+    top: menuPos.top,
+    left: menuPos.left,
+    zIndex: 9999,
+    background: '#FFFFFF',
+    borderRadius: 4,
+    boxShadow: '0px 4px 8px 0px rgba(28, 28, 28, 0.15)',
+    padding: '8px 0',
+    minWidth: 200,
+  }
+
+  const itemStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    padding: '8px 8px',
+    width: '100%',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: 14,
+    fontWeight: 500,
+    fontFamily: 'Inter, sans-serif',
+    color: '#5F737F',
+    lineHeight: '20px',
+    textAlign: 'left' as const,
+    transition: 'background 0.15s',
+  }
+
+  return (
+    <div className="inline-flex mx-auto">
+      <button
+        ref={btnRef}
+        onClick={handleToggle}
+        className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted hover:text-app-text transition-colors"
+        title="Aksi"
+      >
+        <MoreHorizontal size={16} />
+      </button>
+
+      {open && typeof document !== 'undefined' && createPortal(
+        <div ref={menuRef} style={menuStyle}>
+          <button
+            onClick={() => { setOpen(false); onDetail(row) }}
+            style={itemStyle}
+            onMouseEnter={(e) => (e.currentTarget.style.background = '#F6F9FC')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+          >
+            <Eye size={16} />
+            Lihat Detail
+          </button>
+
+          {showEdit && (
+            <>
+              <div style={{ height: 1, background: '#E1E8EC' }} />
+              <button
+                onClick={() => { setOpen(false); onEdit(row) }}
+                style={itemStyle}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#F6F9FC')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <Pencil size={16} />
+                Edit
+              </button>
+              <div style={{ height: 1, background: '#E1E8EC' }} />
+              <button
+                onClick={() => { setOpen(false); onDelete(row) }}
+                style={{ ...itemStyle, color: '#D92D20' }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#FEF3F2')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <Trash2 size={16} />
+                Hapus
+              </button>
+            </>
+          )}
+        </div>,
+        document.body
+      )}
+    </div>
+  )
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -1169,13 +1301,13 @@ export default function AsetPage() {
                        )}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <ActionMenu items={[
-                        { label: 'Lihat Detail', icon: <Eye size={14} />, onClick: () => { setDetailRow(row); setDetailOpen(true) } },
-                        ...(isAdminUser ? [
-                          { label: 'Edit', icon: <Pencil size={14} />, onClick: () => { setEditRow(row); setEditOpen(true) } },
-                          { label: 'Hapus', icon: <Trash2 size={14} />, onClick: () => setDeleteConfirm({ open: true, tower: row, loading: false }), danger: true, dividerBefore: true },
-                        ] : []),
-                      ]} />
+                      <RowActions
+                        row={row}
+                        onDetail={(r) => { setDetailRow(r); setDetailOpen(true) }}
+                        onEdit={(r) => { setEditRow(r); setEditOpen(true) }}
+                        onDelete={(r) => setDeleteConfirm({ open: true, tower: r, loading: false })}
+                        showEdit={isAdminUser}
+                      />
                     </td>
                   </tr>
                 ))

@@ -298,11 +298,26 @@ export default function DashboardPage() {
             if (n.includes('SKTT') || n.includes('JOINT') || n.startsWith('TRS ')) return 'SKTT'
             return 'SUTT'
           }
-          // Transform aset towers to FeaturedTower format expected by TowerMapGoogle
+          // Transform aset towers to FeaturedTower format expected by TowerMapGoogle.
+          // Prefer the per-jenis `kerawanan` array from the backend (each entry
+          // carries the latest levelRisiko of its laporan). Fall back to the
+          // legacy `kerawanan_types` + overall `status` only if the new field is
+          // missing (older API response).
           const mapTowers = (overview.towers ?? []).map((t: any) => {
-            const types: string[] = t.kerawanan_types?.length
-              ? t.kerawanan_types
-              : (t.kerawanan_type ? [t.kerawanan_type] : [])
+            const items: { kategori: string; level: string; status: string }[] =
+              Array.isArray(t.kerawanan) && t.kerawanan.length > 0
+                ? t.kerawanan.map((k: any) => ({
+                    kategori: k.jenis,
+                    level:    k.level ?? 'aman',
+                    status:   k.level ?? 'aman',
+                  }))
+                : (t.kerawanan_types?.length
+                  ? t.kerawanan_types.map((jenis: string) => ({
+                      kategori: jenis,
+                      level:    (t.status ?? 'aman') as string,
+                      status:   t.status ?? 'aman',
+                    }))
+                  : [])
             return {
               id:         t.id,
               nama:       t.name,
@@ -311,13 +326,7 @@ export default function DashboardPage() {
               tipe:       t.tipe ?? getTipe(t.name),
               bersertifikat: t.bersertifikat ?? false,
               updatedAt:  t.updated_at ?? null,
-              kerawanan:  types.length > 0
-                ? types.map((jenis: string) => ({
-                    kategori: jenis,
-                    level:    (t.status ?? 'aman') as string,
-                    status:   t.status ?? 'aman',
-                  }))
-                : [],
+              kerawanan:  items,
             }
           })
           setTowerKerawanan(mapTowers)

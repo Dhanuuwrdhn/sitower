@@ -583,7 +583,7 @@ function TowerDropdown({
                         className={`w-full text-left px-3 py-2 hover:bg-app-bg transition-colors ${value === t.id ? 'bg-blue-50' : ''}`}
                       >
                         <p className={`font-mono text-[13px] font-semibold ${value === t.id ? 'text-blue-600' : 'text-app-text'}`}>{label}</p>
-                        {sub && <p className="text-[11px] text-app-muted leading-tight mt-0.5">{sub}</p>}
+                        {/* {sub && <p className="text-[11px] text-app-muted leading-tight mt-0.5">{sub}</p>} */}
                       </button>
                     )
                   })}
@@ -942,12 +942,12 @@ function PilihTowerSheet({
                   color: isSelected ? '#076C9E' : '#1B1B1B',
                   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                 }}>{label}</p>
-                {sub && (
+                {/* {sub && (
                   <p style={{
                     fontSize: 11, color: '#5F737F', marginTop: 1,
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                   }}>{sub}</p>
-                )}
+                )} */}
               </div>
               {isSelected && (
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0, marginLeft: 8 }}>

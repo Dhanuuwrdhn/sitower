@@ -1337,21 +1337,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     ])
     setDetailLaporan(laporanRes.data)
     setProgress(progressRes.data)
-    // Defensive filter: drop legacy "initial-state" riwayat rows that were
-    // written at (or before) the laporan's creation timestamp. These belong
-    // to an older snapshot-based recording scheme; new entries are always
-    // created strictly AFTER the laporan exists.
-    const laporanCreatedAt = laporanRes.data?.createdAt
-      ? new Date(laporanRes.data.createdAt).getTime()
-      : 0
-    const filtered = (riwayatRes.data ?? []).filter((r: any) => {
-      if (!laporanCreatedAt) return true
-      const ts = new Date(r.tanggal ?? r.createdAt ?? 0).getTime()
-      // Allow a 5-second grace window so an update that happens to share
-      // the exact same second as the create still shows up.
-      return ts > laporanCreatedAt + 5_000
-    })
-    setRiwayat(filtered)
+    setRiwayat(riwayatRes.data ?? [])
   }
 
   async function handleDelete(id: string) {
@@ -1545,6 +1531,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     if (!Array.isArray(cf) || cf.length === 0) return true
     return cf.includes(key)
   }
+  const isInitialRiwayat = (r: any) => Array.isArray(r?.changedFields) && r.changedFields.includes('__initial__')
   const hasAnyChange = (r: any) =>
     !Array.isArray(r?.changedFields) || r.changedFields.length > 0
 
@@ -1901,9 +1888,16 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                 {riwayat.map((r: any, idx: number) => (
                   <div key={r.id} style={{ paddingTop: idx > 0 ? 14 : 0, borderTop: idx > 0 ? '1px solid #E1E8EC' : 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <span style={{ fontSize: 11, color: '#97AAB3' }}>
-                        Tanggal Pembaruan: {formatTanggal(r.tanggal)}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: 11, color: '#97AAB3' }}>
+                          Tanggal Pembaruan: {formatTanggal(r.tanggal)}
+                        </span>
+                        {isInitialRiwayat(r) && (
+                          <span style={{ fontSize: 10, fontWeight: 700, color: '#076C9E', background: '#EAF6FB', padding: '3px 8px', borderRadius: 999 }}>
+                            Data Awal
+                          </span>
+                        )}
+                      </div>
                       {isSuperadmin() && (
                         <button type="button" onClick={() => handleDeleteRiwayat(r.id)}
                           style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 4, minWidth: 32, minHeight: 32 }}>
@@ -2158,9 +2152,16 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
               {riwayat.map((r: any) => (
                 <div key={r.id} style={{ padding: 20, border: '1px solid #E1E8EC', borderRadius: 12, background: '#FFFFFF' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                    <span style={{ fontSize: 13, color: '#566B75', fontWeight: 500 }}>
-                      Tanggal Pembaruan: {formatTanggal(r.tanggal)} · Oleh: {r.oleh}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 13, color: '#566B75', fontWeight: 500 }}>
+                        Tanggal Pembaruan: {formatTanggal(r.tanggal)} · Oleh: {r.oleh}
+                      </span>
+                      {isInitialRiwayat(r) && (
+                        <span style={{ fontSize: 11, fontWeight: 700, color: '#076C9E', background: '#EAF6FB', padding: '4px 10px', borderRadius: 999 }}>
+                          Data Awal
+                        </span>
+                      )}
+                    </div>
                     {isSuperadmin() && (
                       <button onClick={() => handleDeleteRiwayat(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 4 }}>
                         <X size={16} />

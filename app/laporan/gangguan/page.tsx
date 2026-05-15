@@ -1337,7 +1337,21 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     ])
     setDetailLaporan(laporanRes.data)
     setProgress(progressRes.data)
-    setRiwayat(riwayatRes.data ?? [])
+    // Defensive filter: drop legacy "initial-state" riwayat rows that were
+    // written at (or before) the laporan's creation timestamp. These belong
+    // to an older snapshot-based recording scheme; new entries are always
+    // created strictly AFTER the laporan exists.
+    const laporanCreatedAt = laporanRes.data?.createdAt
+      ? new Date(laporanRes.data.createdAt).getTime()
+      : 0
+    const filtered = (riwayatRes.data ?? []).filter((r: any) => {
+      if (!laporanCreatedAt) return true
+      const ts = new Date(r.tanggal ?? r.createdAt ?? 0).getTime()
+      // Allow a 5-second grace window so an update that happens to share
+      // the exact same second as the create still shows up.
+      return ts > laporanCreatedAt + 5_000
+    })
+    setRiwayat(filtered)
   }
 
   async function handleDelete(id: string) {

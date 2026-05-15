@@ -48,12 +48,14 @@ const STATUS_LABEL: Record<string, string> = {
   berlangsung:         'Berlangsung',
   selesai:             'Selesai',
   tidak_ada_aktifitas: 'Tdk Ada Aktivitas',
+  tidak_ada_aktivitas: 'Tdk Ada Aktivitas',
 }
 
 const STATUS_CLASS: Record<string, string> = {
   berlangsung:         'badge-berlangsung badge-blink',
   selesai:             'badge-selesai',
   tidak_ada_aktifitas: 'badge-menunggu',
+  tidak_ada_aktivitas: 'badge-menunggu',
 }
 
 const LEVEL_OPTIONS = [
@@ -584,7 +586,7 @@ function ReportDrawer({ open, type, initial, readOnly, towerOptions, onClose, on
       {/* ── Deskripsi / Uraian Pekerjaan ── */}
       <div>
         <label className="block text-[12px] font-semibold text-app-text mb-1.5">
-          {type === 'ppl' || type === 'span' ? 'Uraian Pekerjaan' : type === 'kebakaran' ? 'Deskripsi Kebakaran' : 'Deskripsi Gangguan'}
+          {type === 'ppl' || type === 'span' ? 'Uraian Pekerjaan' : type === 'kebakaran' ? 'Deskripsi Kebakaran' : 'Deskripsi Kerawanan'}
         </label>
         <textarea disabled={readOnly} rows={4} value={form.deskripsi} onChange={e => set('deskripsi', e.target.value)}
           className="form-input resize-none"

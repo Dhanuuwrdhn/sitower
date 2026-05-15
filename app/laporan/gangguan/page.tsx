@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import toast from 'react-hot-toast'
+import Swal from 'sweetalert2'
 import {
   Search, Plus, Calendar, SlidersHorizontal, RotateCcw,
   Trash2, X, Upload, ChevronLeft, ChevronRight,
@@ -50,8 +51,7 @@ const STATUS_LABEL: Record<string, string> = {
 }
 
 const LEVEL_OPTIONS = [
-  { value: 'kritis_terpenuhi', label: 'Kritis', color: 'text-red-600', bg: 'bg-red-50 border-red-300', dot: 'bg-red-500' },
-  { value: 'kritis_tidak_terpenuhi', label: 'Kritis', color: 'text-red-700', bg: 'bg-red-100 border-red-400', dot: 'bg-red-700' },
+  { value: 'kritis', label: 'Kritis', color: 'text-red-600', bg: 'bg-red-50 border-red-300', dot: 'bg-red-500' },
   { value: 'sedang', label: 'Sedang', color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-300', dot: 'bg-yellow-500' },
   { value: 'aman', label: 'Aman', color: 'text-green-600', bg: 'bg-green-50 border-green-300', dot: 'bg-green-500' },
 ]
@@ -125,6 +125,11 @@ function formatTanggal(iso: string) {
   })
 }
 
+function normalizeLevelValue(level?: string) {
+  if (!level) return ''
+  return ['kritis', 'kritis_terpenuhi', 'kritis_tidak_terpenuhi'].includes(level) ? 'kritis' : level
+}
+
 function StatusPill({ status }: { status: string }) {
   const label = STATUS_LABEL[status] ?? status
   return <span className={STATUS_CLASS[status] ?? 'badge-menunggu'}>{label}</span>
@@ -141,10 +146,20 @@ function LevelBadge({ level }: { level: string }) {
   )
 }
 
+// Normalize legacy/typo variants (aktifitas vs aktivitas, whitespace, casing)
+// so a single mapping covers every spelling that appears in the DB.
+function normalizeProgresValue(v: string | null | undefined): string {
+  if (!v) return ''
+  const t = String(v).toLowerCase().trim().replace(/\s+/g, '_')
+  if (t === 'tidak_ada_aktivitas') return 'tidak_ada_aktifitas'
+  return t
+}
+
 function ProgressBadge({ tipe }: { tipe: string | null | undefined }) {
   if (!tipe) return <span className="text-app-subtle text-[12px]">—</span>
-  const label = PROGRESS_TIPE_LABEL[tipe] ?? tipe
-  const color = PROGRESS_BADGE_COLOR[tipe] ?? { bg: '#5F737F', text: '#FFFFFF' }
+  const key = normalizeProgresValue(tipe)
+  const label = PROGRESS_TIPE_LABEL[key] ?? PROGRESS_TIPE_LABEL[tipe] ?? tipe
+  const color = PROGRESS_BADGE_COLOR[key] ?? PROGRESS_BADGE_COLOR[tipe] ?? { bg: '#5F737F', text: '#FFFFFF' }
   return (
     <span style={{ background: color.bg, color: color.text, display: 'inline-flex', alignItems: 'center', padding: '2px 10px', borderRadius: 99, fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>
       {label}
@@ -450,6 +465,7 @@ interface TowerOption {
   garduInduk: string
   tipe: string
   nama?: string
+  jalur?: string
   lat?: number
   lng?: number
   radius?: number
@@ -1297,6 +1313,7 @@ function PhotoLightbox({
 
 function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }: { laporan: any; onSaved?: () => void; onClose?: () => void; onDelete?: (l: any) => void; autoOpenUpdate?: boolean }) {
   const { isMobile } = useSidebar()
+  const [detailLaporan, setDetailLaporan] = useState(laporan)
   const [progress, setProgress] = useState<Record<string, any[]>>({ spanduk: [], brosur: [], laporan_baru: [], berita_acara: [], surat: [] })
   const [riwayat, setRiwayat] = useState<any[]>([])
   const [uploading, setUploading] = useState<string | null>(null)
@@ -1306,10 +1323,22 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   const [riwayatForm, setRiwayatForm] = useState({ statusKerawanan: 'aman', progresLaporan: 'sedang_berlangsung', uraianPekerjaan: '', upayaPengendalian: '', pihakLain: '', contactPerson: '' })
   const [riwayatFiles, setRiwayatFiles] = useState<{ foto: File[]; beritaAcara: File[]; spanduk: File[]; surat: File[] }>({ foto: [], beritaAcara: [], spanduk: [], surat: [] })
   const [savingRiwayat, setSavingRiwayat] = useState(false)
-  const riwayatFileRefs = useRef<{ foto: HTMLInputElement | null; beritaAcara: HTMLInputElement | null; spanduk: HTMLInputElement | null; surat: HTMLInputElement | null }>({ foto: null, beritaAcara: null, spanduk: null, surat: null })
   const progressRefs = useRef<Record<string, HTMLInputElement | null>>({})
   const user = getUser()
-  const isPPL = laporan?.jenisGangguan === 'pekerjaan_pihak_lain'
+  const activeLaporan = detailLaporan ?? laporan
+  const isPPL = activeLaporan?.jenisGangguan === 'pekerjaan_pihak_lain'
+
+  async function reloadDetailData() {
+    if (!activeLaporan?.id) return
+    const [laporanRes, progressRes, riwayatRes] = await Promise.all([
+      laporanApi.getById(activeLaporan.id),
+      laporanApi.getProgress(activeLaporan.id),
+      laporanApi.getRiwayat(activeLaporan.id),
+    ])
+    setDetailLaporan(laporanRes.data)
+    setProgress(progressRes.data)
+    setRiwayat(riwayatRes.data ?? [])
+  }
 
   async function handleDelete(id: string) {
     try {
@@ -1323,18 +1352,40 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   }
 
   useEffect(() => {
-    if (autoOpenUpdate && laporan?.status !== 'selesai') setShowUpdateDrawer(true)
-  }, [autoOpenUpdate, laporan?.status])
+    // Only re-sync from prop when the underlying report changed (different id).
+    // Prevents stale parent re-renders from overwriting freshly-fetched detail
+    // right after Perbarui Laporan submits.
+    if (!detailLaporan || detailLaporan.id !== laporan?.id) setDetailLaporan(laporan)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [laporan])
 
   useEffect(() => {
-    if (!laporan?.id) return
-    laporanApi.getProgress(laporan.id).then(r => setProgress(r.data)).catch(() => { })
-    laporanApi.getRiwayat(laporan.id).then(r => setRiwayat(r.data ?? [])).catch(() => { })
-  }, [laporan?.id])
+    if (autoOpenUpdate && activeLaporan?.status !== 'selesai') setShowUpdateDrawer(true)
+  }, [autoOpenUpdate, activeLaporan?.status])
+
+  // Prefill the Perbarui Laporan form with current laporan values so that
+  // unchanged fields are NOT recorded as changes in riwayat (Bug 3).
+  useEffect(() => {
+    if (!showUpdateDrawer || !activeLaporan) return
+    setRiwayatForm({
+      statusKerawanan: activeLaporan.levelRisiko ?? 'aman',
+      progresLaporan:  activeLaporan.progresLaporan ?? 'sedang_berlangsung',
+      uraianPekerjaan: activeLaporan.deskripsi ?? '',
+      upayaPengendalian: activeLaporan.keterangan ?? '',
+      pihakLain: activeLaporan.jenisGangguan === 'pekerjaan_pihak_lain' ? (activeLaporan.teknisi ?? '') : '',
+      contactPerson: activeLaporan.contactPerson ?? '',
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showUpdateDrawer, activeLaporan?.id])
+
+  useEffect(() => {
+    if (!activeLaporan?.id) return
+    reloadDetailData().catch(() => { })
+  }, [activeLaporan?.id])
 
   async function handleAddRiwayat(e?: React.FormEvent) {
     e?.preventDefault()
-    if (!laporan?.id) return
+    if (!activeLaporan?.id) return
     setSavingRiwayat(true)
     try {
       const fd = new FormData()
@@ -1349,28 +1400,45 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
       riwayatFiles.beritaAcara.forEach(f => fd.append('beritaAcara', f))
       riwayatFiles.spanduk.forEach(f => fd.append('spanduk', f))
       riwayatFiles.surat.forEach(f => fd.append('surat', f))
-      const res = await laporanApi.addRiwayat(laporan.id, fd)
-      setRiwayat(prev => [res.data, ...prev])
+      const res = await laporanApi.addRiwayat(activeLaporan.id, fd)
+      // Apply server-returned updated laporan immediately so the
+      // "Informasi Kerawanan" section reflects new values without flicker.
+      if (res?.data?.laporan) setDetailLaporan((prev: any) => ({ ...(prev ?? {}), ...res.data.laporan }))
+      await reloadDetailData()
       setShowUpdateDrawer(false)
       setRiwayatForm({ statusKerawanan: 'aman', progresLaporan: 'sedang_berlangsung', uraianPekerjaan: '', upayaPengendalian: '', pihakLain: '', contactPerson: '' })
       setRiwayatFiles({ foto: [], beritaAcara: [], spanduk: [], surat: [] })
-      toast.success('Riwayat pembaruan ditambahkan')
-    } catch { toast.error('Gagal menyimpan riwayat') } finally { setSavingRiwayat(false) }
+      onSaved?.()
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil',
+        text: 'Laporan berhasil diperbarui.',
+        confirmButtonColor: '#076C9E',
+        confirmButtonText: 'OK',
+      })
+    } catch {
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal',
+        text: 'Gagal menyimpan pembaruan laporan.',
+        confirmButtonColor: '#d33',
+      })
+    } finally { setSavingRiwayat(false) }
   }
 
   async function handleDeleteRiwayat(riwayatId: string) {
-    if (!laporan?.id || !confirm('Hapus riwayat ini?')) return
+    if (!activeLaporan?.id || !confirm('Hapus riwayat ini?')) return
     try {
-      await laporanApi.deleteRiwayat(laporan.id, riwayatId)
+      await laporanApi.deleteRiwayat(activeLaporan.id, riwayatId)
       setRiwayat(prev => prev.filter(r => r.id !== riwayatId))
     } catch { toast.error('Gagal menghapus riwayat') }
   }
 
   async function handleSelesaikan() {
-    if (!laporan?.id) return
+    if (!activeLaporan?.id) return
     setSelesaiLoading(true)
     try {
-      await laporanApi.update(laporan.id, { status: 'selesai' })
+      await laporanApi.update(activeLaporan.id, { status: 'selesai' })
       toast.success('Laporan berhasil diselesaikan')
       onSaved?.()
       onClose?.()
@@ -1381,8 +1449,8 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     setUploading(tipe)
     try {
       const toUpload = /\.(jpe?g|png|webp)$/i.test(file.name) ? await compressImage(file) : file
-      await laporanApi.uploadProgress(laporan.id, tipe, toUpload)
-      const r = await laporanApi.getProgress(laporan.id)
+      await laporanApi.uploadProgress(activeLaporan.id, tipe, toUpload)
+      const r = await laporanApi.getProgress(activeLaporan.id)
       setProgress(r.data)
       toast.success('Dokumen berhasil diunggah')
     } catch { toast.error('Gagal mengunggah') } finally { setUploading(null) }
@@ -1390,13 +1458,13 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
 
   async function handleProgressDelete(tipe: string, progressId: string) {
     try {
-      await laporanApi.deleteProgress(laporan.id, progressId)
+      await laporanApi.deleteProgress(activeLaporan.id, progressId)
       setProgress(prev => ({ ...prev, [tipe]: prev[tipe].filter(p => p.id !== progressId) }))
       toast.success('Dokumen dihapus')
     } catch { toast.error('Gagal menghapus') }
   }
 
-  const fotoUrls: string[] = laporan?.foto ?? []
+  const fotoUrls: string[] = activeLaporan?.foto ?? []
 
   // ── shared progress hidden inputs
   const progressInputs = PROGRESS_TIPE_LIST.map((tipe) => (
@@ -1418,13 +1486,13 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
       { key: 'spanduk', label: 'Spanduk' },
       { key: 'surat', label: 'Surat Pemberitahuan' },
     ]
-    const hasAny = fields.some(f => (r[f.key] ?? []).length > 0)
+    const hasAny = fields.some(f => showField(r, f.key) && (r[f.key] ?? []).length > 0)
     if (!hasAny) return null
     return (
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 10 }}>
         {fields.map(({ key, label }) => {
           const urls: string[] = r[key] ?? []
-          if (!urls.length) return null
+          if (!urls.length || !showField(r, key)) return null
           const imgs = urls.filter(u => /\.(jpe?g|png|webp)$/i.test(u))
           const pdfs = urls.filter(u => /\.pdf$/i.test(u))
           return (
@@ -1454,18 +1522,52 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     )
   }
 
+  // ── Riwayat field visibility helper.
+  // Legacy rows (no changedFields, pre-migration) → show everything to avoid
+  // hiding historical data. New rows → show only the fields that actually
+  // changed in that update (Bug 3).
+  const showField = (r: any, key: string) => {
+    const cf = r?.changedFields
+    if (!Array.isArray(cf) || cf.length === 0) return true
+    return cf.includes(key)
+  }
+  const hasAnyChange = (r: any) =>
+    !Array.isArray(r?.changedFields) || r.changedFields.length > 0
+
   // ── Helper for rendering file cards in update form
   function renderRiwayatUpload(field: keyof typeof riwayatFiles, label: string, icon?: React.ReactNode) {
     const files = riwayatFiles[field]
+    const inputId = `riwayat-upload-${field}`
+    // <label htmlFor> on a real <input type="file"> opens the OS file picker
+    // when clicked — no ref / programmatic click() needed, which is the most
+    // reliable cross-browser pattern (works in Safari iOS, Android Chrome).
+    const hiddenInput = (
+      <input
+        id={inputId}
+        type="file"
+        accept="image/*,application/pdf,.pdf,.jpg,.jpeg,.png,.webp"
+        multiple
+        style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
+        onChange={e => {
+          // Capture FileList eagerly — by the time React's functional setState
+          // runs, e.target.files may already be reset (line below) and the
+          // closure would read an empty list.
+          const picked = e.target.files ? Array.from(e.target.files) : []
+          e.target.value = ''
+          if (picked.length) setRiwayatFiles(f => ({ ...f, [field]: picked }))
+        }}
+      />
+    )
     return (
       <div style={{ flex: 1 }}>
         <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 8 }}>{label}</label>
+        {hiddenInput}
         {files.length === 0 ? (
-          <button type="button" onClick={() => riwayatFileRefs.current[field]?.click()}
-            style={{ width: '100%', padding: '12px', border: '1px dashed #C5D3D9', borderRadius: 8, background: '#fff', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#5F737F' }}>
+          <label htmlFor={inputId}
+            style={{ width: '100%', padding: '12px', border: '1px dashed #C5D3D9', borderRadius: 8, background: '#fff', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#5F737F', boxSizing: 'border-box' }}>
             {icon || <Upload size={16} />}
             Pilih file
-          </button>
+          </label>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {files.map((file, idx) => {
@@ -1492,9 +1594,9 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                 </div>
               )
             })}
-            <button type="button" onClick={() => riwayatFileRefs.current[field]?.click()} style={{ fontSize: 12, color: '#076C9E', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '4px 0', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <label htmlFor={inputId} style={{ fontSize: 12, color: '#076C9E', fontWeight: 600, cursor: 'pointer', textAlign: 'left', padding: '4px 0', display: 'inline-flex', alignItems: 'center', gap: 4, width: 'fit-content' }}>
               <Plus size={14} /> Tambah file lain
-            </button>
+            </label>
           </div>
         )}
       </div>
@@ -1505,7 +1607,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   const updateDrawer = showUpdateDrawer && typeof window !== 'undefined' && createPortal(
     <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', justifyContent: 'flex-end' }}>
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)' }} onClick={() => setShowUpdateDrawer(false)} />
-      <div style={{ position: 'relative', width: isMobile ? '100%' : 420, background: '#fff', height: '100%', display: 'flex', flexDirection: 'column', zIndex: 1, boxShadow: '-4px 0 24px rgba(0,0,0,0.12)' }}>
+      <div style={{ position: 'relative', width: isMobile ? '100%' : 560, background: '#fff', height: '100%', display: 'flex', flexDirection: 'column', zIndex: 1, boxShadow: '-4px 0 24px rgba(0,0,0,0.12)' }}>
         {/* Drawer header */}
         <div style={{ padding: '20px 20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B' }}>Perbarui Laporan</span>
@@ -1532,7 +1634,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             <select className="form-input" value={riwayatForm.statusKerawanan} onChange={e => setRiwayatForm(f => ({ ...f, statusKerawanan: e.target.value }))}>
               <option value="aman">Aman</option>
               <option value="sedang">Sedang</option>
-              <option value="kritis_terpenuhi">Kritis</option>
+              <option value="kritis">Kritis</option>
             </select>
           </div>
 
@@ -1647,12 +1749,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           </button>
         </div>
 
-        {/* Hidden file inputs */}
-        {(['foto', 'beritaAcara', 'spanduk', 'surat'] as const).map(field => (
-          <input key={field} ref={el => { riwayatFileRefs.current[field] = el }}
-            type="file" accept="image/*,.pdf" multiple className="hidden"
-            onChange={e => { if (e.target.files?.length) setRiwayatFiles(f => ({ ...f, [field]: Array.from(e.target.files!) })); e.target.value = '' }} />
-        ))}
+        {/* Hidden file inputs are colocated inside renderRiwayatUpload */}
       </div>
     </div>,
     document.body
@@ -1662,10 +1759,10 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   // MOBILE — synced with desktop
   // ══════════════════════════════════════════════════
   if (isMobile) {
-    const pihakLainMobile = isPPL ? laporan?.teknisi : null
+    const pihakLainMobile = isPPL ? activeLaporan?.teknisi : null
     const lastUpdateM = riwayat[0]
-    const lastUpdatedAtM = lastUpdateM?.tanggal ?? laporan?.updatedAt ?? laporan?.tanggal
-    const canPerbarui = (isAdmin() || isSuperadmin() || isTeknisi()) && laporan?.status !== 'selesai'
+    const lastUpdatedAtM = lastUpdateM?.tanggal ?? activeLaporan?.updatedAt ?? activeLaporan?.tanggal
+    const canPerbarui = (isAdmin() || isSuperadmin() || isTeknisi()) && activeLaporan?.status !== 'selesai'
 
     // File attachment row: [thumb] [Label / filename] [eye]
     const FileRow = ({ label, url }: { label: string; url: string }) => {
@@ -1730,9 +1827,9 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           <div style={{ background: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, border: '1px solid #E1E8EC' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>
-                {JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan ?? '—'}
+                {JENIS_LABEL[activeLaporan?.jenisGangguan] ?? activeLaporan?.jenisGangguan ?? '—'}
               </span>
-              {laporan?.status && <StatusPill status={laporan.status} />}
+              {activeLaporan?.status && <StatusPill status={activeLaporan.status} />}
             </div>
             <div style={{ marginTop: 6, fontSize: 12, color: '#5F737F' }}>
               Terakhir Diperbarui: {formatTanggal(lastUpdatedAtM)}
@@ -1742,15 +1839,15 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           {/* ── Informasi Kerawanan (no header) ────────────────── */}
           <div style={{ background: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, border: '1px solid #E1E8EC', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama) ?? '—'} />
-              <InfoRow label="Span" value={laporan?.lokasiDetail || '—'} />
+              <InfoRow label="Ruas" value={activeLaporan?.tower?.nama ?? '—'} />
+              <InfoRow label="Span" value={activeLaporan?.lokasiDetail || '—'} />
             </div>
-            <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
+            <InfoRow label="Status Kerawanan" value={<LevelBadge level={activeLaporan?.levelRisiko} />} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <InfoRow label="Informasi Pihak Lain" value={pihakLainMobile || '—'} />
-              <InfoRow label="Contact Person" value={laporan?.contactPerson || '—'} />
+              <InfoRow label="Contact Person" value={activeLaporan?.contactPerson || '—'} />
             </div>
-            <InfoRow label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'} value={laporan?.deskripsi || '—'} />
+            <InfoRow label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'} value={activeLaporan?.deskripsi || '—'} />
 
             {fotoUrls.length > 0 && (
               <FileGroup label="Bukti Kerawanan" urls={fotoUrls} />
@@ -1763,7 +1860,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
               Informasi Pengendalian
             </span>
             <div style={{ marginBottom: 12 }}>
-              <InfoRow label="Deskripsi Pengendalian" value={laporan?.keterangan || '—'} />
+              <InfoRow label="Deskripsi Pengendalian" value={activeLaporan?.keterangan || '—'} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <FileGroup label="Berita Acara" urls={(progress?.berita_acara ?? []).map((d: any) => d.fileUrl)} />
@@ -1799,32 +1896,54 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                       )}
                     </div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: '#1B1B1B', marginBottom: 10 }}>Detail Pembaruan</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-                      <div>
-                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 4 }}>Status Kerawanan</span>
-                        <LevelBadge level={r.statusKerawanan} />
+                    {!hasAnyChange(r) && (
+                      <div style={{ fontSize: 12, color: '#97AAB3', fontStyle: 'italic' }}>Tidak ada perubahan tercatat</div>
+                    )}
+                    {(showField(r, 'statusKerawanan') || showField(r, 'progresLaporan')) && (
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                        {showField(r, 'statusKerawanan') && (
+                          <div>
+                            <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 4 }}>Status Kerawanan</span>
+                            <LevelBadge level={r.statusKerawanan} />
+                          </div>
+                        )}
+                        {showField(r, 'progresLaporan') && (
+                          <div>
+                            <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 4 }}>Progres Laporan</span>
+                            <ProgressBadge tipe={r.progresLaporan} />
+                          </div>
+                        )}
                       </div>
-                      <div>
-                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 4 }}>Progres Laporan</span>
-                        <ProgressBadge tipe={r.progresLaporan} />
-                      </div>
-                    </div>
-                    {r.uraianPekerjaan && (
+                    )}
+                    {showField(r, 'uraianPekerjaan') && r.uraianPekerjaan && (
                       <div style={{ marginBottom: 10 }}>
                         <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Uraian Pekerjaan</span>
                         <span style={{ fontSize: 13, color: '#1B1B1B' }}>{r.uraianPekerjaan}</span>
                       </div>
                     )}
-                    {r.upayaPengendalian && (
+                    {showField(r, 'upayaPengendalian') && r.upayaPengendalian && (
                       <div style={{ marginBottom: 10 }}>
                         <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Upaya Pengendalian</span>
                         <span style={{ fontSize: 13, color: '#1B1B1B' }}>{r.upayaPengendalian}</span>
                       </div>
                     )}
+                    {showField(r, 'pihakLain') && r.pihakLain && (
+                      <div style={{ marginBottom: 10 }}>
+                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Pihak Lain</span>
+                        <span style={{ fontSize: 13, color: '#1B1B1B' }}>{r.pihakLain}</span>
+                      </div>
+                    )}
+                    {showField(r, 'contactPerson') && r.contactPerson && (
+                      <div style={{ marginBottom: 10 }}>
+                        <span style={{ fontSize: 11, color: '#5F737F', display: 'block', marginBottom: 2 }}>Contact Person</span>
+                        <span style={{ fontSize: 13, color: '#1B1B1B' }}>{r.contactPerson}</span>
+                      </div>
+                    )}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <FileGroup label="Berita Acara" urls={r.beritaAcara ?? []} />
-                      <FileGroup label="Surat Pemberitahuan" urls={r.surat ?? []} />
-                      <FileGroup label="Foto Bukti" urls={r.foto ?? []} />
+                      {showField(r, 'beritaAcara') && <FileGroup label="Berita Acara" urls={r.beritaAcara ?? []} />}
+                      {showField(r, 'spanduk') && <FileGroup label="Spanduk" urls={r.spanduk ?? []} />}
+                      {showField(r, 'surat') && <FileGroup label="Surat Pemberitahuan" urls={r.surat ?? []} />}
+                      {showField(r, 'foto') && <FileGroup label="Foto Bukti" urls={r.foto ?? []} />}
                     </div>
                   </div>
                 ))}
@@ -1858,8 +1977,8 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   }
   // ─── Desktop readOnly detail view ────────────────────────────────────────
   const lastUpdate = riwayat[0]
-  const lastUpdatedAt = lastUpdate?.tanggal ?? laporan?.updatedAt ?? laporan?.tanggal
-  const lastUpdatedBy = lastUpdate?.oleh ?? laporan?.pelapor?.nama ?? '-'
+  const lastUpdatedAt = lastUpdate?.tanggal ?? activeLaporan?.updatedAt ?? activeLaporan?.tanggal
+  const lastUpdatedBy = lastUpdate?.oleh ?? activeLaporan?.pelapor?.nama ?? '-'
 
   const beritaAcaraDoc = (progress?.berita_acara ?? [])[0]
   const suratDoc       = (progress?.surat ?? [])[0]
@@ -1908,7 +2027,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
               Kembali
             </button>
             <span style={{ fontSize: 24, fontWeight: 700, color: '#1B1B1B' }}>Detail Laporan Kerawanan</span>
-            {laporan?.status && <StatusPill status={laporan.status} />}
+            {activeLaporan?.status && <StatusPill status={activeLaporan.status} />}
           </div>
           <div style={{ display: 'flex', gap: 8, fontSize: 14, fontWeight: 500, color: '#566B75', flexWrap: 'wrap' }}>
             <span>Terakhir diupdate : {formatTanggal(lastUpdatedAt)}</span>
@@ -1916,7 +2035,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             <span>Oleh : {lastUpdatedBy}</span>
           </div>
         </div>
-        {laporan?.status !== 'selesai' && (
+        {activeLaporan?.status !== 'selesai' && (
           <button
             onClick={() => setShowUpdateDrawer(true)}
             style={{ height: 44, padding: '0 24px', background: '#076C9E', border: 'none', borderRadius: 8, color: '#FFFFFF', fontSize: 14, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
@@ -1934,25 +2053,25 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
 
           {/* Row 1 */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, marginBottom: 20 }}>
-            <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[laporan?.jenisGangguan] ?? laporan?.jenisGangguan ?? '—'} />
-            <InfoRow label="Status Kerawanan" value={<LevelBadge level={laporan?.levelRisiko} />} />
-            <InfoRow label="Tower Terdampak" value={extractTowerNo(laporan?.tower?.nama) ?? '—'} />
-            <InfoRow label="Span" value={laporan?.lokasiDetail || '—'} />
+            <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[activeLaporan?.jenisGangguan] ?? activeLaporan?.jenisGangguan ?? '—'} />
+            <InfoRow label="Status Kerawanan" value={<LevelBadge level={activeLaporan?.levelRisiko} />} />
+            <InfoRow label="Ruas" value={activeLaporan?.tower?.nama ?? '—'} />
+            <InfoRow label="Span" value={activeLaporan?.lokasiDetail || '—'} />
           </div>
 
           {/* Row 2 */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, marginBottom: 20 }}>
             <InfoRow
               label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'}
-              value={laporan?.deskripsi || '—'}
+              value={activeLaporan?.deskripsi || '—'}
             />
             <InfoRow
               label="Informasi Pihak Lain"
-              value={(isPPL ? laporan?.teknisi : null) || '—'}
+              value={(isPPL ? activeLaporan?.teknisi : null) || '—'}
             />
             <InfoRow
               label="Contact Person"
-              value={laporan?.contactPerson || '—'}
+              value={activeLaporan?.contactPerson || '—'}
             />
             <div />
           </div>
@@ -1987,7 +2106,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
 
           <div style={{ marginBottom: 20 }}>
             <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{laporan?.keterangan || '—'}</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{activeLaporan?.keterangan || '—'}</span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, maxWidth: 640 }}>
@@ -2028,25 +2147,45 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
 
                   <div style={{ fontSize: 14, fontWeight: 700, color: '#1B1B1B', marginBottom: 14 }}>Detail Pembaruan</div>
 
+                  {!hasAnyChange(r) && (
+                    <div style={{ fontSize: 13, color: '#97AAB3', fontStyle: 'italic', marginBottom: 8 }}>Tidak ada perubahan tercatat</div>
+                  )}
+
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 14 }}>
-                    <div>
-                      <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Status Kerawanan</span>
-                      <LevelBadge level={r.statusKerawanan} />
-                    </div>
-                    <div>
-                      <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Progres Laporan</span>
-                      <ProgressBadge tipe={r.progresLaporan} />
-                    </div>
-                    {r.uraianPekerjaan && (
+                    {showField(r, 'statusKerawanan') && (
+                      <div>
+                        <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Status Kerawanan</span>
+                        <LevelBadge level={r.statusKerawanan} />
+                      </div>
+                    )}
+                    {showField(r, 'progresLaporan') && (
+                      <div>
+                        <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Progres Laporan</span>
+                        <ProgressBadge tipe={r.progresLaporan} />
+                      </div>
+                    )}
+                    {showField(r, 'uraianPekerjaan') && r.uraianPekerjaan && (
                       <div>
                         <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Uraian Pekerjaan</span>
                         <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.uraianPekerjaan}</span>
                       </div>
                     )}
-                    {r.upayaPengendalian && (
+                    {showField(r, 'upayaPengendalian') && r.upayaPengendalian && (
                       <div>
                         <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</span>
                         <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.upayaPengendalian}</span>
+                      </div>
+                    )}
+                    {showField(r, 'pihakLain') && r.pihakLain && (
+                      <div>
+                        <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Pihak Lain</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.pihakLain}</span>
+                      </div>
+                    )}
+                    {showField(r, 'contactPerson') && r.contactPerson && (
+                      <div>
+                        <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Contact Person</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{r.contactPerson}</span>
                       </div>
                     )}
                   </div>
@@ -2096,17 +2235,34 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
 
 // ── Form drawer ───────────────────────────────────────────────────────────────
 
+// Format a Date as a "YYYY-MM-DDTHH:MM" string in Asia/Jakarta (WIB, UTC+7),
+// suitable for an <input type="datetime-local"> value. Using toISOString()
+// would yield UTC and show 7 hours behind for WIB users.
+function jakartaDatetimeLocalString(d: Date = new Date()): string {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: false,
+  }).formatToParts(d).reduce<Record<string, string>>((acc, p) => {
+    if (p.type !== 'literal') acc[p.type] = p.value
+    return acc
+  }, {})
+  // Intl can emit hour "24" at midnight in some locales; normalize.
+  const hour = parts.hour === '24' ? '00' : parts.hour
+  return `${parts.year}-${parts.month}-${parts.day}T${hour}:${parts.minute}`
+}
+
 const EMPTY_FORM = {
   towerId: '',
   towerLabel: '',
   towerIdEnd: '',       // span end tower (pekerjaan_pihak_lain)
   towerLabelEnd: '',
   jenisGangguan: '',
-  tanggalWaktu: new Date().toISOString().slice(0, 16),
-  levelRisiko: 'sedang',
+  tanggalWaktu: jakartaDatetimeLocalString(),
+  levelRisiko: '',
   status: 'berlangsung',
   progresLaporan: 'sedang_berlangsung',
-  lokasiDetail: '',     // stores span "T-x s/d T-y" for ppl
+  lokasiDetail: '',
   deskripsi: '',        // Uraian Pekerjaan
   keterangan: '',       // Upaya Pengendalian (ppl) / notes
   pihakLain: '',        // company name for pekerjaan_pihak_lain (stored in teknisi)
@@ -2140,11 +2296,19 @@ function LaporanDrawer({
   onClose: () => void
   onSaved: () => void
 }) {
+  type SubmitErrors = {
+    foto?: string
+    towerId?: string
+    lokasiDetail?: string
+    levelRisiko?: string
+  }
+
   const user = getUser()
   const { isMobile, sidebarWidth } = useSidebar()
   const [form, setForm] = useState(EMPTY_FORM)
   const [fotos, setFotos] = useState<File[]>([])
   const [fotoUrls, setFotoUrls] = useState<string[]>([])
+  const [submitErrors, setSubmitErrors] = useState<SubmitErrors>({})
   const [saving, setSaving] = useState(false)
   const [locating, setLocating] = useState(false)
   const [useGPS, setUseGPS] = useState(false)
@@ -2171,8 +2335,10 @@ function LaporanDrawer({
           towerId: initial.towerId ?? '',
           towerLabel: initial.tower?.nama ?? initial.tower?.id ?? '',
           jenisGangguan: initial.jenisGangguan ?? '',
-          tanggalWaktu: initial.tanggal?.slice(0, 16) ?? new Date().toISOString().slice(0, 16),
-          levelRisiko: initial.levelRisiko ?? 'sedang',
+          tanggalWaktu: initial.tanggal
+            ? jakartaDatetimeLocalString(new Date(initial.tanggal))
+            : jakartaDatetimeLocalString(),
+          levelRisiko: normalizeLevelValue(initial.levelRisiko) || 'sedang',
           status: initial.status ?? 'berlangsung',
           progresLaporan: initial.progresLaporan ?? 'sedang_berlangsung',
           lokasiDetail: initial.lokasiDetail ?? '',
@@ -2200,10 +2366,33 @@ function LaporanDrawer({
           setTimeout(() => { document.getElementById('btn-detect-location')?.click() }, 100)
         }
       }
+      setSubmitErrors({})
     }
   }, [open, initial, initialFotos])
 
-  const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }))
+  const set = (k: string, v: string) => {
+    setForm((f) => ({ ...f, [k]: v }))
+    if (k === 'towerId' && v) {
+      setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
+    }
+    if (k === 'lokasiDetail' && v.trim()) {
+      setSubmitErrors((prev) => ({ ...prev, lokasiDetail: undefined }))
+    }
+    if (k === 'levelRisiko' && v) {
+      setSubmitErrors((prev) => ({ ...prev, levelRisiko: undefined }))
+    }
+  }
+
+  function validateRequiredFields() {
+    const nextErrors: SubmitErrors = {}
+    if (!form.towerId) nextErrors.towerId = 'Ruas wajib diisi'
+    if (!form.levelRisiko) nextErrors.levelRisiko = 'Status Kerawanan wajib diisi'
+    if (!initial && fotos.length === 0 && fotoUrls.length === 0) {
+      nextErrors.foto = 'Foto Bukti Terjadinya Kerawanan wajib diisi'
+    }
+    setSubmitErrors(nextErrors)
+    return Object.keys(nextErrors).length === 0
+  }
 
   const handleDetectLocation = () => {
     if (readOnly || locating) return
@@ -2220,6 +2409,7 @@ function LaporanDrawer({
         const towerRadius = nearest?.radius ?? 100
         if (nearest && min <= towerRadius) {
           setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: nearest!.nomorTower }))
+          setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
           setGpsLocked(true)
           setDetectedMsg(`📍 Tower ${nearest.nomorTower} (${Math.round(min)}m)`)
           toast.success('Tower terdekat dipilih!')
@@ -2246,6 +2436,7 @@ function LaporanDrawer({
             const towerRadius = nearest?.radius ?? 100
             if (nearest && min <= towerRadius) {
               setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: nearest!.nomorTower }))
+              setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
               setDetectedMsg(`📍 Tower ${nearest.nomorTower} (${Math.round(min)}m)`)
               toast.success('Tower terdekat dipilih!')
             } else if (nearest) {
@@ -2273,8 +2464,8 @@ function LaporanDrawer({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (readOnly) { onClose(); return }
-    if (!form.towerId) { toast.error('Pilih tower terlebih dahulu'); return }
-    if (!form.jenisGangguan) { toast.error('Pilih kategori gangguan'); return }
+    if (!validateRequiredFields()) return
+    if (!form.jenisGangguan) { toast.error('Pilih kategori kerawanan'); return }
     setSaving(true)
     try {
       let uploadedUrls: string[] = []
@@ -2326,7 +2517,7 @@ function LaporanDrawer({
   const isCUI = form.jenisGangguan === 'cui'
   const isCleanup = form.jenisGangguan === 'cleanup'
   const isGangg = !isPPL && !isCUI && !isCleanup && !!form.jenisGangguan
-  const title = readOnly ? 'Detail Laporan' : initial ? 'Edit Laporan' : 'Buat Laporan Gangguan'
+  const title = readOnly ? 'Detail Laporan' : initial ? 'Edit Laporan' : 'Buat Laporan Baru'
   const formBody = (
     <form id="laporan-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
 
@@ -2345,7 +2536,9 @@ function LaporanDrawer({
 
       {/* Foto bukti */}
       <div>
-        <label className="block text-[14px] font-bold text-app-text mb-2">Foto Bukti Terjadinya Kerawanan</label>
+        <label className="block text-[14px] font-bold text-app-text mb-2">
+          Foto Bukti Terjadinya Kerawanan <span className="text-[#EF4444]">*</span>
+        </label>
         {/* Desktop: grid preview of existing foto URLs — click to lightbox */}
         {!isMobile && fotoUrls.length > 0 && (
           <div className="grid grid-cols-4 gap-2 mb-2">
@@ -2395,18 +2588,26 @@ function LaporanDrawer({
         {!readOnly && !isMobile && (
           <FotoUpload
             fotos={fotos}
-            onChange={setFotos}
+            onChange={(nextFotos) => {
+              setFotos(nextFotos)
+              if (nextFotos.length > 0) {
+                setSubmitErrors((prev) => ({ ...prev, foto: undefined }))
+              }
+            }}
             onPhotoAdded={handleDetectLocation}
             onPreview={(i) => setLightbox({ urls: fotos.map((f) => URL.createObjectURL(f)), index: i })}
           />
         )}
+        {submitErrors.foto && (
+          <p className="mt-2 text-[12px] font-medium text-[#EF4444]">{submitErrors.foto}</p>
+        )}
       </div>
 
       {/* Tower terdampak & Span */}
-      <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>
+      <div className="grid grid-cols-2 gap-4">
         <div className="flex-1 min-w-0">
           <label className="block text-[14px] font-bold text-app-text mb-2">
-            {isPPL ? 'No. Ruas' : 'Ruas Terganggu'}
+            Ruas <span className="text-[#EF4444]">*</span>
           </label>
           {readOnly ? (
             <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
@@ -2435,60 +2636,45 @@ function LaporanDrawer({
             <TowerDropdown
               options={towerOptions}
               value={form.towerId}
-              onChange={(id, label) => setForm(f => ({ ...f, towerId: id, towerLabel: label }))}
+              onChange={(id, label) => {
+                setForm(f => ({ ...f, towerId: id, towerLabel: label }))
+                if (id) {
+                  setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
+                }
+              }}
             />
+          )}
+          {submitErrors.towerId && (
+            <p className="mt-2 text-[12px] font-medium text-[#EF4444]">{submitErrors.towerId}</p>
           )}
         </div>
 
-        {/* Span — free text, optional, semua jenis laporan */}
-        {isPPL && (
-          <div className="flex-1 min-w-0">
-            <label className="block text-[14px] font-bold text-app-text mb-2">Span</label>
-            <div className="relative">
-              <input
-                type="text"
-                disabled={readOnly}
-                value={form.lokasiDetail}
-                onChange={e => set('lokasiDetail', e.target.value)}
-                placeholder="Contoh: T-23 - T-25"
-                className="form-input pr-8"
-              />
-              {form.lokasiDetail && !readOnly && (
-                <button type="button" onClick={() => set('lokasiDetail', '')} className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <X size={14} className="text-[#97AAB3]" />
-                </button>
-              )}
-            </div>
+        {/* Span */}
+        <div className="flex-1 min-w-0">
+          <label className="block text-[14px] font-bold text-app-text mb-2">Span <span className="font-normal text-app-subtle text-[12px]">(Opsional)</span></label>
+          <div className="relative">
+            <input
+              type="text"
+              disabled={readOnly}
+              value={form.lokasiDetail}
+              onChange={e => set('lokasiDetail', e.target.value)}
+              placeholder="Contoh: T-23 - T-25"
+              className="form-input pr-8"
+            />
+            {form.lokasiDetail && !readOnly && (
+              <button type="button" onClick={() => set('lokasiDetail', '')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                <X size={14} className="text-[#97AAB3]" />
+              </button>
+            )}
           </div>
-        )}
+          {submitErrors.lokasiDetail && (
+            <p className="mt-2 text-[12px] font-medium text-[#EF4444]">{submitErrors.lokasiDetail}</p>
+          )}
+        </div>
       </div>
 
-      {/* GPS checkbox */}
-      {!readOnly && (
-        <div className="flex items-center gap-2.5">
-          <div
-            onClick={() => setUseGPS(v => !v)}
-            className={`w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-colors shrink-0 ${useGPS ? 'bg-[#076C9E] border-[#076C9E]' : 'border-app-border bg-white'}`}
-          >
-            {useGPS && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-          </div>
-          <button
-            id="btn-detect-location"
-            type="button"
-            onClick={() => { setUseGPS(true); if (!locating) handleDetectLocation() }}
-            className="text-[13px] text-app-text"
-          >
-            Gunakan lokasi anda saat ini.
-          </button>
-          {locating && <span className="text-[11px] text-[#076C9E] animate-pulse">Mendeteksi...</span>}
-        </div>
-      )}
-      {detectedMsg && (
-        <p className={`text-[12px] font-medium -mt-2 ${detectedMsg.includes('⚠️') ? 'text-orange-600' : 'text-green-600'}`}>{detectedMsg}</p>
-      )}
-
       {/* Jenis & Status Kerawanan */}
-      <div className={isPPL ? "grid grid-cols-2 gap-4" : "block"}>
+      <div className="grid grid-cols-2 gap-4">
         <div className="flex-1 min-w-0">
           <label className="block text-[14px] font-bold text-app-text mb-2">Jenis Kerawanan</label>
           {isMobile && !readOnly ? (
@@ -2521,55 +2707,41 @@ function LaporanDrawer({
           )}
         </div>
 
-        {isPPL && (
-          <div className="flex-1 min-w-0">
-            <label className="block text-[14px] font-bold text-app-text mb-2">Status Kerawanan</label>
-            {isMobile && !readOnly ? (
-              <button
-                type="button"
-                onClick={() => setLevelSheetOpen(true)}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  width: '100%', padding: '10px 14px', background: '#FFFFFF',
-                  border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
-                }}
-              >
-                <span style={{ fontSize: 14, color: form.levelRisiko ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
-                  {LEVEL_OPTIONS.find(l => l.value === form.levelRisiko)?.label || 'Pilih status...'}
-                </span>
-                <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
-              </button>
-            ) : (
-              <select
-                disabled={readOnly}
-                value={form.levelRisiko}
-                onChange={(e) => set('levelRisiko', e.target.value)}
-                className={`form-input truncate pr-8 ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
-              >
-                {LEVEL_OPTIONS.map(l => (
-                  <option key={l.value} value={l.value}>{l.label}</option>
-                ))}
-              </select>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Progres Laporan */}
-      {!readOnly && (
-        <div>
-          <label className={`block font-bold text-app-text mb-2 text-[14px]`}>Progres Laporan</label>
-          <select
-            value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(form.progresLaporan) ? 'tidak_ada_aktifitas' : form.progresLaporan}
-            onChange={(e) => set('progresLaporan', e.target.value)}
-            className="form-input"
-          >
-            <option value="sedang_berlangsung">Sedang Berlangsung</option>
-            <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
-            <option value="selesai">Selesai</option>
-          </select>
+        <div className="flex-1 min-w-0">
+          <label className="block text-[14px] font-bold text-app-text mb-2">Status Kerawanan</label>
+          {isMobile && !readOnly ? (
+            <button
+              type="button"
+              onClick={() => setLevelSheetOpen(true)}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                width: '100%', padding: '10px 14px', background: '#FFFFFF',
+                border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+              }}
+            >
+              <span style={{ fontSize: 14, color: form.levelRisiko ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }}>
+                {LEVEL_OPTIONS.find(l => l.value === form.levelRisiko)?.label || 'Pilih status...'}
+              </span>
+              <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+            </button>
+          ) : (
+            <select
+              disabled={readOnly}
+              value={form.levelRisiko}
+              onChange={(e) => set('levelRisiko', e.target.value)}
+              className={`form-input truncate pr-8 ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
+            >
+              <option value="">Pilih status...</option>
+              {LEVEL_OPTIONS.map(l => (
+                <option key={l.value} value={l.value}>{l.label}</option>
+              ))}
+            </select>
+          )}
+          {submitErrors.levelRisiko && (
+            <p className="mt-2 text-[12px] font-medium text-[#EF4444]">{submitErrors.levelRisiko}</p>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Uraian Pekerjaan / Deskripsi */}
       <div>
@@ -2583,7 +2755,7 @@ function LaporanDrawer({
             value={form.deskripsi}
             onChange={(e) => set('deskripsi', e.target.value)}
             className="form-input resize-none w-full"
-            placeholder={isPPL ? 'Proyek renovasi gudang menggunakan alat berat crane' : 'Deskripsi gangguan...'}
+            placeholder={isPPL ? 'Proyek renovasi gudang menggunakan alat berat crane' : 'Deskripsi Kerawanan...'}
           />
           {form.deskripsi && !readOnly && (
             <button type="button" onClick={() => set('deskripsi', '')} className="absolute bottom-3 right-3">
@@ -2592,20 +2764,6 @@ function LaporanDrawer({
           )}
         </div>
       </div>
-
-      {!isPPL && (
-        <div>
-          <label className="block text-[14px] font-bold text-app-text mb-2">Keterangan</label>
-          <textarea
-            disabled={readOnly}
-            rows={4}
-            value={form.keterangan}
-            onChange={(e) => set('keterangan', e.target.value)}
-            className="form-input resize-none"
-            placeholder="Catatan tambahan laporan..."
-          />
-        </div>
-      )}
 
       {/* Pekerjaan Pihak Lain section */}
       {isPPL && (
@@ -2654,14 +2812,45 @@ function LaporanDrawer({
             </div>
           </div>
 
-          {!readOnly && (
-            <>
-              <div style={{ margin: '8px -20px 0', height: 8, background: '#F6F9FC' }} />
-              <div style={{ padding: '12px 0 4px' }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>Informasi Progres Laporan</h3>
-              </div>
-            </>
-          )}
+        </>
+      )}
+
+      {/* Upaya Pengendalian (Opsional) — common (PPL + non-PPL) */}
+      {!readOnly && (
+        <div>
+          <label className="block text-[14px] font-bold text-app-text mb-2">
+            Upaya Pengendalian <span className="font-normal text-[#5F737F]">(Opsional)</span>
+          </label>
+          <textarea
+            disabled={readOnly}
+            rows={4}
+            value={form.keterangan}
+            onChange={(e) => set('keterangan', e.target.value)}
+            className="form-input resize-none w-full"
+            placeholder="sudah di lakukan pemasangan banner, sudah di sosialisasikan dan sudah dibuatkan (BA)"
+          />
+        </div>
+      )}
+
+      {/* Informasi Progres Laporan section */}
+      {!readOnly && (
+        <>
+          <div style={{ margin: '8px -20px 0', height: 8, background: '#F6F9FC' }} />
+          <div style={{ padding: '12px 0 4px' }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1B1B1B' }}>Informasi Progres Laporan</h3>
+          </div>
+          <div>
+            <label className="block text-[14px] font-bold text-app-text mb-2">Progres Laporan</label>
+            <select
+              value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(form.progresLaporan) ? 'tidak_ada_aktifitas' : form.progresLaporan}
+              onChange={(e) => set('progresLaporan', e.target.value)}
+              className="form-input"
+            >
+              <option value="sedang_berlangsung">Sedang Berlangsung</option>
+              <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
+              <option value="selesai">Selesai</option>
+            </select>
+          </div>
         </>
       )}
 
@@ -2680,27 +2869,35 @@ function LaporanDrawer({
         </div>
       )}
 
-      {isGangg && (
-        <div className="space-y-4 p-4 bg-app-bg rounded-xl border border-app-border">
-          <p className="text-[11px] font-bold text-app-muted uppercase tracking-wider">Detail Gangguan Teknis</p>
-          <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Penyebab</label><input disabled={readOnly} type="text" value={form.penyebab} onChange={(e) => set('penyebab', e.target.value)} className="form-input" /></div>
-          <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Durasi (jam)</label><input disabled={readOnly} type="number" value={form.durasi} onChange={(e) => set('durasi', e.target.value)} className="form-input" /></div>
-        </div>
-      )}
 
       {/* Tanggal & Waktu — editable by admin, readonly for teknisi, hidden for teknisi on create */}
-      {(readOnly || !!initial || isAdmin() || isSuperadmin()) && (
-        <div>
-          <label className="block text-[12px] font-semibold text-app-text mb-1.5">Dibuat pada</label>
-          <input
-            disabled={readOnly || (!isAdmin() && !isSuperadmin())}
-            type="datetime-local"
-            value={form.tanggalWaktu}
-            onChange={(e) => set('tanggalWaktu', e.target.value)}
-            className={`form-input ${(readOnly || (!isAdmin() && !isSuperadmin())) ? 'bg-app-bg text-app-muted' : ''}`}
-          />
-        </div>
-      )}
+      {(readOnly || !!initial || isAdmin() || isSuperadmin()) && (() => {
+        const dtDisabled = readOnly || (!isAdmin() && !isSuperadmin())
+        const [datePart, timePart] = (form.tanggalWaktu || 'T').split('T')
+        const onDateChange = (d: string) => set('tanggalWaktu', `${d}T${timePart || '00:00'}`)
+        const onTimeChange = (t: string) => set('tanggalWaktu', `${datePart || jakartaDatetimeLocalString().split('T')[0]}T${t}`)
+        return (
+          <div>
+            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Dibuat pada</label>
+            <div className="flex gap-2">
+              <input
+                disabled={dtDisabled}
+                type="date"
+                value={datePart || ''}
+                onChange={(e) => onDateChange(e.target.value)}
+                className={`form-input flex-1 ${dtDisabled ? 'bg-app-bg text-app-muted' : ''}`}
+              />
+              <input
+                disabled={dtDisabled}
+                type="time"
+                value={timePart || ''}
+                onChange={(e) => onTimeChange(e.target.value)}
+                className={`form-input w-[120px] ${dtDisabled ? 'bg-app-bg text-app-muted' : ''}`}
+              />
+            </div>
+          </div>
+        )
+      })()}
 
       <div>
         <label className="block text-[12px] font-semibold text-app-text mb-1.5">Pelapor</label>
@@ -2731,7 +2928,12 @@ function LaporanDrawer({
         value={towerSheetTarget === 'end' ? form.towerIdEnd : form.towerId}
         onSelect={(id, label) => {
           if (towerSheetTarget === 'end') setForm(f => ({ ...f, towerIdEnd: id, towerLabelEnd: label }))
-          else setForm(f => ({ ...f, towerId: id, towerLabel: label }))
+          else {
+            setForm(f => ({ ...f, towerId: id, towerLabel: label }))
+            if (id) {
+              setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
+            }
+          }
         }}
         onClose={() => setTowerSheetOpen(false)}
       />
@@ -2744,6 +2946,9 @@ function LaporanDrawer({
           )
           const next = [...fotos, ...valid].slice(0, 10)
           setFotos(next)
+          if (next.length > 0) {
+            setSubmitErrors((prev) => ({ ...prev, foto: undefined }))
+          }
           if (valid.length > 0) handleDetectLocation()
         }}
       />
@@ -2966,7 +3171,7 @@ export default function GangguanPage() {
         jenisGangguan: jenis.length ? jenis.join(',') : undefined,
         status: statusFilter.length ? statusFilter.join(',') : undefined,
         levelRisiko: levelFilter.length ? levelFilter.join(',') : undefined,
-        towerId: towerFilter.length ? towerFilter.join(',') : undefined,
+        jalur: towerFilter.length ? towerFilter.join(',') : undefined,
         teknisi: teknisiFilter.length ? teknisiFilter.join(',') : undefined,
         tglMulai: tglMulai || undefined,
         tglAkhir: tglAkhir || undefined,
@@ -3008,12 +3213,43 @@ export default function GangguanPage() {
       .catch(() => { })
   }, [])
 
+  // Filter the Line Walker dropdown to teknisi-role users only.
+  const teknisiOptions = pegawaiOptions.filter(p => (p?.role ?? '').toLowerCase() === 'teknisi')
+
+  // Distinct ruas (jalur) for the Ruas filter dropdown.
+  const jalurOptions = (() => {
+    const seen = new Set<string>()
+    const out: { value: string; label: string }[] = []
+    for (const t of towerOptions) {
+      const j = (t.jalur ?? '').trim()
+      if (!j || seen.has(j)) continue
+      seen.add(j)
+      out.push({ value: j, label: j })
+    }
+    return out.sort((a, b) => a.label.localeCompare(b.label))
+  })()
+
+  // For teknisi role: lock the Line Walker filter to themselves so they
+  // only ever see their own laporan. The filter UI is hidden below.
+  useEffect(() => {
+    if (isTeknisi()) {
+      const me = getUser()?.nama
+      if (me) setTeknisiFilter([me])
+    }
+  }, [])
+
   function resetFilters() {
     setSearch('')
     setJenis([])
     setStatusFilter([])
     setLevelFilter([])
-    setTeknisiFilter([])
+    // Teknisi role: keep locked to own name even after reset.
+    if (isTeknisi()) {
+      const me = getUser()?.nama
+      setTeknisiFilter(me ? [me] : [])
+    } else {
+      setTeknisiFilter([])
+    }
     setTowerFilter([])
     setTglMulai('')
     setTglAkhir('')
@@ -3099,14 +3335,8 @@ export default function GangguanPage() {
               {hasActiveFilters && <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#D92D20]" />}
             </button>
           </div>
-          {/* Row 2: Import + Tambah Laporan Baru */}
+          {/* Row 2: Tambah Laporan Baru */}
           <div className="flex gap-2">
-            <button
-              onClick={() => setImportOpen(true)}
-              className="flex-1 h-11 rounded-[22px] bg-white border border-[#076c9e] text-[#076c9e] font-semibold text-[14px] cursor-pointer flex items-center justify-center gap-2"
-            >
-              <Upload size={16} /> Import Excel
-            </button>
             <button
               onClick={openAdd}
               className="flex-1 h-11 rounded-[22px] bg-[#076c9e] text-white font-semibold text-[14px] border-none cursor-pointer flex items-center justify-center gap-2"
@@ -3203,28 +3433,29 @@ export default function GangguanPage() {
                     </div>
                     <div style={{ height: 1, background: '#E1E8EC' }} />
 
-                    {/* Teknisi / Line Walker */}
-                    <div style={{ padding: '12px 16px' }}>
-                      <SearchableSelect
-                        label="Line Walker / Teknisi"
-                        placeholder="Pilih petugas..."
-                        options={pegawaiOptions.map(p => ({ value: p.nama, label: p.nama, sub: `${p.jabatan} · ${p.unit}` }))}
-                        values={teknisiFilter}
-                        onChange={(vals) => { setTeknisiFilter(vals); setPage(1) }}
-                        onClear={() => { setTeknisiFilter([]); setPage(1) }}
-                      />
-                    </div>
-                    <div style={{ height: 1, background: '#E1E8EC' }} />
+                    {/* Teknisi / Line Walker — hidden for teknisi role (auto-filtered to themselves) */}
+                    {!isTeknisi() && (
+                      <>
+                        <div style={{ padding: '12px 16px' }}>
+                          <SearchableSelect
+                            label="Line Walker / Teknisi"
+                            placeholder="Pilih petugas..."
+                            options={teknisiOptions.map(p => ({ value: p.nama, label: p.nama, sub: `${p.jabatan} · ${p.unit}` }))}
+                            values={teknisiFilter}
+                            onChange={(vals) => { setTeknisiFilter(vals); setPage(1) }}
+                            onClear={() => { setTeknisiFilter([]); setPage(1) }}
+                          />
+                        </div>
+                        <div style={{ height: 1, background: '#E1E8EC' }} />
+                      </>
+                    )}
 
-                    {/* Tower Name */}
+                    {/* Ruas (jalur) */}
                     <div style={{ padding: '12px 16px' }}>
                       <SearchableSelect
                         label="Ruas"
                         placeholder="Pilih ruas..."
-                        options={towerOptions.map(t => {
-                          const { label, sub } = parseTowerDisplay(t)
-                          return { value: t.id, label, sub }
-                        })}
+                        options={jalurOptions}
                         values={towerFilter}
                         onChange={(vals) => { setTowerFilter(vals); setPage(1) }}
                         onClear={() => { setTowerFilter([]); setPage(1) }}
@@ -3258,14 +3489,8 @@ export default function GangguanPage() {
             </div>
           </div>
 
-          {/* Right: Import + Add buttons */}
+          {/* Right: Add button */}
           <div style={{ display: 'flex', gap: 8 }}>
-            <button
-              onClick={() => setImportOpen(true)}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', height: 44, borderRadius: 22, background: '#FFFFFF', border: '1px solid #076c9e', color: '#076c9e', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14, cursor: 'pointer', whiteSpace: 'nowrap' }}
-            >
-              <Upload size={16} /> Import Excel
-            </button>
             <button
               onClick={openAdd}
               style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', height: 44, borderRadius: 22, background: '#076c9e', border: 'none', color: '#FFFFFF', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14, cursor: 'pointer', whiteSpace: 'nowrap' }}
@@ -3319,7 +3544,7 @@ export default function GangguanPage() {
                     <td className="text-[14px] text-[#5f737f]">{row.pelapor?.nama ?? '—'}</td>
                     <td><LevelBadge level={row.levelRisiko} /></td>
                     <td><ProgressBadge tipe={row.progresLaporan} /></td>
-                    <td className="text-center">
+                    <td className="text-center" onClick={(e) => e.stopPropagation()}>
                       <RowActions
                         row={row}
                         onDetail={openDetail}
@@ -3501,27 +3726,26 @@ export default function GangguanPage() {
               })}
             </div>
 
-            {/* Teknisi / Line Walker (Mobile) */}
-            <div className="mb-5">
-              <SearchableSelect
-                label="Line Walker / Teknisi"
-                placeholder="Pilih petugas..."
-                options={pegawaiOptions.map(p => ({ value: p.nama, label: p.nama, sub: `${p.jabatan} · ${p.unit}` }))}
-                values={teknisiFilter}
-                onChange={(vals) => { setTeknisiFilter(vals); setPage(1) }}
-                onClear={() => { setTeknisiFilter([]); setPage(1) }}
-              />
-            </div>
+            {/* Teknisi / Line Walker — hidden for teknisi role */}
+            {!isTeknisi() && (
+              <div className="mb-5">
+                <SearchableSelect
+                  label="Line Walker / Teknisi"
+                  placeholder="Pilih petugas..."
+                  options={teknisiOptions.map(p => ({ value: p.nama, label: p.nama, sub: `${p.jabatan} · ${p.unit}` }))}
+                  values={teknisiFilter}
+                  onChange={(vals) => { setTeknisiFilter(vals); setPage(1) }}
+                  onClear={() => { setTeknisiFilter([]); setPage(1) }}
+                />
+              </div>
+            )}
 
-            {/* Tower Name (Mobile) */}
+            {/* Ruas (jalur) */}
             <div className="mb-5">
               <SearchableSelect
                 label="Ruas"
                 placeholder="Pilih ruas..."
-                options={towerOptions.map(t => {
-                  const { label, sub } = parseTowerDisplay(t)
-                  return { value: t.id, label, sub }
-                })}
+                options={jalurOptions}
                 values={towerFilter}
                 onChange={(vals) => { setTowerFilter(vals); setPage(1) }}
                 onClear={() => { setTowerFilter([]); setPage(1) }}

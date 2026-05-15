@@ -1,4 +1,4 @@
-const CACHE = 'spektra-v1'
+const CACHE = 'spektra-v2'
 const SHELL = ['/login', '/manifest.json']
 
 self.addEventListener('install', (e) => {

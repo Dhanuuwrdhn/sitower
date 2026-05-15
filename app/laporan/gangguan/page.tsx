@@ -3553,7 +3553,7 @@ export default function GangguanPage() {
                 ))
               ) : rows.length === 0 ? (
                 <tr>
-                  <td colSpan={7}><EmptyState title="Belum ada data Riwayat Kerawanan Transmisi." /></td>
+                  <td colSpan={7}><EmptyState title={isTeknisi() ? "Belum ada laporan kerawanan" : "Belum ada data Riwayat Kerawanan Transmisi."} /></td>
                 </tr>
               ) : (
                 rows.map((row) => (

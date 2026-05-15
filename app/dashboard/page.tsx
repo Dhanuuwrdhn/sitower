@@ -24,7 +24,7 @@ interface RecentRow {
   tanggal: string
   ruas: string
   jenisGangguan: string
-  teknisi: string
+  lineWalker: string
   levelRisiko: string
   progresLaporan: string | null
 }
@@ -69,22 +69,23 @@ function normalizeProgresValue(v: string | null | undefined): string {
 }
 
 function LevelBadge({ level }: { level: string }) {
-  const cfg = LEVEL_BADGE[level]
-  if (!cfg) return <span style={{ color: '#5f737f' }}>—</span>
+  const cfg = LEVEL_BADGE[level?.toLowerCase()]
+  if (!cfg) return <span style={{ color: '#5f737f', fontSize: 12 }}>—</span>
+  const blink = level?.toLowerCase() === 'kritis_tidak_terpenuhi'
   return (
-    <span style={{ backgroundColor: cfg.bg, color: cfg.text, borderRadius: 6, padding: '2px 10px', fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap' }}>
+    <span className={blink ? 'badge-blink' : undefined} style={{ background: cfg.bg, color: cfg.text, display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 10px', borderRadius: 99, fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>
       {cfg.label}
     </span>
   )
 }
 
 function ProgressBadge({ tipe }: { tipe: string | null }) {
-  if (!tipe) return <span style={{ color: '#5f737f' }}>—</span>
+  if (!tipe) return <span style={{ color: '#5f737f', fontSize: 12 }}>—</span>
   const key = normalizeProgresValue(tipe)
-  const cfg = PROGRESS_BADGE_COLOR[key] ?? { bg: '#F1F5F9', text: '#475569' }
+  const cfg = PROGRESS_BADGE_COLOR[key] ?? PROGRESS_BADGE_COLOR[tipe] ?? { bg: '#5F737F', text: '#FFFFFF' }
   const label = PROGRESS_TIPE_LABEL[key] ?? PROGRESS_TIPE_LABEL[tipe] ?? tipe
   return (
-    <span style={{ backgroundColor: cfg.bg, color: cfg.text, borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>
+    <span style={{ background: cfg.bg, color: cfg.text, display: 'inline-flex', alignItems: 'center', padding: '2px 10px', borderRadius: 99, fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>
       {label}
     </span>
   )
@@ -262,7 +263,7 @@ export default function DashboardPage() {
             tanggal: r.tanggal ?? '—',
             ruas: r.tower?.nama ?? r.tower?.id ?? r.towerId ?? '—',
             jenisGangguan: JENIS_LABEL[r.jenisGangguan] ?? r.jenisGangguan ?? '—',
-            teknisi: r.teknisi ?? r.pelapor?.nama ?? '—',
+            lineWalker: r.pelapor?.nama ?? '—',
             levelRisiko: r.levelRisiko ?? '—',
             progresLaporan: r.progresLaporan ?? r.latestProgressTipe ?? null,
           })))
@@ -475,7 +476,7 @@ export default function DashboardPage() {
                 <th>Tanggal</th>
                 <th>Ruas</th>
                 <th>Jenis Kerawanan</th>
-                <th>Teknisi</th>
+                <th>Line Walker</th>
                 <th>Status Kerawanan</th>
                 <th>Progres Laporan</th>
               </tr>
@@ -488,7 +489,7 @@ export default function DashboardPage() {
                     <span className="block truncate" title={row.ruas}>{row.ruas}</span>
                   </td>
                   <td className="text-[14px] text-[#5f737f]">{row.jenisGangguan}</td>
-                  <td className="text-[14px] text-[#5f737f]">{row.teknisi}</td>
+                  <td className="text-[14px] text-[#5f737f]">{row.lineWalker}</td>
                   <td><LevelBadge level={row.levelRisiko} /></td>
                   <td><ProgressBadge tipe={row.progresLaporan} /></td>
                 </tr>
@@ -517,7 +518,7 @@ export default function DashboardPage() {
               </div>
               <p className="dash-mobile-jenis">{row.jenisGangguan}</p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
-                <p className="dash-mobile-pelapor">Teknisi: <span>{row.teknisi}</span></p>
+                <p className="dash-mobile-pelapor">Line Walker: <span>{row.lineWalker}</span></p>
                 <ProgressBadge tipe={row.progresLaporan} />
               </div>
             </div>

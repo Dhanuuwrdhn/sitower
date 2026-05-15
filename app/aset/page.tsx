@@ -418,12 +418,6 @@ function AsetDetailDrawer({
                     <LabelValue label="Tipe" value={tower.tipe} weight="bold" />
                     <LabelValue label="Tegangan" value={tower.tegangan} weight="bold" />
                     <LabelValue label="Radius Deteksi (m)" value={tower.radius} weight="bold" />
-                                         <div className="flex flex-col gap-0.5">
-                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Kondisi</span>
-                        <div className="mt-1">
-                           <StatusBadge status={tower.kondisi} />
-                        </div>
-                     </div>
                     <div className="flex flex-col gap-0.5">
                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Status Sertifikat</span>
                        <div className="mt-1">
@@ -594,7 +588,6 @@ function AsetDetailDrawer({
 
 // ── Edit Drawer ───────────────────────────────────────────────────────────────
 
-const KONDISI_EDIT_OPTIONS = ['normal', 'waspada', 'gangguan', 'maintenance']
 const TIPE_EDIT_OPTIONS    = ['SUTET', 'SUTT', 'SKTT', 'garduInduk']
 
 function AsetEditDrawer({
@@ -629,7 +622,6 @@ function AsetEditDrawer({
         nama:      tower.nama     ?? '',
         tegangan:  tower.tegangan ?? '',
         tipe:      tower.tipe     ?? '',
-        kondisi:   tower.kondisi  ?? 'normal',
         lokasi:    tower.lokasi   ?? '',
         lat:       tower.lat      ?? '',
         lng:       tower.lng      ?? '',
@@ -700,12 +692,12 @@ function AsetEditDrawer({
                 </div>
              </div>
 
-             <div className="grid grid-cols-2 gap-4">
+             <div className="grid grid-cols-1 gap-4">
                 <div className="flex flex-col gap-1.5">
                    <label className="text-[12px] font-bold text-gray-700">Radius Deteksi (m)</label>
                    <input className="form-input rounded-xl" type="number" value={form.radius} onChange={e => set('radius', Number(e.target.value))} />
                 </div>
-                <CustomSelect label="Kondisi" value={form.kondisi} onChange={v => set('kondisi', v)} options={KONDISI_EDIT_OPTIONS} />             </div>
+             </div>
            </div>
 
            {/* LOKASI */}
@@ -835,7 +827,6 @@ function AsetAddDrawer({
     nama: '',
     tipe: 'SUTT',
     tegangan: '150kV',
-    kondisi: 'normal',
     lat: '',
     lng: '',
     lokasi: '',
@@ -865,7 +856,7 @@ function AsetAddDrawer({
       onSaved()
       onClose()
       setForm({
-        nama: '', tipe: 'SUTT', tegangan: '150kV', kondisi: 'normal',
+        nama: '', tipe: 'SUTT', tegangan: '150kV',
         lat: '', lng: '', lokasi: '', radius: 100, jalur: '', nomorUrut: '',
         hasCertificate: false
       })
@@ -910,12 +901,11 @@ function AsetAddDrawer({
                 </div>
              </div>
 
-             <div className="grid grid-cols-2 gap-4">
+             <div className="grid grid-cols-1 gap-4">
                 <div className="flex flex-col gap-1.5">
                    <label className="text-[12px] font-bold text-gray-700">Radius Deteksi (m)</label>
                    <input className="form-input rounded-xl" type="number" value={form.radius} onChange={e => set('radius', Number(e.target.value))} />
                 </div>
-                <CustomSelect label="Kondisi" value={form.kondisi} onChange={v => set('kondisi', v)} options={KONDISI_EDIT_OPTIONS} />
              </div>
            </div>
 

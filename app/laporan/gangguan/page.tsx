@@ -2213,13 +2213,30 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
 
 // ── Form drawer ───────────────────────────────────────────────────────────────
 
+// Format a Date as a "YYYY-MM-DDTHH:MM" string in Asia/Jakarta (WIB, UTC+7),
+// suitable for an <input type="datetime-local"> value. Using toISOString()
+// would yield UTC and show 7 hours behind for WIB users.
+function jakartaDatetimeLocalString(d: Date = new Date()): string {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: false,
+  }).formatToParts(d).reduce<Record<string, string>>((acc, p) => {
+    if (p.type !== 'literal') acc[p.type] = p.value
+    return acc
+  }, {})
+  // Intl can emit hour "24" at midnight in some locales; normalize.
+  const hour = parts.hour === '24' ? '00' : parts.hour
+  return `${parts.year}-${parts.month}-${parts.day}T${hour}:${parts.minute}`
+}
+
 const EMPTY_FORM = {
   towerId: '',
   towerLabel: '',
   towerIdEnd: '',       // span end tower (pekerjaan_pihak_lain)
   towerLabelEnd: '',
   jenisGangguan: '',
-  tanggalWaktu: new Date().toISOString().slice(0, 16),
+  tanggalWaktu: jakartaDatetimeLocalString(),
   levelRisiko: '',
   status: 'berlangsung',
   progresLaporan: 'sedang_berlangsung',
@@ -2296,7 +2313,9 @@ function LaporanDrawer({
           towerId: initial.towerId ?? '',
           towerLabel: initial.tower?.nama ?? initial.tower?.id ?? '',
           jenisGangguan: initial.jenisGangguan ?? '',
-          tanggalWaktu: initial.tanggal?.slice(0, 16) ?? new Date().toISOString().slice(0, 16),
+          tanggalWaktu: initial.tanggal
+            ? jakartaDatetimeLocalString(new Date(initial.tanggal))
+            : jakartaDatetimeLocalString(),
           levelRisiko: normalizeLevelValue(initial.levelRisiko) || 'sedang',
           status: initial.status ?? 'berlangsung',
           progresLaporan: initial.progresLaporan ?? 'sedang_berlangsung',
@@ -2345,7 +2364,6 @@ function LaporanDrawer({
   function validateRequiredFields() {
     const nextErrors: SubmitErrors = {}
     if (!form.towerId) nextErrors.towerId = 'Ruas wajib diisi'
-    if (!form.lokasiDetail.trim()) nextErrors.lokasiDetail = 'Span wajib diisi'
     if (!form.levelRisiko) nextErrors.levelRisiko = 'Status Kerawanan wajib diisi'
     if (!initial && fotos.length === 0 && fotoUrls.length === 0) {
       nextErrors.foto = 'Foto Bukti Terjadinya Kerawanan wajib diisi'
@@ -2611,7 +2629,7 @@ function LaporanDrawer({
 
         {/* Span */}
         <div className="flex-1 min-w-0">
-          <label className="block text-[14px] font-bold text-app-text mb-2">Span</label>
+          <label className="block text-[14px] font-bold text-app-text mb-2">Span <span className="font-normal text-app-subtle text-[12px]">(Opsional)</span></label>
           <div className="relative">
             <input
               type="text"

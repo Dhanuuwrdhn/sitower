@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useLayoutEffect, useState } from 'react'
-import { X, KeyRound, LogOut } from 'lucide-react'
+import { X, KeyRound, LogOut, Lock } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { authApi } from '@/lib/api'
 import {
@@ -211,46 +211,67 @@ export default function Sidebar() {
             </button>
           </div>
 
-          {/* User info — Figma: avatar circle + nama 16px/700 + jabatan 14px/500 */}
+          {/* Profile card — avatar + name + role + Request Ganti Password button */}
           {user && (
             <div style={{
-              padding: '16px',
-              borderBottom: '1px solid rgba(255,255,255,0.12)',
-              display: 'flex', alignItems: 'center', gap: 12,
-              flexShrink: 0, position: 'relative',
+              margin: '12px 16px',
+              padding: '14px',
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.10)',
+              borderRadius: 12,
+              display: 'flex', flexDirection: 'column', gap: 12,
+              flexShrink: 0,
             }}>
-              <div style={{
-                width: 44, height: 44, borderRadius: '50%',
-                background: 'rgba(255,255,255,0.2)',
-                border: '2px solid rgba(255,255,255,0.4)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff', fontWeight: 700, fontSize: 15,
-                flexShrink: 0, userSelect: 'none',
-              }}>
-                {getInitials(user.nama)}
-              </div>
-              <div style={{ overflow: 'hidden' }}>
-                <p style={{
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{
+                  width: 48, height: 48, borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.2)',
+                  border: '2px solid rgba(255,255,255,0.4)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: '#fff', fontWeight: 700, fontSize: 16,
-                  lineHeight: '24px', whiteSpace: 'nowrap',
-                  overflow: 'hidden', textOverflow: 'ellipsis',
+                  flexShrink: 0, userSelect: 'none',
                 }}>
-                  {user.nama}
-                </p>
-                <p style={{
-                  color: 'rgba(255,255,255,0.7)', fontSize: 13,
-                  lineHeight: '20px', whiteSpace: 'nowrap',
-                  overflow: 'hidden', textOverflow: 'ellipsis',
-                }}>
-                  {user.jabatan ?? user.unit ?? 'PLN'}
-                </p>
+                  {getInitials(user.nama)}
+                </div>
+                <div style={{ overflow: 'hidden', minWidth: 0, flex: 1 }}>
+                  <p style={{
+                    color: '#fff', fontWeight: 700, fontSize: 16,
+                    lineHeight: '22px', whiteSpace: 'nowrap',
+                    overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>
+                    {user.nama}
+                  </p>
+                  <p style={{
+                    color: 'rgba(255,255,255,0.75)', fontSize: 13,
+                    lineHeight: '18px', whiteSpace: 'nowrap',
+                    overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>
+                    {user.jabatan ?? user.unit ?? 'PLN'}
+                  </p>
+                </div>
               </div>
+              <button
+                type="button"
+                onClick={() => setShowChangePassword(true)}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  gap: 8, padding: '10px 14px',
+                  background: 'transparent',
+                  border: '1px solid rgba(255,255,255,0.45)',
+                  borderRadius: 8,
+                  color: '#FFFFFF', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                  minHeight: 40,
+                }}
+              >
+                <Lock size={15} />
+                Request Ganti Password
+              </button>
             </div>
           )}
 
-          {/* Nav menu — Figma: 8 items, 14px/500 */}
+          {/* Nav menu */}
           <nav style={{
-            flex: 1, overflowY: 'auto', padding: '12px 16px',
+            flex: 1, overflowY: 'auto', padding: '4px 16px 12px',
             position: 'relative',
           }}>
             {navItems.map(({ label, icon: Icon, href }) => (
@@ -264,52 +285,41 @@ export default function Sidebar() {
             ))}
           </nav>
 
-          {/* Bottom action items */}
+          {/* Keluar Akun — full-width prominent button */}
           <div style={{
+            padding: '12px 16px',
             borderTop: '1px solid rgba(255,255,255,0.10)',
-            padding: '8px 0',
             flexShrink: 0,
           }}>
             <button
               type="button"
-              onClick={() => setShowChangePassword(true)}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 20px', background: 'transparent', border: 'none',
-                color: '#FFFFFF', fontSize: 14, fontWeight: 500, cursor: 'pointer',
-                minHeight: 44,
-              }}
-            >
-              <KeyRound size={18} />
-              Request Ganti Password
-            </button>
-            <button
-              type="button"
               onClick={() => setShowLogoutConfirm(true)}
               style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 20px', background: 'transparent', border: 'none',
-                color: '#FCA5A5', fontSize: 14, fontWeight: 500, cursor: 'pointer',
-                minHeight: 44,
+                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: 10, padding: '12px 16px',
+                background: 'rgba(252,165,165,0.10)',
+                border: '1px solid rgba(252,165,165,0.45)',
+                borderRadius: 10,
+                color: '#FCA5A5', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                minHeight: 48,
               }}
             >
               <LogOut size={18} />
-              Keluar
+              Keluar Akun
             </button>
           </div>
 
           {/* Footer */}
           <div style={{
-            borderTop: '1px solid rgba(255,255,255,0.10)',
-            padding: '14px 16px',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+            padding: '10px 16px 14px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
             flexShrink: 0, position: 'relative',
           }}>
-            <p style={{ fontSize: 9, fontWeight: 500, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              Powered by
+            <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.01em' }}>
+              © 2026. PT PLN (Persero).
             </p>
-            <p style={{ fontSize: 13, fontWeight: 800, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.06em' }}>
-              Born2Works
+            <p style={{ fontSize: 9, fontWeight: 500, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              Powered by Born2Works
             </p>
           </div>
         </aside>

@@ -1847,7 +1847,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
               <InfoRow label="Informasi Pihak Lain" value={pihakLainMobile || '—'} />
               <InfoRow label="Contact Person" value={activeLaporan?.contactPerson || '—'} />
             </div>
-            <InfoRow label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'} value={activeLaporan?.deskripsi || '—'} />
+            <InfoRow label="Uraian Pekerjaan" value={activeLaporan?.deskripsi || '—'} />
 
             {fotoUrls.length > 0 && (
               <FileGroup label="Bukti Kerawanan" urls={fotoUrls} />
@@ -1859,9 +1859,11 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
               Informasi Pengendalian
             </span>
-            <div style={{ marginBottom: 12 }}>
-              <InfoRow label="Deskripsi Pengendalian" value={activeLaporan?.keterangan || '—'} />
-            </div>
+            {activeLaporan?.keterangan && (
+              <div style={{ marginBottom: 12 }}>
+                <InfoRow label="Upaya Pengendalian" value={activeLaporan.keterangan} />
+              </div>
+            )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <FileGroup label="Berita Acara" urls={(progress?.berita_acara ?? []).map((d: any) => d.fileUrl)} />
               <FileGroup label="Spanduk" urls={(progress?.spanduk ?? []).map((d: any) => d.fileUrl)} />
@@ -2062,7 +2064,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           {/* Row 2 */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, marginBottom: 20 }}>
             <InfoRow
-              label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'}
+              label="Uraian Pekerjaan"
               value={activeLaporan?.deskripsi || '—'}
             />
             <InfoRow
@@ -2104,10 +2106,12 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
         <div style={{ marginBottom: 32 }}>
           <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 20 }}>Informasi Pengendalian Kerawanan</span>
 
-          <div style={{ marginBottom: 20 }}>
-            <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{activeLaporan?.keterangan || '—'}</span>
-          </div>
+          {activeLaporan?.keterangan && (
+            <div style={{ marginBottom: 20 }}>
+              <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{activeLaporan.keterangan}</span>
+            </div>
+          )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, maxWidth: 640 }}>
             <div>
@@ -2746,7 +2750,7 @@ function LaporanDrawer({
       {/* Uraian Pekerjaan / Deskripsi */}
       <div>
         <label className="block text-[14px] font-bold text-app-text mb-2">
-          {isPPL ? <>Uraian Pekerjaan <span className="font-normal text-[#5F737F]">(Opsional)</span></> : 'Deskripsi'}
+          Uraian Pekerjaan <span className="font-normal text-[#5F737F]">(Opsional)</span>
         </label>
         <div className="relative">
           <textarea
@@ -2815,8 +2819,9 @@ function LaporanDrawer({
         </>
       )}
 
-      {/* Upaya Pengendalian (Opsional) — common (PPL + non-PPL) */}
-      {!readOnly && (
+      {/* Upaya Pengendalian — only on edit mode. Hidden on Tambah Laporan
+          (create) since the field is filled later via Perbarui Laporan. */}
+      {!readOnly && !!initial && (
         <div>
           <label className="block text-[14px] font-bold text-app-text mb-2">
             Upaya Pengendalian <span className="font-normal text-[#5F737F]">(Opsional)</span>

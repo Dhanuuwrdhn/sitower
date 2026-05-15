@@ -449,11 +449,11 @@ function TowerMarkers({
 // ─── Info popup ───────────────────────────────────────────────────────────────
 
 const RISIKO_LABEL: Record<string, string> = {
-  kritis_tidak_terpenuhi: 'KRITIS',
-  kritis_terpenuhi:       'KRITIS',
-  kritis:                 'RISIKO KRITIS',
-  sedang:                 'RISIKO SEDANG',
-  aman:                   'AMAN',
+  kritis_tidak_terpenuhi: 'Kritis',
+  kritis_terpenuhi:       'Kritis',
+  kritis:                 'Kritis',
+  sedang:                 'Sedang',
+  aman:                   'Aman',
 }
 
 function TowerPopup({ tower, onClose }: { tower: FeaturedTower; onClose: () => void }) {

@@ -22,12 +22,11 @@ interface Stats {
 interface RecentRow {
   id: string
   tanggal: string
-  towerNama: string
-  towerNo: string
+  ruas: string
   jenisGangguan: string
-  teknisi: string
+  lineWalker: string
   levelRisiko: string
-  latestProgressTipe: string | null
+  progresLaporan: string | null
 }
 
 const LEVEL_BADGE: Record<string, { bg: string; text: string; label: string }> = {
@@ -43,10 +42,10 @@ const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {
   berita_acara:        { bg: '#076C9E', text: '#FFFFFF' },
   spanduk:             { bg: '#076C9E', text: '#FFFFFF' },
   brosur:              { bg: '#076C9E', text: '#FFFFFF' },
-  sedang_berlangsung:  { bg: '#FFFAEB', text: '#F79009' },
-  selesai:             { bg: '#ECFDF3', text: '#039855' },
-  tidak_ada_aktifitas: { bg: '#F1F5F9', text: '#475569' },
-  tidak_ada_aktivitas: { bg: '#F1F5F9', text: '#475569' },
+  sedang_berlangsung:  { bg: '#076C9E', text: '#FFFFFF' },
+  selesai:             { bg: '#039855', text: '#FFFFFF' },
+  tidak_ada_aktifitas: { bg: '#66757F', text: '#FFFFFF' },
+  tidak_ada_aktivitas: { bg: '#66757F', text: '#FFFFFF' },
 }
 
 const PROGRESS_TIPE_LABEL: Record<string, string> = {
@@ -69,29 +68,24 @@ function normalizeProgresValue(v: string | null | undefined): string {
   return t
 }
 
-function extractTowerNo(nama?: string | null): string {
-  if (!nama) return '—'
-  const m = nama.match(/#(\d+)/)
-  return m ? `#${m[1]}` : '—'
-}
-
 function LevelBadge({ level }: { level: string }) {
-  const cfg = LEVEL_BADGE[level]
-  if (!cfg) return <span style={{ color: '#5f737f' }}>—</span>
+  const cfg = LEVEL_BADGE[level?.toLowerCase()]
+  if (!cfg) return <span style={{ color: '#5f737f', fontSize: 12 }}>—</span>
+  const blink = level?.toLowerCase() === 'kritis_tidak_terpenuhi'
   return (
-    <span style={{ backgroundColor: cfg.bg, color: cfg.text, borderRadius: 6, padding: '2px 10px', fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap' }}>
+    <span className={blink ? 'badge-blink' : undefined} style={{ background: cfg.bg, color: cfg.text, display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 10px', borderRadius: 99, fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>
       {cfg.label}
     </span>
   )
 }
 
 function ProgressBadge({ tipe }: { tipe: string | null }) {
-  if (!tipe) return <span style={{ color: '#5f737f' }}>—</span>
+  if (!tipe) return <span style={{ color: '#5f737f', fontSize: 12 }}>—</span>
   const key = normalizeProgresValue(tipe)
-  const cfg = PROGRESS_BADGE_COLOR[key] ?? { bg: '#F1F5F9', text: '#475569' }
+  const cfg = PROGRESS_BADGE_COLOR[key] ?? PROGRESS_BADGE_COLOR[tipe] ?? { bg: '#5F737F', text: '#FFFFFF' }
   const label = PROGRESS_TIPE_LABEL[key] ?? PROGRESS_TIPE_LABEL[tipe] ?? tipe
   return (
-    <span style={{ backgroundColor: cfg.bg, color: cfg.text, borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>
+    <span style={{ background: cfg.bg, color: cfg.text, display: 'inline-flex', alignItems: 'center', padding: '2px 10px', borderRadius: 99, fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>
       {label}
     </span>
   )
@@ -267,12 +261,11 @@ export default function DashboardPage() {
           setRecent(rows.slice(0, 5).map((r: any) => ({
             id: r.id,
             tanggal: r.tanggal ?? '—',
-            towerNama: r.tower?.nama ?? r.tower?.id ?? r.towerId ?? '—',
-            towerNo: extractTowerNo(r.tower?.nama),
+            ruas: r.tower?.nama ?? r.tower?.id ?? r.towerId ?? '—',
             jenisGangguan: JENIS_LABEL[r.jenisGangguan] ?? r.jenisGangguan ?? '—',
-            teknisi: r.teknisi ?? r.pelapor?.nama ?? '—',
+            lineWalker: r.pelapor?.nama ?? '—',
             levelRisiko: r.levelRisiko ?? '—',
-            latestProgressTipe: r.progresLaporan ?? r.latestProgressTipe ?? null,
+            progresLaporan: r.progresLaporan ?? r.latestProgressTipe ?? null,
           })))
         })
         .catch(() => {}),
@@ -305,11 +298,26 @@ export default function DashboardPage() {
             if (n.includes('SKTT') || n.includes('JOINT') || n.startsWith('TRS ')) return 'SKTT'
             return 'SUTT'
           }
-          // Transform aset towers to FeaturedTower format expected by TowerMapGoogle
+          // Transform aset towers to FeaturedTower format expected by TowerMapGoogle.
+          // Prefer the per-jenis `kerawanan` array from the backend (each entry
+          // carries the latest levelRisiko of its laporan). Fall back to the
+          // legacy `kerawanan_types` + overall `status` only if the new field is
+          // missing (older API response).
           const mapTowers = (overview.towers ?? []).map((t: any) => {
-            const types: string[] = t.kerawanan_types?.length
-              ? t.kerawanan_types
-              : (t.kerawanan_type ? [t.kerawanan_type] : [])
+            const items: { kategori: string; level: string; status: string }[] =
+              Array.isArray(t.kerawanan) && t.kerawanan.length > 0
+                ? t.kerawanan.map((k: any) => ({
+                    kategori: k.jenis,
+                    level:    k.level ?? 'aman',
+                    status:   k.level ?? 'aman',
+                  }))
+                : (t.kerawanan_types?.length
+                  ? t.kerawanan_types.map((jenis: string) => ({
+                      kategori: jenis,
+                      level:    (t.status ?? 'aman') as string,
+                      status:   t.status ?? 'aman',
+                    }))
+                  : [])
             return {
               id:         t.id,
               nama:       t.name,
@@ -318,13 +326,7 @@ export default function DashboardPage() {
               tipe:       t.tipe ?? getTipe(t.name),
               bersertifikat: t.bersertifikat ?? false,
               updatedAt:  t.updated_at ?? null,
-              kerawanan:  types.length > 0
-                ? types.map((jenis: string) => ({
-                    kategori: jenis,
-                    level:    (t.status ?? 'aman') as string,
-                    status:   t.status ?? 'aman',
-                  }))
-                : [],
+              kerawanan:  items,
             }
           })
           setTowerKerawanan(mapTowers)
@@ -479,11 +481,11 @@ export default function DashboardPage() {
         <div className="dash-table-wrap">
           <table className="dash-table">
             <thead>
-              <tr>
+                <tr>
                 <th>Tanggal</th>
                 <th>Ruas</th>
                 <th>Jenis Kerawanan</th>
-                <th>Teknisi</th>
+                <th>Line Walker</th>
                 <th>Status Kerawanan</th>
                 <th>Progres Laporan</th>
               </tr>
@@ -493,12 +495,12 @@ export default function DashboardPage() {
                 <tr key={row.id}>
                   <td className="text-[14px] text-[#5f737f] whitespace-nowrap">{formatTanggal(row.tanggal)}</td>
                   <td className="text-[14px] text-[#5f737f]" style={{ maxWidth: 220 }}>
-                    <span className="block truncate" title={row.towerNama}>{row.towerNama}</span>
+                    <span className="block truncate" title={row.ruas}>{row.ruas}</span>
                   </td>
                   <td className="text-[14px] text-[#5f737f]">{row.jenisGangguan}</td>
-                  <td className="text-[14px] text-[#5f737f]">{row.teknisi}</td>
+                  <td className="text-[14px] text-[#5f737f]">{row.lineWalker}</td>
                   <td><LevelBadge level={row.levelRisiko} /></td>
-                  <td><ProgressBadge tipe={row.latestProgressTipe} /></td>
+                  <td><ProgressBadge tipe={row.progresLaporan} /></td>
                 </tr>
               ))}
               {recent.length === 0 && (
@@ -518,15 +520,15 @@ export default function DashboardPage() {
             <div key={row.id} className="dash-mobile-card">
               <div className="dash-mobile-card-top">
                 <div>
-                  <p className="dash-mobile-tower">{row.towerNama}</p>
-                  <p className="dash-mobile-date">{formatTanggal(row.tanggal)} · {row.towerNo}</p>
+                  <p className="dash-mobile-tower">{row.ruas}</p>
+                  <p className="dash-mobile-date">{formatTanggal(row.tanggal)}</p>
                 </div>
                 <LevelBadge level={row.levelRisiko} />
               </div>
               <p className="dash-mobile-jenis">{row.jenisGangguan}</p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
-                <p className="dash-mobile-pelapor">Teknisi: <span>{row.teknisi}</span></p>
-                <ProgressBadge tipe={row.latestProgressTipe} />
+                <p className="dash-mobile-pelapor">Line Walker: <span>{row.lineWalker}</span></p>
+                <ProgressBadge tipe={row.progresLaporan} />
               </div>
             </div>
           ))}

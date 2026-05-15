@@ -14,6 +14,7 @@ export interface MenuItem {
 
 export function ActionMenu({ items }: { items: MenuItem[] }) {
   const [open, setOpen] = useState(false)
+  const [pos, setPos]   = useState({ top: 0, right: 0 })
   const btnRef  = useRef<HTMLButtonElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -31,11 +32,15 @@ export function ActionMenu({ items }: { items: MenuItem[] }) {
 
   function handleOpen(e: React.MouseEvent) {
     e.stopPropagation()
+    if (btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      setPos({ top: rect.bottom + 4, right: window.innerWidth - rect.right })
+    }
     setOpen((v) => !v)
   }
 
   return (
-    <div className="relative">
+    <div className="relative inline-flex">
       <button
         ref={btnRef}
         onClick={handleOpen}
@@ -44,10 +49,11 @@ export function ActionMenu({ items }: { items: MenuItem[] }) {
         <MoreHorizontal size={16} />
       </button>
 
-      {open && (
+      {open && typeof document !== 'undefined' && createPortal(
         <div
           ref={menuRef}
-          className="absolute z-[100] top-full right-0 mt-2 bg-white border border-app-border rounded-xl shadow-dropdown w-48 py-1 animate-in fade-in zoom-in duration-200 origin-top-right"
+          style={{ position: 'fixed', top: pos.top, right: pos.right, zIndex: 9999 }}
+          className="bg-white border border-app-border rounded-xl shadow-dropdown w-48 py-1 animate-in fade-in zoom-in duration-200 origin-top-right"
         >
           {items.map((item, i) => (
             <div key={i}>
@@ -67,7 +73,8 @@ export function ActionMenu({ items }: { items: MenuItem[] }) {
               </button>
             </div>
           ))}
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   )

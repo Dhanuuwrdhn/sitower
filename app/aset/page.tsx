@@ -1166,8 +1166,7 @@ export default function AsetPage() {
                 rows.map((row, i) => (
                   <tr 
                     key={`tower-${row.id}`} 
-                    onClick={() => { setDetailRow(row); setDetailOpen(true) }}
-                    className="hover:bg-gray-50/50 transition-colors group cursor-pointer"
+                    className="hover:bg-gray-50/50 transition-colors group"
                   >
                     <td className="px-6 py-4 text-gray-400 text-[12px]">{(page - 1) * limit + i + 1}</td>
                     <td className="px-6 py-4 font-bold text-gray-800">{row.nama ?? '—'}</td>

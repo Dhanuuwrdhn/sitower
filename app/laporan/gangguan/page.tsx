@@ -1313,13 +1313,6 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   const [riwayatForm, setRiwayatForm] = useState({ statusKerawanan: 'aman', progresLaporan: 'sedang_berlangsung', uraianPekerjaan: '', upayaPengendalian: '', pihakLain: '', contactPerson: '' })
   const [riwayatFiles, setRiwayatFiles] = useState<{ foto: File[]; beritaAcara: File[]; spanduk: File[]; surat: File[] }>({ foto: [], beritaAcara: [], spanduk: [], surat: [] })
   const [savingRiwayat, setSavingRiwayat] = useState(false)
-  const fotoInputRef = useRef<HTMLInputElement | null>(null)
-  const beritaInputRef = useRef<HTMLInputElement | null>(null)
-  const spandukInputRef = useRef<HTMLInputElement | null>(null)
-  const suratInputRef = useRef<HTMLInputElement | null>(null)
-  const riwayatFileRefs: Record<'foto' | 'beritaAcara' | 'spanduk' | 'surat', React.MutableRefObject<HTMLInputElement | null>> = {
-    foto: fotoInputRef, beritaAcara: beritaInputRef, spanduk: spandukInputRef, surat: suratInputRef,
-  }
   const progressRefs = useRef<Record<string, HTMLInputElement | null>>({})
   const user = getUser()
   const activeLaporan = detailLaporan ?? laporan
@@ -1534,33 +1527,35 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   // ── Helper for rendering file cards in update form
   function renderRiwayatUpload(field: keyof typeof riwayatFiles, label: string, icon?: React.ReactNode) {
     const files = riwayatFiles[field]
-    const inputRef = riwayatFileRefs[field]
-    const triggerPick = () => inputRef.current?.click()
+    const inputId = `riwayat-upload-${field}`
+    // <label htmlFor> on a real <input type="file"> opens the OS file picker
+    // when clicked — no ref / programmatic click() needed, which is the most
+    // reliable cross-browser pattern (works in Safari iOS, Android Chrome).
+    const hiddenInput = (
+      <input
+        id={inputId}
+        type="file"
+        accept="image/*,application/pdf,.pdf,.jpg,.jpeg,.png,.webp"
+        multiple
+        style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
+        onChange={e => {
+          if (e.target.files?.length) {
+            setRiwayatFiles(f => ({ ...f, [field]: Array.from(e.target.files!) }))
+          }
+          e.target.value = ''
+        }}
+      />
+    )
     return (
       <div style={{ flex: 1 }}>
         <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 8 }}>{label}</label>
-        {/* Hidden file input colocated with its trigger button so the ref is
-            guaranteed mounted at the same time. Inline display:none for safety
-            (no reliance on global '.hidden' utility class). */}
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*,.pdf"
-          multiple
-          style={{ display: 'none' }}
-          onChange={e => {
-            if (e.target.files?.length) {
-              setRiwayatFiles(f => ({ ...f, [field]: Array.from(e.target.files!) }))
-            }
-            e.target.value = ''
-          }}
-        />
+        {hiddenInput}
         {files.length === 0 ? (
-          <button type="button" onClick={triggerPick}
-            style={{ width: '100%', padding: '12px', border: '1px dashed #C5D3D9', borderRadius: 8, background: '#fff', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#5F737F' }}>
+          <label htmlFor={inputId}
+            style={{ width: '100%', padding: '12px', border: '1px dashed #C5D3D9', borderRadius: 8, background: '#fff', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#5F737F', boxSizing: 'border-box' }}>
             {icon || <Upload size={16} />}
             Pilih file
-          </button>
+          </label>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {files.map((file, idx) => {
@@ -1587,9 +1582,9 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                 </div>
               )
             })}
-            <button type="button" onClick={triggerPick} style={{ fontSize: 12, color: '#076C9E', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '4px 0', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <label htmlFor={inputId} style={{ fontSize: 12, color: '#076C9E', fontWeight: 600, cursor: 'pointer', textAlign: 'left', padding: '4px 0', display: 'inline-flex', alignItems: 'center', gap: 4, width: 'fit-content' }}>
               <Plus size={14} /> Tambah file lain
-            </button>
+            </label>
           </div>
         )}
       </div>

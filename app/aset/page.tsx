@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Eye, Pencil, X, MapPin, Zap, Activity, ExternalLink, Plus, Trash2, FileText, Upload, MoreHorizontal, ZoomIn, ZoomOut, Maximize2, SlidersHorizontal, Check } from 'lucide-react'
 import { towersApi, asetApi, jalurKmlApi, sertifikatApi } from '@/lib/api'
-import { isAdmin } from '@/lib/auth'
+import { isAdminOrSuperadmin } from '@/lib/auth'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { ActionMenu } from '@/components/ui/ActionMenu'
 import { Pagination } from '@/components/ui/Pagination'
@@ -357,11 +357,13 @@ function AsetDetailDrawer({
   open,
   onClose,
   onEdit,
+  canEdit,
 }: {
   towerId: string | null
   open: boolean
   onClose: () => void
   onEdit: (tower: any) => void
+  canEdit: boolean
 }) {
   const [tower, setTower] = useState<any>(null)
   const [loading, setLoading] = useState(false)
@@ -482,15 +484,17 @@ function AsetDetailDrawer({
                                 </div>
                                  <div className="p-3.5 border-t border-gray-50 flex items-center justify-between gap-2">
                                     <p className="text-[11.5px] font-bold text-gray-700 truncate" title={doc.namaFile}>{doc.namaFile}</p>
-                                    <button 
-                                      onClick={(e) => {
-                                        e.stopPropagation()
-                                        setConfirm({ open: true, docId: doc.id, loading: false })
-                                      }}
-                                      className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors shrink-0"
-                                    >
-                                       <Trash2 size={14} />
-                                    </button>
+                                    {canEdit && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          setConfirm({ open: true, docId: doc.id, loading: false })
+                                        }}
+                                        className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors shrink-0"
+                                      >
+                                         <Trash2 size={14} />
+                                      </button>
+                                    )}
                                  </div>
                             </div>
                           ))
@@ -571,14 +575,16 @@ function AsetDetailDrawer({
         />
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-100 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
-           <button 
-             onClick={() => onEdit(tower)} 
-             className="w-full py-3.5 rounded-xl border-2 border-blue-600 text-blue-600 font-bold text-[14px] hover:bg-blue-50 transition-colors"
-           >
-             Edit Detail Aset
-           </button>
-        </div>
+        {canEdit && (
+          <div className="p-6 border-t border-gray-100 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+             <button
+               onClick={() => onEdit(tower)}
+               className="w-full py-3.5 rounded-xl border-2 border-blue-600 text-blue-600 font-bold text-[14px] hover:bg-blue-50 transition-colors"
+             >
+               Edit Detail Aset
+             </button>
+          </div>
+        )}
       </div>
 
       <CertificatePreviewModal doc={selectedDoc} onClose={() => setSelectedDoc(null)} />
@@ -1035,7 +1041,7 @@ export default function AsetPage() {
   })
 
   const [isAdminUser, setIsAdminUser] = useState(false)
-  useEffect(() => { setIsAdminUser(isAdmin()) }, [])
+  useEffect(() => { setIsAdminUser(isAdminOrSuperadmin()) }, [])
 
   const [skttRoutes, setSkttRoutes] = useState<any[]>([])
   useEffect(() => {
@@ -1154,14 +1160,14 @@ export default function AsetPage() {
                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Tegangan</th>
                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Jalur Transmisi</th>
                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Sertifikat</th>
-                {isAdminUser && <th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">Aksi</th>}
+                <th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {loading ? (
-                <SkeletonRow cols={isAdminUser ? 8 : 7} rows={limit} />
+                <SkeletonRow cols={7} rows={limit} />
               ) : rows.length === 0 ? (
-                <tr><td colSpan={isAdminUser ? 8 : 7}><EmptyState title="Belum ada data aset." /></td></tr>
+                <tr><td colSpan={7}><EmptyState title="Belum ada data aset." /></td></tr>
               ) : (
                 rows.map((row, i) => (
                   <tr 
@@ -1186,15 +1192,15 @@ export default function AsetPage() {
                          </div>
                        )}
                     </td>
-                    {isAdminUser && (
-                      <td className="px-6 py-4 text-right">
-                        <ActionMenu items={[
-                          { label: 'Lihat Detail', icon: <Eye size={14} />, onClick: () => { setDetailRow(row); setDetailOpen(true) } },
+                    <td className="px-6 py-4 text-right">
+                      <ActionMenu items={[
+                        { label: 'Lihat Detail', icon: <Eye size={14} />, onClick: () => { setDetailRow(row); setDetailOpen(true) } },
+                        ...(isAdminUser ? [
                           { label: 'Edit', icon: <Pencil size={14} />, onClick: () => { setEditRow(row); setEditOpen(true) } },
                           { label: 'Hapus', icon: <Trash2 size={14} />, onClick: () => setDeleteConfirm({ open: true, tower: row, loading: false }), danger: true, dividerBefore: true },
-                        ]} />
-                      </td>
-                    )}
+                        ] : []),
+                      ]} />
+                    </td>
                   </tr>
                 ))
               )}
@@ -1252,11 +1258,12 @@ export default function AsetPage() {
       )} */}
 
       <AsetAddDrawer open={addOpen} onClose={() => setAddOpen(false)} onSaved={fetchData} />
-      <AsetDetailDrawer 
-        towerId={detailRow?.id ?? null} 
-        open={detailOpen} 
-        onClose={() => setDetailOpen(false)} 
-        onEdit={(row) => { setDetailOpen(false); setEditRow(row); setEditOpen(true); }} 
+      <AsetDetailDrawer
+        towerId={detailRow?.id ?? null}
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        onEdit={(row) => { setDetailOpen(false); setEditRow(row); setEditOpen(true); }}
+        canEdit={isAdminUser}
       />
       <AsetEditDrawer tower={editRow} open={editOpen} onClose={() => setEditOpen(false)} onSaved={fetchData} />
 

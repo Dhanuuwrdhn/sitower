@@ -1,19 +1,20 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import toast from 'react-hot-toast'
-import { Eye, Pencil, X, MapPin, Zap, Activity, ExternalLink, Plus, Trash2, FileText, Upload, MoreHorizontal, ZoomIn, ZoomOut, Maximize2, SlidersHorizontal, Check } from 'lucide-react'
+import { Eye, Pencil, X, MapPin, Zap, Activity, ExternalLink, Plus, Trash2, FileText, Upload, MoreHorizontal, ZoomIn, ZoomOut, Maximize2, SlidersHorizontal, Check, RotateCcw } from 'lucide-react'
 import { towersApi, asetApi, jalurKmlApi, sertifikatApi } from '@/lib/api'
-import { isAdmin } from '@/lib/auth'
+import { isAdminOrSuperadmin } from '@/lib/auth'
+import { useSidebar } from '@/components/layout/SidebarContext'
 import { StatusBadge } from '@/components/ui/StatusBadge'
-import { ActionMenu } from '@/components/ui/ActionMenu'
 import { Pagination } from '@/components/ui/Pagination'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonRow } from '@/components/ui/SkeletonRow'
 import { CustomSelect } from '@/components/ui/CustomSelect'
 
-const TIPE_CHIPS = ['SUTET', 'SUTT', 'SKTT', 'Gardu Induk']
+const TIPE_CHIPS = ['SUTET', 'SUTT', 'SKTT']
 const STATUS_CHIPS = ['Aman', 'Sedang', 'Kritis']
 const JENIS_CHIPS = [
   { id: 'pekerjaan_pihak_lain', label: 'Pekerjaan Pihak Lain (PPL)' },
@@ -53,9 +54,141 @@ function ProgresChip({ progres }: { progres?: string }) {
   return <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-semibold bg-blue-50 text-blue-700">{PROGRES_LABEL[progres] ?? progres}</span>
 }
 
-const TIPE_OPTIONS = ['Semua', 'SUTET', 'SUTT', 'SKTT', 'Gardu Induk']
+const TIPE_OPTIONS = ['Semua', 'SUTET', 'SUTT', 'SKTT']
 const KATEGORI_OPTIONS = ['Kelayakan', 'Grounding', 'Konstruksi', 'K3', 'Lingkungan']
 const STATUS_OPTIONS    = ['berlaku', 'expired']
+
+// ── Row action menu ───────────────────────────────────────────────────────────
+
+function RowActions({
+  row,
+  onDetail,
+  onEdit,
+  onDelete,
+  showEdit,
+}: {
+  row: any
+  onDetail: (row: any) => void
+  onEdit: (row: any) => void
+  onDelete: (row: any) => void
+  showEdit: boolean
+}) {
+  const [open, setOpen] = useState(false)
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 })
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handler(e: MouseEvent) {
+      if (
+        btnRef.current && !btnRef.current.contains(e.target as Node) &&
+        menuRef.current && !menuRef.current.contains(e.target as Node)
+      ) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+    const onScroll = () => setOpen(false)
+    window.addEventListener('scroll', onScroll, true)
+    return () => window.removeEventListener('scroll', onScroll, true)
+  }, [open])
+
+  function handleToggle(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      setMenuPos({ top: rect.bottom + 4, left: rect.right - 200 })
+    }
+    setOpen((v) => !v)
+  }
+
+  const menuStyle: React.CSSProperties = {
+    position: 'fixed',
+    top: menuPos.top,
+    left: menuPos.left,
+    zIndex: 9999,
+    background: '#FFFFFF',
+    borderRadius: 4,
+    boxShadow: '0px 4px 8px 0px rgba(28, 28, 28, 0.15)',
+    padding: '8px 0',
+    minWidth: 200,
+  }
+
+  const itemStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    padding: '8px 8px',
+    width: '100%',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: 14,
+    fontWeight: 500,
+    fontFamily: 'Inter, sans-serif',
+    color: '#5F737F',
+    lineHeight: '20px',
+    textAlign: 'left' as const,
+    transition: 'background 0.15s',
+  }
+
+  return (
+    <div className="inline-flex mx-auto">
+      <button
+        ref={btnRef}
+        onClick={handleToggle}
+        className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted hover:text-app-text transition-colors"
+        title="Aksi"
+      >
+        <MoreHorizontal size={16} />
+      </button>
+
+      {open && typeof document !== 'undefined' && createPortal(
+        <div ref={menuRef} style={menuStyle}>
+          <button
+            onClick={() => { setOpen(false); onDetail(row) }}
+            style={itemStyle}
+            onMouseEnter={(e) => (e.currentTarget.style.background = '#F6F9FC')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+          >
+            <Eye size={16} />
+            Lihat Detail
+          </button>
+
+          {showEdit && (
+            <>
+              <div style={{ height: 1, background: '#E1E8EC' }} />
+              <button
+                onClick={() => { setOpen(false); onEdit(row) }}
+                style={itemStyle}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#F6F9FC')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <Pencil size={16} />
+                Edit
+              </button>
+              <div style={{ height: 1, background: '#E1E8EC' }} />
+              <button
+                onClick={() => { setOpen(false); onDelete(row) }}
+                style={{ ...itemStyle, color: '#D92D20' }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#FEF3F2')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <Trash2 size={16} />
+                Hapus
+              </button>
+            </>
+          )}
+        </div>,
+        document.body
+      )}
+    </div>
+  )
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -189,17 +322,11 @@ function ConfirmModal({
 }
 
 function FilterPopover({
-  open,
-  onClose,
-  filters,
-  onApply,
-  onReset
+  open, onClose, filters, onApply, onReset, isMobile,
 }: {
-  open: boolean
-  onClose: () => void
-  filters: any
-  onApply: (newFilters: any) => void
-  onReset: () => void
+  open: boolean; onClose: () => void
+  filters: any; onApply: (f: any) => void; onReset: () => void
+  isMobile?: boolean
 }) {
   const toggle = (key: string, value: any) => {
     const current = filters[key] || []
@@ -209,144 +336,123 @@ function FilterPopover({
     onApply({ ...filters, [key]: next })
   }
 
-  if (!open) return null
+  const chip = (active: boolean) => ({
+    padding: '4px 12px', borderRadius: 18, border: '1px solid',
+    borderColor: active ? '#076C9E' : '#E1E8EC',
+    background: active ? '#076C9E' : 'transparent',
+    color: active ? '#FFFFFF' : '#5F737F',
+    fontWeight: 500, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s',
+  })
 
+  const sections = (
+    <>
+      <div className="p-4 flex flex-col gap-3">
+        <span className="font-bold text-[14px] text-[#1C1C1C]">Tipe Aset</span>
+        <div className="flex flex-wrap gap-2">
+          {TIPE_CHIPS.map(t => (
+            <button key={t} onClick={() => toggle('tipe', t)} style={chip(!!filters.tipe?.includes(t))}>{t}</button>
+          ))}
+        </div>
+      </div>
+      <div className="h-px bg-[#E1E8EC]" />
+      <div className="p-4 flex flex-col gap-3">
+        <span className="font-bold text-[14px] text-[#1C1C1C]">Status Kerawanan</span>
+        <div className="flex flex-wrap gap-2">
+          {STATUS_CHIPS.map(s => (
+            <button key={s} onClick={() => toggle('status', s.toLowerCase())} style={chip(!!filters.status?.includes(s.toLowerCase()))}>{s}</button>
+          ))}
+        </div>
+      </div>
+      <div className="h-px bg-[#E1E8EC]" />
+      <div className="p-4 flex flex-col gap-3">
+        <span className="font-bold text-[14px] text-[#1C1C1C]">Jenis Kerawanan</span>
+        <div className="flex flex-wrap gap-2">
+          {JENIS_CHIPS.map(j => (
+            <button key={j.id} onClick={() => toggle('jenis', j.id)} style={chip(!!filters.jenis?.includes(j.id))}>{j.label}</button>
+          ))}
+        </div>
+      </div>
+      <div className="h-px bg-[#E1E8EC]" />
+      <div className="p-4 flex flex-col gap-3">
+        <span className="font-bold text-[14px] text-[#1C1C1C]">Status Sertifikat</span>
+        <div className="flex flex-wrap gap-2">
+          {SERTIFIKAT_CHIPS.map(s => (
+            <button key={s.id} onClick={() => toggle('certified', s.id)} style={chip(!!filters.certified?.includes(s.id))}>{s.label}</button>
+          ))}
+        </div>
+      </div>
+    </>
+  )
+
+  /* ── Mobile: bottom sheet ── */
+  if (isMobile) {
+    return (
+      <>
+        <div
+          className={`fixed inset-0 bg-black/40 transition-opacity duration-300 ${open ? 'opacity-100 z-[65] pointer-events-auto' : 'opacity-0 z-[-1] pointer-events-none'}`}
+          onClick={onClose}
+        />
+        <div className={`fixed left-0 right-0 bottom-0 z-[70] max-h-[88vh] bg-white rounded-t-2xl transition-transform duration-300 flex flex-col ${open ? 'translate-y-0' : 'translate-y-full'}`}>
+          {/* Drag handle */}
+          <div className="flex justify-center pt-3 pb-2 shrink-0">
+            <div className="w-10 h-1 rounded-sm bg-[#D1D9E0]" />
+          </div>
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 pb-3.5 border-b border-[#E1E8EC] shrink-0">
+            <span className="font-bold text-base text-[#1C1C1C]">Filter</span>
+            <button onClick={onClose} className="w-8 h-8 rounded-lg bg-[#F6F9FC] flex items-center justify-center text-[#5F737F]">
+              <X size={16} />
+            </button>
+          </div>
+          {/* Body */}
+          <div className="flex-1 overflow-y-auto">{sections}</div>
+          {/* Footer */}
+          <div className="px-4 pt-3 pb-6 border-t border-[#E1E8EC] shrink-0 flex items-center gap-3">
+            <button
+              onClick={onClose}
+              className="flex-1 h-11 rounded-[22px] border-none bg-[#076c9e] text-white font-semibold text-[14px] cursor-pointer"
+            >
+              Terapkan
+            </button>
+            <button
+              onClick={onReset}
+              title="Reset filter"
+              className="w-11 h-11 rounded-full border border-[#D92D20] bg-white flex items-center justify-center cursor-pointer shrink-0"
+            >
+              <RotateCcw size={18} className="text-[#D92D20]" />
+            </button>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  /* ── Desktop: dropdown popover ── */
+  if (!open) return null
   return (
     <>
-      {/* Click-outside backdrop */}
       <div className="fixed inset-0 z-[60]" onClick={onClose} />
-      
       <div className="absolute top-full right-0 mt-2 w-[400px] z-[70] bg-white rounded-lg shadow-[0px_4px_8px_0px_rgba(28,28,28,0.15)] border border-[#E1E8EC] flex flex-col overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 origin-top-right">
         <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#E1E8EC]">
-           <span className="font-bold text-[14px] text-[#1C1C1C]">Filter</span>
-           <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded transition-colors"><X size={16} className="text-[#5F737F]" /></button>
+          <span className="font-bold text-[14px] text-[#1C1C1C]">Filter</span>
+          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded transition-colors"><X size={16} className="text-[#5F737F]" /></button>
         </div>
-
-        <div className="max-h-[500px] overflow-y-auto">
-           {/* TIPE */}
-           <div className="p-4 flex flex-col gap-3">
-              <span className="font-bold text-[14px] text-[#1C1C1C]">Tipe Aset</span>
-              <div className="flex flex-wrap gap-2">
-                 {TIPE_CHIPS.map(t => {
-                   const active = filters.tipe?.includes(t)
-                   return (
-                     <button 
-                       key={t}
-                       onClick={() => toggle('tipe', t)}
-                       style={{ 
-                         padding: '4px 12px', 
-                         borderRadius: 18, 
-                         border: '1px solid', 
-                         borderColor: active ? '#076C9E' : '#E1E8EC', 
-                         background: active ? '#076C9E' : 'transparent', 
-                         color: active ? '#FFFFFF' : '#5F737F', 
-                         fontWeight: 500, 
-                         fontSize: 12, 
-                         cursor: 'pointer', 
-                         transition: 'all 0.15s' 
-                       }}
-                     >
-                       {t}
-                     </button>
-                   )
-                 })}
-              </div>
-           </div>
-           <div className="h-px bg-[#E1E8EC]" />
-
-           {/* STATUS KERAWANAN */}
-           <div className="p-4 flex flex-col gap-3">
-              <span className="font-bold text-[14px] text-[#1C1C1C]">Status Kerawanan</span>
-              <div className="flex flex-wrap gap-2">
-                 {STATUS_CHIPS.map(s => {
-                   const active = filters.status?.includes(s.toLowerCase())
-                   return (
-                     <button 
-                       key={s}
-                       onClick={() => toggle('status', s.toLowerCase())}
-                       style={{ 
-                         padding: '4px 12px', 
-                         borderRadius: 18, 
-                         border: '1px solid', 
-                         borderColor: active ? '#076C9E' : '#E1E8EC', 
-                         background: active ? '#076C9E' : 'transparent', 
-                         color: active ? '#FFFFFF' : '#5F737F', 
-                         fontWeight: 500, 
-                         fontSize: 12, 
-                         cursor: 'pointer', 
-                         transition: 'all 0.15s' 
-                       }}
-                     >
-                       {s}
-                     </button>
-                   )
-                 })}
-              </div>
-           </div>
-           <div className="h-px bg-[#E1E8EC]" />
-
-           {/* JENIS KERAWANAN */}
-           <div className="p-4 flex flex-col gap-3">
-              <span className="font-bold text-[14px] text-[#1C1C1C]">Jenis Kerawanan</span>
-              <div className="flex flex-wrap gap-2">
-                 {JENIS_CHIPS.map(j => {
-                   const active = filters.jenis?.includes(j.id)
-                   return (
-                     <button 
-                       key={j.id}
-                       onClick={() => toggle('jenis', j.id)}
-                       style={{ 
-                         padding: '4px 12px', 
-                         borderRadius: 18, 
-                         border: '1px solid', 
-                         borderColor: active ? '#076C9E' : '#E1E8EC', 
-                         background: active ? '#076C9E' : 'transparent', 
-                         color: active ? '#FFFFFF' : '#5F737F', 
-                         fontWeight: 500, 
-                         fontSize: 12, 
-                         cursor: 'pointer', 
-                         transition: 'all 0.15s' 
-                       }}
-                     >
-                       {j.label}
-                     </button>
-                   )
-                 })}
-              </div>
-           </div>
-           <div className="h-px bg-[#E1E8EC]" />
-
-           {/* STATUS SERTIFIKAT */}
-           <div className="p-4 flex flex-col gap-3">
-              <span className="font-bold text-[14px] text-[#1C1C1C]">Status Sertifikat</span>
-              <div className="flex flex-wrap gap-2">
-                 {SERTIFIKAT_CHIPS.map(s => {
-                   const active = filters.certified?.includes(s.id)
-                   return (
-                     <button 
-                       key={s.id}
-                       onClick={() => toggle('certified', s.id)}
-                       style={{ 
-                         padding: '4px 12px', 
-                         borderRadius: 18, 
-                         border: '1px solid', 
-                         borderColor: active ? '#076C9E' : '#E1E8EC', 
-                         background: active ? '#076C9E' : 'transparent', 
-                         color: active ? '#FFFFFF' : '#5F737F', 
-                         fontWeight: 500, 
-                         fontSize: 12, 
-                         cursor: 'pointer', 
-                         transition: 'all 0.15s' 
-                       }}
-                     >
-                       {s.label}
-                     </button>
-                   )
-                 })}
-              </div>
-           </div>
+        <div className="max-h-[500px] overflow-y-auto">{sections}</div>
+        <div className="px-4 pt-3 pb-4 border-t border-[#E1E8EC] flex items-center gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 h-11 rounded-[22px] border-none bg-[#076c9e] text-white font-semibold text-[14px] cursor-pointer hover:bg-[#065a84] transition-colors"
+          >
+            Terapkan
+          </button>
+          <button
+            onClick={onReset}
+            title="Reset filter"
+            className="w-11 h-11 rounded-full border border-[#D92D20] bg-white flex items-center justify-center cursor-pointer shrink-0 hover:bg-red-50 transition-colors"
+          >
+            <RotateCcw size={18} className="text-[#D92D20]" />
+          </button>
         </div>
-
       </div>
     </>
   )
@@ -357,11 +463,13 @@ function AsetDetailDrawer({
   open,
   onClose,
   onEdit,
+  canEdit,
 }: {
   towerId: string | null
   open: boolean
   onClose: () => void
   onEdit: (tower: any) => void
+  canEdit: boolean
 }) {
   const [tower, setTower] = useState<any>(null)
   const [loading, setLoading] = useState(false)
@@ -482,15 +590,17 @@ function AsetDetailDrawer({
                                 </div>
                                  <div className="p-3.5 border-t border-gray-50 flex items-center justify-between gap-2">
                                     <p className="text-[11.5px] font-bold text-gray-700 truncate" title={doc.namaFile}>{doc.namaFile}</p>
-                                    <button 
-                                      onClick={(e) => {
-                                        e.stopPropagation()
-                                        setConfirm({ open: true, docId: doc.id, loading: false })
-                                      }}
-                                      className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors shrink-0"
-                                    >
-                                       <Trash2 size={14} />
-                                    </button>
+                                    {canEdit && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          setConfirm({ open: true, docId: doc.id, loading: false })
+                                        }}
+                                        className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors shrink-0"
+                                      >
+                                         <Trash2 size={14} />
+                                      </button>
+                                    )}
                                  </div>
                             </div>
                           ))
@@ -571,14 +681,16 @@ function AsetDetailDrawer({
         />
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-100 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
-           <button 
-             onClick={() => onEdit(tower)} 
-             className="w-full py-3.5 rounded-xl border-2 border-blue-600 text-blue-600 font-bold text-[14px] hover:bg-blue-50 transition-colors"
-           >
-             Edit Detail Aset
-           </button>
-        </div>
+        {canEdit && (
+          <div className="p-6 border-t border-gray-100 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+             <button
+               onClick={() => onEdit(tower)}
+               className="w-full py-3.5 rounded-xl border-2 border-blue-600 text-blue-600 font-bold text-[14px] hover:bg-blue-50 transition-colors"
+             >
+               Edit Detail Aset
+             </button>
+          </div>
+        )}
       </div>
 
       <CertificatePreviewModal doc={selectedDoc} onClose={() => setSelectedDoc(null)} />
@@ -588,7 +700,7 @@ function AsetDetailDrawer({
 
 // ── Edit Drawer ───────────────────────────────────────────────────────────────
 
-const TIPE_EDIT_OPTIONS    = ['SUTET', 'SUTT', 'SKTT', 'garduInduk']
+const TIPE_EDIT_OPTIONS    = ['SUTET', 'SUTT', 'SKTT']
 
 function AsetEditDrawer({
   tower,
@@ -1018,6 +1130,7 @@ function AsetAddDrawer({
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function AsetPage() {
+  const { isMobile } = useSidebar()
   const [rows, setRows]       = useState<any[]>([])
   const [total, setTotal]     = useState(0)
   const [loading, setLoading] = useState(true)
@@ -1035,7 +1148,7 @@ export default function AsetPage() {
   })
 
   const [isAdminUser, setIsAdminUser] = useState(false)
-  useEffect(() => { setIsAdminUser(isAdmin()) }, [])
+  useEffect(() => { setIsAdminUser(isAdminOrSuperadmin()) }, [])
 
   const [skttRoutes, setSkttRoutes] = useState<any[]>([])
   useEffect(() => {
@@ -1132,12 +1245,13 @@ export default function AsetPage() {
                )}
             </button>
 
-            <FilterPopover 
-              open={filterOpen} 
-              onClose={() => setFilterOpen(false)} 
+            <FilterPopover
+              open={filterOpen}
+              onClose={() => setFilterOpen(false)}
               filters={activeFilters}
               onApply={(newFilters) => { setActiveFilters(newFilters); setPage(1); }}
-              onReset={() => setActiveFilters({ tipe: [], status: [], jenis: [], certified: [] })}
+              onReset={() => { setActiveFilters({ tipe: [], status: [], jenis: [], certified: [] }); setPage(1); }}
+              isMobile={isMobile}
             />
          </div>
       </div>
@@ -1154,20 +1268,19 @@ export default function AsetPage() {
                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Tegangan</th>
                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Jalur Transmisi</th>
                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Sertifikat</th>
-                {isAdminUser && <th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">Aksi</th>}
+                <th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {loading ? (
-                <SkeletonRow cols={isAdminUser ? 8 : 7} rows={limit} />
+                <SkeletonRow cols={7} rows={limit} />
               ) : rows.length === 0 ? (
-                <tr><td colSpan={isAdminUser ? 8 : 7}><EmptyState title="Belum ada data aset." /></td></tr>
+                <tr><td colSpan={7}><EmptyState title="Belum ada data aset." /></td></tr>
               ) : (
                 rows.map((row, i) => (
                   <tr 
                     key={`tower-${row.id}`} 
-                    onClick={() => { setDetailRow(row); setDetailOpen(true) }}
-                    className="hover:bg-gray-50/50 transition-colors group cursor-pointer"
+                    className="hover:bg-gray-50/50 transition-colors group"
                   >
                     <td className="px-6 py-4 text-gray-400 text-[12px]">{(page - 1) * limit + i + 1}</td>
                     <td className="px-6 py-4 font-bold text-gray-800">{row.nama ?? '—'}</td>
@@ -1187,15 +1300,15 @@ export default function AsetPage() {
                          </div>
                        )}
                     </td>
-                    {isAdminUser && (
-                      <td className="px-6 py-4 text-right">
-                        <ActionMenu items={[
-                          { label: 'Lihat Detail', icon: <Eye size={14} />, onClick: () => { setDetailRow(row); setDetailOpen(true) } },
-                          { label: 'Edit', icon: <Pencil size={14} />, onClick: () => { setEditRow(row); setEditOpen(true) } },
-                          { label: 'Hapus', icon: <Trash2 size={14} />, onClick: () => setDeleteConfirm({ open: true, tower: row, loading: false }), danger: true, dividerBefore: true },
-                        ]} />
-                      </td>
-                    )}
+                    <td className="px-6 py-4 text-right">
+                      <RowActions
+                        row={row}
+                        onDetail={(r) => { setDetailRow(r); setDetailOpen(true) }}
+                        onEdit={(r) => { setEditRow(r); setEditOpen(true) }}
+                        onDelete={(r) => setDeleteConfirm({ open: true, tower: r, loading: false })}
+                        showEdit={isAdminUser}
+                      />
+                    </td>
                   </tr>
                 ))
               )}
@@ -1253,11 +1366,12 @@ export default function AsetPage() {
       )} */}
 
       <AsetAddDrawer open={addOpen} onClose={() => setAddOpen(false)} onSaved={fetchData} />
-      <AsetDetailDrawer 
-        towerId={detailRow?.id ?? null} 
-        open={detailOpen} 
-        onClose={() => setDetailOpen(false)} 
-        onEdit={(row) => { setDetailOpen(false); setEditRow(row); setEditOpen(true); }} 
+      <AsetDetailDrawer
+        towerId={detailRow?.id ?? null}
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        onEdit={(row) => { setDetailOpen(false); setEditRow(row); setEditOpen(true); }}
+        canEdit={isAdminUser}
       />
       <AsetEditDrawer tower={editRow} open={editOpen} onClose={() => setEditOpen(false)} onSaved={fetchData} />
 

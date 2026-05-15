@@ -95,7 +95,7 @@ const PROGRESS_TIPE_LABEL: Record<string, string> = {
   brosur: 'Brosur',
   laporan_baru: 'Laporan Baru',
   berita_acara: 'Berita Acara',
-  surat: 'Surat',
+  surat: 'Surat Pemberitahuan',
   sedang_berlangsung: 'Sedang Berlangsung',
   selesai: 'Selesai',
   tidak_ada_aktifitas: 'Tidak Ada Aktivitas',
@@ -583,7 +583,7 @@ function TowerDropdown({
                         className={`w-full text-left px-3 py-2 hover:bg-app-bg transition-colors ${value === t.id ? 'bg-blue-50' : ''}`}
                       >
                         <p className={`font-mono text-[13px] font-semibold ${value === t.id ? 'text-blue-600' : 'text-app-text'}`}>{label}</p>
-                        {sub && <p className="text-[11px] text-app-muted leading-tight mt-0.5">{sub}</p>}
+                        {/* {sub && <p className="text-[11px] text-app-muted leading-tight mt-0.5">{sub}</p>} */}
                       </button>
                     )
                   })}
@@ -942,12 +942,12 @@ function PilihTowerSheet({
                   color: isSelected ? '#076C9E' : '#1B1B1B',
                   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                 }}>{label}</p>
-                {sub && (
+                {/* {sub && (
                   <p style={{
                     fontSize: 11, color: '#5F737F', marginTop: 1,
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                   }}>{sub}</p>
-                )}
+                )} */}
               </div>
               {isSelected && (
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0, marginLeft: 8 }}>
@@ -1531,6 +1531,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     if (!Array.isArray(cf) || cf.length === 0) return true
     return cf.includes(key)
   }
+  const isInitialRiwayat = (r: any) => Array.isArray(r?.changedFields) && r.changedFields.includes('__initial__')
   const hasAnyChange = (r: any) =>
     !Array.isArray(r?.changedFields) || r.changedFields.length > 0
 
@@ -1847,7 +1848,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
               <InfoRow label="Informasi Pihak Lain" value={pihakLainMobile || '—'} />
               <InfoRow label="Contact Person" value={activeLaporan?.contactPerson || '—'} />
             </div>
-            <InfoRow label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'} value={activeLaporan?.deskripsi || '—'} />
+            <InfoRow label="Uraian Pekerjaan" value={activeLaporan?.deskripsi || '—'} />
 
             {fotoUrls.length > 0 && (
               <FileGroup label="Bukti Kerawanan" urls={fotoUrls} />
@@ -1859,9 +1860,11 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>
               Informasi Pengendalian
             </span>
-            <div style={{ marginBottom: 12 }}>
-              <InfoRow label="Deskripsi Pengendalian" value={activeLaporan?.keterangan || '—'} />
-            </div>
+            {activeLaporan?.keterangan && (
+              <div style={{ marginBottom: 12 }}>
+                <InfoRow label="Upaya Pengendalian" value={activeLaporan.keterangan} />
+              </div>
+            )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <FileGroup label="Berita Acara" urls={(progress?.berita_acara ?? []).map((d: any) => d.fileUrl)} />
               <FileGroup label="Spanduk" urls={(progress?.spanduk ?? []).map((d: any) => d.fileUrl)} />
@@ -1885,9 +1888,16 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                 {riwayat.map((r: any, idx: number) => (
                   <div key={r.id} style={{ paddingTop: idx > 0 ? 14 : 0, borderTop: idx > 0 ? '1px solid #E1E8EC' : 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <span style={{ fontSize: 11, color: '#97AAB3' }}>
-                        Tanggal Pembaruan: {formatTanggal(r.tanggal)}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: 11, color: '#97AAB3' }}>
+                          Tanggal Pembaruan: {formatTanggal(r.tanggal)}
+                        </span>
+                        {isInitialRiwayat(r) && (
+                          <span style={{ fontSize: 10, fontWeight: 700, color: '#076C9E', background: '#EAF6FB', padding: '3px 8px', borderRadius: 999 }}>
+                            Data Awal
+                          </span>
+                        )}
+                      </div>
                       {isSuperadmin() && (
                         <button type="button" onClick={() => handleDeleteRiwayat(r.id)}
                           style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 4, minWidth: 32, minHeight: 32 }}>
@@ -1981,6 +1991,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   const lastUpdatedBy = lastUpdate?.oleh ?? activeLaporan?.pelapor?.nama ?? '-'
 
   const beritaAcaraDoc = (progress?.berita_acara ?? [])[0]
+  const spandukDoc     = (progress?.spanduk ?? [])[0]
   const suratDoc       = (progress?.surat ?? [])[0]
 
   function renderDocPreview(doc: any, emptyLabel: string) {
@@ -2062,7 +2073,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           {/* Row 2 */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, marginBottom: 20 }}>
             <InfoRow
-              label={isPPL ? 'Uraian Pekerjaan' : 'Deskripsi'}
+              label="Uraian Pekerjaan"
               value={activeLaporan?.deskripsi || '—'}
             />
             <InfoRow
@@ -2104,10 +2115,12 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
         <div style={{ marginBottom: 32 }}>
           <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 20 }}>Informasi Pengendalian Kerawanan</span>
 
-          <div style={{ marginBottom: 20 }}>
-            <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{activeLaporan?.keterangan || '—'}</span>
-          </div>
+          {activeLaporan?.keterangan && (
+            <div style={{ marginBottom: 20 }}>
+              <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 4 }}>Upaya Pengendalian</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#1B1B1B' }}>{activeLaporan.keterangan}</span>
+            </div>
+          )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, maxWidth: 640 }}>
             <div>
@@ -2115,7 +2128,11 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
               {renderDocPreview(beritaAcaraDoc, 'Tidak ada dokumen')}
             </div>
             <div>
-              <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 8 }}>Surat</span>
+              <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 8 }}>Spanduk</span>
+              {renderDocPreview(spandukDoc, 'Tidak ada dokumen')}
+            </div>
+            <div>
+              <span style={{ fontSize: 12, color: '#97AAB3', display: 'block', marginBottom: 8 }}>Surat Pemberitahuan</span>
               {renderDocPreview(suratDoc, 'Tidak ada dokumen')}
             </div>
           </div>
@@ -2135,9 +2152,16 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
               {riwayat.map((r: any) => (
                 <div key={r.id} style={{ padding: 20, border: '1px solid #E1E8EC', borderRadius: 12, background: '#FFFFFF' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                    <span style={{ fontSize: 13, color: '#566B75', fontWeight: 500 }}>
-                      Tanggal Pembaruan: {formatTanggal(r.tanggal)} · Oleh: {r.oleh}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 13, color: '#566B75', fontWeight: 500 }}>
+                        Tanggal Pembaruan: {formatTanggal(r.tanggal)} · Oleh: {r.oleh}
+                      </span>
+                      {isInitialRiwayat(r) && (
+                        <span style={{ fontSize: 11, fontWeight: 700, color: '#076C9E', background: '#EAF6FB', padding: '4px 10px', borderRadius: 999 }}>
+                          Data Awal
+                        </span>
+                      )}
+                    </div>
                     {isSuperadmin() && (
                       <button onClick={() => handleDeleteRiwayat(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 4 }}>
                         <X size={16} />
@@ -2746,7 +2770,7 @@ function LaporanDrawer({
       {/* Uraian Pekerjaan / Deskripsi */}
       <div>
         <label className="block text-[14px] font-bold text-app-text mb-2">
-          {isPPL ? <>Uraian Pekerjaan <span className="font-normal text-[#5F737F]">(Opsional)</span></> : 'Deskripsi'}
+          Uraian Pekerjaan <span className="font-normal text-[#5F737F]">(Opsional)</span>
         </label>
         <div className="relative">
           <textarea
@@ -2815,8 +2839,9 @@ function LaporanDrawer({
         </>
       )}
 
-      {/* Upaya Pengendalian (Opsional) — common (PPL + non-PPL) */}
-      {!readOnly && (
+      {/* Upaya Pengendalian — only on edit mode. Hidden on Tambah Laporan
+          (create) since the field is filled later via Perbarui Laporan. */}
+      {!readOnly && !!initial && (
         <div>
           <label className="block text-[14px] font-bold text-app-text mb-2">
             Upaya Pengendalian <span className="font-normal text-[#5F737F]">(Opsional)</span>
@@ -3529,11 +3554,11 @@ export default function GangguanPage() {
                 ))
               ) : rows.length === 0 ? (
                 <tr>
-                  <td colSpan={7}><EmptyState title="Belum ada data Riwayat Kerawanan Transmisi." /></td>
+                  <td colSpan={7}><EmptyState title={isTeknisi() ? "Belum ada laporan kerawanan" : "Belum ada data Riwayat Kerawanan Transmisi."} /></td>
                 </tr>
               ) : (
                 rows.map((row) => (
-                  <tr key={row.id} onClick={() => openDetail(row)} style={{ cursor: 'pointer' }}>
+                  <tr key={row.id}>
                     <td className="text-[14px] text-[#5f737f] whitespace-nowrap">{formatTanggal(row.tanggal)}</td>
                     <td className="text-[14px] text-[#5f737f] max-w-[220px]">
                       <span className="block truncate" title={row.tower?.nama ?? row.towerId}>

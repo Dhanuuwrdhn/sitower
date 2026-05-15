@@ -46,6 +46,7 @@ const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {
   sedang_berlangsung:  { bg: '#FFFAEB', text: '#F79009' },
   selesai:             { bg: '#ECFDF3', text: '#039855' },
   tidak_ada_aktifitas: { bg: '#F1F5F9', text: '#475569' },
+  tidak_ada_aktivitas: { bg: '#F1F5F9', text: '#475569' },
 }
 
 const PROGRESS_TIPE_LABEL: Record<string, string> = {
@@ -55,7 +56,17 @@ const PROGRESS_TIPE_LABEL: Record<string, string> = {
   berita_acara:        'Berita Acara',
   sedang_berlangsung:  'Sedang Berlangsung',
   selesai:             'Selesai',
-  tidak_ada_aktifitas: 'Tidak Ada Aktifitas',
+  tidak_ada_aktifitas: 'Tidak Ada Aktivitas',
+  tidak_ada_aktivitas: 'Tidak Ada Aktivitas',
+}
+
+// Normalize legacy/typo variants so the badge config always matches.
+function normalizeProgresValue(v: string | null | undefined): string {
+  if (!v) return ''
+  const t = v.toString().toLowerCase().trim().replace(/\s+/g, '_')
+  // Treat aktifitas/aktivitas as the same value.
+  if (t === 'tidak_ada_aktivitas') return 'tidak_ada_aktifitas'
+  return t
 }
 
 function extractTowerNo(nama?: string | null): string {
@@ -76,11 +87,12 @@ function LevelBadge({ level }: { level: string }) {
 
 function ProgressBadge({ tipe }: { tipe: string | null }) {
   if (!tipe) return <span style={{ color: '#5f737f' }}>—</span>
-  const cfg = PROGRESS_BADGE_COLOR[tipe]
-  if (!cfg) return <span style={{ color: '#5f737f' }}>{tipe}</span>
+  const key = normalizeProgresValue(tipe)
+  const cfg = PROGRESS_BADGE_COLOR[key] ?? { bg: '#F1F5F9', text: '#475569' }
+  const label = PROGRESS_TIPE_LABEL[key] ?? PROGRESS_TIPE_LABEL[tipe] ?? tipe
   return (
     <span style={{ backgroundColor: cfg.bg, color: cfg.text, borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>
-      {PROGRESS_TIPE_LABEL[tipe] ?? tipe}
+      {label}
     </span>
   )
 }

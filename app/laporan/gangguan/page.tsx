@@ -3534,7 +3534,7 @@ export default function GangguanPage() {
                     <td className="text-[14px] text-[#5f737f]">{row.pelapor?.nama ?? '—'}</td>
                     <td><LevelBadge level={row.levelRisiko} /></td>
                     <td><ProgressBadge tipe={row.progresLaporan} /></td>
-                    <td className="text-center">
+                    <td className="text-center" onClick={(e) => e.stopPropagation()}>
                       <RowActions
                         row={row}
                         onDetail={openDetail}

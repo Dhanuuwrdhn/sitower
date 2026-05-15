@@ -2849,18 +2849,33 @@ function LaporanDrawer({
 
 
       {/* Tanggal & Waktu — editable by admin, readonly for teknisi, hidden for teknisi on create */}
-      {(readOnly || !!initial || isAdmin() || isSuperadmin()) && (
-        <div>
-          <label className="block text-[12px] font-semibold text-app-text mb-1.5">Dibuat pada</label>
-          <input
-            disabled={readOnly || (!isAdmin() && !isSuperadmin())}
-            type="datetime-local"
-            value={form.tanggalWaktu}
-            onChange={(e) => set('tanggalWaktu', e.target.value)}
-            className={`form-input ${(readOnly || (!isAdmin() && !isSuperadmin())) ? 'bg-app-bg text-app-muted' : ''}`}
-          />
-        </div>
-      )}
+      {(readOnly || !!initial || isAdmin() || isSuperadmin()) && (() => {
+        const dtDisabled = readOnly || (!isAdmin() && !isSuperadmin())
+        const [datePart, timePart] = (form.tanggalWaktu || 'T').split('T')
+        const onDateChange = (d: string) => set('tanggalWaktu', `${d}T${timePart || '00:00'}`)
+        const onTimeChange = (t: string) => set('tanggalWaktu', `${datePart || jakartaDatetimeLocalString().split('T')[0]}T${t}`)
+        return (
+          <div>
+            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Dibuat pada</label>
+            <div className="flex gap-2">
+              <input
+                disabled={dtDisabled}
+                type="date"
+                value={datePart || ''}
+                onChange={(e) => onDateChange(e.target.value)}
+                className={`form-input flex-1 ${dtDisabled ? 'bg-app-bg text-app-muted' : ''}`}
+              />
+              <input
+                disabled={dtDisabled}
+                type="time"
+                value={timePart || ''}
+                onChange={(e) => onTimeChange(e.target.value)}
+                className={`form-input w-[120px] ${dtDisabled ? 'bg-app-bg text-app-muted' : ''}`}
+              />
+            </div>
+          </div>
+        )
+      })()}
 
       <div>
         <label className="block text-[12px] font-semibold text-app-text mb-1.5">Pelapor</label>

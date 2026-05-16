@@ -205,10 +205,12 @@ function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', ker
       <circle cx="${bcx}" cy="${bcy}" r="${BADGE_D / 2 + 1.5}" fill="white"/>
       <svg x="${bx}" y="${by}" width="${BADGE_D}" height="${BADGE_D}" viewBox="0 0 36 36">${iconBody}</svg>
     `
-  } else if (numBadges === 2) {
-    const GAP = BADGE_D - 4  // slight overlap between badges
-    SVG_W = CIRCLE_D + GAP + BADGE_D - BADGE_OVERLAP + 2
-    for (let i = 0; i < 2; i++) {
+  } else {
+    // 2+ → render one badge per kerawanan jenis, horizontally with slight overlap.
+    // No count pill — every icon is visible directly on the marker.
+    const GAP = BADGE_D - 4  // slight overlap between adjacent badges
+    SVG_W = CIRCLE_D + GAP * (numBadges - 1) + BADGE_D - BADGE_OVERLAP + 2
+    for (let i = 0; i < numBadges; i++) {
       const bx = BADGE_X0 + i * GAP, by = 0
       const bcx = bx + BADGE_D / 2, bcy = by + BADGE_D / 2
       const iconBody = TWEMOJI_BODIES[normKat(kerawanan[i].kategori)] ?? ''
@@ -217,17 +219,6 @@ function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', ker
         <svg x="${bx}" y="${by}" width="${BADGE_D}" height="${BADGE_D}" viewBox="0 0 36 36">${iconBody}</svg>
       `
     }
-  } else {
-    // 3+ → exact count pill (width grows with digit count)
-    const digits = String(numBadges).length
-    const pillW = Math.max(20, 12 + digits * 7)
-    SVG_W = CIRCLE_D + pillW + 4
-    const px = BADGE_X0, py = 2
-    badgeContent = `
-      <rect x="${px}" y="${py}" width="${pillW}" height="15" rx="7.5" fill="${bgColor}"/>
-      <text x="${px + pillW / 2}" y="${py + 10.5}" text-anchor="middle"
-        font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="white">${numBadges}</text>
-    `
   }
 
   const SVG_H = CIRCLE_D + PAD_TOP  // 40

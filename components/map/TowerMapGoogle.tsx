@@ -218,13 +218,15 @@ function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', ker
       `
     }
   } else {
-    // 3+ → count pill
-    SVG_W = CIRCLE_D + 26
+    // 3+ → exact count pill (width grows with digit count)
+    const digits = String(numBadges).length
+    const pillW = Math.max(20, 12 + digits * 7)
+    SVG_W = CIRCLE_D + pillW + 4
     const px = BADGE_X0, py = 2
     badgeContent = `
-      <rect x="${px}" y="${py}" width="24" height="15" rx="7.5" fill="#D32F2F"/>
-      <text x="${px + 12}" y="${py + 10.5}" text-anchor="middle"
-        font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="white">${numBadges}+</text>
+      <rect x="${px}" y="${py}" width="${pillW}" height="15" rx="7.5" fill="${bgColor}"/>
+      <text x="${px + pillW / 2}" y="${py + 10.5}" text-anchor="middle"
+        font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="white">${numBadges}</text>
     `
   }
 

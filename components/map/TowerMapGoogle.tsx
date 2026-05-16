@@ -464,12 +464,10 @@ function TowerPopup({ tower, onClose, onKerawananClick }: { tower: FeaturedTower
   const level = getTopLevel(tower.kerawanan)
   const levelColor = LEVEL_COLOR[level]
   const hasKerawanan = tower.kerawanan.length > 0
-  const shown = tower.kerawanan.slice(0, 3)
-  const extra = tower.kerawanan.length - shown.length
 
   return (
     <InfoWindow position={{ lat: tower.lat, lng: tower.lng }} onCloseClick={onClose}>
-      <div style={{ minWidth: 240, maxWidth: 280, fontFamily: 'Inter, sans-serif', fontSize: 12, padding: 4 }}>
+      <div style={{ minWidth: 240, maxWidth: 280, maxHeight: 400, overflowY: 'auto', fontFamily: 'Inter, sans-serif', fontSize: 12, padding: 4 }}>
         <div style={{ fontWeight: 700, fontSize: 12, color: '#1c1c1c', marginBottom: 6 }}>
           Informasi Tower
         </div>
@@ -484,10 +482,10 @@ function TowerPopup({ tower, onClose, onKerawananClick }: { tower: FeaturedTower
         {hasKerawanan ? (
           <div>
             <div style={{ fontWeight: 600, color: '#1c1c1c', marginBottom: 6 }}>
-              Kerawanan{tower.kerawanan.length > 1 ? ` (${tower.kerawanan.length})` : ''}
+              Kerawanan ({tower.kerawanan.length})
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              {shown.map((k, i) => {
+              {tower.kerawanan.map((k, i) => {
                 const clickable = !!(k.laporanId && onKerawananClick)
                 return (
                   <div key={i}
@@ -516,11 +514,6 @@ function TowerPopup({ tower, onClose, onKerawananClick }: { tower: FeaturedTower
                   </div>
                 )
               })}
-              {extra > 0 && (
-                <div style={{ color: '#97aab3', fontSize: 10, fontStyle: 'italic' }}>
-                  +{extra} lainnya — klik tower untuk detail
-                </div>
-              )}
             </div>
           </div>
         ) : (

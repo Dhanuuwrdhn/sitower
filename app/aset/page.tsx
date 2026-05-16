@@ -210,6 +210,60 @@ function LabelValue({ label, value, weight = 'medium' }: { label: string; value?
 
 // ── Detail Drawer ─────────────────────────────────────────────────────────────
 
+function SertifikatThumb({ doc }: { doc: any }) {
+  const [url, setUrl] = useState<string>('')
+  const [failed, setFailed] = useState(false)
+
+  useEffect(() => {
+    let revoked = false
+    let objectUrl = ''
+    sertifikatApi.previewDokumen(doc.id)
+      .then((u) => {
+        if (revoked) { URL.revokeObjectURL(u); return }
+        objectUrl = u
+        setUrl(u)
+      })
+      .catch(() => setFailed(true))
+    return () => {
+      revoked = true
+      if (objectUrl) URL.revokeObjectURL(objectUrl)
+    }
+  }, [doc.id])
+
+  const isPdf = (doc.namaFile || '').toLowerCase().endsWith('.pdf')
+
+  if (failed || (!url && !isPdf)) {
+    return (
+      <div className="aspect-[4/3] bg-blue-50/30 flex items-center justify-center p-6 relative">
+        <FileText className="text-blue-500 w-12 h-12" />
+      </div>
+    )
+  }
+
+  if (!url) {
+    return (
+      <div className="aspect-[4/3] bg-blue-50/30 flex items-center justify-center relative">
+        <div className="w-6 h-6 border-2 border-blue-600/20 border-t-blue-600 rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="aspect-[4/3] bg-blue-50/30 overflow-hidden relative">
+      {isPdf ? (
+        <iframe
+          src={`${url}#toolbar=0&navpanes=0&view=FitH`}
+          title={doc.namaFile}
+          className="w-full h-full border-0 pointer-events-none"
+        />
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={url} alt={doc.namaFile} className="w-full h-full object-cover" />
+      )}
+    </div>
+  )
+}
+
 function CertificatePreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
   const [scale, setScale] = useState(1)
   const [loading, setLoading] = useState(true)
@@ -571,9 +625,9 @@ function AsetDetailDrawer({
                               onClick={() => setSelectedDoc(doc)}
                               className="group bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
                             >
-                                <div className="aspect-[4/3] bg-blue-50/30 flex items-center justify-center p-6 group-hover:bg-blue-50 transition-colors relative">
-                                   <FileText className="text-blue-500 w-12 h-12 transition-transform duration-300 group-hover:scale-110" />
-                                   <div className="absolute inset-0 flex items-center justify-center bg-blue-600/0 group-hover:bg-blue-600/10 transition-colors" />
+                                <div className="relative">
+                                   <SertifikatThumb doc={doc} />
+                                   <div className="absolute inset-0 flex items-center justify-center bg-blue-600/0 group-hover:bg-blue-600/10 transition-colors pointer-events-none" />
                                 </div>
                                  <div className="p-3.5 border-t border-gray-50 flex items-center justify-between gap-2">
                                     <p className="text-[11.5px] font-bold text-gray-700 truncate" title={doc.namaFile}>{doc.namaFile}</p>

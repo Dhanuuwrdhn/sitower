@@ -1541,21 +1541,37 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                   ))}
                 </div>
               )}
-              {pdfs.map((url, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 8px', border: '1px solid #E1E8EC', borderRadius: 6, marginBottom: 4 }}>
-                  <FileText size={13} style={{ color: '#D92D20', flexShrink: 0 }} />
-                  <a href={resolveMediaUrl(url)} target="_blank" rel="noreferrer"
-                    style={{ flex: 1, fontSize: 11, color: '#1B1B1B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'none' }}>
-                    {url.split('/').pop()}
-                  </a>
-                  <button type="button"
-                    onClick={() => handleDownload(resolveMediaUrl(url), url.split('/').pop() || undefined)}
-                    aria-label="Download dokumen"
-                    style={{ background: 'none', border: 'none', padding: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#076C9E', cursor: 'pointer', flexShrink: 0 }}>
-                    <Download size={14} />
-                  </button>
-                </div>
-              ))}
+              {pdfs.map((url, i) => {
+                const resolved = resolveMediaUrl(url)
+                const filename = url.split('/').pop()
+                return (
+                  <div key={i} style={{ border: '1px solid #E1E8EC', borderRadius: 6, marginBottom: 4, overflow: 'hidden' }}>
+                    <div
+                      onClick={() => window.open(resolved, '_blank')}
+                      style={{ width: '100%', height: 140, background: '#F6F9FC', cursor: 'pointer', position: 'relative' }}
+                    >
+                      <iframe
+                        src={`${resolved}#toolbar=0&navpanes=0&view=FitH`}
+                        title={filename || 'PDF'}
+                        style={{ width: '100%', height: '100%', border: 'none', display: 'block', pointerEvents: 'none' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 8px' }}>
+                      <FileText size={13} style={{ color: '#D92D20', flexShrink: 0 }} />
+                      <a href={resolved} target="_blank" rel="noreferrer"
+                        style={{ flex: 1, fontSize: 11, color: '#1B1B1B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'none' }}>
+                        {filename}
+                      </a>
+                      <button type="button"
+                        onClick={() => handleDownload(resolved, filename || undefined)}
+                        aria-label="Download dokumen"
+                        style={{ background: 'none', border: 'none', padding: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#076C9E', cursor: 'pointer', flexShrink: 0 }}>
+                        <Download size={14} />
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           )
         })}
@@ -1802,8 +1818,8 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   // ══════════════════════════════════════════════════
   if (isMobile) {
     const pihakLainMobile = isPPL ? activeLaporan?.teknisi : null
-    const visibleRiwayat = riwayat.filter((r: any) => !isInitialRiwayat(r))
-    const lastUpdateM = visibleRiwayat[0]
+    const visibleRiwayat = riwayat
+    const lastUpdateM = riwayat.find((r: any) => !isInitialRiwayat(r))
     const lastUpdatedAtM = lastUpdateM?.tanggal ?? activeLaporan?.updatedAt ?? activeLaporan?.tanggal
     const canPerbarui = canUpdate
 
@@ -1937,8 +1953,13 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                         <span style={{ fontSize: 11, color: '#97AAB3' }}>
-                          Tanggal Pembaruan: {formatTanggal(r.tanggal)}
+                          {isInitialRiwayat(r) ? 'Tanggal Dibuat' : 'Tanggal Pembaruan'}: {formatTanggal(r.tanggal)}
                         </span>
+                        {isInitialRiwayat(r) && (
+                          <span style={{ fontSize: 10, fontWeight: 600, color: '#475467', background: '#F2F4F7', border: '1px solid #E1E8EC', padding: '1px 6px', borderRadius: 999 }}>
+                            Data Awal
+                          </span>
+                        )}
                       </div>
                       {isSuperadmin() && (
                         <button type="button" onClick={() => handleDeleteRiwayat(r.id)}
@@ -1947,8 +1968,10 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                         </button>
                       )}
                     </div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1B1B1B', marginBottom: 10 }}>Detail Pembaruan</div>
-                    {!hasAnyChange(r) && (
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1B1B1B', marginBottom: 10 }}>
+                      {isInitialRiwayat(r) ? 'Detail Data Awal' : 'Detail Pembaruan'}
+                    </div>
+                    {!isInitialRiwayat(r) && !hasAnyChange(r) && (
                       <div style={{ fontSize: 12, color: '#97AAB3', fontStyle: 'italic' }}>Tidak ada perubahan tercatat</div>
                     )}
                     {(showField(r, 'statusKerawanan') || showField(r, 'progresLaporan')) && (
@@ -2028,8 +2051,8 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     )
   }
   // ─── Desktop readOnly detail view ────────────────────────────────────────
-  const visibleRiwayat = riwayat.filter((r: any) => !isInitialRiwayat(r))
-  const lastUpdate = visibleRiwayat[0]
+  const visibleRiwayat = riwayat
+  const lastUpdate = riwayat.find((r: any) => !isInitialRiwayat(r))
   const lastUpdatedAt = lastUpdate?.tanggal ?? activeLaporan?.updatedAt ?? activeLaporan?.tanggal
   const lastUpdatedBy = lastUpdate?.oleh ?? activeLaporan?.pelapor?.nama ?? '-'
 
@@ -2052,18 +2075,25 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     }
     const url = resolveMediaUrl(doc.fileUrl)
     const isImg = /\.(jpe?g|png|webp)$/i.test(doc.fileUrl)
+    const isPdf = /\.pdf$/i.test(doc.fileUrl) || /\.pdf$/i.test(doc.namaFile || '')
     const filename = doc.namaFile || doc.fileUrl.split('/').pop() || undefined
     return (
       <div style={{ position: 'relative', width: '100%' }}>
         <div
           onClick={() => isImg ? setLightbox({ urls: [url], index: 0 }) : window.open(url, '_blank')}
-          style={{ width: '100%', aspectRatio: '4/3', borderRadius: 8, overflow: 'hidden', border: '1px solid #E1E8EC', cursor: 'pointer' }}
+          style={{ width: '100%', aspectRatio: '4/3', borderRadius: 8, overflow: 'hidden', border: '1px solid #E1E8EC', cursor: 'pointer', background: '#F6F9FC' }}
         >
           {isImg ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          ) : isPdf ? (
+            <iframe
+              src={`${url}#toolbar=0&navpanes=0&view=FitH`}
+              title={filename || 'PDF'}
+              style={{ width: '100%', height: '100%', border: 'none', display: 'block', pointerEvents: 'none' }}
+            />
           ) : (
-            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F9FC' }}>
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <FileText size={36} style={{ color: '#5F737F' }} />
             </div>
           )}
@@ -2213,8 +2243,13 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                       <span style={{ fontSize: 13, color: '#566B75', fontWeight: 500 }}>
-                        Tanggal Pembaruan: {formatTanggal(r.tanggal)} · Oleh: {r.oleh}
+                        {isInitialRiwayat(r) ? 'Tanggal Dibuat' : 'Tanggal Pembaruan'}: {formatTanggal(r.tanggal)} · Oleh: {r.oleh}
                       </span>
+                      {isInitialRiwayat(r) && (
+                        <span style={{ fontSize: 11, fontWeight: 600, color: '#475467', background: '#F2F4F7', border: '1px solid #E1E8EC', padding: '2px 8px', borderRadius: 999 }}>
+                          Data Awal
+                        </span>
+                      )}
                     </div>
                     {isSuperadmin() && (
                       <button onClick={() => handleDeleteRiwayat(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 4 }}>
@@ -2223,9 +2258,11 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                     )}
                   </div>
 
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#1B1B1B', marginBottom: 14 }}>Detail Pembaruan</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#1B1B1B', marginBottom: 14 }}>
+                    {isInitialRiwayat(r) ? 'Detail Data Awal' : 'Detail Pembaruan'}
+                  </div>
 
-                  {!hasAnyChange(r) && (
+                  {!isInitialRiwayat(r) && !hasAnyChange(r) && (
                     <div style={{ fontSize: 13, color: '#97AAB3', fontStyle: 'italic', marginBottom: 8 }}>Tidak ada perubahan tercatat</div>
                   )}
 

@@ -476,7 +476,7 @@ function TowerPopup({ tower, onClose, onKerawananClick }: { tower: FeaturedTower
           {tower.tipe}{tower.tegangan ? ` · ${tower.tegangan}` : ''}
         </div>
         <div style={{ marginBottom: 10, fontSize: 11, fontWeight: 700, color: tower.bersertifikat ? '#16a34a' : '#dc2626' }}>
-          {tower.bersertifikat ? 'Bersertifikat' : 'Tidak Bersertifikat'}
+          {tower.bersertifikat ? 'Bersertifikat' : 'Belum Bersertifikat'}
         </div>
 
         {hasKerawanan ? (

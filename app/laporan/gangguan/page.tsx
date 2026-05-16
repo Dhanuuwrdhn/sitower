@@ -326,6 +326,7 @@ function RowActions({
   onEdit,
   onDelete,
   showDelete,
+  canUpdate,
 }: {
   row: any
   onDetail: (row: any) => void
@@ -333,6 +334,7 @@ function RowActions({
   onEdit: (row: any) => void
   onDelete: (row: any) => void
   showDelete: boolean
+  canUpdate: boolean
 }) {
   const [open, setOpen] = useState(false)
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0 })
@@ -426,7 +428,7 @@ function RowActions({
 
           <div style={{ height: 1, background: '#E1E8EC' }} />
 
-          {row.status !== 'selesai' && (
+          {row.status !== 'selesai' && canUpdate && (
             <>
               <div style={{ height: 1, background: '#E1E8EC' }} />
               <button
@@ -1792,7 +1794,8 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     const visibleRiwayat = riwayat.filter((r: any) => !isInitialRiwayat(r))
     const lastUpdateM = visibleRiwayat[0]
     const lastUpdatedAtM = lastUpdateM?.tanggal ?? activeLaporan?.updatedAt ?? activeLaporan?.tanggal
-    const canPerbarui = (isAdmin() || isSuperadmin() || isTeknisi()) && activeLaporan?.status !== 'selesai'
+    const ownsLaporan = activeLaporan?.pelaporId === user?.id
+    const canPerbarui = (!isTeknisi() || ownsLaporan) && activeLaporan?.status !== 'selesai'
 
     // File attachment row: [thumb] [Label / filename] [eye]
     const FileRow = ({ label, url }: { label: string; url: string }) => {
@@ -2085,7 +2088,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             <span>Oleh : {lastUpdatedBy}</span>
           </div>
         </div>
-        {activeLaporan?.status !== 'selesai' && (
+        {activeLaporan?.status !== 'selesai' && (!isTeknisi() || activeLaporan?.pelaporId === user?.id) && (
           <button
             onClick={() => setShowUpdateDrawer(true)}
             style={{ height: 44, padding: '0 24px', background: '#076C9E', border: 'none', borderRadius: 8, color: '#FFFFFF', fontSize: 14, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
@@ -3295,14 +3298,9 @@ export default function GangguanPage() {
     return out.sort((a, b) => a.label.localeCompare(b.label))
   })()
 
-  // For teknisi role: lock the Line Walker filter to themselves so they
-  // only ever see their own laporan. The filter UI is hidden below.
-  useEffect(() => {
-    if (isTeknisi()) {
-      const me = getUser()?.nama
-      if (me) setTeknisiFilter([me])
-    }
-  }, [])
+  // Teknisi can now view every report on the Riwayat page; per-row write
+  // permission is enforced inside RowActions / DetailReadView instead of by
+  // pre-filtering the list. Intentionally no auto-filter here.
 
   function resetFilters() {
     setSearch('')
@@ -3641,6 +3639,7 @@ export default function GangguanPage() {
                         onEdit={openEdit}
                         onDelete={setDeleteRow}
                         showDelete={isAdminUser}
+                        canUpdate={!isTeknisi() || row.pelaporId === getUser()?.id}
                       />
                     </td>
                   </tr>

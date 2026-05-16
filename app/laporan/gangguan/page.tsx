@@ -8,7 +8,7 @@ import {
   Search, Plus, Calendar, SlidersHorizontal, RotateCcw,
   Trash2, X, Upload, ChevronLeft, ChevronRight,
   ChevronDown, MoreHorizontal, Eye, Pencil,
-  ArrowLeft, AlertTriangle, FileText, ImagePlus, Clock,
+  ArrowLeft, AlertTriangle, FileText, ImagePlus, Clock, Download,
 } from 'lucide-react'
 import { laporanApi, towersApi, importApi, pegawaiApi } from '@/lib/api'
 import { getUser, isAdmin, isSuperadmin, isTeknisi } from '@/lib/auth'
@@ -117,6 +117,17 @@ const PROGRESS_BADGE_COLOR: Record<string, { bg: string; text: string }> = {
 const PROGRESS_TIPE_LIST = ['spanduk', 'brosur', 'laporan_baru', 'berita_acara', 'surat'] as const
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
+
+function handleDownload(fileUrl: string, fileName?: string) {
+  const link = document.createElement('a')
+  link.href = fileUrl
+  if (fileName) link.download = fileName
+  link.target = '_blank'
+  link.rel = 'noreferrer'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
 
 function formatTanggal(iso: string) {
   if (!iso) return '—'
@@ -1501,19 +1512,35 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
               {imgs.length > 0 && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 4, marginBottom: pdfs.length ? 4 : 0 }}>
                   {imgs.map((url, i) => (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img key={i} src={resolveMediaUrl(url)} alt=""
-                      style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 6, border: '1px solid #E1E8EC', cursor: 'pointer' }}
-                      onClick={() => setLightbox({ urls: imgs.map(resolveMediaUrl), index: i })} />
+                    <div key={i} style={{ position: 'relative' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={resolveMediaUrl(url)} alt=""
+                        style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 6, border: '1px solid #E1E8EC', cursor: 'pointer', display: 'block' }}
+                        onClick={() => setLightbox({ urls: imgs.map(resolveMediaUrl), index: i })} />
+                      <button type="button"
+                        onClick={(e) => { e.stopPropagation(); handleDownload(resolveMediaUrl(url), url.split('/').pop() || undefined) }}
+                        aria-label="Download"
+                        style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.55)', border: 'none', borderRadius: 4, width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', cursor: 'pointer' }}>
+                        <Download size={12} />
+                      </button>
+                    </div>
                   ))}
                 </div>
               )}
               {pdfs.map((url, i) => (
-                <a key={i} href={resolveMediaUrl(url)} target="_blank" rel="noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 8px', border: '1px solid #E1E8EC', borderRadius: 6, marginBottom: 4, textDecoration: 'none' }}>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 8px', border: '1px solid #E1E8EC', borderRadius: 6, marginBottom: 4 }}>
                   <FileText size={13} style={{ color: '#D92D20', flexShrink: 0 }} />
-                  <span style={{ fontSize: 11, color: '#1B1B1B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url.split('/').pop()}</span>
-                </a>
+                  <a href={resolveMediaUrl(url)} target="_blank" rel="noreferrer"
+                    style={{ flex: 1, fontSize: 11, color: '#1B1B1B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'none' }}>
+                    {url.split('/').pop()}
+                  </a>
+                  <button type="button"
+                    onClick={() => handleDownload(resolveMediaUrl(url), url.split('/').pop() || undefined)}
+                    aria-label="Download dokumen"
+                    style={{ background: 'none', border: 'none', padding: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#076C9E', cursor: 'pointer', flexShrink: 0 }}>
+                    <Download size={14} />
+                  </button>
+                </div>
               ))}
             </div>
           )
@@ -1761,7 +1788,8 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   // ══════════════════════════════════════════════════
   if (isMobile) {
     const pihakLainMobile = isPPL ? activeLaporan?.teknisi : null
-    const lastUpdateM = riwayat[0]
+    const visibleRiwayat = riwayat.filter((r: any) => !isInitialRiwayat(r))
+    const lastUpdateM = visibleRiwayat[0]
     const lastUpdatedAtM = lastUpdateM?.tanggal ?? activeLaporan?.updatedAt ?? activeLaporan?.tanggal
     const canPerbarui = (isAdmin() || isSuperadmin() || isTeknisi()) && activeLaporan?.status !== 'selesai'
 
@@ -1790,6 +1818,11 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             style={{ width: 36, height: 36, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: '#076C9E', cursor: 'pointer' }}
             aria-label={`Lihat ${label}`}>
             <Eye size={18} />
+          </button>
+          <button type="button" onClick={(e) => { e.stopPropagation(); handleDownload(resolved, filename) }}
+            style={{ width: 36, height: 36, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: '#076C9E', cursor: 'pointer' }}
+            aria-label={`Download ${label}`}>
+            <Download size={18} />
           </button>
         </div>
       )
@@ -1881,22 +1914,17 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
               Riwayat Pembaruan Laporan
             </span>
 
-            {riwayat.length === 0 ? (
+            {visibleRiwayat.length === 0 ? (
               <p style={{ fontSize: 13, color: '#97AAB3', textAlign: 'center', padding: '12px 0' }}>Belum ada riwayat pembaruan</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                {riwayat.map((r: any, idx: number) => (
+                {visibleRiwayat.map((r: any, idx: number) => (
                   <div key={r.id} style={{ paddingTop: idx > 0 ? 14 : 0, borderTop: idx > 0 ? '1px solid #E1E8EC' : 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                         <span style={{ fontSize: 11, color: '#97AAB3' }}>
                           Tanggal Pembaruan: {formatTanggal(r.tanggal)}
                         </span>
-                        {isInitialRiwayat(r) && (
-                          <span style={{ fontSize: 10, fontWeight: 700, color: '#076C9E', background: '#EAF6FB', padding: '3px 8px', borderRadius: 999 }}>
-                            Data Awal
-                          </span>
-                        )}
                       </div>
                       {isSuperadmin() && (
                         <button type="button" onClick={() => handleDeleteRiwayat(r.id)}
@@ -1986,7 +2014,8 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     )
   }
   // ─── Desktop readOnly detail view ────────────────────────────────────────
-  const lastUpdate = riwayat[0]
+  const visibleRiwayat = riwayat.filter((r: any) => !isInitialRiwayat(r))
+  const lastUpdate = visibleRiwayat[0]
   const lastUpdatedAt = lastUpdate?.tanggal ?? activeLaporan?.updatedAt ?? activeLaporan?.tanggal
   const lastUpdatedBy = lastUpdate?.oleh ?? activeLaporan?.pelapor?.nama ?? '-'
 
@@ -2009,19 +2038,28 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     }
     const url = resolveMediaUrl(doc.fileUrl)
     const isImg = /\.(jpe?g|png|webp)$/i.test(doc.fileUrl)
+    const filename = doc.namaFile || doc.fileUrl.split('/').pop() || undefined
     return (
-      <div
-        onClick={() => isImg ? setLightbox({ urls: [url], index: 0 }) : window.open(url, '_blank')}
-        style={{ width: '100%', aspectRatio: '4/3', borderRadius: 8, overflow: 'hidden', border: '1px solid #E1E8EC', cursor: 'pointer' }}
-      >
-        {isImg ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-        ) : (
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F9FC' }}>
-            <FileText size={36} style={{ color: '#5F737F' }} />
-          </div>
-        )}
+      <div style={{ position: 'relative', width: '100%' }}>
+        <div
+          onClick={() => isImg ? setLightbox({ urls: [url], index: 0 }) : window.open(url, '_blank')}
+          style={{ width: '100%', aspectRatio: '4/3', borderRadius: 8, overflow: 'hidden', border: '1px solid #E1E8EC', cursor: 'pointer' }}
+        >
+          {isImg ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          ) : (
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F9FC' }}>
+              <FileText size={36} style={{ color: '#5F737F' }} />
+            </div>
+          )}
+        </div>
+        <button type="button"
+          onClick={(e) => { e.stopPropagation(); handleDownload(url, filename) }}
+          aria-label="Download dokumen"
+          style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.55)', border: 'none', borderRadius: 6, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', cursor: 'pointer' }}>
+          <Download size={14} />
+        </button>
       </div>
     )
   }
@@ -2095,14 +2133,21 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
               </span>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
                 {fotoUrls.map((url, i) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    key={i}
-                    src={resolveMediaUrl(url)}
-                    alt=""
-                    style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: 8, border: '1px solid #E1E8EC', cursor: 'pointer' }}
-                    onClick={() => setLightbox({ urls: fotoUrls.map(resolveMediaUrl), index: i })}
-                  />
+                  <div key={i} style={{ position: 'relative' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={resolveMediaUrl(url)}
+                      alt=""
+                      style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: 8, border: '1px solid #E1E8EC', cursor: 'pointer', display: 'block' }}
+                      onClick={() => setLightbox({ urls: fotoUrls.map(resolveMediaUrl), index: i })}
+                    />
+                    <button type="button"
+                      onClick={(e) => { e.stopPropagation(); handleDownload(resolveMediaUrl(url), url.split('/').pop() || undefined) }}
+                      aria-label="Download foto"
+                      style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.55)', border: 'none', borderRadius: 6, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', cursor: 'pointer' }}>
+                      <Download size={14} />
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -2143,24 +2188,19 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
         {/* ── Section 3: Riwayat Pembaruan Laporan ────────────────────── */}
         <div>
           <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 20 }}>Riwayat Pembaruan Laporan</span>
-          {riwayat.length === 0 ? (
+          {visibleRiwayat.length === 0 ? (
             <div style={{ padding: '40px 0', textAlign: 'center', color: '#97AAB3' }}>
               Belum ada riwayat pembaruan
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              {riwayat.map((r: any) => (
+              {visibleRiwayat.map((r: any) => (
                 <div key={r.id} style={{ padding: 20, border: '1px solid #E1E8EC', borderRadius: 12, background: '#FFFFFF' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                       <span style={{ fontSize: 13, color: '#566B75', fontWeight: 500 }}>
                         Tanggal Pembaruan: {formatTanggal(r.tanggal)} · Oleh: {r.oleh}
                       </span>
-                      {isInitialRiwayat(r) && (
-                        <span style={{ fontSize: 11, fontWeight: 700, color: '#076C9E', background: '#EAF6FB', padding: '4px 10px', borderRadius: 999 }}>
-                          Data Awal
-                        </span>
-                      )}
                     </div>
                     {isSuperadmin() && (
                       <button onClick={() => handleDeleteRiwayat(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 4 }}>

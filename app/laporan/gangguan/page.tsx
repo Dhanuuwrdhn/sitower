@@ -1342,6 +1342,17 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   const activeLaporan = detailLaporan ?? laporan
   const isPPL = activeLaporan?.jenisGangguan === 'pekerjaan_pihak_lain'
 
+  // Single source of truth for the "Perbarui Laporan" button visibility,
+  // reused by both mobile sticky button and desktop header button so the
+  // gating is identical regardless of how the page was reached (Riwayat
+  // table click vs. ?laporan=<id> from the dashboard map popup).
+  // Admin & superadmin always see the button on an open report; teknisi
+  // only see it on their own.
+  const isOwnLaporan = !!(activeLaporan?.pelaporId && user?.id && activeLaporan.pelaporId === user.id)
+  const canUpdate = !!activeLaporan
+    && activeLaporan.status !== 'selesai'
+    && (!isTeknisi() || isOwnLaporan)
+
   async function reloadDetailData() {
     if (!activeLaporan?.id) return
     const [laporanRes, progressRes, riwayatRes] = await Promise.all([
@@ -1794,8 +1805,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     const visibleRiwayat = riwayat.filter((r: any) => !isInitialRiwayat(r))
     const lastUpdateM = visibleRiwayat[0]
     const lastUpdatedAtM = lastUpdateM?.tanggal ?? activeLaporan?.updatedAt ?? activeLaporan?.tanggal
-    const ownsLaporan = activeLaporan?.pelaporId === user?.id
-    const canPerbarui = (!isTeknisi() || ownsLaporan) && activeLaporan?.status !== 'selesai'
+    const canPerbarui = canUpdate
 
     // File attachment row: [thumb] [Label / filename] [eye]
     const FileRow = ({ label, url }: { label: string; url: string }) => {
@@ -2088,7 +2098,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             <span>Oleh : {lastUpdatedBy}</span>
           </div>
         </div>
-        {activeLaporan?.status !== 'selesai' && (!isTeknisi() || activeLaporan?.pelaporId === user?.id) && (
+        {canUpdate && (
           <button
             onClick={() => setShowUpdateDrawer(true)}
             style={{ height: 44, padding: '0 24px', background: '#076C9E', border: 'none', borderRadius: 8, color: '#FFFFFF', fontSize: 14, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}

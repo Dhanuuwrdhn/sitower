@@ -2,7 +2,8 @@
 
 import { APIProvider, Map, InfoWindow, useMap } from '@vis.gl/react-google-maps'
 import { useEffect, useRef, useState, useMemo } from 'react'
-import { SlidersHorizontal, X as XIcon } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { SlidersHorizontal, X as XIcon, ChevronRight } from 'lucide-react'
 import { JALUR_COLORS } from '@/lib/geodata'
 import { TwIcon } from '@/components/ui/TwIcon'
 
@@ -12,6 +13,7 @@ interface KerawananItem {
   kategori: string
   level: string
   status: string
+  laporanId?: string
 }
 
 export interface FeaturedTower {
@@ -456,7 +458,7 @@ const RISIKO_LABEL: Record<string, string> = {
   aman:                   'Aman',
 }
 
-function TowerPopup({ tower, onClose }: { tower: FeaturedTower; onClose: () => void }) {
+function TowerPopup({ tower, onClose, onKerawananClick }: { tower: FeaturedTower; onClose: () => void; onKerawananClick?: (laporanId: string) => void }) {
   const level = getTopLevel(tower.kerawanan)
   const levelColor = LEVEL_COLOR[level]
   const hasKerawanan = tower.kerawanan.length > 0
@@ -483,20 +485,35 @@ function TowerPopup({ tower, onClose }: { tower: FeaturedTower; onClose: () => v
               Kerawanan{tower.kerawanan.length > 1 ? ` (${tower.kerawanan.length})` : ''}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              {shown.map((k, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ fontSize: 14, lineHeight: 1 }}>{KATEGORI_EMOJI[normKat(k.kategori)] ?? '⚠️'}</span>
-                  <span style={{ color: '#374151', fontSize: 11, flex: 1 }}>{KATEGORI_LABEL[normKat(k.kategori)] ?? k.kategori}</span>
-                  <span style={{
-                    fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 999,
-                    background: (LEVEL_COLOR[k.level] ?? '#94a3b8') + '22',
-                    color: LEVEL_COLOR[k.level] ?? '#94a3b8',
-                    textTransform: 'uppercase', whiteSpace: 'nowrap',
-                  }}>
-                    {RISIKO_LABEL[k.level] ?? k.level}
-                  </span>
-                </div>
-              ))}
+              {shown.map((k, i) => {
+                const clickable = !!(k.laporanId && onKerawananClick)
+                return (
+                  <div key={i}
+                    onClick={clickable ? () => onKerawananClick!(k.laporanId!) : undefined}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      padding: '4px 6px', margin: '-4px -6px',
+                      borderRadius: 6,
+                      cursor: clickable ? 'pointer' : 'default',
+                      transition: 'background-color 120ms',
+                    }}
+                    onMouseEnter={(e) => { if (clickable) (e.currentTarget as HTMLElement).style.background = '#F1F5F9' }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+                  >
+                    <span style={{ fontSize: 14, lineHeight: 1 }}>{KATEGORI_EMOJI[normKat(k.kategori)] ?? '⚠️'}</span>
+                    <span style={{ color: '#374151', fontSize: 11, flex: 1 }}>{KATEGORI_LABEL[normKat(k.kategori)] ?? k.kategori}</span>
+                    <span style={{
+                      fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 999,
+                      background: (LEVEL_COLOR[k.level] ?? '#94a3b8') + '22',
+                      color: LEVEL_COLOR[k.level] ?? '#94a3b8',
+                      textTransform: 'uppercase', whiteSpace: 'nowrap',
+                    }}>
+                      {RISIKO_LABEL[k.level] ?? k.level}
+                    </span>
+                    {clickable && <ChevronRight size={12} style={{ color: '#94a3b8' }} />}
+                  </div>
+                )
+              })}
               {extra > 0 && (
                 <div style={{ color: '#97aab3', fontSize: 10, fontStyle: 'italic' }}>
                   +{extra} lainnya — klik tower untuk detail
@@ -583,10 +600,16 @@ const ALL_LAYER_TYPES = ['SUTT', 'SUTET', 'SKTT'] as const
 type LayerType = typeof ALL_LAYER_TYPES[number]
 
 export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props) {
+  const router = useRouter()
   const [selected, setSelected] = useState<FeaturedTower | null>(null)
   const [activeJenis, setActiveJenis] = useState<string[]>([])
   const [visibleLayers, setVisibleLayers] = useState<Set<string>>(new Set(['SUTT', 'SUTET', 'SKTT']))
   const [filterOpen, setFilterOpen] = useState(false)
+
+  function handleKerawananClick(laporanId: string) {
+    setSelected(null)
+    router.push(`/laporan/gangguan?laporan=${encodeURIComponent(laporanId)}`)
+  }
 
   function toggleJenis(k: string) {
     setActiveJenis(prev => prev.includes(k) ? prev.filter(x => x !== k) : [...prev, k])
@@ -655,7 +678,7 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
         >
           {jalurKml && jalurKml.length > 0 && <JalurKmlLines jalurKml={jalurKml} visibleTypes={visibleLayers} />}
           <TowerMarkers towers={displayTowers} onSelect={handleSelect} />
-          {selected && <TowerPopup tower={selected} onClose={() => setSelected(null)} />}
+          {selected && <TowerPopup tower={selected} onClose={() => setSelected(null)} onKerawananClick={handleKerawananClick} />}
         </Map>
       </APIProvider>
 

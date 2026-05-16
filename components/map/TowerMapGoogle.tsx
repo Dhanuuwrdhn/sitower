@@ -607,7 +607,13 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
     const all = towers ?? []
     const byLayer = all.filter((t) => t.tipe === 'gardu' || visibleLayers.has(t.tipe))
     if (activeJenis.length === 0) return byLayer
-    return byLayer.filter((t) => t.kerawanan.some((k) => activeJenis.includes(normKat(k.kategori))))
+    // Filter at the kerawanan level (not just at the tower level), so the
+    // marker color, badge count, and popup only reflect the selected jenis.
+    return byLayer.flatMap((t) => {
+      const matching = t.kerawanan.filter((k) => activeJenis.includes(normKat(k.kategori)))
+      if (matching.length === 0) return []
+      return [{ ...t, kerawanan: matching }]
+    })
   }, [towers, activeJenis, visibleLayers])
 
   const hasActiveFilter = activeJenis.length > 0 || visibleLayers.size < ALL_LAYER_TYPES.length

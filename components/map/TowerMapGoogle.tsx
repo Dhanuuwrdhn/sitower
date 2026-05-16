@@ -206,9 +206,9 @@ function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', ker
       <svg x="${bx}" y="${by}" width="${BADGE_D}" height="${BADGE_D}" viewBox="0 0 36 36">${iconBody}</svg>
     `
   } else {
-    // 2+ → render one badge per kerawanan jenis, horizontally with slight overlap.
+    // 2+ → render one badge per kerawanan jenis, horizontally with breathing room.
     // No count pill — every icon is visible directly on the marker.
-    const GAP = BADGE_D - 4  // slight overlap between adjacent badges
+    const GAP = BADGE_D + 4  // small spacing between adjacent badges so icons don't touch
     SVG_W = CIRCLE_D + GAP * (numBadges - 1) + BADGE_D - BADGE_OVERLAP + 2
     for (let i = 0; i < numBadges; i++) {
       const bx = BADGE_X0 + i * GAP, by = 0

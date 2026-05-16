@@ -285,7 +285,7 @@ function UserModal({ open, initial, onClose, onSaved }: { open: boolean; initial
 
   async function handleSubmit(e?: React.FormEvent) {
     e?.preventDefault()
-    if (!form.nik || !form.nama) { toast.error('NIK dan Nama wajib diisi'); return }
+    if (!form.nik || !form.nama) { toast.error('NIP dan Nama wajib diisi'); return }
     if (!initial && !form.password) { toast.error('Password wajib diisi untuk user baru'); return }
     if (form.password) {
       const p = form.password
@@ -319,13 +319,13 @@ function UserModal({ open, initial, onClose, onSaved }: { open: boolean; initial
   const formFields = (
     <form id="user-form" onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-[13px] font-semibold text-app-text mb-1.5">NIK <span className="text-red-500">*</span></label>
+        <label className="block text-[13px] font-semibold text-app-text mb-1.5">NIP <span className="text-red-500">*</span></label>
         <input
           type="text" inputMode="numeric"
           value={form.nik}
           onChange={(e) => set('nik', e.target.value)}
           className="form-input font-mono"
-          placeholder="Masukkan NIK"
+          placeholder="Masukkan NIP"
           readOnly={!!initial}
           style={{ minHeight: 44, ...(initial ? { background: 'var(--color-app-bg)', cursor: 'not-allowed' } : {}) }}
         />
@@ -653,7 +653,7 @@ export default function UsersPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari berdasarkan NIK, Jabatan, atau Role"
+              placeholder="Cari berdasarkan NIP, Jabatan, atau Role"
               className="form-input pl-10"
               style={{ height: 44, width: '100%' }}
             />
@@ -734,7 +734,7 @@ export default function UsersPage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>NIK</th>
+                <th>NIP</th>
                 <th>Nama</th>
                 <th>Jabatan</th>
                 <th>Role</th>

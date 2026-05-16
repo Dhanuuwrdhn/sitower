@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import toast from 'react-hot-toast'
 import Swal from 'sweetalert2'
@@ -3337,6 +3338,29 @@ export default function GangguanPage() {
   function openEdit(row: any) { setAutoOpenUpdate(false); setEditRow(row); setViewMode('edit'); setDrawerOpen(true) }
   function openDetail(row: any) { setAutoOpenUpdate(false); setEditRow(row); setViewMode('detail'); setDrawerOpen(false) }
   function openUpdate(row: any) { setAutoOpenUpdate(true); setEditRow(row); setViewMode('detail'); setDrawerOpen(false) }
+
+  // Auto-open detail when arriving with ?laporan=<id> (e.g. from the map popup).
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const queryLaporanId = searchParams.get('laporan')
+  useEffect(() => {
+    if (!queryLaporanId) return
+    let cancelled = false
+    laporanApi.getById(queryLaporanId)
+      .then((res) => {
+        if (cancelled) return
+        const lap = res.data
+        if (lap) openDetail(lap)
+        router.replace('/laporan/gangguan', { scroll: false })
+      })
+      .catch(() => {
+        if (cancelled) return
+        toast.error('Laporan tidak ditemukan')
+        router.replace('/laporan/gangguan', { scroll: false })
+      })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryLaporanId])
 
   async function handleImport() {
     if (!importFile) return

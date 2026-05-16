@@ -307,9 +307,10 @@ export default function DashboardPage() {
             const items: { kategori: string; level: string; status: string }[] =
               Array.isArray(t.kerawanan) && t.kerawanan.length > 0
                 ? t.kerawanan.map((k: any) => ({
-                    kategori: k.jenis,
-                    level:    k.level ?? 'aman',
-                    status:   k.level ?? 'aman',
+                    kategori:  k.jenis,
+                    level:     k.level ?? 'aman',
+                    status:    k.level ?? 'aman',
+                    laporanId: k.laporan_id,
                   }))
                 : (t.kerawanan_types?.length
                   ? t.kerawanan_types.map((jenis: string) => ({

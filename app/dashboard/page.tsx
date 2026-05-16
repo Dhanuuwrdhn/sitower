@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic'
 import { CloudUpload } from 'lucide-react'
 import Swal from 'sweetalert2'
 import { laporanApi, towersApi, asetApi, importApi, jalurKmlApi } from '@/lib/api'
-import { isTeknisi } from '@/lib/auth'
 import B2WLoader from '@/components/ui/B2WLoader'
 import { TwIcon } from '@/components/ui/TwIcon'
 
@@ -256,7 +255,7 @@ export default function DashboardPage() {
         .then((res) => setStats(res.data))
         .catch(() => {}),
 
-      laporanApi.getAll({ limit: 5, ...(isTeknisi() ? { mine: 'true' } : {}) })
+      laporanApi.getAll({ limit: 5 })
         .then((res) => {
           const rows = (res.data.data ?? res.data) as any[]
           setRecent(rows.slice(0, 5).map((r: any) => ({

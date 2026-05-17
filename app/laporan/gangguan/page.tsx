@@ -1717,11 +1717,25 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           {/* Status Kerawanan */}
           <div>
             <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 6 }}>Status Kerawanan</label>
-            <select className="form-input" value={riwayatForm.statusKerawanan} onChange={e => setRiwayatForm(f => ({ ...f, statusKerawanan: e.target.value }))}>
-              <option value="aman">Aman</option>
-              <option value="sedang">Sedang</option>
-              <option value="kritis">Kritis</option>
-            </select>
+            <div style={{ position: 'relative' }}>
+              <select
+                className="form-input"
+                value={riwayatForm.statusKerawanan}
+                onChange={e => setRiwayatForm(f => ({ ...f, statusKerawanan: e.target.value }))}
+                style={{
+                  appearance: 'none', WebkitAppearance: 'none', MozAppearance: 'none',
+                  background: '#FFFFFF', color: '#1B1B1B', paddingRight: 32, cursor: 'pointer',
+                }}
+              >
+                <option value="aman">Aman</option>
+                <option value="sedang">Sedang</option>
+                <option value="kritis">Kritis</option>
+              </select>
+              <ChevronDown
+                size={14}
+                style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: '#5F737F', pointerEvents: 'none' }}
+              />
+            </div>
           </div>
 
           {/* Uraian Pekerjaan */}
@@ -1813,11 +1827,35 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>Informasi Progres Laporan</span>
             <div>
               <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 6 }}>Progres Laporan</label>
-              <select className="form-input" value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(riwayatForm.progresLaporan) ? 'tidak_ada_aktifitas' : riwayatForm.progresLaporan} onChange={e => setRiwayatForm(f => ({ ...f, progresLaporan: e.target.value }))}>
-                <option value="sedang_berlangsung">Sedang Berlangsung</option>
-                <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
-                <option value="selesai">Selesai</option>
-              </select>
+              {/* Reset native appearance + explicit color/bg + manual chevron.
+                  Without this, iOS Safari renders the <select> with grayed
+                  system text when the .form-input @apply rules don't include
+                  `appearance: none`, which made the field look disabled
+                  even though it is interactive. */}
+              <div style={{ position: 'relative' }}>
+                <select
+                  className="form-input"
+                  value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(riwayatForm.progresLaporan) ? 'tidak_ada_aktifitas' : riwayatForm.progresLaporan}
+                  onChange={e => setRiwayatForm(f => ({ ...f, progresLaporan: e.target.value }))}
+                  style={{
+                    appearance: 'none',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    background: '#FFFFFF',
+                    color: '#1B1B1B',
+                    paddingRight: 32,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <option value="sedang_berlangsung">Sedang Berlangsung</option>
+                  <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
+                  <option value="selesai">Selesai</option>
+                </select>
+                <ChevronDown
+                  size={14}
+                  style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: '#5F737F', pointerEvents: 'none' }}
+                />
+              </div>
             </div>
           </div>
         </div>

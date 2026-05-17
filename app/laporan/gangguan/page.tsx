@@ -3469,7 +3469,10 @@ export default function GangguanPage() {
     return (
       <DetailReadView
         laporan={editRow}
-        onSaved={() => { fetchData(); setEditRow(null); setViewMode(null); setAutoOpenUpdate(false) }}
+        // After Perbarui Laporan: stay on Detail page (drawer closes itself + reloadDetailData
+        // already refreshes the panel). Only refresh the parent list. For Delete / Selesaikan
+        // the handler explicitly calls onClose() to exit Detail.
+        onSaved={() => { fetchData() }}
         onClose={() => { setEditRow(null); setViewMode(null); setAutoOpenUpdate(false) }}
         onDelete={(l) => { setDeleteRow(l); setEditRow(null); setViewMode(null); setAutoOpenUpdate(false) }}
         autoOpenUpdate={autoOpenUpdate}

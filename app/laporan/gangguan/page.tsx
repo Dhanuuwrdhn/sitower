@@ -895,6 +895,70 @@ function ProgresLaporanSheet({
   )
 }
 
+// ── Time picker bottom sheet ──────────────────────────────────────────────────
+
+function TimePickerSheet({
+  open, value, onConfirm, onClose,
+}: {
+  open: boolean; value: string; onConfirm: (t: string) => void; onClose: () => void
+}) {
+  const [h, m] = (value || '00:00').split(':')
+  const [hour, setHour] = useState(h || '00')
+  const [minute, setMinute] = useState(m || '00')
+  useEffect(() => {
+    if (!open) return
+    const [hh, mm] = (value || '00:00').split(':')
+    setHour(hh || '00'); setMinute(mm || '00')
+  }, [open, value])
+  const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
+  const minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'))
+  const Col = ({ items, val, onPick }: { items: string[]; val: string; onPick: (v: string) => void }) => (
+    <div style={{ flex: 1, height: 220, overflowY: 'auto', borderRight: '1px solid #F0F4F6' }}>
+      {items.map(it => (
+        <button
+          key={it}
+          onClick={() => onPick(it)}
+          style={{
+            display: 'block', width: '100%', height: 40, border: 'none',
+            background: val === it ? '#EAF4FA' : '#FFFFFF',
+            color: val === it ? '#076C9E' : '#1B1B1B',
+            fontWeight: val === it ? 700 : 500, fontSize: 16, cursor: 'pointer',
+          }}
+        >
+          {it}
+        </button>
+      ))}
+    </div>
+  )
+  return (
+    <BottomSheet open={open} onClose={onClose} height={360}>
+      <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 48, position: 'relative' }}>
+        <button
+          onClick={onClose}
+          style={{ position: 'absolute', left: 16, background: 'none', border: 'none', padding: 4, cursor: 'pointer', display: 'flex' }}
+        >
+          <X size={15} style={{ color: '#97AAB3' }} />
+        </button>
+        <span style={{ flex: 1, textAlign: 'center', fontWeight: 700, fontSize: 16, color: '#1B1B1B' }}>
+          Pilih Waktu
+        </span>
+      </div>
+      <div style={{ display: 'flex', borderTop: '1px solid #F0F4F6', borderBottom: '1px solid #F0F4F6' }}>
+        <Col items={hours} val={hour} onPick={setHour} />
+        <Col items={minutes} val={minute} onPick={setMinute} />
+      </div>
+      <div style={{ padding: 16 }}>
+        <button
+          onClick={() => { onConfirm(`${hour}:${minute}`); onClose() }}
+          style={{ width: '100%', height: 44, borderRadius: 22, background: '#076C9E', color: '#fff', fontWeight: 600, fontSize: 14, border: 'none', cursor: 'pointer' }}
+        >
+          Konfirmasi
+        </button>
+      </div>
+    </BottomSheet>
+  )
+}
+
 // ── Ambil Foto bottom sheet ───────────────────────────────────────────────────
 
 function AmbilFotoSheet({
@@ -2589,6 +2653,8 @@ function LaporanDrawer({
   const [jenisSheetOpen, setJenisSheetOpen] = useState(false)
   const [levelSheetOpen, setLevelSheetOpen] = useState(false)
   const [progresSheetOpen, setProgresSheetOpen] = useState(false)
+  const [dateSheetOpen, setDateSheetOpen] = useState(false)
+  const [timeSheetOpen, setTimeSheetOpen] = useState(false)
   const [towerSheetOpen, setTowerSheetOpen] = useState(false)
   const [towerSheetTarget, setTowerSheetTarget] = useState<'start' | 'end'>('start')
   const [fotoSheetOpen, setFotoSheetOpen] = useState(false)
@@ -3271,25 +3337,80 @@ function LaporanDrawer({
         const [datePart, timePart] = (form.tanggalWaktu || 'T').split('T')
         const onDateChange = (d: string) => set('tanggalWaktu', `${d}T${timePart || '00:00'}`)
         const onTimeChange = (t: string) => set('tanggalWaktu', `${datePart || jakartaDatetimeLocalString().split('T')[0]}T${t}`)
+        const formatDateLabel = (d: string) => {
+          if (!d) return 'Pilih tanggal...'
+          const dt = new Date(d + 'T00:00:00')
+          if (isNaN(dt.getTime())) return d
+          return dt.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+        }
         return (
           <div>
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">Dibuat pada</label>
-            <div className="flex gap-2">
-              <input
-                disabled={dtDisabled}
-                type="date"
-                value={datePart || ''}
-                onChange={(e) => onDateChange(e.target.value)}
-                className={`form-input flex-1 ${dtDisabled ? 'bg-app-bg text-app-muted' : ''}`}
-              />
-              <input
-                disabled={dtDisabled}
-                type="time"
-                value={timePart || ''}
-                onChange={(e) => onTimeChange(e.target.value)}
-                className={`form-input w-[120px] ${dtDisabled ? 'bg-app-bg text-app-muted' : ''}`}
-              />
-            </div>
+            {isMobile ? (
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  disabled={dtDisabled}
+                  onClick={() => !dtDisabled && setDateSheetOpen(true)}
+                  style={{
+                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '10px 14px', background: dtDisabled ? '#F6F9FC' : '#FFFFFF',
+                    border: '1px solid #E1E8EC', borderRadius: 8,
+                    cursor: dtDisabled ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  <span style={{ fontSize: 14, color: datePart ? (dtDisabled ? '#97AAB3' : '#1B1B1B') : '#97AAB3', fontWeight: 500 }} className="truncate">
+                    {formatDateLabel(datePart)}
+                  </span>
+                  <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+                </button>
+                <button
+                  type="button"
+                  disabled={dtDisabled}
+                  onClick={() => !dtDisabled && setTimeSheetOpen(true)}
+                  style={{
+                    width: 120, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '10px 14px', background: dtDisabled ? '#F6F9FC' : '#FFFFFF',
+                    border: '1px solid #E1E8EC', borderRadius: 8,
+                    cursor: dtDisabled ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  <span style={{ fontSize: 14, color: timePart ? (dtDisabled ? '#97AAB3' : '#1B1B1B') : '#97AAB3', fontWeight: 500 }}>
+                    {timePart ? timePart.replace(':', '.') : '--.--'}
+                  </span>
+                  <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+                </button>
+                <CalendarPickerSheet
+                  open={dateSheetOpen}
+                  value={datePart || ''}
+                  onConfirm={onDateChange}
+                  onClose={() => setDateSheetOpen(false)}
+                />
+                <TimePickerSheet
+                  open={timeSheetOpen}
+                  value={timePart || ''}
+                  onConfirm={onTimeChange}
+                  onClose={() => setTimeSheetOpen(false)}
+                />
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  disabled={dtDisabled}
+                  type="date"
+                  value={datePart || ''}
+                  onChange={(e) => onDateChange(e.target.value)}
+                  className={`form-input flex-1 ${dtDisabled ? 'bg-app-bg text-app-muted' : ''}`}
+                />
+                <input
+                  disabled={dtDisabled}
+                  type="time"
+                  value={timePart || ''}
+                  onChange={(e) => onTimeChange(e.target.value)}
+                  className={`form-input w-[120px] ${dtDisabled ? 'bg-app-bg text-app-muted' : ''}`}
+                />
+              </div>
+            )}
           </div>
         )
       })()}

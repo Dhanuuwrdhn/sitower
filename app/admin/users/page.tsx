@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import {
   Plus, Pencil, Trash2, X, Power, Check, CircleX,
   KeyRound, RefreshCw, SlidersHorizontal, ChevronLeft, ChevronRight,
-  Eye, EyeOff, Shield, Wrench, Crown, Search, Building2, Save,
+  Eye, EyeOff, Shield, Wrench, Crown, Search, Building2, Save, Users,
 } from 'lucide-react'
 import { pegawaiApi, authApi, unitsApi } from '@/lib/api'
 import { isSuperadmin, isAdminOrSuperadmin } from '@/lib/auth'
@@ -531,7 +531,7 @@ function UnitManagement({ units, onChanged }: { units: { id: string; nama: strin
   }
 
   return (
-    <div className="mt-8">
+    <div>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Building2 size={18} className="text-[#076c9e]" />
@@ -666,6 +666,8 @@ export default function UsersPage() {
   const [pwRequests, setPwRequests]   = useState<any[]>([])
   const [pwLoading, setPwLoading]     = useState(true)
   const [pwProcessing, setPwProcessing] = useState<string | null>(null)
+
+  const [activeTab, setActiveTab] = useState<'users' | 'password' | 'units'>('users')
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -809,11 +811,78 @@ export default function UsersPage() {
   const startRow = filtered.length === 0 ? 0 : (page - 1) * pageSize + 1
   const endRow = Math.min(page * pageSize, filtered.length)
   const showExpiredCol = superadmin
+  const pendingCount = pwRequests.filter(r => r.status === 'pending').length
+
+  const TABS = [
+    { id: 'users',    label: 'Daftar User' },
+    { id: 'password', label: 'Permintaan Ganti Password' },
+    { id: 'units',    label: 'Manajemen Unit' },
+  ] as const
 
   return (
     <>
       {/* Header */}
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-app-text)', marginBottom: 16 }}>Manajemen User</h1>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-app-text)', marginBottom: 20 }}>Manajemen User</h1>
+
+      {/* Tab Bar */}
+      <div style={{ display: 'flex', borderBottom: '2px solid #f1f5f9', marginBottom: 24 }}>
+        {TABS.map(({ id, label }) => {
+          const active = activeTab === id
+          return (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              style={{
+                position: 'relative',
+                padding: '10px 20px 12px',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 14,
+                fontWeight: active ? 700 : 500,
+                color: active ? '#076C9E' : '#5F737F',
+                transition: 'color 0.15s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {label}
+              {id === 'password' && pendingCount > 0 && (
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  width: 18, height: 18, borderRadius: 999,
+                  background: '#D92D20', color: '#fff',
+                  fontSize: 10, fontWeight: 700,
+                }}>
+                  {pendingCount}
+                </span>
+              )}
+              {active && (
+                <span style={{
+                  position: 'absolute', bottom: -2, left: 0, right: 0,
+                  height: 2, background: '#076C9E', borderRadius: 2,
+                }} />
+              )}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Tab content — key triggers remount + animate-in on switch */}
+      <div key={activeTab} className="animate-in fade-in slide-in-from-bottom-2 duration-200">
+
+      {/* ── Daftar User ─────────────────────────────────────────────── */}
+      {activeTab === 'users' && (<>
+
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Users size={18} className="text-[#076c9e]" />
+          <h2 className="text-lg font-bold text-app-text">Daftar User</h2>
+          <span className="text-app-muted text-[13px]">({filtered.length})</span>
+        </div>
+      </div>
 
       {/* Toolbar: Search + Filter + Tambah User in one row */}
       <div className="mb-4" style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -1088,15 +1157,18 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* ── Password Change Requests ─────────────────────────────────────── */}
-      <div className="mt-8">
+      </>)}
+
+      {/* ── Permintaan Ganti Password ────────────────────────────────── */}
+      {activeTab === 'password' && (<>
+
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <KeyRound size={18} className="text-[#076c9e]" />
             <h2 className="text-lg font-bold text-app-text">Permintaan Ganti Password</h2>
-            {pwRequests.filter(r => r.status === 'pending').length > 0 && (
+            {pendingCount > 0 && (
               <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#D92D20] text-white text-[11px] font-bold">
-                {pwRequests.filter(r => r.status === 'pending').length}
+                {pendingCount}
               </span>
             )}
           </div>
@@ -1104,6 +1176,8 @@ export default function UsersPage() {
             <RefreshCw size={15} />
           </button>
         </div>
+
+        <div>
 
         {/* Mobile cards */}
         <div className="md:hidden space-y-3">
@@ -1255,8 +1329,14 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* ── Manajemen Unit ────────────────────────────────────────────────── */}
-      <UnitManagement units={units} onChanged={fetchUnits} />
+      </>)}
+
+      {/* ── Manajemen Unit ──────────────────────────────────────────── */}
+      {activeTab === 'units' && (
+        <UnitManagement units={units} onChanged={fetchUnits} />
+      )}
+
+      </div>{/* end tab content */}
 
       {/* Mobile filter bottom sheet */}
       <BottomSheet open={mobileFilterOpen} onClose={() => setMobileFilterOpen(false)} title="Filter">

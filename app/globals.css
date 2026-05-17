@@ -863,6 +863,11 @@
   align-items: center;
   gap: 12px;
 }
+/* Hide the section-header "Lihat Semua" on PWA mobile — there is already a
+   bottom "Lihat Semua" CTA further down the list. */
+@media (max-width: 768px) {
+  .dash-riwayat-actions { display: none; }
+}
 
 .dash-import-btn {
   display: flex;

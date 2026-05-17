@@ -896,50 +896,60 @@ function PilihTowerSheet({
   const allFiltered = options.filter((t) => {
     if (!search) return true
     const q = search.toLowerCase()
-    return t.id.toLowerCase().includes(q) || (t.nama ?? '').toLowerCase().includes(q)
+    return (
+      t.id.toLowerCase().includes(q) ||
+      (t.nama ?? '').toLowerCase().includes(q) ||
+      (t.nomorTower ?? '').toLowerCase().includes(q) ||
+      (t.jalur ?? '').toLowerCase().includes(q)
+    )
   })
-  const displayed = search ? allFiltered : allFiltered.slice(0, 5)
+  const displayed = allFiltered
 
   return (
-    <BottomSheet open={open} onClose={onClose} height={424}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 48, position: 'relative' }}>
-        <button
-          onClick={onClose}
-          style={{ position: 'absolute', left: 16, background: 'none', border: 'none', padding: 4, cursor: 'pointer', display: 'flex' }}
-        >
-          <X size={15} style={{ color: '#97AAB3' }} />
-        </button>
-        <span style={{ flex: 1, textAlign: 'center', fontWeight: 700, fontSize: 16, color: '#1B1B1B' }}>
-          Pilih Tower
-        </span>
-      </div>
-      {/* Search bar */}
-      <div style={{ padding: '12px 16px' }}>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 10,
-          background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8,
-          padding: '0 12px', height: 44,
-        }}>
-          <Search size={16} style={{ color: '#566B75', flexShrink: 0 }} />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari tower berdasarkan nama"
-            style={{
-              border: 'none', outline: 'none', width: '100%',
-              fontSize: 14, fontWeight: 500, color: '#1B1B1B', background: 'transparent',
-            }}
-          />
-          {search && (
-            <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex' }}>
-              <X size={14} style={{ color: '#97AAB3' }} />
-            </button>
-          )}
+    <BottomSheet open={open} onClose={onClose}>
+      {/* Flex column so list can fill remaining height and scroll. The sheet
+          is capped at 85vh — header + search are flexShrink:0, list takes the
+          rest with overflowY:auto. */}
+      <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 'calc(85vh - 24px)' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 48, position: 'relative', flexShrink: 0 }}>
+          <button
+            onClick={onClose}
+            style={{ position: 'absolute', left: 16, background: 'none', border: 'none', padding: 4, cursor: 'pointer', display: 'flex' }}
+          >
+            <X size={15} style={{ color: '#97AAB3' }} />
+          </button>
+          <span style={{ flex: 1, textAlign: 'center', fontWeight: 700, fontSize: 16, color: '#1B1B1B' }}>
+            Pilih Tower
+          </span>
         </div>
-      </div>
-      {/* Tower list — fixed 280px, scrollable */}
-      <div style={{ height: 280, overflowY: 'auto' }}>
+        {/* Search bar */}
+        <div style={{ padding: '12px 16px', flexShrink: 0 }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            background: '#FFFFFF', border: '1px solid #E1E8EC', borderRadius: 8,
+            padding: '0 12px', height: 44,
+          }}>
+            <Search size={16} style={{ color: '#566B75', flexShrink: 0 }} />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari tower berdasarkan nama"
+              style={{
+                border: 'none', outline: 'none', width: '100%',
+                fontSize: 14, fontWeight: 500, color: '#1B1B1B', background: 'transparent',
+              }}
+            />
+            {search && (
+              <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex' }}>
+                <X size={14} style={{ color: '#97AAB3' }} />
+              </button>
+            )}
+          </div>
+        </div>
+        {/* Tower list — scrollable, fills remaining height. minHeight:0 is
+            required for flex children that need to shrink to enable overflow. */}
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 32 }}>
         {displayed.map((t) => {
           const { label, sub } = parseTowerDisplay(t)
           const isSelected = value === t.id
@@ -980,6 +990,7 @@ function PilihTowerSheet({
             Tower tidak ditemukan
           </p>
         )}
+        </div>
       </div>
     </BottomSheet>
   )

@@ -5,7 +5,7 @@ import ClientLayout from '@/components/layout/ClientLayout'
 
 export const metadata: Metadata = {
   title: 'SPEKTRA – Sistem Pemantauan Kerawanan Transmisi',
-  description: 'Sistem Pemantauan Kerawanan Transmisi Tower PLN.',
+  description: 'Sistem Pemantauan Kerawanan Transmisi UPT Durikosambi',
   keywords: ['SPEKTRA', 'PLN', 'tower transmisi', 'kerawanan', 'monitoring', 'Born2Works'],
   authors: [{ name: 'Born2Works' }],
   creator: 'Born2Works',

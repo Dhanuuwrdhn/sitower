@@ -608,6 +608,18 @@ export default function UsersPage() {
     } finally { setPwProcessing(null) }
   }
 
+  async function handleDeletePwRequest(id: string) {
+    if (!confirm('Hapus permintaan ganti password ini?')) return
+    setPwProcessing(id)
+    try {
+      await authApi.deletePasswordChangeRequest(id)
+      toast.success('Permintaan dihapus')
+      fetchPwRequests()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'Gagal menghapus permintaan')
+    } finally { setPwProcessing(null) }
+  }
+
   async function confirmDelete() {
     if (!deleteId) return
     setDeleting(true)
@@ -957,7 +969,7 @@ export default function UsersPage() {
                   {req.status === 'rejected' && <span className="badge-menunggu">Ditolak</span>}
                   {req.status === 'expired'  && <span className="badge-menunggu opacity-60">Kedaluwarsa</span>}
                 </div>
-                {isPending && (
+                {isPending ? (
                   <div className="flex gap-2 mt-3">
                     <button
                       onClick={() => handleApprove(req.id)} disabled={processing}
@@ -972,6 +984,16 @@ export default function UsersPage() {
                       style={{ minHeight: 44 }}
                     >
                       <CircleX size={14} /> Tolak
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mt-3">
+                    <button
+                      onClick={() => handleDeletePwRequest(req.id)} disabled={processing}
+                      className="w-full flex items-center justify-center gap-1 py-2 rounded-lg bg-red-50 border border-red-200 text-red-600 text-[13px] font-semibold disabled:opacity-50"
+                      style={{ minHeight: 44 }}
+                    >
+                      <Trash2 size={14} /> Hapus
                     </button>
                   </div>
                 )}
@@ -1054,7 +1076,14 @@ export default function UsersPage() {
                               </button>
                             </div>
                           ) : (
-                            <span className="text-[12px] text-app-subtle">—</span>
+                            <button
+                              onClick={() => handleDeletePwRequest(req.id)}
+                              disabled={processing}
+                              title="Hapus"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 border border-red-200 text-red-600 text-[12px] font-semibold hover:bg-red-100 transition disabled:opacity-50 cursor-pointer"
+                            >
+                              <Trash2 size={13} /> Hapus
+                            </button>
                           )}
                         </td>
                       </tr>

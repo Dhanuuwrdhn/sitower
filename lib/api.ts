@@ -36,6 +36,7 @@ export const authApi = {
   listPasswordChangeRequests: () => api.get('/auth/password-change-requests'),
   approvePasswordChangeRequest: (id: string) => api.post(`/auth/password-change-requests/${id}/approve`),
   rejectPasswordChangeRequest: (id: string) => api.post(`/auth/password-change-requests/${id}/reject`),
+  deletePasswordChangeRequest: (id: string) => api.delete(`/auth/password-change-requests/${id}`),
 }
 
 export const towersApi = {

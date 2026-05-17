@@ -2588,6 +2588,7 @@ function LaporanDrawer({
   // Mobile bottom-sheet state
   const [jenisSheetOpen, setJenisSheetOpen] = useState(false)
   const [levelSheetOpen, setLevelSheetOpen] = useState(false)
+  const [progresSheetOpen, setProgresSheetOpen] = useState(false)
   const [towerSheetOpen, setTowerSheetOpen] = useState(false)
   const [towerSheetTarget, setTowerSheetTarget] = useState<'start' | 'end'>('start')
   const [fotoSheetOpen, setFotoSheetOpen] = useState(false)
@@ -3218,15 +3219,32 @@ function LaporanDrawer({
           </div>
           <div>
             <label className="block text-[14px] font-bold text-app-text mb-2">Progres Laporan</label>
-            <select
-              value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(form.progresLaporan) ? 'tidak_ada_aktifitas' : form.progresLaporan}
-              onChange={(e) => set('progresLaporan', e.target.value)}
-              className="form-input"
-            >
-              <option value="sedang_berlangsung">Sedang Berlangsung</option>
-              <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
-              <option value="selesai">Selesai</option>
-            </select>
+            {isMobile ? (
+              <button
+                type="button"
+                onClick={() => setProgresSheetOpen(true)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  width: '100%', padding: '10px 14px', background: '#FFFFFF',
+                  border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+                }}
+              >
+                <span style={{ fontSize: 14, color: form.progresLaporan ? '#1B1B1B' : '#97AAB3', fontWeight: 500 }} className="truncate">
+                  {PROGRES_OPTIONS.find(o => o.value === (['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(form.progresLaporan) ? 'tidak_ada_aktifitas' : form.progresLaporan))?.label || 'Pilih progres...'}
+                </span>
+                <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+              </button>
+            ) : (
+              <select
+                value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(form.progresLaporan) ? 'tidak_ada_aktifitas' : form.progresLaporan}
+                onChange={(e) => set('progresLaporan', e.target.value)}
+                className="form-input"
+              >
+                <option value="sedang_berlangsung">Sedang Berlangsung</option>
+                <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
+                <option value="selesai">Selesai</option>
+              </select>
+            )}
           </div>
         </>
       )}
@@ -3298,6 +3316,12 @@ function LaporanDrawer({
         value={form.levelRisiko}
         onSelect={(v) => set('levelRisiko', v)}
         onClose={() => setLevelSheetOpen(false)}
+      />
+      <ProgresLaporanSheet
+        open={progresSheetOpen}
+        value={form.progresLaporan}
+        onSelect={(v) => set('progresLaporan', v)}
+        onClose={() => setProgresSheetOpen(false)}
       />
       <PilihTowerSheet
         open={towerSheetOpen}

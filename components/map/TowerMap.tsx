@@ -72,12 +72,13 @@ const KATEGORI_LABEL: Record<string, string> = {
   pemanfaatan_lahan: 'Pemanfaatan Lahan',
 }
 
+// Mirror Dashboard / TowerMapGoogle KATEGORI_EMOJI for consistency.
 const KATEGORI_EMOJI: Record<string, string> = {
-  pekerjaan_pihak_lain: '🚜',
+  pekerjaan_pihak_lain: '🚧',
   kebakaran: '🔥',
   layangan: '🪁',
-  pencurian: '🥷',
-  pemanfaatan_lahan: '🏚️',
+  pencurian: '☠️',
+  pemanfaatan_lahan: '🏡',
 }
 
 // Mock seed data – replaced by props when API data is available

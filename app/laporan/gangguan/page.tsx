@@ -58,11 +58,13 @@ const LEVEL_OPTIONS = [
   { value: 'aman', label: 'Aman', color: 'text-green-600', bg: 'bg-green-50 border-green-300', dot: 'bg-green-500' },
 ]
 
+// Icons mirror the Dashboard summary cards (app/dashboard/page.tsx STATS_CFG)
+// and the map marker emoji map (TowerMapGoogle.tsx KATEGORI_EMOJI).
 const JENIS_ITEMS = [
-  { value: 'pekerjaan_pihak_lain', label: 'Pekerjaan Pihak Lain', emoji: '🚜' },
+  { value: 'pekerjaan_pihak_lain', label: 'Pekerjaan Pihak Lain', emoji: '🚧' },
   { value: 'kebakaran', label: 'Kebakaran', emoji: '🔥' },
   { value: 'layangan', label: 'Layangan', emoji: '🪁' },
-  { value: 'pencurian', label: 'Pencurian', emoji: '🥷' },
+  { value: 'pencurian', label: 'Pencurian', emoji: '☠️' },
   { value: 'pemanfaatan_lahan', label: 'Pemanfaatan Lahan', emoji: '🏡' },
 ]
 

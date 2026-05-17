@@ -1,7 +1,7 @@
 {
-  "name": "SPEKTRA – Pemantauan Tower PLN",
+  "name": "SPEKTRA – Sistem Pemantauan Kerawanan Transmisi",
   "short_name": "SPEKTRA",
-  "description": "Sistem Pemantauan Kerawanan Transmisi Tower PLN",
+  "description": "Sistem Pemantauan Kerawanan Transmisi",
   "start_url": "/dashboard",
   "display": "standalone",
   "orientation": "portrait",

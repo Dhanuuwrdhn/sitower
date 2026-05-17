@@ -45,6 +45,14 @@ const STATUS_OPTIONS = [
   { value: 'tidak_ada_aktifitas', label: 'Tidak Ada Aktifitas' },
 ]
 
+// Used by the Perbarui Laporan form's Progres Laporan dropdown.
+// Keys must match the values the form already sends to the API.
+const PROGRES_OPTIONS = [
+  { value: 'sedang_berlangsung', label: 'Sedang Berlangsung' },
+  { value: 'tidak_ada_aktifitas', label: 'Tidak Ada Aktivitas' },
+  { value: 'selesai', label: 'Selesai' },
+]
+
 const STATUS_LABEL: Record<string, string> = {
   berlangsung: 'Sedang Berlangsung',
   selesai: 'Selesai',
@@ -840,6 +848,53 @@ function StatusKerawananSheet({
   )
 }
 
+// ── Progres Laporan bottom sheet ─────────────────────────────────────────────
+
+function ProgresLaporanSheet({
+  open, value, onSelect, onClose,
+}: {
+  open: boolean; value: string; onSelect: (v: string) => void; onClose: () => void
+}) {
+  const normalizedValue = ['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(value) ? 'tidak_ada_aktifitas' : value
+  return (
+    <BottomSheet open={open} onClose={onClose} height={316}>
+      <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', height: 48, position: 'relative' }}>
+        <button
+          onClick={onClose}
+          style={{ position: 'absolute', left: 16, background: 'none', border: 'none', padding: 4, cursor: 'pointer', display: 'flex' }}
+        >
+          <X size={15} style={{ color: '#97AAB3' }} />
+        </button>
+        <span style={{ flex: 1, textAlign: 'center', fontWeight: 700, fontSize: 16, color: '#1B1B1B' }}>
+          Pilih Progres Laporan
+        </span>
+      </div>
+      {PROGRES_OPTIONS.map((item, idx) => {
+        const isSelected = normalizedValue === item.value
+        return (
+          <button
+            key={item.value}
+            onClick={() => { onSelect(item.value); onClose() }}
+            style={{
+              width: '100%', height: 56, display: 'flex', alignItems: 'center',
+              padding: '0 20px', background: '#FFFFFF',
+              border: 'none', borderBottom: idx < PROGRES_OPTIONS.length - 1 ? '1px solid #F0F4F6' : 'none',
+              cursor: 'pointer', textAlign: 'left',
+            }}
+          >
+            <span style={{ flex: 1, fontWeight: 500, fontSize: 14, color: '#1B1B1B' }}>{item.label}</span>
+            {isSelected && (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M4 10L8 14L16 6" stroke="#076C9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </button>
+        )
+      })}
+    </BottomSheet>
+  )
+}
+
 // ── Ambil Foto bottom sheet ───────────────────────────────────────────────────
 
 function AmbilFotoSheet({
@@ -1365,6 +1420,11 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   const [riwayatForm, setRiwayatForm] = useState({ statusKerawanan: 'aman', progresLaporan: 'sedang_berlangsung', uraianPekerjaan: '', upayaPengendalian: '', pihakLain: '', contactPerson: '' })
   const [riwayatFiles, setRiwayatFiles] = useState<{ foto: File[]; beritaAcara: File[]; spanduk: File[]; surat: File[] }>({ foto: [], beritaAcara: [], spanduk: [], surat: [] })
   const [savingRiwayat, setSavingRiwayat] = useState(false)
+  // Bottom-sheet pickers for the Perbarui form on mobile. Native <select>
+  // renders grey/disabled-looking on iOS Safari, so on mobile we open a
+  // BottomSheet instead. Desktop keeps the native select.
+  const [statusSheetOpen, setStatusSheetOpen] = useState(false)
+  const [progresSheetOpen, setProgresSheetOpen] = useState(false)
   const progressRefs = useRef<Record<string, HTMLInputElement | null>>({})
   const user = getUser()
   const activeLaporan = detailLaporan ?? laporan
@@ -1717,25 +1777,28 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           {/* Status Kerawanan */}
           <div>
             <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 6 }}>Status Kerawanan</label>
-            <div style={{ position: 'relative' }}>
-              <select
-                className="form-input"
-                value={riwayatForm.statusKerawanan}
-                onChange={e => setRiwayatForm(f => ({ ...f, statusKerawanan: e.target.value }))}
+            {isMobile ? (
+              <button
+                type="button"
+                onClick={() => setStatusSheetOpen(true)}
                 style={{
-                  appearance: 'none', WebkitAppearance: 'none', MozAppearance: 'none',
-                  background: '#FFFFFF', color: '#1B1B1B', paddingRight: 32, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  width: '100%', padding: '10px 14px', background: '#FFFFFF',
+                  border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
                 }}
               >
+                <span style={{ fontSize: 14, color: '#1B1B1B', fontWeight: 500 }}>
+                  {LEVEL_OPTIONS.find(o => o.value === riwayatForm.statusKerawanan)?.label ?? 'Pilih status...'}
+                </span>
+                <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+              </button>
+            ) : (
+              <select className="form-input" value={riwayatForm.statusKerawanan} onChange={e => setRiwayatForm(f => ({ ...f, statusKerawanan: e.target.value }))}>
                 <option value="aman">Aman</option>
                 <option value="sedang">Sedang</option>
                 <option value="kritis">Kritis</option>
               </select>
-              <ChevronDown
-                size={14}
-                style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: '#5F737F', pointerEvents: 'none' }}
-              />
-            </div>
+            )}
           </div>
 
           {/* Uraian Pekerjaan */}
@@ -1827,35 +1890,32 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             <span style={{ fontSize: 15, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 12 }}>Informasi Progres Laporan</span>
             <div>
               <label style={{ fontSize: 13, fontWeight: 600, color: '#1B1B1B', display: 'block', marginBottom: 6 }}>Progres Laporan</label>
-              {/* Reset native appearance + explicit color/bg + manual chevron.
-                  Without this, iOS Safari renders the <select> with grayed
-                  system text when the .form-input @apply rules don't include
-                  `appearance: none`, which made the field look disabled
-                  even though it is interactive. */}
-              <div style={{ position: 'relative' }}>
+              {isMobile ? (
+                <button
+                  type="button"
+                  onClick={() => setProgresSheetOpen(true)}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    width: '100%', padding: '10px 14px', background: '#FFFFFF',
+                    border: '1px solid #E1E8EC', borderRadius: 8, cursor: 'pointer',
+                  }}
+                >
+                  <span style={{ fontSize: 14, color: '#1B1B1B', fontWeight: 500 }}>
+                    {PROGRES_OPTIONS.find(o => o.value === (['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(riwayatForm.progresLaporan) ? 'tidak_ada_aktifitas' : riwayatForm.progresLaporan))?.label ?? 'Pilih progres...'}
+                  </span>
+                  <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
+                </button>
+              ) : (
                 <select
                   className="form-input"
                   value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(riwayatForm.progresLaporan) ? 'tidak_ada_aktifitas' : riwayatForm.progresLaporan}
                   onChange={e => setRiwayatForm(f => ({ ...f, progresLaporan: e.target.value }))}
-                  style={{
-                    appearance: 'none',
-                    WebkitAppearance: 'none',
-                    MozAppearance: 'none',
-                    background: '#FFFFFF',
-                    color: '#1B1B1B',
-                    paddingRight: 32,
-                    cursor: 'pointer',
-                  }}
                 >
                   <option value="sedang_berlangsung">Sedang Berlangsung</option>
                   <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
                   <option value="selesai">Selesai</option>
                 </select>
-                <ChevronDown
-                  size={14}
-                  style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: '#5F737F', pointerEvents: 'none' }}
-                />
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -2113,6 +2173,18 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           <PhotoLightbox urls={lightbox.urls} startIndex={lightbox.index} onClose={() => setLightbox(null)} />
         )}
         {updateDrawer}
+        <StatusKerawananSheet
+          open={statusSheetOpen}
+          value={riwayatForm.statusKerawanan}
+          onSelect={(v) => setRiwayatForm(f => ({ ...f, statusKerawanan: v }))}
+          onClose={() => setStatusSheetOpen(false)}
+        />
+        <ProgresLaporanSheet
+          open={progresSheetOpen}
+          value={riwayatForm.progresLaporan}
+          onSelect={(v) => setRiwayatForm(f => ({ ...f, progresLaporan: v }))}
+          onClose={() => setProgresSheetOpen(false)}
+        />
       </div>
     )
   }
@@ -2398,6 +2470,18 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           <PhotoLightbox urls={lightbox.urls} startIndex={lightbox.index} onClose={() => setLightbox(null)} />
         )}
         {updateDrawer}
+        <StatusKerawananSheet
+          open={statusSheetOpen}
+          value={riwayatForm.statusKerawanan}
+          onSelect={(v) => setRiwayatForm(f => ({ ...f, statusKerawanan: v }))}
+          onClose={() => setStatusSheetOpen(false)}
+        />
+        <ProgresLaporanSheet
+          open={progresSheetOpen}
+          value={riwayatForm.progresLaporan}
+          onSelect={(v) => setRiwayatForm(f => ({ ...f, progresLaporan: v }))}
+          onClose={() => setProgresSheetOpen(false)}
+        />
       </div>
 
       {/* Footer copyright */}

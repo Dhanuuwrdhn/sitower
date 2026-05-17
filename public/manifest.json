@@ -1,7 +1,7 @@
 {
   "name": "SPEKTRA – Sistem Pemantauan Kerawanan Transmisi",
   "short_name": "SPEKTRA",
-  "description": "Sistem Pemantauan Kerawanan Transmisi",
+  "description": "Sistem Pemantauan Kerawanan Transmisi UPT Durikosambi ",
   "start_url": "/dashboard",
   "display": "standalone",
   "orientation": "portrait",

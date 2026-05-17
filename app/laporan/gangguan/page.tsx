@@ -9,7 +9,7 @@ import {
   Search, Plus, Calendar, SlidersHorizontal, RotateCcw,
   Trash2, X, Upload, ChevronLeft, ChevronRight,
   ChevronDown, MoreHorizontal, Eye, Pencil,
-  ArrowLeft, AlertTriangle, FileText, ImagePlus, Clock, Download,
+  ArrowLeft, AlertTriangle, FileText, ImagePlus, Clock, Download, Lock,
 } from 'lucide-react'
 import exifr from 'exifr'
 import { laporanApi, towersApi, importApi, pegawaiApi } from '@/lib/api'
@@ -2746,6 +2746,22 @@ function LaporanDrawer({
         )}
       </div>
 
+      {/* Locating indicator (mobile, while detecting EXIF / device GPS) */}
+      {isMobile && locating && !readOnly && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '8px 12px', marginBottom: 12,
+          background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 8,
+          fontSize: 13, color: '#1D4ED8',
+        }}>
+          <span style={{
+            width: 14, height: 14, border: '2px solid #BFDBFE', borderTopColor: '#1D4ED8',
+            borderRadius: '50%', display: 'inline-block', animation: 'spin 0.8s linear infinite',
+          }} />
+          <span>Mendeteksi lokasi...</span>
+        </div>
+      )}
+
       {/* Tower terdampak & Span */}
       <div className="grid grid-cols-2 gap-4">
         <div className="flex-1 min-w-0">
@@ -2755,10 +2771,45 @@ function LaporanDrawer({
           {readOnly ? (
             <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
           ) : isMobile && gpsLocked ? (
-            <div className="form-input bg-app-bg flex items-center justify-between">
-              <span style={{ fontSize: 14, color: '#1B1B1B', fontWeight: 500 }}>{form.towerLabel || '—'}</span>
-              <span style={{ fontSize: 11, color: '#039855', fontWeight: 600 }}>📍 GPS</span>
-            </div>
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  Swal.fire({
+                    title: 'Ubah Ruas?',
+                    text: 'Ruas yang dipilih otomatis mungkin tidak sesuai jika diubah secara manual.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Ubah Ruas',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#076C9E',
+                    cancelButtonColor: '#97AAB3',
+                    reverseButtons: true,
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      setGpsLocked(false)
+                      setTowerSheetTarget('start')
+                      setTowerSheetOpen(true)
+                    }
+                  })
+                }}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  width: '100%', padding: '10px 14px',
+                  background: '#F3F4F6',
+                  border: '1px solid #D1D5DB', borderRadius: 8, cursor: 'pointer',
+                  color: '#6B7280',
+                }}
+              >
+                <span style={{ fontSize: 14, fontWeight: 500 }} className="truncate">
+                  {form.towerLabel || '—'}
+                </span>
+                <Lock size={14} style={{ color: '#6B7280', flexShrink: 0 }} />
+              </button>
+              <p style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
+                📍 Ruas dipilih otomatis berdasarkan lokasi
+              </p>
+            </>
           ) : isMobile ? (
             <button
               type="button"

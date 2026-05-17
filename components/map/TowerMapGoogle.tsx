@@ -195,33 +195,39 @@ function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', ker
   const BADGE_X0 = CIRCLE_D - BADGE_OVERLAP  // x where first badge starts
   let badgeContent = ''
   let SVG_W: number
+  let extraH = 0  // additional height when badges wrap to a 2nd row
 
-  if (numBadges === 1) {
-    SVG_W = CIRCLE_D + BADGE_D - BADGE_OVERLAP + 2
-    const bx = BADGE_X0, by = 0
+  const renderBadge = (idx: number, bx: number, by: number) => {
     const bcx = bx + BADGE_D / 2, bcy = by + BADGE_D / 2
-    const iconBody = TWEMOJI_BODIES[normKat(kerawanan[0].kategori)] ?? ''
-    badgeContent = `
+    const iconBody = TWEMOJI_BODIES[normKat(kerawanan[idx].kategori)] ?? ''
+    return `
       <circle cx="${bcx}" cy="${bcy}" r="${BADGE_D / 2 + 1.5}" fill="white"/>
       <svg x="${bx}" y="${by}" width="${BADGE_D}" height="${BADGE_D}" viewBox="0 0 36 36">${iconBody}</svg>
     `
+  }
+
+  if (numBadges === 1) {
+    SVG_W = CIRCLE_D + BADGE_D - BADGE_OVERLAP + 2
+    badgeContent = renderBadge(0, BADGE_X0, 0)
   } else {
-    // 2+ → render one badge per kerawanan jenis, horizontally with breathing room.
-    // No count pill — every icon is visible directly on the marker.
-    const GAP = BADGE_D + 4  // small spacing between adjacent badges so icons don't touch
-    SVG_W = CIRCLE_D + GAP * (numBadges - 1) + BADGE_D - BADGE_OVERLAP + 2
-    for (let i = 0; i < numBadges; i++) {
-      const bx = BADGE_X0 + i * GAP, by = 0
-      const bcx = bx + BADGE_D / 2, bcy = by + BADGE_D / 2
-      const iconBody = TWEMOJI_BODIES[normKat(kerawanan[i].kategori)] ?? ''
-      badgeContent += `
-        <circle cx="${bcx}" cy="${bcy}" r="${BADGE_D / 2 + 1.5}" fill="white"/>
-        <svg x="${bx}" y="${by}" width="${BADGE_D}" height="${BADGE_D}" viewBox="0 0 36 36">${iconBody}</svg>
-      `
+    // 2+ → up to 3 badges on row 1, remaining (up to 2) wrap to row 2.
+    const GAP = BADGE_D + 4
+    const ROW_GAP = 4
+    const row1Count = Math.min(numBadges, 3)
+    const row2Count = Math.max(0, numBadges - 3)  // 0–2
+    const widestCount = Math.max(row1Count, row2Count)
+    SVG_W = CIRCLE_D + GAP * (widestCount - 1) + BADGE_D - BADGE_OVERLAP + 2
+    if (row2Count > 0) extraH = BADGE_D + ROW_GAP
+
+    for (let i = 0; i < row1Count; i++) {
+      badgeContent += renderBadge(i, BADGE_X0 + i * GAP, 0)
+    }
+    for (let i = 0; i < row2Count; i++) {
+      badgeContent += renderBadge(3 + i, BADGE_X0 + i * GAP, BADGE_D + ROW_GAP)
     }
   }
 
-  const SVG_H = CIRCLE_D + PAD_TOP  // 40
+  const SVG_H = CIRCLE_D + PAD_TOP + extraH
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${SVG_W}" height="${SVG_H}" viewBox="0 0 ${SVG_W} ${SVG_H}">
     ${mainCircle}
     ${badgeContent}

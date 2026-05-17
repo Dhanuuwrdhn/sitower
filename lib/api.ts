@@ -39,6 +39,13 @@ export const authApi = {
   deletePasswordChangeRequest: (id: string) => api.delete(`/auth/password-change-requests/${id}`),
 }
 
+export const unitsApi = {
+  list:   ()                                  => api.get('/units'),
+  create: (nama: string)                      => api.post('/units', { nama }),
+  update: (id: string, nama: string)          => api.patch(`/units/${id}`, { nama }),
+  delete: (id: string)                        => api.delete(`/units/${id}`),
+}
+
 export const towersApi = {
   getAll:    (params?: any) => api.get('/aset/towers', { params }),
   getMap:    ()             => api.get('/aset/towers/map'),

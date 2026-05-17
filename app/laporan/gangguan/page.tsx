@@ -2433,6 +2433,9 @@ function LaporanDrawer({
   const [useGPS, setUseGPS] = useState(false)
   const [detectedMsg, setDetectedMsg] = useState('')
   const [gpsLocked, setGpsLocked] = useState(false)
+  // Distance in meters from user location to the auto-detected nearest tower.
+  // Null when auto-detect hasn't run / failed.
+  const [nearestDistanceM, setNearestDistanceM] = useState<number | null>(null)
   const [alertVisible, setAlertVisible] = useState(true)
 
 
@@ -2481,6 +2484,7 @@ function LaporanDrawer({
         setDetectedMsg('')
         setUseGPS(false)
         setGpsLocked(false)
+        setNearestDistanceM(null)
         if (initialFotos && initialFotos.length > 0) {
           setTimeout(() => { handleDetectLocation(initialFotos[0]) }, 100)
         }
@@ -2526,6 +2530,9 @@ function LaporanDrawer({
     // when nama is missing. For UUID-id'd towers, nomorTower === the UUID,
     // which is what was leaking into the UI before this fix.
     const displayName = (t: TowerOption) => t.nama ?? t.nomorTower
+    // Track the distance regardless of in/out-of-radius so the mobile UI can
+    // show a "close vs far" alert below the Ruas field.
+    setNearestDistanceM(nearest ? min : null)
     if (nearest && min <= towerRadius) {
       setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: displayName(nearest!) }))
       setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
@@ -2792,6 +2799,7 @@ function LaporanDrawer({
                   }).then((result) => {
                     if (result.isConfirmed) {
                       setGpsLocked(false)
+                      setNearestDistanceM(null)
                       setTowerSheetTarget('start')
                       setTowerSheetOpen(true)
                     }
@@ -2845,6 +2853,30 @@ function LaporanDrawer({
           {submitErrors.towerId && (
             <p className="mt-2 text-[12px] font-medium text-[#EF4444]">{submitErrors.towerId}</p>
           )}
+          {/* Distance alert (mobile only). Threshold: < 500m info, ≥ 500m warning. */}
+          {isMobile && !readOnly && nearestDistanceM !== null && (() => {
+            const m = nearestDistanceM
+            const isFar = m >= 500
+            const text = m < 1000 ? `${Math.round(m)}m` : `${(m / 1000).toFixed(1)} km`
+            return (
+              <div
+                style={{
+                  fontSize: 12,
+                  padding: '6px 10px',
+                  borderRadius: 6,
+                  marginTop: 6,
+                  background: isFar ? '#FFFBEB' : '#F0FDF4',
+                  color: isFar ? '#D97706' : '#16A34A',
+                  border: isFar ? '1px solid #FDE68A' : 'none',
+                  lineHeight: 1.4,
+                }}
+              >
+                {isFar
+                  ? `⚠️ Lokasi Anda sejauh ${text} dari tower terdekat. Pastikan ruas yang dipilih sudah benar.`
+                  : `📍 Tower terdekat: ${text} dari lokasi Anda`}
+              </div>
+            )
+          })()}
         </div>
 
         {/* Span */}

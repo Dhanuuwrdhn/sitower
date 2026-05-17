@@ -138,6 +138,17 @@ function formatTanggal(iso: string) {
   })
 }
 
+// Date + time in id-ID format, e.g. "17 Mei 2026, 17.13". Used for update
+// timestamps where the exact moment matters (Riwayat Pembaruan, Terakhir
+// Diperbarui). Plain `formatTanggal` stays date-only for table columns.
+function formatTanggalWaktu(iso: string) {
+  if (!iso) return '—'
+  const d = new Date(iso)
+  const date = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+  const time = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })
+  return `${date}, ${time}`
+}
+
 function normalizeLevelValue(level?: string) {
   if (!level) return ''
   return ['kritis', 'kritis_terpenuhi', 'kritis_tidak_terpenuhi'].includes(level) ? 'kritis' : level
@@ -1911,7 +1922,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
               {activeLaporan?.status && <StatusPill status={activeLaporan.status} />}
             </div>
             <div style={{ marginTop: 6, fontSize: 12, color: '#5F737F' }}>
-              Terakhir Diperbarui: {formatTanggal(lastUpdatedAtM)}
+              Terakhir Diperbarui: {formatTanggalWaktu(lastUpdatedAtM)}
             </div>
           </div>
 
@@ -1968,7 +1979,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                         <span style={{ fontSize: 11, color: '#97AAB3' }}>
-                          {isInitialRiwayat(r) ? 'Tanggal Dibuat' : 'Tanggal Pembaruan'}: {formatTanggal(r.tanggal)}
+                          {isInitialRiwayat(r) ? 'Tanggal Dibuat' : 'Tanggal Pembaruan'}: {formatTanggalWaktu(r.tanggal)}
                         </span>
                         {isInitialRiwayat(r) && (
                           <span style={{ fontSize: 10, fontWeight: 600, color: '#475467', background: '#F2F4F7', border: '1px solid #E1E8EC', padding: '1px 6px', borderRadius: 999 }}>
@@ -2138,7 +2149,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             {activeLaporan?.status && <StatusPill status={activeLaporan.status} />}
           </div>
           <div style={{ display: 'flex', gap: 8, fontSize: 14, fontWeight: 500, color: '#566B75', flexWrap: 'wrap' }}>
-            <span>Terakhir diupdate : {formatTanggal(lastUpdatedAt)}</span>
+            <span>Terakhir diupdate : {formatTanggalWaktu(lastUpdatedAt)}</span>
             <span>-</span>
             <span>Oleh : {lastUpdatedBy}</span>
           </div>
@@ -2258,7 +2269,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                       <span style={{ fontSize: 13, color: '#566B75', fontWeight: 500 }}>
-                        {isInitialRiwayat(r) ? 'Tanggal Dibuat' : 'Tanggal Pembaruan'}: {formatTanggal(r.tanggal)} · Oleh: {r.oleh}
+                        {isInitialRiwayat(r) ? 'Tanggal Dibuat' : 'Tanggal Pembaruan'}: {formatTanggalWaktu(r.tanggal)} · Oleh: {r.oleh}
                       </span>
                       {isInitialRiwayat(r) && (
                         <span style={{ fontSize: 11, fontWeight: 600, color: '#475467', background: '#F2F4F7', border: '1px solid #E1E8EC', padding: '2px 8px', borderRadius: 999 }}>

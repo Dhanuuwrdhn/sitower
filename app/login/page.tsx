@@ -48,7 +48,7 @@ export default function LoginPage() {
               <IconLightning size={28} />
               SPEKTRA
             </h1>
-            <p className="login-logo-subtitle">Sistem Pemantauan Kabel dan Tower Transmisi</p>
+            <p className="login-logo-subtitle">Sistem Pemantauan Kerawanan Transmisi</p>
           </div>
 
           {/* Fields */}

@@ -6,16 +6,16 @@ import toast from 'react-hot-toast'
 import {
   Plus, Pencil, Trash2, X, Power, Check, CircleX,
   KeyRound, RefreshCw, SlidersHorizontal, ChevronLeft, ChevronRight,
-  Eye, EyeOff, Shield, Wrench, Crown, Search,
+  Eye, EyeOff, Shield, Wrench, Crown, Search, Building2, Save,
 } from 'lucide-react'
-import { pegawaiApi, authApi } from '@/lib/api'
+import { pegawaiApi, authApi, unitsApi } from '@/lib/api'
 import { isSuperadmin, isAdminOrSuperadmin } from '@/lib/auth'
 import { ActionMenu } from '@/components/ui/ActionMenu'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonRow } from '@/components/ui/SkeletonRow'
 
-const UNIT_OPTIONS = ['UPT Banten', 'UPT Tangerang', 'UPT Cilegon', 'UPT Serang']
+const UNIT_FALLBACK = ['UPT Durikosambi', 'ULTG Durikosambi']
 const JABATAN_OPTIONS = [
   'Teknisi Senior', 'Petugas Lapangan', 'Teknisi Lapangan',
   'Supervisor Transmisi', 'Manager',
@@ -262,9 +262,9 @@ function RoleToggle({ value, onChange }: { value: string; onChange: (r: string) 
 
 // ── User Form (Tambah / Edit) — shared component ──────────────────────────────
 
-const EMPTY_USER = { nik: '', nama: '', jabatan: '', unit: 'UPT Banten', role: 'teknisi', password: '', expiredAt: '' }
+const EMPTY_USER = { nik: '', nama: '', jabatan: '', unit: '', role: 'teknisi', password: '', expiredAt: '' }
 
-function UserModal({ open, initial, onClose, onSaved }: { open: boolean; initial: any | null; onClose: () => void; onSaved: () => void }) {
+function UserModal({ open, initial, onClose, onSaved, unitOptions }: { open: boolean; initial: any | null; onClose: () => void; onSaved: () => void; unitOptions: string[] }) {
   const [form, setForm] = useState(EMPTY_USER)
   const [saving, setSaving] = useState(false)
   const [showPass, setShowPass] = useState(false)
@@ -274,12 +274,13 @@ function UserModal({ open, initial, onClose, onSaved }: { open: boolean; initial
   useEffect(() => {
     if (open) {
       setShowPass(false)
+      const defaultUnit = unitOptions[0] ?? UNIT_FALLBACK[0]
       setForm(initial ? {
         nik: initial.nik ?? '', nama: initial.nama ?? '',
-        jabatan: initial.jabatan ?? '', unit: initial.unit ?? 'UPT Banten',
+        jabatan: initial.jabatan ?? '', unit: initial.unit ?? defaultUnit,
         role: initial.role ?? 'teknisi', password: '',
         expiredAt: initial.expiredAt ? new Date(initial.expiredAt).toISOString().slice(0, 10) : '',
-      } : EMPTY_USER)
+      } : { ...EMPTY_USER, unit: defaultUnit })
     }
   }, [open, initial])
 
@@ -343,7 +344,10 @@ function UserModal({ open, initial, onClose, onSaved }: { open: boolean; initial
       <div>
         <label className="block text-[13px] font-semibold text-app-text mb-1.5">Unit</label>
         <select value={form.unit} onChange={(e) => set('unit', e.target.value)} className="form-input" style={{ minHeight: 44 }}>
-          {UNIT_OPTIONS.map((u) => <option key={u}>{u}</option>)}
+          {(unitOptions.length > 0 ? unitOptions : UNIT_FALLBACK).map((u) => <option key={u}>{u}</option>)}
+          {form.unit && !(unitOptions.length > 0 ? unitOptions : UNIT_FALLBACK).includes(form.unit) && (
+            <option key={form.unit} value={form.unit}>{form.unit}</option>
+          )}
         </select>
       </div>
       <div>
@@ -477,6 +481,152 @@ function UserCard({ row, onEdit, onToggle, onDelete, canDelete, showExpired }: {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+// ── Manajemen Unit ───────────────────────────────────────────────────────────
+
+function UnitManagement({ units, onChanged }: { units: { id: string; nama: string }[]; onChanged: () => void }) {
+  const [newName, setNewName] = useState('')
+  const [adding, setAdding] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editName, setEditName] = useState('')
+  const [busy, setBusy] = useState<string | null>(null)
+
+  async function handleAdd() {
+    const nama = newName.trim()
+    if (!nama) { toast.error('Nama unit wajib diisi'); return }
+    setAdding(true)
+    try {
+      await unitsApi.create(nama)
+      toast.success('Unit ditambahkan')
+      setNewName('')
+      onChanged()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'Gagal menambah unit')
+    } finally { setAdding(false) }
+  }
+
+  async function handleSaveEdit(id: string) {
+    const nama = editName.trim()
+    if (!nama) { toast.error('Nama unit wajib diisi'); return }
+    setBusy(id)
+    try {
+      await unitsApi.update(id, nama)
+      toast.success('Unit diperbarui')
+      setEditingId(null)
+      onChanged()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'Gagal memperbarui unit')
+    } finally { setBusy(null) }
+  }
+
+  async function handleDelete(id: string, nama: string) {
+    if (!confirm(`Hapus unit "${nama}"?`)) return
+    setBusy(id)
+    try {
+      await unitsApi.delete(id)
+      toast.success('Unit dihapus')
+      onChanged()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'Gagal menghapus unit')
+    } finally { setBusy(null) }
+  }
+
+  return (
+    <div className="mt-8">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Building2 size={18} className="text-[#076c9e]" />
+          <h2 className="text-lg font-bold text-app-text">Manajemen Unit</h2>
+          <span className="text-app-muted text-[13px]">({units.length})</span>
+        </div>
+      </div>
+
+      <div className="bg-white border border-app-border rounded-xl p-4">
+        {/* Add new */}
+        <div className="flex gap-2 mb-4">
+          <input
+            type="text"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAdd() } }}
+            placeholder="Nama unit baru (mis. ULTG Cilegon)"
+            className="form-input flex-1"
+            style={{ minHeight: 44 }}
+          />
+          <button
+            onClick={handleAdd}
+            disabled={adding}
+            className="flex items-center gap-1.5 px-4 rounded-lg bg-[#076C9E] text-white font-semibold text-[14px] disabled:opacity-50"
+            style={{ minHeight: 44 }}
+          >
+            <Plus size={16} /> Tambah
+          </button>
+        </div>
+
+        {/* List */}
+        {units.length === 0 ? (
+          <EmptyState title="Belum ada unit" />
+        ) : (
+          <div className="divide-y divide-app-border">
+            {units.map((u) => {
+              const isEditing = editingId === u.id
+              const isBusy = busy === u.id
+              return (
+                <div key={u.id} className="flex items-center gap-2 py-2">
+                  {isEditing ? (
+                    <>
+                      <input
+                        type="text"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleSaveEdit(u.id) } }}
+                        className="form-input flex-1"
+                        style={{ minHeight: 40 }}
+                        autoFocus
+                      />
+                      <button
+                        onClick={() => handleSaveEdit(u.id)} disabled={isBusy}
+                        title="Simpan"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 border border-green-200 text-green-700 text-[12px] font-semibold hover:bg-green-100 transition disabled:opacity-50"
+                      >
+                        <Save size={13} /> Simpan
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)} disabled={isBusy}
+                        title="Batal"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-app-bg border border-app-border text-app-muted text-[12px] font-semibold hover:bg-app-border transition disabled:opacity-50"
+                      >
+                        <X size={13} /> Batal
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="flex-1 text-app-text text-[14px]">{u.nama}</span>
+                      <button
+                        onClick={() => { setEditingId(u.id); setEditName(u.nama) }}
+                        title="Edit"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-app-bg border border-app-border text-app-muted text-[12px] font-semibold hover:bg-app-border transition"
+                      >
+                        <Pencil size={13} /> Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(u.id, u.nama)} disabled={isBusy}
+                        title="Hapus"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 border border-red-200 text-red-600 text-[12px] font-semibold hover:bg-red-100 transition disabled:opacity-50"
+                      >
+                        <Trash2 size={13} /> Hapus
+                      </button>
+                    </>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function UsersPage() {
   const router = useRouter()
   const [ready, setReady] = useState(false)
@@ -493,6 +643,7 @@ export default function UsersPage() {
 
   const [rows, setRows]       = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [units, setUnits]     = useState<{ id: string; nama: string }[]>([])
   const [search, setSearch]   = useState('')
   const [modalOpen, setModalOpen]   = useState(false)
   const [editRow, setEditRow]       = useState<any | null>(null)
@@ -528,6 +679,13 @@ export default function UsersPage() {
     }
   }, [])
 
+  const fetchUnits = useCallback(async () => {
+    try {
+      const res = await unitsApi.list()
+      setUnits(Array.isArray(res.data) ? res.data : [])
+    } catch { setUnits([]) }
+  }, [])
+
   const fetchPwRequests = useCallback(async () => {
     setPwLoading(true)
     try {
@@ -544,8 +702,9 @@ export default function UsersPage() {
     if (ready) {
       fetchData()
       fetchPwRequests()
+      fetchUnits()
     }
-  }, [ready, fetchData, fetchPwRequests])
+  }, [ready, fetchData, fetchPwRequests, fetchUnits])
 
   useEffect(() => { setPage(1) }, [search, appliedJabatan, appliedRole, appliedStatus, pageSize])
 
@@ -1096,6 +1255,9 @@ export default function UsersPage() {
         </div>
       </div>
 
+      {/* ── Manajemen Unit ────────────────────────────────────────────────── */}
+      <UnitManagement units={units} onChanged={fetchUnits} />
+
       {/* Mobile filter bottom sheet */}
       <BottomSheet open={mobileFilterOpen} onClose={() => setMobileFilterOpen(false)} title="Filter">
         <FilterBody
@@ -1106,7 +1268,13 @@ export default function UsersPage() {
         />
       </BottomSheet>
 
-      <UserModal open={modalOpen} initial={editRow} onClose={() => setModalOpen(false)} onSaved={fetchData} />
+      <UserModal
+        open={modalOpen}
+        initial={editRow}
+        onClose={() => setModalOpen(false)}
+        onSaved={fetchData}
+        unitOptions={units.map(u => u.nama)}
+      />
       <ConfirmModal
         isOpen={!!deleteId}
         title="Hapus User?"

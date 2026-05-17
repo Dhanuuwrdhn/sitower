@@ -326,8 +326,7 @@ function UserModal({ open, initial, onClose, onSaved }: { open: boolean; initial
           onChange={(e) => set('nik', e.target.value)}
           className="form-input font-mono"
           placeholder="Masukkan NIP"
-          readOnly={!!initial}
-          style={{ minHeight: 44, ...(initial ? { background: 'var(--color-app-bg)', cursor: 'not-allowed' } : {}) }}
+          style={{ minHeight: 44 }}
         />
       </div>
       <div>
@@ -482,6 +481,7 @@ export default function UsersPage() {
   const router = useRouter()
   const [ready, setReady] = useState(false)
   const superadmin = isSuperadmin()
+  const canDeleteUser = isAdminOrSuperadmin()
 
   useEffect(() => {
     if (!isAdminOrSuperadmin()) {
@@ -721,7 +721,7 @@ export default function UsersPage() {
               onEdit={() => { setEditRow(row); setModalOpen(true) }}
               onToggle={() => handleToggle(row.id)}
               onDelete={() => setDeleteId(row.id)}
-              canDelete={superadmin}
+              canDelete={canDeleteUser}
               showExpired={showExpiredCol}
             />
           ))
@@ -783,7 +783,7 @@ export default function UsersPage() {
                         icon: <Power size={14} />,
                         onClick: () => handleToggle(row.id),
                       },
-                      ...(superadmin ? [{
+                      ...(canDeleteUser ? [{
                         label: 'Hapus User',
                         icon: <Trash2 size={14} />,
                         onClick: () => setDeleteId(row.id),

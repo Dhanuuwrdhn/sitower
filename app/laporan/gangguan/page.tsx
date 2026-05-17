@@ -11,6 +11,7 @@ import {
   ChevronDown, MoreHorizontal, Eye, Pencil,
   ArrowLeft, AlertTriangle, FileText, ImagePlus, Clock, Download,
 } from 'lucide-react'
+import exifr from 'exifr'
 import { laporanApi, towersApi, importApi, pegawaiApi } from '@/lib/api'
 import { getUser, isAdmin, isSuperadmin, isTeknisi } from '@/lib/auth'
 import { getDistance } from '@/lib/geo'
@@ -539,12 +540,15 @@ function TowerDropdown({
   const groupOrder = ['garduInduk', 'SUTET', 'SUTT', 'SKTT', 'other']
   const grouped: Record<string, TowerOption[]> = { garduInduk: [], SUTET: [], SUTT: [], SKTT: [], other: [] }
 
-  const q = search.toLowerCase()
+  const q = search.toLowerCase().trim()
   const allFiltered = options.filter((t) => {
     if (!q) return true
     return (
       t.id.toLowerCase().includes(q) ||
-      (t.nama ?? '').toLowerCase().includes(q)
+      (t.nama ?? '').toLowerCase().includes(q) ||
+      (t.nomorTower ?? '').toLowerCase().includes(q) ||
+      (t.jalur ?? '').toLowerCase().includes(q) ||
+      (t.tipe ?? '').toLowerCase().includes(q)
     )
   })
   const limited = allFiltered
@@ -624,7 +628,7 @@ function FotoUpload({
 }: {
   fotos: File[]
   onChange: (files: File[]) => void
-  onPhotoAdded?: () => void
+  onPhotoAdded?: (file?: File) => void
   onPreview?: (index: number) => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -639,7 +643,7 @@ function FotoUpload({
     )
     const next = [...fotos, ...valid].slice(0, 10)
     onChange(next)
-    if (valid.length > 0 && onPhotoAdded) onPhotoAdded()
+    if (valid.length > 0 && onPhotoAdded) onPhotoAdded(valid[0])
   }
 
   return (
@@ -2478,7 +2482,7 @@ function LaporanDrawer({
         setUseGPS(false)
         setGpsLocked(false)
         if (initialFotos && initialFotos.length > 0) {
-          setTimeout(() => { document.getElementById('btn-detect-location')?.click() }, 100)
+          setTimeout(() => { handleDetectLocation(initialFotos[0]) }, 100)
         }
       }
       setSubmitErrors({})
@@ -2509,28 +2513,48 @@ function LaporanDrawer({
     return Object.keys(nextErrors).length === 0
   }
 
-  const handleDetectLocation = () => {
-    if (readOnly || locating) return
-    if (!navigator.geolocation) { toast.error('Browser tidak mendukung deteksi lokasi'); return }
-    setLocating(true)
+  // Apply coordinates → find nearest tower → set form field.
+  // `source` distinguishes EXIF (from photo) vs GPS (from device) for messaging.
+  const applyCoordsAndSelectTower = useCallback((lat: number, lng: number, source: 'exif' | 'gps') => {
+    let min = Infinity; let nearest: TowerOption | null = null
+    for (const t of towerOptions) {
+      if (t.lat && t.lng) { const d = getDistance(lat, lng, t.lat, t.lng); if (d < min) { min = d; nearest = t } }
+    }
+    const towerRadius = nearest?.radius ?? 100
+    const prefix = source === 'exif' ? '📷' : '📍'
+    if (nearest && min <= towerRadius) {
+      setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: nearest!.nomorTower }))
+      setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
+      if (source === 'gps') setGpsLocked(true)
+      setDetectedMsg(`${prefix} Tower ${nearest.nomorTower} (${Math.round(min)}m) — dipilih otomatis`)
+      toast.success(source === 'exif' ? 'Ruas dipilih dari lokasi foto' : 'Tower terdekat dipilih!')
+      return true
+    }
+    if (nearest) {
+      setDetectedMsg(`⚠️ Tower terdekat (${nearest.nomorTower}) ${Math.round(min)}m — di luar radius ${towerRadius}m`)
+    }
+    return false
+  }, [towerOptions])
+
+  // Try to read GPS from photo EXIF. Returns coords or null.
+  const extractGPSFromPhoto = async (file: File): Promise<{ latitude: number; longitude: number } | null> => {
+    try {
+      const gps = await exifr.gps(file)
+      if (gps && typeof gps.latitude === 'number' && typeof gps.longitude === 'number') {
+        return { latitude: gps.latitude, longitude: gps.longitude }
+      }
+    } catch {
+      // ignore — fall through to GPS fallback
+    }
+    return null
+  }
+
+  const detectFromDeviceGPS = () => {
+    if (!navigator.geolocation) { toast.error('Browser tidak mendukung deteksi lokasi'); setLocating(false); return }
     setDetectedMsg('Mendeteksi lokasi Anda...')
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const { latitude: lat, longitude: lng } = pos.coords
-        let min = Infinity; let nearest: TowerOption | null = null
-        for (const t of towerOptions) {
-          if (t.lat && t.lng) { const d = getDistance(lat, lng, t.lat, t.lng); if (d < min) { min = d; nearest = t } }
-        }
-        const towerRadius = nearest?.radius ?? 100
-        if (nearest && min <= towerRadius) {
-          setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: nearest!.nomorTower }))
-          setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
-          setGpsLocked(true)
-          setDetectedMsg(`📍 Tower ${nearest.nomorTower} (${Math.round(min)}m)`)
-          toast.success('Tower terdekat dipilih!')
-        } else if (nearest) {
-          setDetectedMsg(`⚠️ Tower terdekat (${nearest.nomorTower}) ${Math.round(min)}m — di luar radius ${towerRadius}m`)
-        }
+        applyCoordsAndSelectTower(pos.coords.latitude, pos.coords.longitude, 'gps')
         setLocating(false)
       },
       (err) => {
@@ -2543,20 +2567,7 @@ function LaporanDrawer({
         // High-accuracy failed (desktop/no GPS) — retry with low accuracy
         navigator.geolocation.getCurrentPosition(
           (pos) => {
-            const { latitude: lat, longitude: lng } = pos.coords
-            let min = Infinity; let nearest: TowerOption | null = null
-            for (const t of towerOptions) {
-              if (t.lat && t.lng) { const d = getDistance(lat, lng, t.lat, t.lng); if (d < min) { min = d; nearest = t } }
-            }
-            const towerRadius = nearest?.radius ?? 100
-            if (nearest && min <= towerRadius) {
-              setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: nearest!.nomorTower }))
-              setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
-              setDetectedMsg(`📍 Tower ${nearest.nomorTower} (${Math.round(min)}m)`)
-              toast.success('Tower terdekat dipilih!')
-            } else if (nearest) {
-              setDetectedMsg(`⚠️ Tower terdekat (${nearest.nomorTower}) ${Math.round(min)}m — di luar radius ${towerRadius}m`)
-            }
+            applyCoordsAndSelectTower(pos.coords.latitude, pos.coords.longitude, 'gps')
             setLocating(false)
           },
           () => {
@@ -2569,6 +2580,23 @@ function LaporanDrawer({
       },
       { enableHighAccuracy: true, timeout: 8000 },
     )
+  }
+
+  // Single entry point: optional `file` triggers EXIF-first flow; without file, falls back to device GPS.
+  const handleDetectLocation = async (file?: File) => {
+    if (readOnly || locating) return
+    setLocating(true)
+    if (file) {
+      setDetectedMsg('Membaca lokasi dari foto...')
+      const exifCoords = await extractGPSFromPhoto(file)
+      if (exifCoords) {
+        applyCoordsAndSelectTower(exifCoords.latitude, exifCoords.longitude, 'exif')
+        setLocating(false)
+        return
+      }
+      // No EXIF GPS — fall back silently to device GPS
+    }
+    detectFromDeviceGPS()
   }
 
   useEffect(() => {
@@ -3065,7 +3093,7 @@ function LaporanDrawer({
           if (next.length > 0) {
             setSubmitErrors((prev) => ({ ...prev, foto: undefined }))
           }
-          if (valid.length > 0) handleDetectLocation()
+          if (valid.length > 0) handleDetectLocation(valid[0])
         }}
       />
 
@@ -3313,13 +3341,17 @@ export default function GangguanPage() {
   // Set role setelah mount agar tidak mismatch SSR/CSR
   useEffect(() => { setIsAdminUser(isAdmin() || isSuperadmin()) }, [])
 
-  useEffect(() => {
-    towersApi.getAll({ page: 1, limit: 500 })
+  const refetchTowers = useCallback(() => {
+    towersApi.getDropdown()
       .then((res) => {
         const payload = res.data
-        setTowerOptions(Array.isArray(payload) ? payload : (payload.data ?? []))
+        setTowerOptions(Array.isArray(payload) ? payload : (payload?.data ?? []))
       })
       .catch(() => { })
+  }, [])
+
+  useEffect(() => {
+    refetchTowers()
 
     pegawaiApi.getAll()
       .then((res) => {
@@ -3380,6 +3412,12 @@ export default function GangguanPage() {
     setPendingFotos(arr)
     setDrawerOpen(true)
   }
+  // Refetch towers whenever the form drawer opens so newly-added towers
+  // (created via Tambah Aset Transmisi) appear immediately without a page reload.
+  useEffect(() => {
+    if (drawerOpen) refetchTowers()
+  }, [drawerOpen, refetchTowers])
+
   function openEdit(row: any) { setAutoOpenUpdate(false); setEditRow(row); setViewMode('edit'); setDrawerOpen(true) }
   function openDetail(row: any) { setAutoOpenUpdate(false); setEditRow(row); setViewMode('detail'); setDrawerOpen(false) }
   function openUpdate(row: any) { setAutoOpenUpdate(true); setEditRow(row); setViewMode('detail'); setDrawerOpen(false) }

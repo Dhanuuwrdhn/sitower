@@ -166,16 +166,28 @@ function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', ker
     }
   }
 
-  // Layout constants
+  // Layout constants — Option A "Stacked Pill":
+  //   dot on top, badges stacked BELOW in rows of 2 (last row = 1 if odd count).
   const CIRCLE_D = 32          // main circle diameter
-  const PAD_TOP  = 8           // top padding so badges don't clip
+  const PAD_TOP  = 4           // top padding for circle drop-shadow
   const BADGE_D  = 18          // badge diameter
-  const BADGE_OVERLAP = 6      // how many px badge overlaps circle edge
-  const CX = CIRCLE_D / 2     // circle center x
-  const CY = CIRCLE_D / 2 + PAD_TOP  // circle center y (shifted down for badge room)
+  const COL_GAP  = 2           // horizontal gap between badges in same row
+  const ROW_GAP  = 2           // vertical gap between badge rows
+  const DOT_GAP  = 3           // vertical gap between circle bottom and first badge row
   const R  = CIRCLE_D / 2 - 1
   const bgColor = LEVEL_BG[topLevel] ?? '#076C9E'
   const filterId = `f${topLevel}${kerawanan.length}`
+
+  const numBadges = kerawanan.length
+  const numRows = Math.ceil(numBadges / 2)
+  const widestRowW = numBadges >= 2 ? (BADGE_D * 2 + COL_GAP) : BADGE_D
+  const SVG_W = Math.max(CIRCLE_D, widestRowW) + 4  // small horizontal padding
+  const CX = SVG_W / 2
+  const CY = CIRCLE_D / 2 + PAD_TOP
+  const badgesStartY = CIRCLE_D + PAD_TOP + DOT_GAP
+  const SVG_H = numBadges === 0
+    ? CIRCLE_D + PAD_TOP
+    : badgesStartY + numRows * BADGE_D + (numRows - 1) * ROW_GAP + 2
 
   // Main circle + tower icon (nested SVG of CELL_TOWER_PATH in 26x26 viewBox)
   const mainCircle = `
@@ -191,12 +203,6 @@ function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', ker
     </svg>
   `
 
-  const numBadges = kerawanan.length
-  const BADGE_X0 = CIRCLE_D - BADGE_OVERLAP  // x where first badge starts
-  let badgeContent = ''
-  let SVG_W: number
-  let extraH = 0  // additional height when badges wrap to a 2nd row
-
   const renderBadge = (idx: number, bx: number, by: number) => {
     const bcx = bx + BADGE_D / 2, bcy = by + BADGE_D / 2
     const iconBody = TWEMOJI_BODIES[normKat(kerawanan[idx].kategori)] ?? ''
@@ -206,28 +212,20 @@ function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', ker
     `
   }
 
-  if (numBadges === 1) {
-    SVG_W = CIRCLE_D + BADGE_D - BADGE_OVERLAP + 2
-    badgeContent = renderBadge(0, BADGE_X0, 0)
-  } else {
-    // 2+ → up to 3 badges on row 1, remaining (up to 2) wrap to row 2.
-    const GAP = BADGE_D + 4
-    const ROW_GAP = 4
-    const row1Count = Math.min(numBadges, 3)
-    const row2Count = Math.max(0, numBadges - 3)  // 0–2
-    const widestCount = Math.max(row1Count, row2Count)
-    SVG_W = CIRCLE_D + GAP * (widestCount - 1) + BADGE_D - BADGE_OVERLAP + 2
-    if (row2Count > 0) extraH = BADGE_D + ROW_GAP
-
-    for (let i = 0; i < row1Count; i++) {
-      badgeContent += renderBadge(i, BADGE_X0 + i * GAP, 0)
-    }
-    for (let i = 0; i < row2Count; i++) {
-      badgeContent += renderBadge(3 + i, BADGE_X0 + i * GAP, BADGE_D + ROW_GAP)
+  // Badges: rows of 2 centered horizontally beneath the circle. Final row may have 1.
+  let badgeContent = ''
+  for (let row = 0; row < numRows; row++) {
+    const startIdx = row * 2
+    const countInRow = Math.min(2, numBadges - startIdx)
+    const rowW = countInRow * BADGE_D + (countInRow - 1) * COL_GAP
+    const rowX0 = CX - rowW / 2
+    const by = badgesStartY + row * (BADGE_D + ROW_GAP)
+    for (let i = 0; i < countInRow; i++) {
+      const bx = rowX0 + i * (BADGE_D + COL_GAP)
+      badgeContent += renderBadge(startIdx + i, bx, by)
     }
   }
 
-  const SVG_H = CIRCLE_D + PAD_TOP + extraH
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${SVG_W}" height="${SVG_H}" viewBox="0 0 ${SVG_W} ${SVG_H}">
     ${mainCircle}
     ${badgeContent}

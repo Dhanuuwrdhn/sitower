@@ -195,7 +195,7 @@ export default function Sidebar() {
                 lineHeight: 1.35,
                 userSelect: 'none',
               }}>
-                Sistem Pemantauan Kabel<br />dan Tower Transmisi
+                Sistem Pemantauan<br />Kerawanan Transmisi
               </span>
             </div>
             <button
@@ -384,7 +384,7 @@ export default function Sidebar() {
               color: 'rgba(255,255,255,0.7)',
               letterSpacing: '0.02em',
             }}>
-              Sistem Pemantauan Kabel<br />dan Tower Transmisi
+              Sistem Pemantauan<br />Kerawanan Transmisi
             </span>
           </div>
         )}

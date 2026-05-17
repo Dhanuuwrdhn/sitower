@@ -2522,16 +2522,20 @@ function LaporanDrawer({
     }
     const towerRadius = nearest?.radius ?? 100
     const prefix = source === 'exif' ? '📷' : '📍'
+    // Prefer the human-readable tower name; fall back to nomorTower (id) only
+    // when nama is missing. For UUID-id'd towers, nomorTower === the UUID,
+    // which is what was leaking into the UI before this fix.
+    const displayName = (t: TowerOption) => t.nama ?? t.nomorTower
     if (nearest && min <= towerRadius) {
-      setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: nearest!.nomorTower }))
+      setForm(f => ({ ...f, towerId: nearest!.id, towerLabel: displayName(nearest!) }))
       setSubmitErrors((prev) => ({ ...prev, towerId: undefined }))
       if (source === 'gps') setGpsLocked(true)
-      setDetectedMsg(`${prefix} Tower ${nearest.nomorTower} (${Math.round(min)}m) — dipilih otomatis`)
+      setDetectedMsg(`${prefix} ${displayName(nearest)} (${Math.round(min)}m) — dipilih otomatis`)
       toast.success(source === 'exif' ? 'Ruas dipilih dari lokasi foto' : 'Tower terdekat dipilih!')
       return true
     }
     if (nearest) {
-      setDetectedMsg(`⚠️ Tower terdekat (${nearest.nomorTower}) ${Math.round(min)}m — di luar radius ${towerRadius}m`)
+      setDetectedMsg(`⚠️ Tower terdekat (${displayName(nearest)}) ${Math.round(min)}m — di luar radius ${towerRadius}m`)
     }
     return false
   }, [towerOptions])

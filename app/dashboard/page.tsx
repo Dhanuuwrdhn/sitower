@@ -349,10 +349,17 @@ export default function DashboardPage() {
     pemanfaatan: stats.pemanfaatan,
   }
 
-  const amanPct   = totalTower > 0 ? Math.round((amanTower                / totalTower) * 100) : 0
-  const sedangPct = totalTower > 0 ? Math.round((sedangTower             / totalTower) * 100) : 0
-  const ktPct     = totalTower > 0 ? Math.round((kritisTerpenuhiTower    / totalTower) * 100) : 0
-  const kntPct    = totalTower > 0 ? Math.round((kritisLdakTerpenuhiTower / totalTower) * 100) : 0
+  const fmtPct = (n: number, total: number) => {
+    if (total <= 0) return '0'
+    const pct = (n / total) * 100
+    if (pct === 0 || pct === 100) return String(pct)
+    return pct.toFixed(2).replace(/\.?0+$/, '')
+  }
+  const amanPct   = fmtPct(amanTower, totalTower)
+  const sedangPct = fmtPct(sedangTower, totalTower)
+  const ktPct     = fmtPct(kritisTerpenuhiTower, totalTower)
+  const kntPct    = fmtPct(kritisLdakTerpenuhiTower, totalTower)
+  const kritisPct = fmtPct(kritisTerpenuhiTower + kritisLdakTerpenuhiTower, totalTower)
 
   if (loading) return <B2WLoader label="Memuat dashboard..." />
 
@@ -435,7 +442,7 @@ export default function DashboardPage() {
             {[
               { color: '#039855', label: 'Aman',                  count: amanTower,                 pct: amanPct   },
               { color: '#F79009', label: 'Sedang',                count: sedangTower,               pct: sedangPct },
-              { color: '#EF4444', label: 'Kritis', count: kritisTerpenuhiTower + kritisLdakTerpenuhiTower, pct: ktPct + kntPct },
+              { color: '#EF4444', label: 'Kritis', count: kritisTerpenuhiTower + kritisLdakTerpenuhiTower, pct: kritisPct },
             ].map((row) => (
               <div key={row.label} className="dash-aset-legend-item">
                 <div className="dash-legend-header">

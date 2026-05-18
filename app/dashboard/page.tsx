@@ -262,18 +262,11 @@ export default function DashboardPage() {
 
   useEffect(() => {
     Promise.allSettled([
-      // Fetch base stats then override PPL with active-only count (exclude selesai).
-      // Chained so the PPL override always runs after setStats, avoiding a race.
+      // getStats returns distinct-tower-per-jenis counts among active laporan
+      // (berlangsung/tidak_ada_aktifitas only) so jenis cards stay in sync
+      // with the markers shown on the map.
       laporanApi.getStats()
-        .then((res) => {
-          setStats(res.data)
-          return laporanApi.getAll({ jenisGangguan: 'pekerjaan_pihak_lain', status: 'berlangsung,tidak_ada_aktifitas', limit: 1 })
-        })
-        .then((r2) => {
-          const payload = r2.data
-          const activeCount = payload.total ?? (Array.isArray(payload) ? payload.length : 0)
-          setStats((prev) => ({ ...prev, ppl: activeCount }))
-        })
+        .then((res) => setStats(res.data))
         .catch(() => {}),
 
       laporanApi.getAll({ limit: 5 })

@@ -13,6 +13,7 @@ interface KerawananItem {
   kategori: string
   level: string
   status: string
+  progres?: string
   laporanId?: string
 }
 
@@ -456,6 +457,14 @@ const RISIKO_LABEL: Record<string, string> = {
   aman:                   'Aman',
 }
 
+const PROGRES_LABEL: Record<string, string> = {
+  sedang_berlangsung:  'Sedang Berlangsung',
+  selesai:             'Selesai',
+  tidak_ada_aktifitas: 'Tidak Ada Aktivitas',
+  tidak_ada_aktivitas: 'Tidak Ada Aktivitas',
+  berlangsung:         'Berlangsung',
+}
+
 function TowerPopup({ tower, onClose, onKerawananClick }: { tower: FeaturedTower; onClose: () => void; onKerawananClick?: (laporanId: string) => void }) {
   const level = getTopLevel(tower.kerawanan)
   const levelColor = LEVEL_COLOR[level]
@@ -512,7 +521,16 @@ function TowerPopup({ tower, onClose, onKerawananClick }: { tower: FeaturedTower
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
                   >
                     <span style={{ fontSize: 14, lineHeight: 1 }}>{KATEGORI_EMOJI[normKat(k.kategori)] ?? '⚠️'}</span>
-                    <span style={{ color: '#374151', fontSize: 11, flex: 1 }}>{KATEGORI_LABEL[normKat(k.kategori)] ?? k.kategori}</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
+                      <span style={{ color: '#374151', fontSize: 11 }}>{KATEGORI_LABEL[normKat(k.kategori)] ?? k.kategori}</span>
+                      {k.progres && (
+                        <span style={{
+                          fontSize: 9, fontWeight: 600, color: '#64748b',
+                        }}>
+                          {PROGRES_LABEL[k.progres] ?? k.progres}
+                        </span>
+                      )}
+                    </div>
                     <span style={{
                       fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 999,
                       background: (LEVEL_COLOR[k.level] ?? '#94a3b8') + '22',

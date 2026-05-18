@@ -1481,6 +1481,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   const [selesaiLoading, setSelesaiLoading] = useState(false)
   const [lightbox, setLightbox] = useState<{ urls: string[]; index: number } | null>(null)
   const [showUpdateDrawer, setShowUpdateDrawer] = useState(false)
+  const [activeDetailTab, setActiveDetailTab] = useState<'informasi' | 'riwayat'>('informasi')
   const [riwayatForm, setRiwayatForm] = useState({ statusKerawanan: 'aman', progresLaporan: 'sedang_berlangsung', uraianPekerjaan: '', upayaPengendalian: '', pihakLain: '', contactPerson: '' })
   const [riwayatFiles, setRiwayatFiles] = useState<{ foto: File[]; beritaAcara: File[]; spanduk: File[]; surat: File[] }>({ foto: [], beritaAcara: [], spanduk: [], surat: [] })
   const [savingRiwayat, setSavingRiwayat] = useState(false)
@@ -2340,7 +2341,62 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
         )}
       </div>
 
-      <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 32, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+      <div style={{ background: '#FFFFFF', borderRadius: 12, boxShadow: '0 1px 3px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+
+        {/* ── Tab bar ─────────────────────────────────────────────────── */}
+        <div style={{ display: 'flex', borderBottom: '2px solid #f1f5f9', padding: '0 32px' }}>
+          {([
+            { id: 'informasi', label: 'Informasi' },
+            { id: 'riwayat',   label: 'Riwayat Pembaruan' },
+          ] as const).map(({ id, label }) => {
+            const active = activeDetailTab === id
+            return (
+              <button
+                key={id}
+                onClick={() => setActiveDetailTab(id)}
+                style={{
+                  position: 'relative',
+                  padding: '16px 20px 18px',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: 14,
+                  fontWeight: active ? 700 : 500,
+                  color: active ? '#076C9E' : '#5F737F',
+                  transition: 'color 0.15s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {label}
+                {id === 'riwayat' && riwayat.length > 0 && (
+                  <span style={{
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    minWidth: 18, height: 18, padding: '0 5px', borderRadius: 999,
+                    background: active ? '#076C9E' : '#E1E8EC',
+                    color: active ? '#fff' : '#5F737F',
+                    fontSize: 10, fontWeight: 700,
+                  }}>
+                    {riwayat.length}
+                  </span>
+                )}
+                {active && (
+                  <span style={{
+                    position: 'absolute', bottom: -2, left: 0, right: 0,
+                    height: 2, background: '#076C9E', borderRadius: 2,
+                  }} />
+                )}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* ── Tab content ─────────────────────────────────────────────── */}
+        <div key={activeDetailTab} className="animate-in fade-in slide-in-from-bottom-2 duration-200" style={{ padding: 32 }}>
+
+        {activeDetailTab === 'informasi' && (<>
 
         {/* ── Section 1: Informasi Kerawanan ──────────────────────────── */}
         <div style={{ marginBottom: 32 }}>
@@ -2429,11 +2485,10 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           </div>
         </div>
 
-        <div style={{ height: 1, background: '#E1E8EC', marginBottom: 32 }} />
+        </>)}
 
-        {/* ── Section 3: Riwayat Pembaruan Laporan ────────────────────── */}
+        {activeDetailTab === 'riwayat' && (<>
         <div>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#1B1B1B', display: 'block', marginBottom: 20 }}>Riwayat Pembaruan Laporan</span>
           {visibleRiwayat.length === 0 ? (
             <div style={{ padding: '40px 0', textAlign: 'center', color: '#97AAB3' }}>
               Belum ada riwayat pembaruan
@@ -2513,10 +2568,13 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             </div>
           )}
         </div>
+        </>)}
+
+        </div>{/* end tab content */}
 
         {/* Hapus Laporan Button (Only for Admins/Superadmins) */}
         {(isAdmin() || isSuperadmin()) && (
-          <div style={{ marginTop: 32, display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ padding: '0 32px 32px', display: 'flex', justifyContent: 'flex-end' }}>
             <button
               onClick={() => {
                 if (window.confirm('Apakah Anda yakin ingin menghapus laporan ini? Semua data riwayat dan foto akan ikut terhapus.')) {
@@ -3635,8 +3693,20 @@ export default function GangguanPage() {
 
   // Filters
   const [search, setSearch] = useState('')
-  const [jenis, setJenis] = useState<string[]>([])
-  const [statusFilter, setStatusFilter] = useState<string[]>([])
+  const [jenis, setJenis] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search).get('jenis')
+      return p ? [p] : []
+    }
+    return []
+  })
+  const [statusFilter, setStatusFilter] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search).get('status')
+      return p ? p.split(',').filter(Boolean) : []
+    }
+    return []
+  })
   const [levelFilter, setLevelFilter] = useState<string[]>([])
   const [teknisiFilter, setTeknisiFilter] = useState<string[]>([])
   const [towerFilter, setTowerFilter] = useState<string[]>([])
@@ -3804,6 +3874,12 @@ export default function GangguanPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const queryLaporanId = searchParams.get('laporan')
+  const queryJenis = searchParams.get('jenis')
+  const queryStatus = searchParams.get('status')
+  useEffect(() => {
+    if (!queryJenis && !queryStatus) return
+    router.replace('/laporan/gangguan', { scroll: false })
+  }, [queryJenis, queryStatus, router])
   useEffect(() => {
     if (!queryLaporanId) return
     let cancelled = false

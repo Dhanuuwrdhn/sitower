@@ -26,6 +26,7 @@ export interface FeaturedTower {
   kerawanan: KerawananItem[]
   updatedAt?: string
   bersertifikat?: boolean
+  hasCctv?: boolean
 }
 
 export interface JalurKmlItem {
@@ -470,8 +471,22 @@ function TowerPopup({ tower, onClose, onKerawananClick }: { tower: FeaturedTower
         <div style={{ color: '#97aab3', fontSize: 11, marginBottom: 6 }}>
           {tower.tipe}{tower.tegangan ? ` · ${tower.tegangan}` : ''}
         </div>
-        <div style={{ marginBottom: 10, fontSize: 11, fontWeight: 700, color: tower.bersertifikat ? '#16a34a' : '#dc2626' }}>
-          {tower.bersertifikat ? 'Bersertifikat' : 'Belum Bersertifikat'}
+        <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          <span style={{
+            fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
+            background: tower.bersertifikat ? '#dcfce7' : '#fee2e2',
+            color: tower.bersertifikat ? '#16a34a' : '#dc2626',
+          }}>
+            {tower.bersertifikat ? 'Bersertifikat' : 'Belum Bersertifikat'}
+          </span>
+          {tower.hasCctv && (
+            <span style={{
+              fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
+              background: '#dcfce7', color: '#16a34a',
+            }}>
+              Terpasang CCTV
+            </span>
+          )}
         </div>
 
         {hasKerawanan ? (
@@ -531,41 +546,54 @@ function TowerPopup({ tower, onClose, onKerawananClick }: { tower: FeaturedTower
 // ─── Legend ───────────────────────────────────────────────────────────────────
 
 function Legend() {
+  const [collapsed, setCollapsed] = useState(false)
   return (
     <div style={{
       position: 'absolute', bottom: 28, left: 12, zIndex: 10,
       background: 'rgba(255,255,255,0.96)', borderRadius: 8,
-      boxShadow: '0 2px 8px rgba(0,0,0,0.15)', padding: '10px 14px', fontSize: 11, lineHeight: 1.9,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.15)', padding: '8px 12px', fontSize: 11, lineHeight: 1.9,
+      minWidth: 170,
     }}>
-      <p style={{ fontWeight: 700, fontSize: 11.5, marginBottom: 4, color: '#0f172a' }}>Legenda</p>
-      {/* Tower Normal per tipe */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#0288D1', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #0288D1', flexShrink: 0 }} />
-        <span style={{ color: '#374151' }}>Tower SUTT (Normal)</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: collapsed ? 0 : 4 }}>
+        <p style={{ fontWeight: 700, fontSize: 11.5, color: '#0f172a', margin: 0 }}>Legenda</p>
+        <button
+          onClick={() => setCollapsed(v => !v)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 2px', color: '#64748b', lineHeight: 1, fontSize: 14 }}
+          title={collapsed ? 'Tampilkan legenda' : 'Sembunyikan legenda'}
+        >
+          {collapsed ? '▲' : '▼'}
+        </button>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#e65100', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #e65100', flexShrink: 0 }} />
-        <span style={{ color: '#374151' }}>Tower SUTET (Normal)</span>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FF00FF', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #FF00FF', flexShrink: 0 }} />
-        <span style={{ color: '#374151' }}>SKTT (Normal)</span>
-      </div>
-      {/* Tower with kerawanan — status colors */}
-      {([
-        { bg: '#22C55E', label: 'Aman' },
-        { bg: '#F59E0B', label: 'Sedang' },
-        { bg: '#EF4444', label: 'Kritis' },
-      ] as { bg: string; label: string }[]).map(({ bg, label }) => (
-        <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <svg width="14" height="14" viewBox="0 0 26 26" fill="none" style={{ flexShrink: 0 }}>
-            <rect width="26" height="26" rx="13" fill={bg}/>
-            <path d={CELL_TOWER_PATH} fill="white"/>
-          </svg>
-          <span style={{ color: '#374151' }}>Kerawanan {label}</span>
-        </div>
-      ))}
 
+      {!collapsed && (
+        <>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#0288D1', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #0288D1', flexShrink: 0 }} />
+            <span style={{ color: '#374151' }}>Tower SUTT (Normal)</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#e65100', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #e65100', flexShrink: 0 }} />
+            <span style={{ color: '#374151' }}>Tower SUTET (Normal)</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FF00FF', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #FF00FF', flexShrink: 0 }} />
+            <span style={{ color: '#374151' }}>SKTT (Normal)</span>
+          </div>
+          {([
+            { bg: '#22C55E', label: 'Aman' },
+            { bg: '#F59E0B', label: 'Sedang' },
+            { bg: '#EF4444', label: 'Kritis' },
+          ] as { bg: string; label: string }[]).map(({ bg, label }) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <svg width="14" height="14" viewBox="0 0 26 26" fill="none" style={{ flexShrink: 0 }}>
+                <rect width="26" height="26" rx="13" fill={bg}/>
+                <path d={CELL_TOWER_PATH} fill="white"/>
+              </svg>
+              <span style={{ color: '#374151' }}>Kerawanan {label}</span>
+            </div>
+          ))}
+        </>
+      )}
     </div>
   )
 }

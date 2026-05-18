@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import dynamic from 'next/dynamic'
+import { useRouter } from 'next/navigation'
 import { CloudUpload } from 'lucide-react'
 import Swal from 'sweetalert2'
 import { laporanApi, towersApi, asetApi, importApi, jalurKmlApi } from '@/lib/api'
@@ -103,11 +104,11 @@ const MOCK_RECENT: RecentRow[] = []
 
 // ── Stat card config ───────────────────────────────────────────────────────────
 const STAT_CARDS = [
-  { key: 'ppl',         label: 'Pekerjaan Pihak Lain',    emoji: '🚧', numColor: '#005DAA' },
-  { key: 'kebakaran',   label: 'Kebakaran',                emoji: '🔥', numColor: '#FD2D03' },
-  { key: 'layangan',    label: 'Layangan',                 emoji: '🪁', numColor: '#3B84CE' },
-  { key: 'pencurian',   label: 'Pencurian',                emoji: '☠️', numColor: '#1B1B1B' },
-  { key: 'pemanfaatan',       label: 'Pemanfaatan Lahan', emoji: '🏡', numColor: '#059669' },
+  { key: 'ppl',         label: 'Pekerjaan Pihak Lain',    emoji: '🚧', numColor: '#005DAA', jenis: 'pekerjaan_pihak_lain', extraParams: '&status=berlangsung,tidak_ada_aktifitas' },
+  { key: 'kebakaran',   label: 'Kebakaran',                emoji: '🔥', numColor: '#FD2D03', jenis: 'kebakaran',            extraParams: ''                                      },
+  { key: 'layangan',    label: 'Layangan',                 emoji: '🪁', numColor: '#3B84CE', jenis: 'layangan',             extraParams: ''                                      },
+  { key: 'pencurian',   label: 'Pencurian',                emoji: '☠️', numColor: '#1B1B1B', jenis: 'pencurian',            extraParams: ''                                      },
+  { key: 'pemanfaatan', label: 'Pemanfaatan Lahan',        emoji: '🏡', numColor: '#059669', jenis: 'pemanfaatan_lahan',    extraParams: ''                                      },
 ] as const
 
 // ── Status config — Figma tokens ──────────────────────────────────────────────
@@ -199,6 +200,7 @@ function StatusPill({ status }: { status: string }) {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
+  const router = useRouter()
   const [stats, setStats] = useState<Stats>(MOCK_STATS)
   const [recent, setRecent] = useState<RecentRow[]>(MOCK_RECENT)
   const [alertCount, setAlertCount] = useState(0)
@@ -253,6 +255,15 @@ export default function DashboardPage() {
     Promise.allSettled([
       laporanApi.getStats()
         .then((res) => setStats(res.data))
+        .catch(() => {}),
+
+      // PPL count: only berlangsung + tidak_ada_aktifitas (exclude selesai)
+      laporanApi.getAll({ jenisGangguan: 'pekerjaan_pihak_lain', status: 'berlangsung,tidak_ada_aktifitas', limit: 1 })
+        .then((r2) => {
+          const payload = r2.data
+          const activeCount = payload.total ?? (Array.isArray(payload) ? payload.length : 0)
+          setStats((prev) => ({ ...prev, ppl: activeCount }))
+        })
         .catch(() => {}),
 
       laporanApi.getAll({ limit: 5 })
@@ -326,6 +337,7 @@ export default function DashboardPage() {
               lng:        t.lng,
               tipe:       t.tipe ?? getTipe(t.name),
               bersertifikat: t.bersertifikat ?? false,
+              hasCctv:       t.hasCctv ?? false,
               updatedAt:  t.updated_at ?? null,
               kerawanan:  items,
             }
@@ -373,7 +385,7 @@ export default function DashboardPage() {
       {/* Stat cards — 5 columns (desktop) */}
       <div className="dash-stat-row">
         {STAT_CARDS.map((card) => (
-          <div key={card.key} className="dash-stat-card">
+          <div key={card.key} className="dash-stat-card" style={{ cursor: 'pointer' }} onClick={() => router.push('/laporan/gangguan?jenis=' + card.jenis + card.extraParams)}>
             <div className="dash-stat-head">
               <TwIcon emoji={card.emoji} size={32} />
               <span className="dash-stat-label">{card.label}</span>
@@ -390,7 +402,7 @@ export default function DashboardPage() {
         {/* Row 1: PPL + Pemanfaatan */}
         <div className="pwa-stat-row-2">
           {[STAT_CARDS[0], STAT_CARDS[4]].map((card) => (
-            <div key={card.key} className="pwa-stat-card">
+            <div key={card.key} className="pwa-stat-card" style={{ cursor: 'pointer' }} onClick={() => router.push('/laporan/gangguan?jenis=' + card.jenis + card.extraParams)}>
               <div className="pwa-stat-head">
                 <TwIcon emoji={card.emoji} size={28} />
                 <span className="pwa-stat-label">{card.label}</span>
@@ -404,7 +416,7 @@ export default function DashboardPage() {
         {/* Row 2: Pencurian + Kebakaran + Layangan */}
         <div className="pwa-stat-row-3">
           {[STAT_CARDS[3], STAT_CARDS[1], STAT_CARDS[2]].map((card) => (
-            <div key={card.key} className="pwa-stat-card">
+            <div key={card.key} className="pwa-stat-card" style={{ cursor: 'pointer' }} onClick={() => router.push('/laporan/gangguan?jenis=' + card.jenis + card.extraParams)}>
               <div className="pwa-stat-head">
                 <TwIcon emoji={card.emoji} size={24} />
                 <span className="pwa-stat-label">{card.label}</span>

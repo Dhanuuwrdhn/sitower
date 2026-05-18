@@ -325,6 +325,7 @@ export default function DashboardPage() {
                     kategori:  k.jenis,
                     level:     k.level ?? 'aman',
                     status:    k.level ?? 'aman',
+                    progres:   k.progres,
                     laporanId: k.laporan_id,
                   }))
                 : (t.kerawanan_types?.length

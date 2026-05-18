@@ -654,22 +654,33 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
     const all = towers ?? []
     const byLayer = all.filter((t) => t.tipe === 'gardu' || visibleLayers.has(t.tipe))
 
-    let byStatus = byLayer
-    if (activeStatus.length > 0) {
-      byStatus = byLayer.filter((t) => {
-        const top = getTopLevel(t.kerawanan)
-        const key = top === 'normal' ? 'tidak_ada_aktivitas'
-          : (top === 'kritis' || top === 'kritis_terpenuhi' || top === 'kritis_tidak_terpenuhi') ? 'kritis'
-          : top
-        return activeStatus.includes(key)
-      })
-    }
+    const wantTidakAda = activeStatus.includes('tidak_ada_aktivitas')
+    const itemLevels = activeStatus.filter((s) => s !== 'tidak_ada_aktivitas')
+    const hasJenis = activeJenis.length > 0
+    const hasItemStatus = itemLevels.length > 0
 
-    if (activeJenis.length === 0) return byStatus
-    return byStatus.flatMap((t) => {
-      const matching = t.kerawanan.filter((k) => activeJenis.includes(normKat(k.kategori)))
-      if (matching.length === 0) return []
-      return [{ ...t, kerawanan: matching }]
+    // No active filter → return all
+    if (!hasJenis && activeStatus.length === 0) return byLayer
+
+    return byLayer.flatMap((t) => {
+      // Per-item filter: a kerawanan matches when BOTH jenis (if any) AND
+      // level (if any) match. Tower is included if it has ≥1 matching item.
+      const matching = t.kerawanan.filter((k) => {
+        if (hasJenis && !activeJenis.includes(normKat(k.kategori))) return false
+        if (hasItemStatus) {
+          const key = (k.level === 'kritis' || k.level === 'kritis_terpenuhi' || k.level === 'kritis_tidak_terpenuhi')
+            ? 'kritis'
+            : k.level
+          if (!itemLevels.includes(key)) return false
+        }
+        return true
+      })
+      if (matching.length > 0) return [{ ...t, kerawanan: matching }]
+
+      // Include towers with no active kerawanan only when user selects
+      // "Tidak Ada Aktivitas" and no jenis filter is set.
+      if (wantTidakAda && !hasJenis && t.kerawanan.length === 0) return [t]
+      return []
     })
   }, [towers, activeJenis, activeStatus, visibleLayers])
 

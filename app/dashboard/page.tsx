@@ -516,9 +516,9 @@ export default function DashboardPage() {
             <thead>
                 <tr>
                 <th>Tanggal</th>
-                <th>Ruas</th>
+                <th>Penghantar</th>
                 <th>Jenis Kerawanan</th>
-                <th>Line Walker</th>
+                <th>Petugas</th>
                 <th>Status Kerawanan</th>
                 <th>Progres Laporan</th>
               </tr>
@@ -560,7 +560,7 @@ export default function DashboardPage() {
               </div>
               <p className="dash-mobile-jenis">{row.jenisGangguan}</p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
-                <p className="dash-mobile-pelapor">Line Walker: <span>{row.lineWalker}</span></p>
+                <p className="dash-mobile-pelapor">Petugas: <span>{row.lineWalker}</span></p>
                 <ProgressBadge tipe={row.progresLaporan} />
               </div>
             </div>

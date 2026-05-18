@@ -589,7 +589,7 @@ function TowerDropdown({
         className="form-input flex items-center justify-between text-left"
       >
         <span className={selectedLabel ? 'text-app-text' : 'text-app-subtle'}>
-          {selectedLabel || 'Pilih ruas...'}
+          {selectedLabel || 'Pilih penghantar...'}
         </span>
         <ChevronDown size={14} className="text-app-muted shrink-0" />
       </button>
@@ -601,7 +601,7 @@ function TowerDropdown({
               autoFocus
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari ruas atau jalur..."
+              placeholder="Cari penghantar atau jalur..."
               className="form-input text-[12px]"
             />
           </div>
@@ -3138,7 +3138,7 @@ function LaporanDrawer({
               }}
             >
               <span style={{ fontSize: 14, color: form.towerId ? '#5F737F' : '#97AAB3', fontWeight: 500 }}>
-                {form.towerLabel || 'Pilih ruas...'}
+                {form.towerLabel || 'Pilih penghantar...'}
               </span>
               <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
             </button>

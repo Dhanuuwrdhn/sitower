@@ -127,10 +127,10 @@ const JENIS_LABEL: Record<string, string> = {
 }
 
 // ── Donut Chart — 4 segments: Aman / Sedang / Kritis / Kritis ────
-function DonutChart({ aman, sedang, kritisTerpenuhi, kritisLdakTerpenuhi }: {
-  aman: number; sedang: number; kritisTerpenuhi: number; kritisLdakTerpenuhi: number
+function DonutChart({ noActivity, aman, sedang, kritisTerpenuhi, kritisLdakTerpenuhi }: {
+  noActivity: number; aman: number; sedang: number; kritisTerpenuhi: number; kritisLdakTerpenuhi: number
 }) {
-  const total = aman + sedang + kritisTerpenuhi + kritisLdakTerpenuhi
+  const total = noActivity + aman + sedang + kritisTerpenuhi + kritisLdakTerpenuhi
   const cx = 80, cy = 80, r = 60, strokeW = 24
   const circumference = 2 * Math.PI * r
   const startOffset = circumference * 0.25
@@ -144,6 +144,7 @@ function DonutChart({ aman, sedang, kritisTerpenuhi, kritisLdakTerpenuhi }: {
     )
   }
 
+  const naArc  = circumference * (noActivity          / total)
   const amanArc  = circumference * (aman              / total)
   const sedArc   = circumference * (sedang            / total)
   const ktArc    = circumference * (kritisTerpenuhi   / total)
@@ -151,31 +152,38 @@ function DonutChart({ aman, sedang, kritisTerpenuhi, kritisLdakTerpenuhi }: {
 
   return (
     <svg width="160" height="160" viewBox="0 0 160 160">
+      {/* Tidak Ada Aktivitas — #CBD5E1 */}
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#CBD5E1" strokeWidth={strokeW}
+        strokeDasharray={`${naArc} ${circumference - naArc}`}
+        strokeDashoffset={startOffset}
+        strokeLinecap="butt"
+        style={{ transition: 'stroke-dasharray 0.6s ease' }}
+      />
       {/* Aman — #039855 */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#039855" strokeWidth={strokeW}
         strokeDasharray={`${amanArc} ${circumference - amanArc}`}
-        strokeDashoffset={startOffset}
+        strokeDashoffset={startOffset - naArc}
         strokeLinecap="butt"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
       {/* Sedang — #F79009 */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#F79009" strokeWidth={strokeW}
         strokeDasharray={`${sedArc} ${circumference - sedArc}`}
-        strokeDashoffset={startOffset - amanArc}
+        strokeDashoffset={startOffset - naArc - amanArc}
         strokeLinecap="butt"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
-      {/* Kritis — #EF4444 */}
+      {/* Kritis Terpenuhi — #EF4444 */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#EF4444" strokeWidth={strokeW}
         strokeDasharray={`${ktArc} ${circumference - ktArc}`}
-        strokeDashoffset={startOffset - amanArc - sedArc}
+        strokeDashoffset={startOffset - naArc - amanArc - sedArc}
         strokeLinecap="butt"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
-      {/* Kritis — #991B1B */}
+      {/* Kritis Tidak Terpenuhi — #991B1B */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#991B1B" strokeWidth={strokeW}
         strokeDasharray={`${kntArc} ${circumference - kntArc}`}
-        strokeDashoffset={startOffset - amanArc - sedArc - ktArc}
+        strokeDashoffset={startOffset - naArc - amanArc - sedArc - ktArc}
         strokeLinecap="butt"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
@@ -206,6 +214,7 @@ export default function DashboardPage() {
   const [alertCount, setAlertCount] = useState(0)
   const [towerKerawanan, setTowerKerawanan] = useState<any[]>([])
   const [totalTower, setTotalTower] = useState(0)
+  const [noActivityTower, setNoActivityTower] = useState(0)
   const [amanTower, setAmanTower] = useState(0)
   const [sedangTower, setSedangTower] = useState(0)
   const [kritisTerpenuhiTower, setKritisTerpenuhiTower] = useState(0)
@@ -253,12 +262,13 @@ export default function DashboardPage() {
 
   useEffect(() => {
     Promise.allSettled([
+      // Fetch base stats then override PPL with active-only count (exclude selesai).
+      // Chained so the PPL override always runs after setStats, avoiding a race.
       laporanApi.getStats()
-        .then((res) => setStats(res.data))
-        .catch(() => {}),
-
-      // PPL count: only berlangsung + tidak_ada_aktifitas (exclude selesai)
-      laporanApi.getAll({ jenisGangguan: 'pekerjaan_pihak_lain', status: 'berlangsung,tidak_ada_aktifitas', limit: 1 })
+        .then((res) => {
+          setStats(res.data)
+          return laporanApi.getAll({ jenisGangguan: 'pekerjaan_pihak_lain', status: 'berlangsung,tidak_ada_aktifitas', limit: 1 })
+        })
         .then((r2) => {
           const payload = r2.data
           const activeCount = payload.total ?? (Array.isArray(payload) ? payload.length : 0)
@@ -281,25 +291,8 @@ export default function DashboardPage() {
         })
         .catch(() => {}),
 
-      // Pakai asetApi.getStats() untuk counts + asetApi.getMapOverview() untuk peta
-      asetApi.getStats()
-        .then((res) => {
-          const s = res.data
-          const total              = s.total                   ?? 0
-          const aman               = s.aman                   ?? 0
-          const sedang             = s.sedang                 ?? 0
-          const kritisTerpenuhi    = s.kritis_terpenuhi       ?? 0
-          const kritisLdak         = s.kritis_tidak_terpenuhi ?? 0
-          const kritisLegacy       = s.kritis                 ?? 0
-          setTotalTower(total)
-          setAmanTower(aman)
-          setSedangTower(sedang)
-          setKritisTerpenuhiTower(kritisTerpenuhi + kritisLegacy)
-          setKritisLdakTerpenuhiTower(kritisLdak)
-          setAlertCount(sedang + kritisTerpenuhi + kritisLdak + kritisLegacy)
-        })
-        .catch(() => {}),
-
+      // Derive both map markers AND card counts from the same overview response
+      // so the donut chart always matches what the map shows.
       asetApi.getMapOverview()
         .then((res) => {
           const overview = res.data
@@ -309,12 +302,30 @@ export default function DashboardPage() {
             if (n.includes('SKTT') || n.includes('JOINT') || n.startsWith('TRS ')) return 'SKTT'
             return 'SUTT'
           }
-          // Transform aset towers to FeaturedTower format expected by TowerMapGoogle.
-          // Prefer the per-jenis `kerawanan` array from the backend (each entry
-          // carries the latest levelRisiko of its laporan). Fall back to the
-          // legacy `kerawanan_types` + overall `status` only if the new field is
-          // missing (older API response).
-          const mapTowers = (overview.towers ?? []).map((t: any) => {
+
+          const rawTowers: any[] = overview.towers ?? []
+
+          // Compute status counts using the same overallStatus the map uses.
+          // Towers with no laporan (kerawanan array empty) → "Tidak Ada Aktivitas".
+          let noActivity = 0, aman = 0, sedang = 0, kritisTerpenuhi = 0, kritisLdak = 0
+          for (const t of rawTowers) {
+            const hasActivity = Array.isArray(t.kerawanan) && t.kerawanan.length > 0
+            if (!hasActivity) { noActivity++; continue }
+            const s: string = t.status ?? 'aman'
+            if (s === 'sedang') sedang++
+            else if (s === 'kritis_tidak_terpenuhi') kritisLdak++
+            else if (s === 'kritis_terpenuhi' || s === 'kritis') kritisTerpenuhi++
+            else aman++
+          }
+          setTotalTower(rawTowers.length)
+          setNoActivityTower(noActivity)
+          setAmanTower(aman)
+          setSedangTower(sedang)
+          setKritisTerpenuhiTower(kritisTerpenuhi)
+          setKritisLdakTerpenuhiTower(kritisLdak)
+          setAlertCount(sedang + kritisTerpenuhi + kritisLdak)
+
+          const mapTowers = rawTowers.map((t: any) => {
             const items: { kategori: string; level: string; status: string }[] =
               Array.isArray(t.kerawanan) && t.kerawanan.length > 0
                 ? t.kerawanan.map((k: any) => ({
@@ -331,15 +342,15 @@ export default function DashboardPage() {
                     }))
                   : [])
             return {
-              id:         t.id,
-              nama:       t.name,
-              lat:        t.lat,
-              lng:        t.lng,
-              tipe:       t.tipe ?? getTipe(t.name),
+              id:           t.id,
+              nama:         t.name,
+              lat:          t.lat,
+              lng:          t.lng,
+              tipe:         t.tipe ?? getTipe(t.name),
               bersertifikat: t.bersertifikat ?? false,
-              hasCctv:       t.hasCctv ?? false,
-              updatedAt:  t.updated_at ?? null,
-              kerawanan:  items,
+              hasCctv:      t.hasCctv ?? false,
+              updatedAt:    t.updated_at ?? null,
+              kerawanan:    items,
             }
           })
           setTowerKerawanan(mapTowers)
@@ -367,11 +378,12 @@ export default function DashboardPage() {
     if (pct === 0 || pct === 100) return String(pct)
     return pct.toFixed(2).replace(/\.?0+$/, '')
   }
-  const amanPct   = fmtPct(amanTower, totalTower)
-  const sedangPct = fmtPct(sedangTower, totalTower)
-  const ktPct     = fmtPct(kritisTerpenuhiTower, totalTower)
-  const kntPct    = fmtPct(kritisLdakTerpenuhiTower, totalTower)
-  const kritisPct = fmtPct(kritisTerpenuhiTower + kritisLdakTerpenuhiTower, totalTower)
+  const noActivityPct = fmtPct(noActivityTower, totalTower)
+  const amanPct       = fmtPct(amanTower, totalTower)
+  const sedangPct     = fmtPct(sedangTower, totalTower)
+  const ktPct         = fmtPct(kritisTerpenuhiTower, totalTower)
+  const kntPct        = fmtPct(kritisLdakTerpenuhiTower, totalTower)
+  const kritisPct     = fmtPct(kritisTerpenuhiTower + kritisLdakTerpenuhiTower, totalTower)
 
   if (loading) return <B2WLoader label="Memuat dashboard..." />
 
@@ -442,7 +454,7 @@ export default function DashboardPage() {
 
           {/* Section 2 — Chart (kiri) + Total label+num (kanan), Figma: HORIZONTAL gap=24 */}
           <div className="dash-aset-body">
-            <DonutChart aman={amanTower} sedang={sedangTower} kritisTerpenuhi={kritisTerpenuhiTower} kritisLdakTerpenuhi={kritisLdakTerpenuhiTower} />
+            <DonutChart noActivity={noActivityTower} aman={amanTower} sedang={sedangTower} kritisTerpenuhi={kritisTerpenuhiTower} kritisLdakTerpenuhi={kritisLdakTerpenuhiTower} />
             <div className="dash-aset-total">
               <span className="dash-aset-total-label">Total Aset{'\n'}Transmisi</span>
               <span className="dash-aset-total-num">{totalTower}</span>
@@ -452,8 +464,9 @@ export default function DashboardPage() {
           {/* Section 3 — Legend rows, Figma: VERTICAL gap=16, each row space-between */}
           <div className="dash-aset-legend">
             {[
-              { color: '#039855', label: 'Aman',                  count: amanTower,                 pct: amanPct   },
-              { color: '#F79009', label: 'Sedang',                count: sedangTower,               pct: sedangPct },
+              { color: '#CBD5E1', label: 'Tidak Ada Aktivitas',   count: noActivityTower,           pct: noActivityPct },
+              { color: '#039855', label: 'Aman',                  count: amanTower,                 pct: amanPct       },
+              { color: '#F79009', label: 'Sedang',                count: sedangTower,               pct: sedangPct     },
               { color: '#EF4444', label: 'Kritis', count: kritisTerpenuhiTower + kritisLdakTerpenuhiTower, pct: kritisPct },
             ].map((row) => (
               <div key={row.label} className="dash-aset-legend-item">

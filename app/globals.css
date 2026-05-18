@@ -682,7 +682,7 @@
 /* ── Middle row: Aset + Map ── */
 .dash-mid-row {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 340px 1fr;
   gap: 16px;
 }
 @media (max-width: 900px) {
@@ -713,8 +713,8 @@
 .dash-aset-card {
   display: flex;
   flex-direction: column;
-  gap: 40px;
-  padding: 24px;
+  gap: 32px;
+  padding: 28px 32px;
   background: #FFFFFF;
   border: 1px solid #E1E8EC;
   border-radius: 8px;
@@ -793,8 +793,8 @@
 .dash-legend-label {
   font-family: 'Inter', sans-serif;
   font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 13px;
+  line-height: 18px;
   color: #5F737F;
 }
 
@@ -802,13 +802,14 @@
   display: flex;
   align-items: flex-end;
   gap: 4px;
+  flex-shrink: 0;
 }
 
 .dash-legend-num {
   font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: 24px;
-  line-height: 30px;
+  font-size: 20px;
+  line-height: 26px;
   color: #1C1C1C;
 }
 

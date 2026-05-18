@@ -1605,11 +1605,36 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   }
 
   async function handleDeleteRiwayat(riwayatId: string) {
-    if (!activeLaporan?.id || !confirm('Hapus riwayat ini?')) return
+    if (!activeLaporan?.id) return
+    const result = await Swal.fire({
+      title: 'Hapus Riwayat?',
+      text: 'Riwayat pembaruan laporan ini akan dihapus permanen dan tidak bisa dikembalikan.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, Hapus',
+      cancelButtonText: 'Batal',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#97AAB3',
+      reverseButtons: true,
+    })
+    if (!result.isConfirmed) return
     try {
       await laporanApi.deleteRiwayat(activeLaporan.id, riwayatId)
       setRiwayat(prev => prev.filter(r => r.id !== riwayatId))
-    } catch { toast.error('Gagal menghapus riwayat') }
+      Swal.fire({
+        title: 'Berhasil',
+        text: 'Riwayat pembaruan berhasil dihapus.',
+        icon: 'success',
+        confirmButtonColor: '#076C9E',
+      })
+    } catch {
+      Swal.fire({
+        title: 'Gagal',
+        text: 'Gagal menghapus riwayat.',
+        icon: 'error',
+        confirmButtonColor: '#d33',
+      })
+    }
   }
 
   async function handleSelesaikan() {

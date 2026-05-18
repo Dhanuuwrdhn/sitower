@@ -621,6 +621,7 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
   const router = useRouter()
   const [selected, setSelected] = useState<FeaturedTower | null>(null)
   const [activeJenis, setActiveJenis] = useState<string[]>([])
+  const [activeStatus, setActiveStatus] = useState<string[]>([])
   const [visibleLayers, setVisibleLayers] = useState<Set<string>>(new Set(['SUTT', 'SUTET', 'SKTT']))
   const [filterOpen, setFilterOpen] = useState(false)
 
@@ -632,6 +633,9 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
   function toggleJenis(k: string) {
     setActiveJenis(prev => prev.includes(k) ? prev.filter(x => x !== k) : [...prev, k])
   }
+  function toggleStatus(k: string) {
+    setActiveStatus(prev => prev.includes(k) ? prev.filter(x => x !== k) : [...prev, k])
+  }
   function toggleLayer(k: string) {
     setVisibleLayers(prev => {
       const next = new Set(prev)
@@ -641,23 +645,34 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
   }
   function clearFilters() {
     setActiveJenis([])
+    setActiveStatus([])
     setVisibleLayers(new Set(['SUTT', 'SUTET', 'SKTT']))
   }
 
   const displayTowers = useMemo<FeaturedTower[]>(() => {
     const all = towers ?? []
     const byLayer = all.filter((t) => t.tipe === 'gardu' || visibleLayers.has(t.tipe))
-    if (activeJenis.length === 0) return byLayer
-    // Filter at the kerawanan level (not just at the tower level), so the
-    // marker color, badge count, and popup only reflect the selected jenis.
-    return byLayer.flatMap((t) => {
+
+    let byStatus = byLayer
+    if (activeStatus.length > 0) {
+      byStatus = byLayer.filter((t) => {
+        const top = getTopLevel(t.kerawanan)
+        const key = top === 'normal' ? 'tidak_ada_aktivitas'
+          : (top === 'kritis' || top === 'kritis_terpenuhi' || top === 'kritis_tidak_terpenuhi') ? 'kritis'
+          : top
+        return activeStatus.includes(key)
+      })
+    }
+
+    if (activeJenis.length === 0) return byStatus
+    return byStatus.flatMap((t) => {
       const matching = t.kerawanan.filter((k) => activeJenis.includes(normKat(k.kategori)))
       if (matching.length === 0) return []
       return [{ ...t, kerawanan: matching }]
     })
-  }, [towers, activeJenis, visibleLayers])
+  }, [towers, activeJenis, activeStatus, visibleLayers])
 
-  const hasActiveFilter = activeJenis.length > 0 || visibleLayers.size < ALL_LAYER_TYPES.length
+  const hasActiveFilter = activeJenis.length > 0 || activeStatus.length > 0 || visibleLayers.size < ALL_LAYER_TYPES.length
 
   const handleSelect = useMemo(() => (t: FeaturedTower) => {
     setSelected(t)
@@ -786,6 +801,35 @@ export default function TowerMapGoogle({ towers, onTowerClick, jalurKml }: Props
                     </button>
                   )
                 })}
+            </div>
+
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#5F737F', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>Status</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 12 }}>
+              {([
+                { key: 'aman',               label: 'Aman',                color: '#22C55E' },
+                { key: 'sedang',             label: 'Sedang',              color: '#F59E0B' },
+                { key: 'kritis',             label: 'Kritis',              color: '#EF4444' },
+                { key: 'tidak_ada_aktivitas', label: 'Tidak Ada Aktivitas', color: '#94A3B8' },
+              ] as { key: string; label: string; color: string }[]).map(({ key, label, color }) => {
+                const active = activeStatus.includes(key)
+                return (
+                  <button
+                    key={key}
+                    onClick={() => toggleStatus(key)}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 5,
+                      padding: '4px 10px', borderRadius: 16, fontSize: 11, fontWeight: 500,
+                      cursor: 'pointer',
+                      border: active ? `1px solid ${color}` : '1px solid #E1E8EC',
+                      background: active ? color : '#fff',
+                      color: active ? '#FFFFFF' : '#5F737F',
+                    }}
+                  >
+                    <span style={{ width: 7, height: 7, borderRadius: '50%', background: active ? 'rgba(255,255,255,0.7)' : color, flexShrink: 0, display: 'inline-block' }} />
+                    {label}
+                  </button>
+                )
+              })}
             </div>
 
             {hasActiveFilter && (

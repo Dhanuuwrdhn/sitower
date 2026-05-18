@@ -253,12 +253,13 @@ export default function DashboardPage() {
 
   useEffect(() => {
     Promise.allSettled([
+      // Fetch base stats then override PPL with active-only count (exclude selesai).
+      // Chained so the PPL override always runs after setStats, avoiding a race.
       laporanApi.getStats()
-        .then((res) => setStats(res.data))
-        .catch(() => {}),
-
-      // PPL count: only berlangsung + tidak_ada_aktifitas (exclude selesai)
-      laporanApi.getAll({ jenisGangguan: 'pekerjaan_pihak_lain', status: 'berlangsung,tidak_ada_aktifitas', limit: 1 })
+        .then((res) => {
+          setStats(res.data)
+          return laporanApi.getAll({ jenisGangguan: 'pekerjaan_pihak_lain', status: 'berlangsung,tidak_ada_aktifitas', limit: 1 })
+        })
         .then((r2) => {
           const payload = r2.data
           const activeCount = payload.total ?? (Array.isArray(payload) ? payload.length : 0)

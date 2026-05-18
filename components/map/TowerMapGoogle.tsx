@@ -471,23 +471,24 @@ function TowerPopup({ tower, onClose, onKerawananClick }: { tower: FeaturedTower
         <div style={{ color: '#97aab3', fontSize: 11, marginBottom: 6 }}>
           {tower.tipe}{tower.tegangan ? ` · ${tower.tegangan}` : ''}
         </div>
-        <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-          <span style={{
-            fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
-            background: tower.bersertifikat ? '#dcfce7' : '#fee2e2',
-            color: tower.bersertifikat ? '#16a34a' : '#dc2626',
-          }}>
-            {tower.bersertifikat ? 'Bersertifikat' : 'Belum Bersertifikat'}
-          </span>
-          {tower.hasCctv && (
+        {tower.tipe !== 'SKTT' && (
+          <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
             <span style={{
               fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
-              background: '#dcfce7', color: '#16a34a',
+              background: tower.bersertifikat ? '#dcfce7' : '#fee2e2',
+              color: tower.bersertifikat ? '#16a34a' : '#dc2626',
             }}>
-              Terpasang CCTV
+              {tower.bersertifikat ? 'Bersertifikat' : 'Belum Bersertifikat'}
             </span>
-          )}
-        </div>
+            <span style={{
+              fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
+              background: tower.hasCctv ? '#dcfce7' : '#fee2e2',
+              color: tower.hasCctv ? '#16a34a' : '#dc2626',
+            }}>
+              {tower.hasCctv ? 'Terpasang CCTV' : 'Belum Ada CCTV'}
+            </span>
+          </div>
+        )}
 
         {hasKerawanan ? (
           <div>

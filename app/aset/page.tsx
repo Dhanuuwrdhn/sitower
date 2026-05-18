@@ -430,24 +430,28 @@ function FilterPopover({
           ))}
         </div>
       </div>
-      <div className="h-px bg-[#E1E8EC]" />
-      <div className="p-4 flex flex-col gap-3">
-        <span className="font-bold text-[14px] text-[#1C1C1C]">Status Sertifikat</span>
-        <div className="flex flex-wrap gap-2">
-          {SERTIFIKAT_CHIPS.map(s => (
-            <button key={s.id} onClick={() => toggle('certified', s.id)} style={chip(!!filters.certified?.includes(s.id))}>{s.label}</button>
-          ))}
-        </div>
-      </div>
-      <div className="h-px bg-[#E1E8EC]" />
-      <div className="p-4 flex flex-col gap-3">
-        <span className="font-bold text-[14px] text-[#1C1C1C]">Status CCTV</span>
-        <div className="flex flex-wrap gap-2">
-          {CCTV_CHIPS.map(s => (
-            <button key={s.id} onClick={() => toggle('cctv', s.id)} style={chip(!!filters.cctv?.includes(s.id))}>{s.label}</button>
-          ))}
-        </div>
-      </div>
+      {!filters.tipe?.includes('SKTT') && (
+        <>
+          <div className="h-px bg-[#E1E8EC]" />
+          <div className="p-4 flex flex-col gap-3">
+            <span className="font-bold text-[14px] text-[#1C1C1C]">Status Sertifikat</span>
+            <div className="flex flex-wrap gap-2">
+              {SERTIFIKAT_CHIPS.map(s => (
+                <button key={s.id} onClick={() => toggle('certified', s.id)} style={chip(!!filters.certified?.includes(s.id))}>{s.label}</button>
+              ))}
+            </div>
+          </div>
+          <div className="h-px bg-[#E1E8EC]" />
+          <div className="p-4 flex flex-col gap-3">
+            <span className="font-bold text-[14px] text-[#1C1C1C]">Status CCTV</span>
+            <div className="flex flex-wrap gap-2">
+              {CCTV_CHIPS.map(s => (
+                <button key={s.id} onClick={() => toggle('cctv', s.id)} style={chip(!!filters.cctv?.includes(s.id))}>{s.label}</button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </>
   )
 
@@ -1306,8 +1310,11 @@ export default function AsetPage() {
         tipe: activeFilters.tipe.length ? activeFilters.tipe.join(',') : undefined,
         status: activeFilters.status.length ? activeFilters.status.join(',') : undefined,
         kerawanan_type: activeFilters.jenis.length ? activeFilters.jenis.join(',') : undefined,
-        hasCertificate: activeFilters.certified.length === 1 ? activeFilters.certified[0] : undefined,
-        hasCctv: activeFilters.cctv.length === 1 ? activeFilters.cctv[0] : undefined,
+        // SKTT towers don't have sertifikat/CCTV — skip these filters when SKTT is selected
+        hasCertificate: activeFilters.tipe.includes('SKTT') ? undefined
+          : (activeFilters.certified.length === 1 ? activeFilters.certified[0] : undefined),
+        hasCctv: activeFilters.tipe.includes('SKTT') ? undefined
+          : (activeFilters.cctv.length === 1 ? activeFilters.cctv[0] : undefined),
       })
       const p = res.data
       if (Array.isArray(p)) { setRows(p); setTotal(p.length) }

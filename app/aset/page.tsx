@@ -1397,7 +1397,9 @@ export default function AsetPage() {
                     <td className="px-6 py-4 font-mono text-[12px] text-gray-500">{row.tegangan ?? '—'}</td>
                     <td className="px-6 py-4 text-gray-500 text-[12px] max-w-[160px] truncate" title={row.jalur ?? ''}>{row.jalur ?? '—'}</td>
                     <td className="px-6 py-4">
-                       {row.hasCertificate ? (
+                       {row.tipe === 'SKTT' ? (
+                         <span className="text-[11px] text-gray-300">—</span>
+                       ) : row.hasCertificate ? (
                          <div className="flex items-center gap-1.5 text-emerald-600">
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             <span className="text-[11px] font-bold uppercase tracking-wide">Bersertifikat</span>

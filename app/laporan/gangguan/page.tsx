@@ -3878,6 +3878,9 @@ export default function GangguanPage() {
   const queryStatus = searchParams.get('status')
   useEffect(() => {
     if (!queryJenis && !queryStatus) return
+    if (queryJenis) setJenis(queryJenis.split(',').filter(Boolean))
+    if (queryStatus) setStatusFilter(queryStatus.split(',').filter(Boolean))
+    setPage(1)
     router.replace('/laporan/gangguan', { scroll: false })
   }, [queryJenis, queryStatus, router])
   useEffect(() => {

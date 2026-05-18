@@ -2576,10 +2576,18 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
         {(isAdmin() || isSuperadmin()) && (
           <div style={{ padding: '0 32px 32px', display: 'flex', justifyContent: 'flex-end' }}>
             <button
-              onClick={() => {
-                if (window.confirm('Apakah Anda yakin ingin menghapus laporan ini? Semua data riwayat dan foto akan ikut terhapus.')) {
-                  onDelete?.(laporan)
-                }
+              onClick={async () => {
+                const result = await Swal.fire({
+                  title: 'Hapus Laporan?',
+                  text: 'Semua data riwayat dan foto akan ikut terhapus. Tindakan ini tidak dapat dibatalkan.',
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#D92D20',
+                  cancelButtonColor: '#6B7280',
+                  confirmButtonText: 'Ya, Hapus',
+                  cancelButtonText: 'Batal',
+                })
+                if (result.isConfirmed) onDelete?.(laporan)
               }}
               style={{ padding: '10px 24px', border: '1px solid #D92D20', borderRadius: 22, background: '#FFFFFF', color: '#D92D20', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
             >

@@ -15,7 +15,7 @@ import { SkeletonRow } from '@/components/ui/SkeletonRow'
 import { CustomSelect } from '@/components/ui/CustomSelect'
 
 const TIPE_CHIPS = ['SUTET', 'SUTT', 'SKTT', 'Gardu Induk']
-const STATUS_CHIPS = ['Aman', 'Sedang', 'Kritis']
+const STATUS_CHIPS = ['Aman', 'Sedang', 'Kritis', 'Tidak Ada Aktivitas']
 const JENIS_CHIPS = [
   { id: 'pekerjaan_pihak_lain', label: 'Pekerjaan Pihak Lain (PPL)' },
   { id: 'layangan', label: 'Layangan' },

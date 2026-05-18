@@ -3693,8 +3693,20 @@ export default function GangguanPage() {
 
   // Filters
   const [search, setSearch] = useState('')
-  const [jenis, setJenis] = useState<string[]>([])
-  const [statusFilter, setStatusFilter] = useState<string[]>([])
+  const [jenis, setJenis] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search).get('jenis')
+      return p ? [p] : []
+    }
+    return []
+  })
+  const [statusFilter, setStatusFilter] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search).get('status')
+      return p ? p.split(',').filter(Boolean) : []
+    }
+    return []
+  })
   const [levelFilter, setLevelFilter] = useState<string[]>([])
   const [teknisiFilter, setTeknisiFilter] = useState<string[]>([])
   const [towerFilter, setTowerFilter] = useState<string[]>([])
@@ -3862,6 +3874,12 @@ export default function GangguanPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const queryLaporanId = searchParams.get('laporan')
+  const queryJenis = searchParams.get('jenis')
+  const queryStatus = searchParams.get('status')
+  useEffect(() => {
+    if (!queryJenis && !queryStatus) return
+    router.replace('/laporan/gangguan', { scroll: false })
+  }, [queryJenis, queryStatus, router])
   useEffect(() => {
     if (!queryLaporanId) return
     let cancelled = false

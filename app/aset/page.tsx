@@ -27,6 +27,10 @@ const SERTIFIKAT_CHIPS = [
   { id: 'true', label: 'Bersertifikat' },
   { id: 'false', label: 'Belum Bersertifikat' }
 ]
+const CCTV_CHIPS = [
+  { id: 'true', label: 'Terpasang' },
+  { id: 'false', label: 'Belum Terpasang' }
+]
 
 const JENIS_LABEL_MAP: Record<string, string> = Object.fromEntries(JENIS_CHIPS.map(c => [c.id, c.label]))
 const formatJenis = (j?: string | null) => j ? (JENIS_LABEL_MAP[j] ?? j) : '—'
@@ -435,6 +439,15 @@ function FilterPopover({
           ))}
         </div>
       </div>
+      <div className="h-px bg-[#E1E8EC]" />
+      <div className="p-4 flex flex-col gap-3">
+        <span className="font-bold text-[14px] text-[#1C1C1C]">Status CCTV</span>
+        <div className="flex flex-wrap gap-2">
+          {CCTV_CHIPS.map(s => (
+            <button key={s.id} onClick={() => toggle('cctv', s.id)} style={chip(!!filters.cctv?.includes(s.id))}>{s.label}</button>
+          ))}
+        </div>
+      </div>
     </>
   )
 
@@ -571,6 +584,13 @@ function AsetDetailDrawer({
                        <div className={`mt-1 flex items-center gap-1.5 ${tower.hasCertificate ? 'text-emerald-600' : 'text-gray-400'}`}>
                           <div className={`w-1.5 h-1.5 rounded-full ${tower.hasCertificate ? 'bg-emerald-500 animate-pulse' : 'bg-gray-300'}`} />
                           <span className="text-[11px] font-bold uppercase tracking-wide">{tower.hasCertificate ? 'Bersertifikat' : 'Belum Bersertifikat'}</span>
+                       </div>
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                       <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Status CCTV</span>
+                       <div className={`mt-1 flex items-center gap-1.5 ${tower.hasCctv ? 'text-emerald-600' : 'text-gray-400'}`}>
+                          <div className={`w-1.5 h-1.5 rounded-full ${tower.hasCctv ? 'bg-emerald-500 animate-pulse' : 'bg-gray-300'}`} />
+                          <span className="text-[11px] font-bold uppercase tracking-wide">{tower.hasCctv ? 'Terpasang' : 'Belum Terpasang'}</span>
                        </div>
                     </div>
                  </div>
@@ -781,7 +801,8 @@ function AsetEditDrawer({
         radius:    tower.radius   ?? 100,
         jalur:     tower.jalur    ?? '',
         nomorUrut: tower.nomorUrut ?? '',
-        hasCertificate:  tower.hasCertificate  ?? false,
+        hasCertificate: tower.hasCertificate ?? false,
+        hasCctv:        tower.hasCctv        ?? false,
       })
       setFiles([])
       fetchCerts()
@@ -887,19 +908,35 @@ function AsetEditDrawer({
              </div>
            </div>
 
-           {/* STATUS SERTIFIKAT */}
-           <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm flex items-center justify-between">
-              <div>
-                 <p className="text-[13px] font-bold text-gray-800">Status Sertifikat</p>
-                 <p className="text-[11px] text-gray-400 font-medium">Aktifkan jika tower memiliki sertifikat</p>
+           {/* STATUS SERTIFIKAT & CCTV */}
+           <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                 <div>
+                    <p className="text-[13px] font-bold text-gray-800">Status Sertifikat</p>
+                    <p className="text-[11px] text-gray-400 font-medium">Aktifkan jika tower memiliki sertifikat</p>
+                 </div>
+                 <button
+                   type="button"
+                   onClick={() => set('hasCertificate', !form.hasCertificate)}
+                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${form.hasCertificate ? 'bg-blue-600' : 'bg-gray-200'}`}
+                 >
+                   <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.hasCertificate ? 'translate-x-6' : 'translate-x-1'}`} />
+                 </button>
               </div>
-              <button 
-                type="button"
-                onClick={() => set('hasCertificate', !form.hasCertificate)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${form.hasCertificate ? 'bg-blue-600' : 'bg-gray-200'}`}
-              >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.hasCertificate ? 'translate-x-6' : 'translate-x-1'}`} />
-              </button>
+              <div className="h-px bg-gray-100" />
+              <div className="flex items-center justify-between">
+                 <div>
+                    <p className="text-[13px] font-bold text-gray-800">Status CCTV</p>
+                    <p className="text-[11px] text-gray-400 font-medium">Aktifkan jika tower memiliki CCTV</p>
+                 </div>
+                 <button
+                   type="button"
+                   onClick={() => set('hasCctv', !form.hasCctv)}
+                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${form.hasCctv ? 'bg-blue-600' : 'bg-gray-200'}`}
+                 >
+                   <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.hasCctv ? 'translate-x-6' : 'translate-x-1'}`} />
+                 </button>
+              </div>
            </div>
 
            {/* SERTIFIKAT FILES */}
@@ -923,7 +960,7 @@ function AsetEditDrawer({
                         <div className="p-2.5 border-t border-blue-50 bg-white">
                            <p className="text-[10px] font-bold text-gray-700 truncate pr-4">{f.name}</p>
                         </div>
-                        <button 
+                        <button
                           type="button"
                           onClick={() => setFiles(prev => prev.filter((_, idx) => idx !== i))}
                           className="absolute top-2 right-2 p-1 bg-white/80 backdrop-blur-sm rounded-lg text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -932,7 +969,7 @@ function AsetEditDrawer({
                         </button>
                     </div>
                  ))}
-                 
+
                  {/* Existing Files */}
                  {certs.map(cert => cert.dokumen.map((doc: any) => (
                     <div key={doc.id} className="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm opacity-60">
@@ -987,6 +1024,7 @@ function AsetAddDrawer({
     jalur: '',
     nomorUrut: '',
     hasCertificate: false,
+    hasCctv: false,
   })
   const [saving, setSaving] = useState(false)
   const [files, setFiles] = useState<File[]>([])
@@ -1011,7 +1049,7 @@ function AsetAddDrawer({
       setForm({
         nama: '', tipe: 'SUTT', tegangan: '150kV',
         lat: '', lng: '', lokasi: '', radius: 100, jalur: '', nomorUrut: '',
-        hasCertificate: false,
+        hasCertificate: false, hasCctv: false,
       })
       setFiles([])
     } catch (err: any) {
@@ -1096,19 +1134,35 @@ function AsetAddDrawer({
              </div>
            </div>
 
-           {/* STATUS SERTIFIKAT */}
-           <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm flex items-center justify-between">
-              <div>
-                 <p className="text-[13px] font-bold text-gray-800">Status Sertifikat</p>
-                 <p className="text-[11px] text-gray-400 font-medium">Aktifkan jika tower memiliki sertifikat</p>
+           {/* STATUS SERTIFIKAT & CCTV */}
+           <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                 <div>
+                    <p className="text-[13px] font-bold text-gray-800">Status Sertifikat</p>
+                    <p className="text-[11px] text-gray-400 font-medium">Aktifkan jika tower memiliki sertifikat</p>
+                 </div>
+                 <button
+                   type="button"
+                   onClick={() => set('hasCertificate', !form.hasCertificate)}
+                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${form.hasCertificate ? 'bg-blue-600' : 'bg-gray-200'}`}
+                 >
+                   <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.hasCertificate ? 'translate-x-6' : 'translate-x-1'}`} />
+                 </button>
               </div>
-              <button 
-                type="button"
-                onClick={() => set('hasCertificate', !form.hasCertificate)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${form.hasCertificate ? 'bg-blue-600' : 'bg-gray-200'}`}
-              >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.hasCertificate ? 'translate-x-6' : 'translate-x-1'}`} />
-              </button>
+              <div className="h-px bg-gray-100" />
+              <div className="flex items-center justify-between">
+                 <div>
+                    <p className="text-[13px] font-bold text-gray-800">Status CCTV</p>
+                    <p className="text-[11px] text-gray-400 font-medium">Aktifkan jika tower memiliki CCTV</p>
+                 </div>
+                 <button
+                   type="button"
+                   onClick={() => set('hasCctv', !form.hasCctv)}
+                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${form.hasCctv ? 'bg-blue-600' : 'bg-gray-200'}`}
+                 >
+                   <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.hasCctv ? 'translate-x-6' : 'translate-x-1'}`} />
+                 </button>
+              </div>
            </div>
 
            {/* SERTIFIKAT FILES */}
@@ -1132,7 +1186,7 @@ function AsetAddDrawer({
                         <div className="p-2.5 border-t border-blue-50 bg-white">
                            <p className="text-[10px] font-bold text-gray-700 truncate pr-4">{f.name}</p>
                         </div>
-                        <button 
+                        <button
                           type="button"
                           onClick={() => setFiles(prev => prev.filter((_, idx) => idx !== i))}
                           className="absolute top-2 right-2 p-1 bg-white/80 backdrop-blur-sm rounded-lg text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -1141,7 +1195,7 @@ function AsetAddDrawer({
                         </button>
                     </div>
                  ))}
-                 
+
                  {files.length === 0 && (
                    <div className="col-span-2 py-8 border-2 border-dashed border-gray-100 rounded-2xl flex flex-col items-center justify-center bg-white">
                       <Upload className="text-gray-200 mb-2" size={32} />
@@ -1186,6 +1240,7 @@ export default function AsetPage() {
     status: [],
     jenis: [],
     certified: [],
+    cctv: [],
   })
 
   const [isAdminUser, setIsAdminUser] = useState(false)
@@ -1240,6 +1295,7 @@ export default function AsetPage() {
         status: activeFilters.status.length ? activeFilters.status.join(',') : undefined,
         kerawanan_type: activeFilters.jenis.length ? activeFilters.jenis.join(',') : undefined,
         hasCertificate: activeFilters.certified.length === 1 ? activeFilters.certified[0] : undefined,
+        hasCctv: activeFilters.cctv.length === 1 ? activeFilters.cctv[0] : undefined,
       })
       const p = res.data
       if (Array.isArray(p)) { setRows(p); setTotal(p.length) }
@@ -1291,7 +1347,7 @@ export default function AsetPage() {
               onClose={() => setFilterOpen(false)}
               filters={activeFilters}
               onApply={(newFilters) => { setActiveFilters(newFilters); setPage(1); }}
-              onReset={() => { setActiveFilters({ tipe: [], status: [], jenis: [], certified: [] }); setPage(1); }}
+              onReset={() => { setActiveFilters({ tipe: [], status: [], jenis: [], certified: [], cctv: [] }); setPage(1); }}
               isMobile={isMobile}
             />
          </div>

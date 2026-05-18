@@ -579,20 +579,24 @@ function AsetDetailDrawer({
                     <LabelValue label="Tipe" value={tower.tipe} weight="bold" />
                     <LabelValue label="Tegangan" value={tower.tegangan} weight="bold" />
                     <LabelValue label="Radius Deteksi (m)" value={tower.radius} weight="bold" />
-                    <div className="flex flex-col gap-0.5">
-                       <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Status Sertifikat</span>
-                       <div className={`mt-1 flex items-center gap-1.5 ${tower.hasCertificate ? 'text-emerald-600' : 'text-gray-400'}`}>
-                          <div className={`w-1.5 h-1.5 rounded-full ${tower.hasCertificate ? 'bg-emerald-500 animate-pulse' : 'bg-gray-300'}`} />
-                          <span className="text-[11px] font-bold uppercase tracking-wide">{tower.hasCertificate ? 'Bersertifikat' : 'Belum Bersertifikat'}</span>
-                       </div>
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                       <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Status CCTV</span>
-                       <div className={`mt-1 flex items-center gap-1.5 ${tower.hasCctv ? 'text-emerald-600' : 'text-gray-400'}`}>
-                          <div className={`w-1.5 h-1.5 rounded-full ${tower.hasCctv ? 'bg-emerald-500 animate-pulse' : 'bg-gray-300'}`} />
-                          <span className="text-[11px] font-bold uppercase tracking-wide">{tower.hasCctv ? 'Terpasang' : 'Belum Terpasang'}</span>
-                       </div>
-                    </div>
+                    {tower.tipe !== 'SKTT' && (
+                      <>
+                        <div className="flex flex-col gap-0.5">
+                           <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Status Sertifikat</span>
+                           <div className={`mt-1 flex items-center gap-1.5 ${tower.hasCertificate ? 'text-emerald-600' : 'text-gray-400'}`}>
+                              <div className={`w-1.5 h-1.5 rounded-full ${tower.hasCertificate ? 'bg-emerald-500 animate-pulse' : 'bg-gray-300'}`} />
+                              <span className="text-[11px] font-bold uppercase tracking-wide">{tower.hasCertificate ? 'Bersertifikat' : 'Belum Bersertifikat'}</span>
+                           </div>
+                        </div>
+                        <div className="flex flex-col gap-0.5">
+                           <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Status CCTV</span>
+                           <div className={`mt-1 flex items-center gap-1.5 ${tower.hasCctv ? 'text-emerald-600' : 'text-gray-400'}`}>
+                              <div className={`w-1.5 h-1.5 rounded-full ${tower.hasCctv ? 'bg-emerald-500 animate-pulse' : 'bg-gray-300'}`} />
+                              <span className="text-[11px] font-bold uppercase tracking-wide">{tower.hasCctv ? 'Terpasang' : 'Belum Terpasang'}</span>
+                           </div>
+                        </div>
+                      </>
+                    )}
                  </div>
                </div>
 
@@ -908,7 +912,8 @@ function AsetEditDrawer({
              </div>
            </div>
 
-           {/* STATUS SERTIFIKAT & CCTV */}
+           {/* STATUS SERTIFIKAT & CCTV — disembunyikan untuk tower SKTT */}
+           {form.tipe !== 'SKTT' && (
            <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div>
@@ -938,8 +943,10 @@ function AsetEditDrawer({
                  </button>
               </div>
            </div>
+           )}
 
-           {/* SERTIFIKAT FILES */}
+           {/* SERTIFIKAT FILES — disembunyikan untuk tower SKTT */}
+           {form.tipe !== 'SKTT' && (
            <div className="flex flex-col gap-3 pb-4">
               <div className="flex items-center justify-between">
                  <h3 className="text-[14px] font-bold text-gray-800">Sertifikat</h3>
@@ -983,6 +990,7 @@ function AsetEditDrawer({
                  )))}
               </div>
            </div>
+           )}
         </form>
 
         {/* Footer */}
@@ -1134,7 +1142,8 @@ function AsetAddDrawer({
              </div>
            </div>
 
-           {/* STATUS SERTIFIKAT & CCTV */}
+           {/* STATUS SERTIFIKAT & CCTV — disembunyikan untuk tower SKTT */}
+           {form.tipe !== 'SKTT' && (
            <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div>
@@ -1164,8 +1173,10 @@ function AsetAddDrawer({
                  </button>
               </div>
            </div>
+           )}
 
-           {/* SERTIFIKAT FILES */}
+           {/* SERTIFIKAT FILES — disembunyikan untuk tower SKTT */}
+           {form.tipe !== 'SKTT' && (
            <div className="flex flex-col gap-3 pb-4">
               <div className="flex items-center justify-between">
                  <h3 className="text-[14px] font-bold text-gray-800">Sertifikat</h3>
@@ -1204,6 +1215,7 @@ function AsetAddDrawer({
                  )}
               </div>
            </div>
+           )}
         </form>
 
         {/* Footer */}

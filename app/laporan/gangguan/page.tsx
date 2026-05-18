@@ -630,7 +630,7 @@ function TowerDropdown({
               ) : null
             )}
             {groupOrder.every((g) => grouped[g].length === 0) && (
-              <p className="text-center text-[13px] text-app-muted py-6">Ruas tidak ditemukan</p>
+              <p className="text-center text-[13px] text-app-muted py-6">Penghantar tidak ditemukan</p>
             )}
           </div>
         </div>
@@ -2119,7 +2119,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           {/* ── Informasi Kerawanan (no header) ────────────────── */}
           <div style={{ background: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, border: '1px solid #E1E8EC', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <InfoRow label="Ruas" value={activeLaporan?.tower?.nama ?? '—'} />
+              <InfoRow label="Penghantar" value={activeLaporan?.tower?.nama ?? '—'} />
               <InfoRow label="Span" value={activeLaporan?.lokasiDetail || '—'} />
             </div>
             <InfoRow label="Status Kerawanan" value={<LevelBadge level={activeLaporan?.levelRisiko} />} />
@@ -2431,7 +2431,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, marginBottom: 20 }}>
             <InfoRow label="Jenis Kerawanan" value={JENIS_LABEL[activeLaporan?.jenisGangguan] ?? activeLaporan?.jenisGangguan ?? '—'} />
             <InfoRow label="Status Kerawanan" value={<LevelBadge level={activeLaporan?.levelRisiko} />} />
-            <InfoRow label="Ruas" value={activeLaporan?.tower?.nama ?? '—'} />
+            <InfoRow label="Penghantar" value={activeLaporan?.tower?.nama ?? '—'} />
             <InfoRow label="Span" value={activeLaporan?.lokasiDetail || '—'} />
           </div>
 
@@ -2812,7 +2812,7 @@ function LaporanDrawer({
 
   function validateRequiredFields() {
     const nextErrors: SubmitErrors = {}
-    if (!form.towerId) nextErrors.towerId = 'Ruas wajib diisi'
+    if (!form.towerId) nextErrors.towerId = 'Penghantar wajib diisi'
     if (!form.levelRisiko) nextErrors.levelRisiko = 'Status Kerawanan wajib diisi'
     if (!initial && fotos.length === 0 && fotoUrls.length === 0) {
       nextErrors.foto = 'Foto Bukti Terjadinya Kerawanan wajib diisi'
@@ -3081,7 +3081,7 @@ function LaporanDrawer({
       <div className="grid grid-cols-2 gap-4">
         <div className="flex-1 min-w-0">
           <label className="block text-[14px] font-bold text-app-text mb-2">
-            Ruas <span className="text-[#EF4444]">*</span>
+            Penghantar <span className="text-[#EF4444]">*</span>
           </label>
           {readOnly ? (
             <input readOnly className="form-input bg-app-bg text-app-muted" value={form.towerLabel || form.towerId} />
@@ -3091,11 +3091,11 @@ function LaporanDrawer({
                 type="button"
                 onClick={() => {
                   Swal.fire({
-                    title: 'Ubah Ruas?',
-                    text: 'Ruas yang dipilih otomatis mungkin tidak sesuai jika diubah secara manual.',
+                    title: 'Ubah Penghantar?',
+                    text: 'Penghantar yang dipilih otomatis mungkin tidak sesuai jika diubah secara manual.',
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Ya, Ubah Ruas',
+                    confirmButtonText: 'Ya, Ubah Penghantar',
                     cancelButtonText: 'Batal',
                     confirmButtonColor: '#076C9E',
                     cancelButtonColor: '#97AAB3',
@@ -3123,7 +3123,7 @@ function LaporanDrawer({
                 <Lock size={14} style={{ color: '#6B7280', flexShrink: 0 }} />
               </button>
               <p style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
-                📍 Ruas dipilih otomatis berdasarkan lokasi
+                📍 Penghantar dipilih otomatis berdasarkan lokasi
               </p>
             </>
           ) : isMobile ? (
@@ -3410,7 +3410,7 @@ function LaporanDrawer({
       {(isCUI || isCleanup) && (
         <div className="space-y-4 p-4 bg-app-bg rounded-xl border border-app-border">
           <p className="text-[11px] font-bold text-app-muted uppercase tracking-wider">{isCUI ? 'Detail CUI' : 'Detail Cleanup'}</p>
-          <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Line Walker</label><input disabled={readOnly} type="text" value={form.teknisi} onChange={(e) => set('teknisi', e.target.value)} className="form-input" /></div>
+          <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">Petugas</label><input disabled={readOnly} type="text" value={form.teknisi} onChange={(e) => set('teknisi', e.target.value)} className="form-input" /></div>
           <div><label className="block text-[12px] font-semibold text-app-text mb-1.5">No. SPK</label><input disabled={readOnly} type="text" value={form.noSpk} onChange={(e) => set('noSpk', e.target.value)} className="form-input" /></div>
           {isCUI && (
             <>
@@ -4103,7 +4103,7 @@ export default function GangguanPage() {
                       <>
                         <div style={{ padding: '12px 16px' }}>
                           <SearchableSelect
-                            label="Line Walker / Teknisi"
+                            label="Petugas / Teknisi"
                             placeholder="Pilih petugas..."
                             options={teknisiOptions.map(p => ({ value: p.nama, label: p.nama, sub: `${p.jabatan} · ${p.unit}` }))}
                             values={teknisiFilter}
@@ -4115,11 +4115,11 @@ export default function GangguanPage() {
                       </>
                     )}
 
-                    {/* Ruas (jalur) */}
+                    {/* Penghantar (jalur) */}
                     <div style={{ padding: '12px 16px' }}>
                       <SearchableSelect
-                        label="Ruas"
-                        placeholder="Pilih ruas..."
+                        label="Penghantar"
+                        placeholder="Pilih penghantar..."
                         options={jalurOptions}
                         values={towerFilter}
                         onChange={(vals) => { setTowerFilter(vals); setPage(1) }}
@@ -4175,9 +4175,9 @@ export default function GangguanPage() {
             <thead>
               <tr>
                 <th>Tanggal</th>
-                <th>Ruas</th>
+                <th>Penghantar</th>
                 <th>Jenis Kerawanan</th>
-                <th>Line Walker</th>
+                <th>Petugas</th>
                 <th>Status Kerawanan</th>
                 <th>Progres Laporan</th>
                 <th style={{ textAlign: 'center' }}>Aksi</th>
@@ -4396,7 +4396,7 @@ export default function GangguanPage() {
             {!isTeknisi() && (
               <div className="mb-5">
                 <SearchableSelect
-                  label="Line Walker / Teknisi"
+                  label="Petugas / Teknisi"
                   placeholder="Pilih petugas..."
                   options={teknisiOptions.map(p => ({ value: p.nama, label: p.nama, sub: `${p.jabatan} · ${p.unit}` }))}
                   values={teknisiFilter}
@@ -4406,11 +4406,11 @@ export default function GangguanPage() {
               </div>
             )}
 
-            {/* Ruas (jalur) */}
+            {/* Penghantar (jalur) */}
             <div className="mb-5">
               <SearchableSelect
-                label="Ruas"
-                placeholder="Pilih ruas..."
+                label="Penghantar"
+                placeholder="Pilih penghantar..."
                 options={jalurOptions}
                 values={towerFilter}
                 onChange={(vals) => { setTowerFilter(vals); setPage(1) }}

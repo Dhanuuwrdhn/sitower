@@ -724,22 +724,27 @@ function BottomSheet({
 }: {
   open: boolean; onClose: () => void; children: React.ReactNode; height?: number
 }) {
-  return (
+  // Render via portal at z-index above the Perbarui Laporan drawer (z=9999)
+  // so the sheet sits ON TOP of the drawer when invoked from inside it.
+  // Otherwise the drawer's backdrop intercepts the tap and closes the drawer.
+  if (typeof window === 'undefined') return null
+  return createPortal(
     <>
       <div
         style={{
           position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
-          zIndex: 65, transition: 'opacity 0.3s',
+          zIndex: 10000, transition: 'opacity 0.3s',
           opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none',
         }}
         onClick={onClose}
       />
       <div
         style={{
-          position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 70,
+          position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 10005,
           background: '#FFFFFF', borderRadius: '16px 16px 0 0',
           transform: open ? 'translateY(0)' : 'translateY(100%)',
           transition: 'transform 0.3s ease-in-out',
+          pointerEvents: open ? 'auto' : 'none',
           ...(height ? { height } : {}),
         }}
       >
@@ -749,7 +754,8 @@ function BottomSheet({
         </div>
         {children}
       </div>
-    </>
+    </>,
+    document.body
   )
 }
 

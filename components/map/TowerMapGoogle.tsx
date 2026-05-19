@@ -552,11 +552,6 @@ function TowerPopup({ tower, onClose, onKerawananClick }: { tower: FeaturedTower
         <div style={{ marginTop: 10, color: '#97aab3', fontSize: 10 }}>
           Terakhir update: {tower.updatedAt ? new Date(tower.updatedAt).toLocaleString('id-ID') : '—'}
         </div>
-        {level !== 'normal' && (
-          <div style={{ marginTop: 8, padding: '3px 8px', background: levelColor + '20', borderRadius: 999, display: 'inline-block', fontSize: 10, fontWeight: 700, color: levelColor }}>
-            {RISIKO_LABEL[level] ?? level}
-          </div>
-        )}
       </div>
     </InfoWindow>
   )

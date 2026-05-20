@@ -1512,12 +1512,13 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     && activeLaporan.status !== 'selesai'
     && (!isTeknisi() || isOwnLaporan)
 
-  async function reloadDetailData() {
-    if (!activeLaporan?.id) return
+  async function reloadDetailData(idOverride?: string) {
+    const id = idOverride ?? activeLaporan?.id
+    if (!id) return
     const [laporanRes, progressRes, riwayatRes] = await Promise.all([
-      laporanApi.getById(activeLaporan.id),
-      laporanApi.getProgress(activeLaporan.id),
-      laporanApi.getRiwayat(activeLaporan.id),
+      laporanApi.getById(id),
+      laporanApi.getProgress(id),
+      laporanApi.getRiwayat(id),
     ])
     setDetailLaporan(laporanRes.data)
     setProgress(progressRes.data)
@@ -1556,7 +1557,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
       progresLaporan:  activeLaporan.progresLaporan ?? 'sedang_berlangsung',
       uraianPekerjaan: activeLaporan.deskripsi ?? '',
       upayaPengendalian: activeLaporan.keterangan ?? '',
-      pihakLain: activeLaporan.jenisGangguan === 'pekerjaan_pihak_lain' ? (activeLaporan.teknisi ?? '') : '',
+      pihakLain: !['cui', 'cleanup'].includes(activeLaporan.jenisGangguan) ? (activeLaporan.teknisi ?? '') : '',
       contactPerson: activeLaporan.contactPerson ?? '',
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1569,7 +1570,8 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
 
   async function handleAddRiwayat(e?: React.FormEvent) {
     e?.preventDefault()
-    if (!activeLaporan?.id) return
+    const laporanId = activeLaporan?.id
+    if (!laporanId) return
     setSavingRiwayat(true)
     try {
       const fd = new FormData()
@@ -1584,11 +1586,10 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
       riwayatFiles.beritaAcara.forEach(f => fd.append('beritaAcara', f))
       riwayatFiles.spanduk.forEach(f => fd.append('spanduk', f))
       riwayatFiles.surat.forEach(f => fd.append('surat', f))
-      const res = await laporanApi.addRiwayat(activeLaporan.id, fd)
-      // Apply server-returned updated laporan immediately so the
-      // "Informasi Kerawanan" section reflects new values without flicker.
-      if (res?.data?.laporan) setDetailLaporan((prev: any) => ({ ...(prev ?? {}), ...res.data.laporan }))
-      await reloadDetailData()
+      await laporanApi.addRiwayat(laporanId, fd)
+      // Fetch authoritative data from server — avoids stale-closure issues
+      // with the immediate merge approach.
+      await reloadDetailData(laporanId)
       setShowUpdateDrawer(false)
       setRiwayatForm({ statusKerawanan: 'aman', progresLaporan: 'sedang_berlangsung', uraianPekerjaan: '', upayaPengendalian: '', pihakLain: '', contactPerson: '' })
       setRiwayatFiles({ foto: [], beritaAcara: [], spanduk: [], surat: [] })
@@ -1611,10 +1612,11 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   }
 
   async function handleDeleteRiwayat(riwayatId: string) {
-    if (!activeLaporan?.id) return
+    const laporanId = activeLaporan?.id
+    if (!laporanId) return
     const result = await Swal.fire({
-      title: 'Hapus Riwayat?',
-      text: 'Riwayat pembaruan laporan ini akan dihapus permanen dan tidak bisa dikembalikan.',
+      title: 'Hapus Riwayat Terbaru?',
+      text: 'Riwayat ini akan dihapus dan data laporan akan dikembalikan ke pembaruan sebelumnya.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Ya, Hapus',
@@ -1625,11 +1627,11 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
     })
     if (!result.isConfirmed) return
     try {
-      await laporanApi.deleteRiwayat(activeLaporan.id, riwayatId)
-      setRiwayat(prev => prev.filter(r => r.id !== riwayatId))
+      await laporanApi.deleteRiwayat(laporanId, riwayatId)
+      await reloadDetailData(laporanId)
       Swal.fire({
         title: 'Berhasil',
-        text: 'Riwayat pembaruan berhasil dihapus.',
+        text: 'Riwayat dihapus dan data laporan dikembalikan ke pembaruan sebelumnya.',
         icon: 'success',
         confirmButtonColor: '#076C9E',
       })
@@ -2039,7 +2041,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
   // MOBILE — synced with desktop
   // ══════════════════════════════════════════════════
   if (isMobile) {
-    const pihakLainMobile = isPPL ? activeLaporan?.teknisi : null
+    const pihakLainMobile = activeLaporan?.teknisi ?? null
     const visibleRiwayat = riwayat
     const lastUpdateM = riwayat.find((r: any) => !isInitialRiwayat(r))
     const lastUpdatedAtM = lastUpdateM?.tanggal ?? activeLaporan?.updatedAt ?? activeLaporan?.tanggal
@@ -2183,11 +2185,21 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                           </span>
                         )}
                       </div>
-                      {isSuperadmin() && (
-                        <button type="button" onClick={() => handleDeleteRiwayat(r.id)}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 4, minWidth: 32, minHeight: 32 }}>
-                          <X size={14} />
-                        </button>
+                      {(isAdmin() || isSuperadmin()) && (
+                        <div style={{ position: 'relative', display: 'inline-flex' }} className="group">
+                          <button
+                            type="button"
+                            onClick={idx === 0 ? () => handleDeleteRiwayat(r.id) : undefined}
+                            style={{ background: 'none', border: 'none', cursor: idx === 0 ? 'pointer' : 'default', color: idx === 0 ? '#D92D20' : '#CBD5E1', padding: 4, minWidth: 32, minHeight: 32 }}>
+                            <Trash2 size={14} />
+                          </button>
+                          {idx !== 0 && (
+                            <div className="group-hover:opacity-100 opacity-0 pointer-events-none transition-opacity duration-150" style={{ position: 'absolute', bottom: '100%', right: 0, marginBottom: 6, background: '#1C1C1C', color: '#fff', fontSize: 11, fontWeight: 500, padding: '5px 9px', borderRadius: 6, whiteSpace: 'nowrap', zIndex: 50, boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}>
+                              Hapus hanya bisa dari riwayat terbaru
+                              <div style={{ position: 'absolute', bottom: -4, right: 10, width: 8, height: 8, background: '#1C1C1C', transform: 'rotate(45deg)' }} />
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: '#1B1B1B', marginBottom: 10 }}>
@@ -2449,7 +2461,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             />
             <InfoRow
               label="Informasi Pihak Lain"
-              value={(isPPL ? activeLaporan?.teknisi : null) || '—'}
+              value={activeLaporan?.teknisi || '—'}
             />
             <InfoRow
               label="Contact Person"
@@ -2526,7 +2538,7 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              {visibleRiwayat.map((r: any) => (
+              {visibleRiwayat.map((r: any, idx: number) => (
                 <div key={r.id} style={{ padding: 20, border: '1px solid #E1E8EC', borderRadius: 12, background: '#FFFFFF' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
@@ -2539,10 +2551,20 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                         </span>
                       )}
                     </div>
-                    {isSuperadmin() && (
-                      <button onClick={() => handleDeleteRiwayat(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D92D20', padding: 4 }}>
-                        <X size={16} />
-                      </button>
+                    {(isAdmin() || isSuperadmin()) && (
+                      <div style={{ position: 'relative', display: 'inline-flex' }} className="group">
+                        <button
+                          onClick={idx === 0 ? () => handleDeleteRiwayat(r.id) : undefined}
+                          style={{ background: 'none', border: 'none', cursor: idx === 0 ? 'pointer' : 'default', color: idx === 0 ? '#D92D20' : '#CBD5E1', padding: 4 }}>
+                          <Trash2 size={16} />
+                        </button>
+                        {idx !== 0 && (
+                          <div className="group-hover:opacity-100 opacity-0 pointer-events-none transition-opacity duration-150" style={{ position: 'absolute', bottom: '100%', right: 0, marginBottom: 6, background: '#1C1C1C', color: '#fff', fontSize: 11, fontWeight: 500, padding: '5px 9px', borderRadius: 6, whiteSpace: 'nowrap', zIndex: 50, boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}>
+                            Hapus hanya bisa dari riwayat terbaru
+                            <div style={{ position: 'absolute', bottom: -4, right: 10, width: 8, height: 8, background: '#1C1C1C', transform: 'rotate(45deg)' }} />
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
 
@@ -3905,11 +3927,23 @@ export default function GangguanPage() {
     if (drawerOpen) refetchTowers()
   }, [drawerOpen, refetchTowers])
 
-  function openEdit(row: any) { setAutoOpenUpdate(false); setEditRow(row); setViewMode('edit'); setDrawerOpen(true) }
-  function openDetail(row: any) { setAutoOpenUpdate(false); setEditRow(row); setViewMode('detail'); setDrawerOpen(false) }
-  function openUpdate(row: any) { setAutoOpenUpdate(true); setEditRow(row); setViewMode('detail'); setDrawerOpen(false) }
+  // Tracks the laporan ID currently shown in detail view so the URL-sync
+  // effect can skip re-fetching when we already have it open.
+  const openLaporanIdRef = useRef<string | null>(null)
 
-  // Auto-open detail when arriving with ?laporan=<id> (e.g. from the map popup).
+  function openEdit(row: any) { setAutoOpenUpdate(false); setEditRow(row); setViewMode('edit'); setDrawerOpen(true) }
+  function openDetail(row: any) {
+    openLaporanIdRef.current = row.id
+    setAutoOpenUpdate(false); setEditRow(row); setViewMode('detail'); setDrawerOpen(false)
+    router.replace(`/laporan/gangguan?laporan=${row.id}`, { scroll: false })
+  }
+  function openUpdate(row: any) {
+    openLaporanIdRef.current = row.id
+    setAutoOpenUpdate(true); setEditRow(row); setViewMode('detail'); setDrawerOpen(false)
+    router.replace(`/laporan/gangguan?laporan=${row.id}`, { scroll: false })
+  }
+
+  // Auto-open detail when arriving with ?laporan=<id> (e.g. from the map popup or a reload).
   const searchParams = useSearchParams()
   const router = useRouter()
   const queryLaporanId = searchParams.get('laporan')
@@ -3924,13 +3958,20 @@ export default function GangguanPage() {
   }, [queryJenis, queryStatus, router])
   useEffect(() => {
     if (!queryLaporanId) return
+    // Already showing this laporan — skip the fetch (happens when openDetail
+    // pushes the same id to the URL and the effect re-fires).
+    if (openLaporanIdRef.current === queryLaporanId) return
     let cancelled = false
     laporanApi.getById(queryLaporanId)
       .then((res) => {
         if (cancelled) return
         const lap = res.data
-        if (lap) openDetail(lap)
-        router.replace('/laporan/gangguan', { scroll: false })
+        if (!lap) { router.replace('/laporan/gangguan', { scroll: false }); return }
+        openLaporanIdRef.current = lap.id
+        setAutoOpenUpdate(false)
+        setEditRow(lap)
+        setViewMode('detail')
+        setDrawerOpen(false)
       })
       .catch(() => {
         if (cancelled) return
@@ -3938,8 +3979,7 @@ export default function GangguanPage() {
         router.replace('/laporan/gangguan', { scroll: false })
       })
     return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryLaporanId])
+  }, [queryLaporanId, router])
 
   async function handleImport() {
     if (!importFile) return
@@ -3969,8 +4009,8 @@ export default function GangguanPage() {
         // already refreshes the panel). Only refresh the parent list. For Delete / Selesaikan
         // the handler explicitly calls onClose() to exit Detail.
         onSaved={() => { fetchData() }}
-        onClose={() => { setEditRow(null); setViewMode(null); setAutoOpenUpdate(false) }}
-        onDelete={(l) => { setDeleteRow(l); setEditRow(null); setViewMode(null); setAutoOpenUpdate(false) }}
+        onClose={() => { openLaporanIdRef.current = null; setEditRow(null); setViewMode(null); setAutoOpenUpdate(false); router.replace('/laporan/gangguan', { scroll: false }) }}
+        onDelete={(l) => { openLaporanIdRef.current = null; setDeleteRow(l); setEditRow(null); setViewMode(null); setAutoOpenUpdate(false); router.replace('/laporan/gangguan', { scroll: false }) }}
         autoOpenUpdate={autoOpenUpdate}
       />
     )

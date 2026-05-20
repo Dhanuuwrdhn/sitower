@@ -21,11 +21,19 @@ const MAP: Record<string, string> = {
   // User
   aktif:       'badge-selesai',
   nonaktif:    'badge-menunggu',
+  // CUI status
+  sedang_berlangsung:  'badge-berlangsung badge-blink',
+  tidak_ada_aktifitas: 'badge-menunggu',
+}
+
+const LABEL: Record<string, string> = {
+  sedang_berlangsung:  'Sedang Berlangsung',
+  tidak_ada_aktifitas: 'Tidak Ada Aktifitas',
 }
 
 export function StatusBadge({ status, text }: { status: string; text?: string }) {
   const key = status?.toLowerCase?.() ?? ''
   const cls = MAP[key] ?? 'badge-menunggu'
-  const displayText = text ?? (status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : '')
+  const displayText = text ?? LABEL[key] ?? (status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : '')
   return <span className={cls}>{displayText}</span>
 }

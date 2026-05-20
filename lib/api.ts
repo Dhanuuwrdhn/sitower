@@ -109,7 +109,7 @@ export const laporanApi = {
 }
 
 export const cuiApi = {
-  getAll: (params?: { search?: string; status?: string; page?: number; limit?: number }) =>
+  getAll: (params?: { search?: string; status?: string; jalur?: string; tglMulai?: string; tglAkhir?: string; page?: number; limit?: number }) =>
     api.get('/cui', { params }),
   getById: (id: string) => api.get(`/cui/${id}`),
   create: (data: { towerId: string; tanggal: string; keterangan?: string; status?: string }) =>

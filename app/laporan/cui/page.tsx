@@ -161,18 +161,14 @@ function CUIDrawer({
             />
           </div>
           <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">
-              Status
-            </label>
-            <select
-              value={form.status}
-              onChange={(e) => set('status', e.target.value)}
-              className="form-input"
-            >
-              {STATUS_OPTIONS.map((s) => (
-                <option key={s.value} value={s.value}>{s.label}</option>
-              ))}
-            </select>
+            <SearchableSelect
+              label="Status"
+              placeholder="Pilih status..."
+              options={STATUS_OPTIONS}
+              values={form.status ? [form.status] : []}
+              onChange={(vals) => set('status', vals[vals.length - 1] ?? '')}
+              onClear={() => set('status', '')}
+            />
           </div>
         </form>
         <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-app-border shrink-0">

@@ -1635,10 +1635,12 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
         icon: 'success',
         confirmButtonColor: '#076C9E',
       })
-    } catch {
+    } catch (err: any) {
+      const apiMessage = err?.response?.data?.message
+      const text = Array.isArray(apiMessage) ? apiMessage.join(', ') : (apiMessage || 'Gagal menghapus riwayat.')
       Swal.fire({
         title: 'Gagal',
-        text: 'Gagal menghapus riwayat.',
+        text,
         icon: 'error',
         confirmButtonColor: '#d33',
       })

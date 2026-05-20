@@ -471,7 +471,7 @@ export default function CUIPage() {
             <StatusBadge status={row.status?.toLowerCase()} />
           </div>
         ))}
-        <div className="card card-body">
+        <div className="card overflow-hidden">
           <Pagination total={total} page={page} limit={limit} onChange={setPage} onLimitChange={setLimit} />
         </div>
       </div>

@@ -12,19 +12,13 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonRow } from '@/components/ui/SkeletonRow'
 import { SearchableSelect } from '@/components/ui/SearchableSelect'
+import { DatePicker } from '@/components/ui/DatePicker'
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: 'selesai',             label: 'Selesai' },
   { value: 'sedang_berlangsung',  label: 'Sedang Berlangsung' },
   { value: 'tidak_ada_aktifitas', label: 'Tidak Ada Aktifitas' },
 ]
-
-function toDateInput(iso: string | undefined) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  if (isNaN(d.getTime())) return ''
-  return d.toISOString().slice(0, 10)
-}
 
 function fmtDate(iso: string | undefined) {
   if (!iso) return '—'
@@ -33,7 +27,9 @@ function fmtDate(iso: string | undefined) {
   const dd = String(d.getDate()).padStart(2, '0')
   const mm = String(d.getMonth() + 1).padStart(2, '0')
   const yyyy = d.getFullYear()
-  return `${dd}/${mm}/${yyyy}`
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mi = String(d.getMinutes()).padStart(2, '0')
+  return `${dd}/${mm}/${yyyy} ${hh}:${mi}`
 }
 
 // ── Form drawer ───────────────────────────────────────────────────────────────
@@ -49,7 +45,7 @@ function CUIDrawer({
 }) {
   const [form, setForm] = useState({
     towerId: '',
-    tanggal: new Date().toISOString().slice(0, 10),
+    tanggal: new Date().toISOString(),
     keterangan: '',
     status: 'sedang_berlangsung',
   })
@@ -61,14 +57,14 @@ function CUIDrawer({
     if (initial) {
       setForm({
         towerId:    initial.towerId ?? initial.tower?.id ?? '',
-        tanggal:    toDateInput(initial.tanggal),
+        tanggal:    initial.tanggal ? new Date(initial.tanggal).toISOString() : new Date().toISOString(),
         keterangan: initial.keterangan ?? '',
         status:     initial.status ?? 'sedang_berlangsung',
       })
     } else {
       setForm({
         towerId: '',
-        tanggal: new Date().toISOString().slice(0, 10),
+        tanggal: new Date().toISOString(),
         keterangan: '',
         status: 'sedang_berlangsung',
       })
@@ -92,7 +88,7 @@ function CUIDrawer({
     try {
       const payload = {
         towerId: form.towerId,
-        tanggal: new Date(form.tanggal).toISOString(),
+        tanggal: form.tanggal,
         keterangan: form.keterangan || undefined,
         status: form.status,
       }
@@ -139,13 +135,13 @@ function CUIDrawer({
           </div>
           <div>
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">
-              Tanggal <span className="text-red-500">*</span>
+              Tanggal & Jam <span className="text-red-500">*</span>
             </label>
-            <input
-              type="date"
+            <DatePicker
               value={form.tanggal}
-              onChange={(e) => set('tanggal', e.target.value)}
-              className="form-input"
+              onChange={(v) => set('tanggal', v)}
+              placeholder="Pilih tanggal & jam"
+              withTime
             />
           </div>
           <div>
@@ -378,20 +374,18 @@ export default function CUIPage() {
                   <div className="flex gap-3">
                     <div className="flex-1">
                       <p className="font-bold text-[13px] text-[#1C1C1C] mb-1">Tanggal Mulai</p>
-                      <input
-                        type="date"
+                      <DatePicker
                         value={tglMulai}
-                        onChange={(e) => { setTglMulai(e.target.value); setPage(1) }}
-                        className="w-full border border-[#E1E8EC] rounded-lg px-2.5 py-2 text-[13px] text-[#5F737F] outline-none"
+                        onChange={(v) => { setTglMulai(v); setPage(1) }}
+                        placeholder="Pilih tanggal"
                       />
                     </div>
                     <div className="flex-1">
                       <p className="font-bold text-[13px] text-[#1C1C1C] mb-1">Tanggal Berakhir</p>
-                      <input
-                        type="date"
+                      <DatePicker
                         value={tglAkhir}
-                        onChange={(e) => { setTglAkhir(e.target.value); setPage(1) }}
-                        className="w-full border border-[#E1E8EC] rounded-lg px-2.5 py-2 text-[13px] text-[#5F737F] outline-none"
+                        onChange={(v) => { setTglAkhir(v); setPage(1) }}
+                        placeholder="Pilih tanggal"
                       />
                     </div>
                   </div>

@@ -119,6 +119,17 @@ export const cuiApi = {
   delete: (id: string) => api.delete(`/cui/${id}`),
 }
 
+export const cleanupApi = {
+  getAll: (params?: { search?: string; status?: string; sirkit?: string; jalur?: string; tglMulai?: string; tglAkhir?: string; page?: number; limit?: number }) =>
+    api.get('/cleanup', { params }),
+  getById: (id: string) => api.get(`/cleanup/${id}`),
+  create: (data: { towerId: string; sirkit: string; tanggal: string; keterangan?: string; status?: string }) =>
+    api.post('/cleanup', data),
+  update: (id: string, data: Partial<{ towerId: string; sirkit: string; tanggal: string; keterangan: string; status: string }>) =>
+    api.patch(`/cleanup/${id}`, data),
+  delete: (id: string) => api.delete(`/cleanup/${id}`),
+}
+
 export const sertifikatApi = {
   getByTower: (towerId: string) => api.get(`/aset/towers/${encodeURIComponent(towerId)}/sertifikat`),
   create: (towerId: string, data: any, files?: File[]) => {

@@ -108,6 +108,17 @@ export const laporanApi = {
   deleteRiwayat: (id: string, riwayatId: string) => api.delete(`/laporan/${id}/riwayat/${riwayatId}`),
 }
 
+export const cuiApi = {
+  getAll: (params?: { search?: string; status?: string; page?: number; limit?: number }) =>
+    api.get('/cui', { params }),
+  getById: (id: string) => api.get(`/cui/${id}`),
+  create: (data: { towerId: string; tanggal: string; keterangan?: string; status?: string }) =>
+    api.post('/cui', data),
+  update: (id: string, data: Partial<{ towerId: string; tanggal: string; keterangan: string; status: string }>) =>
+    api.patch(`/cui/${id}`, data),
+  delete: (id: string) => api.delete(`/cui/${id}`),
+}
+
 export const sertifikatApi = {
   getByTower: (towerId: string) => api.get(`/aset/towers/${encodeURIComponent(towerId)}/sertifikat`),
   create: (towerId: string, data: any, files?: File[]) => {

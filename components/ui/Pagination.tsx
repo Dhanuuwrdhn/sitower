@@ -18,7 +18,7 @@ export function Pagination({ total, page, limit, onChange, onLimitChange }: Prop
   const to   = Math.min(page * limit, total)
 
   return (
-    <div className="flex items-center justify-between px-5 py-3.5 border-t border-app-border bg-white">
+    <div className="flex flex-wrap items-center justify-between gap-3 px-3 sm:px-5 py-3 border-t border-app-border bg-white">
       <select
         value={limit}
         onChange={(e) => { onLimitChange(Number(e.target.value)); onChange(1) }}
@@ -29,11 +29,11 @@ export function Pagination({ total, page, limit, onChange, onLimitChange }: Prop
         ))}
       </select>
 
-      <p className="text-[12px] text-app-muted">
+      <p className="hidden md:block text-[12px] text-app-muted">
         {total === 0 ? 'Tidak ada data' : `Menampilkan ${from}–${to} dari ${total} data`}
       </p>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 ml-auto">
         <select
           value={page}
           onChange={(e) => onChange(Number(e.target.value))}

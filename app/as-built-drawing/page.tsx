@@ -14,8 +14,6 @@ import { SkeletonRow } from '@/components/ui/SkeletonRow'
 import { SearchableSelect } from '@/components/ui/SearchableSelect'
 import { compressFiles, MAX_FILE_SIZE_BYTES } from '@/lib/compressFile'
 
-const TIPE_OPTIONS = ['Electrical', 'Mechanical', 'Civil', 'Grounding', 'Lainnya']
-
 const _cy = new Date().getFullYear()
 const YEAR_OPTIONS = Array.from({ length: _cy - 2009 }, (_, i) => String(_cy - i))
 
@@ -26,7 +24,6 @@ function FolderCard({ row, isAdminUser, onClick, onDelete }: {
 }) {
   const label = row.nama ?? row.namaFile ?? row.tower?.nomorTower ?? '—'
   const meta = [
-    row.tipe,
     row.tahun ? String(row.tahun) : null,
     row.tower?.nomorTower ? `Tower ${row.tower.nomorTower}` : null,
     row._count?.dokumen !== undefined ? `${row._count.dokumen} file` : null,
@@ -80,7 +77,7 @@ function GridSkeleton({ count }: { count: number }) {
 // ── Tambah modal ──────────────────────────────────────────────────────────────
 
 const BLANK_FORM = {
-  nama: '', towerId: '', tipe: 'Electrical',
+  nama: '', towerId: '',
   tahun: String(new Date().getFullYear()), keterangan: '',
 }
 
@@ -98,13 +95,9 @@ function TambahModal({
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }))
 
   function ingestFiles(list: File[]) {
-    const allowed = ['pdf', 'dwg', 'dxf']
-    const validFmt = list.filter((f) => allowed.includes((f.name.split('.').pop() ?? '').toLowerCase()))
-    const skipped = list.length - validFmt.length
-    if (skipped > 0) toast.error(`${skipped} file dilewati (format tidak didukung)`)
     const accepted: File[] = []
     const rejected: string[] = []
-    for (const f of validFmt) {
+    for (const f of list) {
       if (f.size > MAX_FILE_SIZE_BYTES) rejected.push(f.name)
       else accepted.push(f)
     }
@@ -119,7 +112,6 @@ function TambahModal({
     try {
       const res = await asBuiltApi.create({
         nama: form.nama,
-        tipe: form.tipe,
         tahun: form.tahun,
         ...(form.towerId && { towerId: form.towerId }),
         ...(form.keterangan && { keterangan: form.keterangan }),
@@ -152,19 +144,11 @@ function TambahModal({
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">Nama Folder <span className="text-red-500">*</span></label>
             <input type="text" value={form.nama} onChange={(e) => set('nama', e.target.value)} className="form-input" placeholder="cth. ABD Tower ST-001 Electrical" />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tipe</label>
-              <select value={form.tipe} onChange={(e) => set('tipe', e.target.value)} className="form-input">
-                {TIPE_OPTIONS.map((t) => <option key={t}>{t}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tahun</label>
-              <select value={form.tahun} onChange={(e) => set('tahun', e.target.value)} className="form-input">
-                {YEAR_OPTIONS.map((y) => <option key={y}>{y}</option>)}
-              </select>
-            </div>
+          <div>
+            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tahun</label>
+            <select value={form.tahun} onChange={(e) => set('tahun', e.target.value)} className="form-input">
+              {YEAR_OPTIONS.map((y) => <option key={y}>{y}</option>)}
+            </select>
           </div>
           <div>
             <SearchableSelect
@@ -199,7 +183,7 @@ function TambahModal({
               <p className="text-[13px] text-app-muted">
                 {dragOver
                   ? 'Lepaskan file di sini'
-                  : files.length ? `${files.length} file dipilih` : 'Klik atau drag & drop PDF/DWG/DXF (bisa banyak)'}
+                  : files.length ? `${files.length} file dipilih` : 'Klik atau drag & drop file (bisa banyak)'}
               </p>
               {!files.length && !dragOver && (
                 <p className="text-[11px] text-app-muted">Maks 10MB/file — PDF dikompres otomatis</p>
@@ -209,7 +193,6 @@ function TambahModal({
               ref={fileRef}
               type="file"
               multiple
-              accept=".pdf,.dwg,.dxf"
               className="hidden"
               onChange={(e) => {
                 ingestFiles(Array.from(e.target.files ?? []))
@@ -265,7 +248,6 @@ export default function AsBuiltDrawingPage() {
 
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   const [filterOpen, setFilterOpen] = useState(false)
-  const [tipeFilter, setTipeFilter] = useState<string[]>([])
   const [tahunFilter, setTahunFilter] = useState<string[]>([])
   const [towerFilter, setTowerFilter] = useState<string[]>([])
   const [towers, setTowers] = useState<any[]>([])
@@ -286,7 +268,7 @@ export default function AsBuiltDrawingPage() {
     [towers],
   )
 
-  useEffect(() => { setPage(1) }, [search, tipeFilter, tahunFilter, towerFilter])
+  useEffect(() => { setPage(1) }, [search, tahunFilter, towerFilter])
 
   useEffect(() => {
     if (!filterOpen) return
@@ -303,7 +285,6 @@ export default function AsBuiltDrawingPage() {
     setLoading(true)
     try {
       const params: any = { limit: 9999 }
-      if (tipeFilter.length === 1) params.tipe = tipeFilter[0]
       if (tahunFilter.length === 1) params.tahun = tahunFilter[0]
       if (towerFilter.length === 1) params.towerId = towerFilter[0]
       const res = await asBuiltApi.getAll(params)
@@ -314,7 +295,7 @@ export default function AsBuiltDrawingPage() {
     } finally {
       setLoading(false)
     }
-  }, [tipeFilter, tahunFilter, towerFilter])
+  }, [tahunFilter, towerFilter])
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -328,14 +309,10 @@ export default function AsBuiltDrawingPage() {
         (row.namaFile ?? '').toLowerCase().includes(lower) ||
         (row.tower?.nomorTower ?? '').toLowerCase().includes(lower) ||
         (row.tower?.nama ?? '').toLowerCase().includes(lower) ||
-        (row.towerId ?? '').toLowerCase().includes(lower) ||
-        (row.tipe ?? '').toLowerCase().includes(lower)
+        (row.towerId ?? '').toLowerCase().includes(lower)
       )
     }
 
-    if (tipeFilter.length > 1) {
-      result = result.filter((row) => tipeFilter.includes(row.tipe))
-    }
     if (tahunFilter.length > 1) {
       result = result.filter((row) => tahunFilter.includes(String(row.tahun)))
     }
@@ -344,7 +321,7 @@ export default function AsBuiltDrawingPage() {
     }
 
     return result
-  }, [allRows, search, tipeFilter, tahunFilter, towerFilter])
+  }, [allRows, search, tahunFilter, towerFilter])
 
   const total = filteredRows.length
   const displayRows = filteredRows.slice((page - 1) * limit, page * limit)
@@ -364,10 +341,9 @@ export default function AsBuiltDrawingPage() {
     }
   }
 
-  const hasActiveFilter = tipeFilter.length > 0 || tahunFilter.length > 0 || towerFilter.length > 0
+  const hasActiveFilter = tahunFilter.length > 0 || towerFilter.length > 0
 
   function resetFilters() {
-    setTipeFilter([])
     setTahunFilter([])
     setTowerFilter([])
   }
@@ -416,24 +392,6 @@ export default function AsBuiltDrawingPage() {
                 <div className="h-px bg-[#E1E8EC]" />
 
                 <div className="max-h-[450px] overflow-y-auto">
-                  {/* Tipe */}
-                  <div className="px-4 py-3 flex flex-col gap-2.5">
-                    <span className="font-bold text-[14px] text-[#1C1C1C]">Tipe</span>
-                    <div className="flex flex-wrap gap-2">
-                      {TIPE_OPTIONS.map((t) => {
-                        const active = tipeFilter.includes(t)
-                        return (
-                          <button
-                            key={t}
-                            onClick={() => setTipeFilter(active ? tipeFilter.filter((v) => v !== t) : [...tipeFilter, t])}
-                            className={`px-3 py-1 rounded-full border text-[12px] font-medium transition-all ${active ? 'bg-[#076C9E] border-[#076C9E] text-white' : 'border-[#E1E8EC] text-[#5F737F] hover:border-[#076C9E]'}`}
-                          >{t}</button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                  <div className="h-px bg-[#E1E8EC]" />
-
                   {/* Tahun */}
                   <div className="px-4 py-3 flex flex-col gap-2.5">
                     <span className="font-bold text-[14px] text-[#1C1C1C]">Tahun</span>
@@ -540,7 +498,6 @@ export default function AsBuiltDrawingPage() {
                 <tr>
                   <th>Tower</th>
                   <th>Nama</th>
-                  <th>Tipe</th>
                   <th>Tahun</th>
                   <th>File</th>
                   <th className="text-right pr-5">Aksi</th>
@@ -548,15 +505,14 @@ export default function AsBuiltDrawingPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <SkeletonRow cols={6} rows={limit} />
+                  <SkeletonRow cols={5} rows={limit} />
                 ) : displayRows.length === 0 ? (
-                  <tr><td colSpan={6}><EmptyState title="Belum ada data As Built Drawing." /></td></tr>
+                  <tr><td colSpan={5}><EmptyState title="Belum ada data As Built Drawing." /></td></tr>
                 ) : (
                   displayRows.map((row) => (
                     <tr key={row.id}>
                       <td><span className="font-mono text-[12px] text-blue-600 font-semibold">{row.tower?.nomorTower ?? row.tower?.nama ?? row.towerId ?? '—'}</span></td>
                       <td className="font-semibold text-app-text">{row.nama ?? row.namaFile ?? '—'}</td>
-                      <td className="text-app-muted">{row.tipe ?? '—'}</td>
                       <td className="font-mono text-[12px]">{row.tahun ?? '—'}</td>
                       <td className="text-[12px] text-app-muted">{row._count?.dokumen ?? 0} file</td>
                       <td className="text-right pr-4">

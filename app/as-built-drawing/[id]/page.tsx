@@ -35,24 +35,11 @@ function UploadModal({ open, folderId, onClose, onSaved }: {
     if (accepted.length) setFiles((cur) => [...cur, ...accepted])
   }
 
-  function filterByAccept(list: File[]) {
-    const allowed = ['pdf', 'dwg', 'dxf']
-    return list.filter((f) => allowed.includes((f.name.split('.').pop() ?? '').toLowerCase()))
-  }
-
   function onDrop(e: React.DragEvent) {
     e.preventDefault()
     setDragOver(false)
-    const dropped = Array.from(e.dataTransfer.files ?? [])
-    if (!dropped.length) return
-    const filtered = filterByAccept(dropped)
-    const skipped = dropped.length - filtered.length
-    if (skipped > 0) toast.error(`${skipped} file dilewati (format tidak didukung)`)
-    if (filtered.length) {
-      const dt = new DataTransfer()
-      filtered.forEach((f) => dt.items.add(f))
-      addFiles(dt.files)
-    }
+    const dropped = e.dataTransfer.files
+    if (dropped && dropped.length) addFiles(dropped)
   }
 
   function removeAt(i: number) {
@@ -100,12 +87,11 @@ function UploadModal({ open, folderId, onClose, onSaved }: {
             <p className="text-[13px] font-medium text-app-text">
               {dragOver ? 'Lepaskan file di sini' : 'Klik atau drag & drop file (bisa banyak)'}
             </p>
-            <p className="text-[11px] text-app-muted">Format: PDF, DWG, DXF — maks 10MB/file (PDF dikompres otomatis)</p>
+            <p className="text-[11px] text-app-muted">Semua format file — maks 10MB/file (PDF dikompres otomatis)</p>
           </div>
           <input
             ref={fileRef}
             type="file"
-            accept=".pdf,.dwg,.dxf"
             multiple
             className="hidden"
             onChange={(e) => { addFiles(e.target.files); if (fileRef.current) fileRef.current.value = '' }}
@@ -345,12 +331,6 @@ export default function AsBuiltDrawingFolderPage() {
         </button>
         <ChevronRight size={14} className="text-app-muted" />
         <span className="font-medium text-app-text">{folder?.nama ?? '...'}</span>
-        {folder?.tipe && (
-          <>
-            <ChevronRight size={14} className="text-app-muted" />
-            <span className="text-app-muted">{folder.tipe}</span>
-          </>
-        )}
       </div>
 
       {/* Folder meta */}

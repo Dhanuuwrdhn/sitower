@@ -6,6 +6,7 @@ import { FileText, Plus, Upload, X, ChevronRight, Search, Download } from 'lucid
 import toast from 'react-hot-toast'
 import { asBuiltApi } from '@/lib/api'
 import { isAdminOrSuperadmin } from '@/lib/auth'
+import { compressFiles, MAX_FILE_SIZE_BYTES } from '@/lib/compressFile'
 import { ActionMenu } from '@/components/ui/ActionMenu'
 
 // ─── Upload Modal ──────────────────────────────────────────────────────────────
@@ -21,7 +22,16 @@ function UploadModal({ open, folderId, onClose, onSaved }: {
 
   function addFiles(list: FileList | null) {
     if (!list) return
-    setFiles((cur) => [...cur, ...Array.from(list)])
+    const accepted: File[] = []
+    const rejected: string[] = []
+    for (const f of Array.from(list)) {
+      if (f.size > MAX_FILE_SIZE_BYTES) rejected.push(f.name)
+      else accepted.push(f)
+    }
+    if (rejected.length) {
+      toast.error(`${rejected.length} file melebihi 10MB: ${rejected.join(', ')}`)
+    }
+    if (accepted.length) setFiles((cur) => [...cur, ...accepted])
   }
 
   function removeAt(i: number) {
@@ -33,8 +43,9 @@ function UploadModal({ open, folderId, onClose, onSaved }: {
     if (!files.length) { toast.error('Pilih minimal 1 file'); return }
     setSaving(true)
     try {
-      await asBuiltApi.uploadFiles(folderId, files)
-      toast.success(`${files.length} dokumen berhasil diupload`)
+      const compressed = await compressFiles(files)
+      await asBuiltApi.uploadFiles(folderId, compressed)
+      toast.success(`${compressed.length} dokumen berhasil diupload`)
       onSaved(); onClose(); setFiles([])
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? 'Gagal upload')
@@ -59,7 +70,7 @@ function UploadModal({ open, folderId, onClose, onSaved }: {
           >
             <Upload size={24} className="text-app-muted" />
             <p className="text-[13px] font-medium text-app-text">Klik untuk pilih file (bisa banyak)</p>
-            <p className="text-[11px] text-app-muted">Format: PDF, DWG, DXF — maks 50MB/file</p>
+            <p className="text-[11px] text-app-muted">Format: PDF, DWG, DXF — maks 10MB/file (PDF dikompres otomatis)</p>
           </div>
           <input
             ref={fileRef}

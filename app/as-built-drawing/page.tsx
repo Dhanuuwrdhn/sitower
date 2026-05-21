@@ -12,6 +12,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonRow } from '@/components/ui/SkeletonRow'
 import { SearchableSelect } from '@/components/ui/SearchableSelect'
+import { compressFiles, MAX_FILE_SIZE_BYTES } from '@/lib/compressFile'
 
 const TIPE_OPTIONS = ['Electrical', 'Mechanical', 'Civil', 'Grounding', 'Lainnya']
 
@@ -107,7 +108,10 @@ function TambahModal({
         ...(form.towerId && { towerId: form.towerId }),
         ...(form.keterangan && { keterangan: form.keterangan }),
       })
-      if (files.length) await asBuiltApi.uploadFiles(res.data.id, files)
+      if (files.length) {
+        const compressed = await compressFiles(files)
+        await asBuiltApi.uploadFiles(res.data.id, compressed)
+      }
       toast.success('Folder berhasil dibuat')
       onSaved(); onClose()
       setForm(BLANK_FORM); setFiles([])
@@ -168,6 +172,9 @@ function TambahModal({
               <p className="text-[13px] text-app-muted">
                 {files.length ? `${files.length} file dipilih` : 'Klik untuk upload PDF/DWG/DXF (bisa pilih banyak)'}
               </p>
+              {!files.length && (
+                <p className="text-[11px] text-app-muted">Maks 10MB/file — PDF dikompres otomatis</p>
+              )}
             </div>
             <input
               ref={fileRef}
@@ -177,7 +184,14 @@ function TambahModal({
               className="hidden"
               onChange={(e) => {
                 const list = Array.from(e.target.files ?? [])
-                if (list.length) setFiles((prev) => [...prev, ...list])
+                const accepted: File[] = []
+                const rejected: string[] = []
+                for (const f of list) {
+                  if (f.size > MAX_FILE_SIZE_BYTES) rejected.push(f.name)
+                  else accepted.push(f)
+                }
+                if (rejected.length) toast.error(`${rejected.length} file melebihi 10MB: ${rejected.join(', ')}`)
+                if (accepted.length) setFiles((prev) => [...prev, ...accepted])
                 if (fileRef.current) fileRef.current.value = ''
               }}
             />

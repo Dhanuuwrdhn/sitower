@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { FileText, Plus, Upload, X, ChevronRight, Search, Download } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { asBuiltApi } from '@/lib/api'
-import { isAdminOrSuperadmin } from '@/lib/auth'
+import { isAdminOrSuperadmin, isTeknisi } from '@/lib/auth'
 import { compressFiles, MAX_FILE_SIZE_BYTES } from '@/lib/compressFile'
 import { ActionMenu } from '@/components/ui/ActionMenu'
 
@@ -272,8 +272,12 @@ export default function AsBuiltDrawingFolderPage() {
   const [deleteId, setDeleteId]   = useState<string | null>(null)
   const [deleting, setDeleting]   = useState(false)
   const [adminUser, setAdminUser] = useState(false)
+  const [canUpload, setCanUpload] = useState(false)
 
-  useEffect(() => { setAdminUser(isAdminOrSuperadmin()) }, [])
+  useEffect(() => {
+    setAdminUser(isAdminOrSuperadmin())
+    setCanUpload(isAdminOrSuperadmin() || isTeknisi())
+  }, [])
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -324,7 +328,7 @@ export default function AsBuiltDrawingFolderPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        {adminUser && (
+        {canUpload && (
           <button className="btn-primary shrink-0" onClick={() => setUploadOpen(true)}>
             <Plus size={16} /> Upload Dokumen
           </button>
@@ -377,7 +381,7 @@ export default function AsBuiltDrawingFolderPage() {
           <p className="text-[13px] text-app-muted mb-1">
             {search ? 'Tidak ada dokumen yang cocok.' : 'Belum ada dokumen di folder ini.'}
           </p>
-          {!search && adminUser && (
+          {!search && canUpload && (
             <button className="btn-primary mt-3 text-[13px]" onClick={() => setUploadOpen(true)}>
               <Plus size={14} /> Upload Dokumen Pertama
             </button>

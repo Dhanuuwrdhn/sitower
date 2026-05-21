@@ -171,9 +171,17 @@ export const asBuiltApi = {
   getFolder:   (id: string)   => api.get(`/as-built-drawing/${id}`),
   create:      (data: any)    => api.post('/as-built-drawing', data),
   deleteFolder:(id: string)   => api.delete(`/as-built-drawing/${id}`),
+  uploadFiles: (id: string, files: File[]) => {
+    const form = new FormData()
+    files.forEach((f) => form.append('files', f))
+    return api.post(`/as-built-drawing/${id}/dokumen`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  },
+  /** @deprecated use uploadFiles */
   uploadFile: (id: string, file: File) => {
     const form = new FormData()
-    form.append('file', file)
+    form.append('files', file)
     return api.post(`/as-built-drawing/${id}/dokumen`, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })

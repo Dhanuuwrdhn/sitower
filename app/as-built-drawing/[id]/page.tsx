@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { FileText, Plus, Upload, X, ChevronRight, Search, Download } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { asBuiltApi } from '@/lib/api'
-import { isAdmin } from '@/lib/auth'
+import { isAdminOrSuperadmin } from '@/lib/auth'
 import { ActionMenu } from '@/components/ui/ActionMenu'
 
 // ─── Upload Modal ──────────────────────────────────────────────────────────────
@@ -13,18 +13,29 @@ import { ActionMenu } from '@/components/ui/ActionMenu'
 function UploadModal({ open, folderId, onClose, onSaved }: {
   open: boolean; folderId: string; onClose: () => void; onSaved: () => void
 }) {
-  const [file, setFile]     = useState<File | null>(null)
+  const [files, setFiles]   = useState<File[]>([])
   const [saving, setSaving] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
+  useEffect(() => { if (!open) setFiles([]) }, [open])
+
+  function addFiles(list: FileList | null) {
+    if (!list) return
+    setFiles((cur) => [...cur, ...Array.from(list)])
+  }
+
+  function removeAt(i: number) {
+    setFiles((cur) => cur.filter((_, idx) => idx !== i))
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!file) { toast.error('Pilih file terlebih dahulu'); return }
+    if (!files.length) { toast.error('Pilih minimal 1 file'); return }
     setSaving(true)
     try {
-      await asBuiltApi.uploadFile(folderId, file)
-      toast.success('Dokumen berhasil diupload')
-      onSaved(); onClose(); setFile(null)
+      await asBuiltApi.uploadFiles(folderId, files)
+      toast.success(`${files.length} dokumen berhasil diupload`)
+      onSaved(); onClose(); setFiles([])
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? 'Gagal upload')
     } finally {
@@ -34,29 +45,55 @@ function UploadModal({ open, folderId, onClose, onSaved }: {
 
   if (!open) return null
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-[420px] flex flex-col">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-app-border">
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-[460px] flex flex-col max-h-[90vh]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-app-border shrink-0">
           <h2 className="text-[15px] font-bold text-app-text">Upload Dokumen</h2>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted"><X size={18} /></button>
         </div>
-        <form id="upload-form" onSubmit={handleSubmit} className="px-6 py-5">
+        <form id="upload-form" onSubmit={handleSubmit} className="px-6 py-5 overflow-y-auto">
           <div
             onClick={() => fileRef.current?.click()}
-            className="border-2 border-dashed border-app-border rounded-xl py-10 flex flex-col items-center gap-2 cursor-pointer hover:border-blue-300 hover:bg-app-bg transition-colors"
+            className="border-2 border-dashed border-app-border rounded-xl py-8 flex flex-col items-center gap-2 cursor-pointer hover:border-blue-300 hover:bg-app-bg transition-colors"
           >
             <Upload size={24} className="text-app-muted" />
-            <p className="text-[13px] font-medium text-app-text">{file ? file.name : 'Klik untuk pilih file'}</p>
-            <p className="text-[11px] text-app-muted">Format: PDF, DWG, DXF — maks 50MB</p>
+            <p className="text-[13px] font-medium text-app-text">Klik untuk pilih file (bisa banyak)</p>
+            <p className="text-[11px] text-app-muted">Format: PDF, DWG, DXF — maks 50MB/file</p>
           </div>
-          <input ref={fileRef} type="file" accept=".pdf,.dwg,.dxf" className="hidden"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".pdf,.dwg,.dxf"
+            multiple
+            className="hidden"
+            onChange={(e) => { addFiles(e.target.files); if (fileRef.current) fileRef.current.value = '' }}
+          />
+
+          {files.length > 0 && (
+            <div className="mt-4 space-y-2">
+              <p className="text-[12px] font-semibold text-app-muted">{files.length} file dipilih</p>
+              <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-1">
+                {files.map((f, i) => (
+                  <div key={i} className="flex items-center gap-2 px-3 py-2 bg-app-bg rounded-lg border border-app-border">
+                    <span className="text-[12px] text-app-text flex-1 truncate" title={f.name}>{f.name}</span>
+                    <span className="text-[11px] text-app-muted shrink-0">{(f.size / 1024).toFixed(0)} KB</span>
+                    <button
+                      type="button"
+                      onClick={() => removeAt(i)}
+                      className="p-0.5 rounded hover:bg-red-50 text-red-500"
+                      aria-label="Hapus"
+                    ><X size={14} /></button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </form>
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border shrink-0">
           <button type="button" onClick={onClose} className="btn-outline">Batal</button>
-          <button type="submit" form="upload-form" disabled={saving || !file} className="btn-primary">
-            {saving ? 'Mengupload...' : 'Upload'}
+          <button type="submit" form="upload-form" disabled={saving || !files.length} className="btn-primary">
+            {saving ? 'Mengupload...' : `Upload${files.length > 0 ? ` (${files.length})` : ''}`}
           </button>
         </div>
       </div>
@@ -195,7 +232,7 @@ export default function AsBuiltDrawingFolderPage() {
   const [deleting, setDeleting]   = useState(false)
   const [adminUser, setAdminUser] = useState(false)
 
-  useEffect(() => { setAdminUser(isAdmin()) }, [])
+  useEffect(() => { setAdminUser(isAdminOrSuperadmin()) }, [])
 
   const fetchData = useCallback(async () => {
     setLoading(true)

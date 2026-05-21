@@ -439,13 +439,13 @@ export default function AsBuiltDrawingPage() {
         </div>
 
         {canUpload && (
-          <button onClick={() => setUploadOpen(true)} className="btn-outline shrink-0">
-            <Upload size={16} /> Upload Dokumen
+          <button onClick={() => setUploadOpen(true)} className="btn-outline shrink-0" title="Upload dokumen">
+            <Upload size={16} /> <span className="hidden md:inline">Upload Dokumen</span>
           </button>
         )}
         {isAdminUser && (
-          <button onClick={() => setTambahOpen(true)} className="btn-primary shrink-0">
-            <Plus size={16} /> Tambah Folder
+          <button onClick={() => setTambahOpen(true)} className="btn-primary shrink-0" title="Tambah folder">
+            <Plus size={16} /> <span className="hidden md:inline">Tambah Folder</span>
           </button>
         )}
       </div>

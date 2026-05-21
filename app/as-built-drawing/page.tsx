@@ -3,60 +3,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { Plus, Upload, FolderOpen, X, SlidersHorizontal, LayoutGrid, List, Search } from 'lucide-react'
+import { Plus, Upload, X, SlidersHorizontal, Search } from 'lucide-react'
 import { asBuiltApi, towersApi } from '@/lib/api'
-import { isAdminOrSuperadmin } from '@/lib/auth'
-import { ActionMenu } from '@/components/ui/ActionMenu'
+import { isAdminOrSuperadmin, isTeknisi } from '@/lib/auth'
 import { Pagination } from '@/components/ui/Pagination'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
-import { EmptyState } from '@/components/ui/EmptyState'
-import { SkeletonRow } from '@/components/ui/SkeletonRow'
 import { SearchableSelect } from '@/components/ui/SearchableSelect'
 import { compressFiles, MAX_FILE_SIZE_BYTES } from '@/lib/compressFile'
+import {
+  FolderCard, FileCard, PreviewModal, FilePreviewRow,
+} from './_shared'
 
 const _cy = new Date().getFullYear()
 const YEAR_OPTIONS = Array.from({ length: _cy - 2009 }, (_, i) => String(_cy - i))
 
-// ── Folder card (grid view) ───────────────────────────────────────────────────
-
-function FolderCard({ row, isAdminUser, onClick, onDelete }: {
-  row: any; isAdminUser: boolean; onClick: () => void; onDelete: () => void
-}) {
-  const label = row.nama ?? row.namaFile ?? row.tower?.nomorTower ?? '—'
-  const meta = [
-    row.tahun ? String(row.tahun) : null,
-    row.tower?.nomorTower ? `Tower ${row.tower.nomorTower}` : null,
-    row._count?.dokumen !== undefined ? `${row._count.dokumen} file` : null,
-  ].filter(Boolean).join(' · ')
-
-  return (
-    <div className="sert-folder-card" onClick={onClick}>
-      <div className="sert-folder-head">
-        <FolderOpen size={32} color="#ffffff" strokeWidth={1.5} />
-      </div>
-      <div className="sert-folder-body">
-        <div className="sert-folder-row">
-          <p className="sert-folder-name">{label}</p>
-          {isAdminUser && (
-            <div onClick={(e) => e.stopPropagation()}>
-              <ActionMenu
-                items={[{
-                  label: 'Hapus',
-                  icon: <span className="text-red-400">✕</span>,
-                  onClick: onDelete,
-                  danger: true,
-                }]}
-              />
-            </div>
-          )}
-        </div>
-        {meta && <p className="sert-folder-meta">{meta}</p>}
-      </div>
-    </div>
-  )
-}
-
-// ── Grid skeleton ─────────────────────────────────────────────────────────────
+// ── Folder skeleton ──────────────────────────────────────────────────────────
 
 function GridSkeleton({ count }: { count: number }) {
   return (
@@ -74,55 +35,35 @@ function GridSkeleton({ count }: { count: number }) {
   )
 }
 
-// ── Tambah modal ──────────────────────────────────────────────────────────────
+// ── Tambah Folder modal ──────────────────────────────────────────────────────
 
 const BLANK_FORM = {
   nama: '', towerId: '',
   tahun: String(new Date().getFullYear()), keterangan: '',
 }
 
-function TambahModal({
-  open, onClose, onSaved, towerOptions,
-}: {
+function TambahFolderModal({ open, onClose, onSaved, towerOptions }: {
   open: boolean; onClose: () => void; onSaved: () => void;
   towerOptions: { value: string; label: string }[]
 }) {
   const [form, setForm] = useState(BLANK_FORM)
-  const [files, setFiles] = useState<File[]>([])
   const [saving, setSaving] = useState(false)
-  const [dragOver, setDragOver] = useState(false)
-  const fileRef = useRef<HTMLInputElement>(null)
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }))
-
-  function ingestFiles(list: File[]) {
-    const accepted: File[] = []
-    const rejected: string[] = []
-    for (const f of list) {
-      if (f.size > MAX_FILE_SIZE_BYTES) rejected.push(f.name)
-      else accepted.push(f)
-    }
-    if (rejected.length) toast.error(`${rejected.length} file melebihi 10MB: ${rejected.join(', ')}`)
-    if (accepted.length) setFiles((prev) => [...prev, ...accepted])
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!form.nama.trim()) { toast.error('Nama folder wajib diisi'); return }
     setSaving(true)
     try {
-      const res = await asBuiltApi.create({
+      await asBuiltApi.create({
         nama: form.nama,
         tahun: form.tahun,
         ...(form.towerId && { towerId: form.towerId }),
         ...(form.keterangan && { keterangan: form.keterangan }),
       })
-      if (files.length) {
-        const compressed = await compressFiles(files)
-        await asBuiltApi.uploadFiles(res.data.id, compressed)
-      }
       toast.success('Folder berhasil dibuat')
       onSaved(); onClose()
-      setForm(BLANK_FORM); setFiles([])
+      setForm(BLANK_FORM)
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? 'Gagal menyimpan')
     } finally {
@@ -132,17 +73,17 @@ function TambahModal({
 
   if (!open) return null
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-[480px] flex flex-col max-h-[90vh]">
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-[460px] flex flex-col max-h-[90vh]">
         <div className="flex items-center justify-between px-6 py-4 border-b border-app-border">
-          <h2 className="text-[15px] font-bold text-app-text">Tambah As Built Drawing</h2>
+          <h2 className="text-[15px] font-bold text-app-text">Tambah Folder</h2>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted"><X size={18} /></button>
         </div>
-        <form id="abd-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+        <form id="abd-folder-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
           <div>
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">Nama Folder <span className="text-red-500">*</span></label>
-            <input type="text" value={form.nama} onChange={(e) => set('nama', e.target.value)} className="form-input" placeholder="cth. ABD Tower ST-001 Electrical" />
+            <input type="text" value={form.nama} onChange={(e) => set('nama', e.target.value)} className="form-input" placeholder="cth. Tower ST-001" />
           </div>
           <div>
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tahun</label>
@@ -161,69 +102,13 @@ function TambahModal({
             />
           </div>
           <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">
-              Upload Dokumen (opsional)
-            </label>
-            <div
-              onClick={() => fileRef.current?.click()}
-              onDragEnter={(e) => { e.preventDefault(); setDragOver(true) }}
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
-              onDragLeave={(e) => {
-                if (e.currentTarget.contains(e.relatedTarget as Node)) return
-                setDragOver(false)
-              }}
-              onDrop={(e) => {
-                e.preventDefault()
-                setDragOver(false)
-                ingestFiles(Array.from(e.dataTransfer.files ?? []))
-              }}
-              className={`border-2 border-dashed rounded-xl py-6 flex flex-col items-center gap-1.5 cursor-pointer transition-colors ${dragOver ? 'border-blue-500 bg-blue-50' : 'border-app-border hover:border-blue-300 hover:bg-app-bg'}`}
-            >
-              <Upload size={20} className={dragOver ? 'text-blue-500' : 'text-app-muted'} />
-              <p className="text-[13px] text-app-muted">
-                {dragOver
-                  ? 'Lepaskan file di sini'
-                  : files.length ? `${files.length} file dipilih` : 'Klik atau drag & drop file (bisa banyak)'}
-              </p>
-              {!files.length && !dragOver && (
-                <p className="text-[11px] text-app-muted">Maks 10MB/file — PDF dikompres otomatis</p>
-              )}
-            </div>
-            <input
-              ref={fileRef}
-              type="file"
-              multiple
-              className="hidden"
-              onChange={(e) => {
-                ingestFiles(Array.from(e.target.files ?? []))
-                if (fileRef.current) fileRef.current.value = ''
-              }}
-            />
-            {files.length > 0 && (
-              <ul className="mt-2 space-y-1">
-                {files.map((f, i) => (
-                  <li key={`${f.name}-${i}`} className="flex items-center justify-between gap-2 px-3 py-1.5 bg-app-bg rounded-lg text-[12px]">
-                    <span className="truncate text-app-text">{f.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))}
-                      className="p-0.5 rounded hover:bg-white text-app-muted shrink-0"
-                    >
-                      <X size={12} />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          <div>
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">Keterangan</label>
             <textarea rows={3} value={form.keterangan} onChange={(e) => set('keterangan', e.target.value)} className="form-input resize-none" />
           </div>
         </form>
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border">
           <button type="button" onClick={onClose} className="btn-outline">Batal</button>
-          <button type="submit" form="abd-form" disabled={saving} className="btn-primary">
+          <button type="submit" form="abd-folder-form" disabled={saving} className="btn-primary">
             {saving ? 'Menyimpan...' : 'Simpan'}
           </button>
         </div>
@@ -232,21 +117,125 @@ function TambahModal({
   )
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// ── Upload Dokumen modal (root) ──────────────────────────────────────────────
+
+function UploadRootModal({ open, onClose, onSaved }: {
+  open: boolean; onClose: () => void; onSaved: () => void
+}) {
+  const [files, setFiles] = useState<File[]>([])
+  const [saving, setSaving] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => { if (!open) { setFiles([]); setDragOver(false) } }, [open])
+
+  function ingestFiles(list: File[]) {
+    const accepted: File[] = []
+    const rejected: string[] = []
+    for (const f of list) {
+      if (f.size > MAX_FILE_SIZE_BYTES) rejected.push(f.name)
+      else accepted.push(f)
+    }
+    if (rejected.length) toast.error(`${rejected.length} file melebihi 10MB: ${rejected.join(', ')}`)
+    if (accepted.length) setFiles((cur) => [...cur, ...accepted])
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!files.length) { toast.error('Pilih minimal 1 file'); return }
+    setSaving(true)
+    try {
+      const compressed = await compressFiles(files)
+      await asBuiltApi.uploadRootFiles(compressed)
+      toast.success(`${compressed.length} dokumen berhasil diupload`)
+      onSaved(); onClose()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'Gagal upload')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (!open) return null
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-[460px] flex flex-col max-h-[90vh]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-app-border shrink-0">
+          <h2 className="text-[15px] font-bold text-app-text">Upload Dokumen</h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted"><X size={18} /></button>
+        </div>
+        <form id="abd-root-upload" onSubmit={handleSubmit} className="px-6 py-5 overflow-y-auto">
+          <div
+            onClick={() => fileRef.current?.click()}
+            onDragEnter={(e) => { e.preventDefault(); setDragOver(true) }}
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+            onDragLeave={(e) => {
+              if (e.currentTarget.contains(e.relatedTarget as Node)) return
+              setDragOver(false)
+            }}
+            onDrop={(e) => { e.preventDefault(); setDragOver(false); ingestFiles(Array.from(e.dataTransfer.files ?? [])) }}
+            className={`border-2 border-dashed rounded-xl py-8 flex flex-col items-center gap-2 cursor-pointer transition-colors ${dragOver ? 'border-blue-500 bg-blue-50' : 'border-app-border hover:border-blue-300 hover:bg-app-bg'}`}
+          >
+            <Upload size={24} className={dragOver ? 'text-blue-500' : 'text-app-muted'} />
+            <p className="text-[13px] font-medium text-app-text">
+              {dragOver ? 'Lepaskan file di sini' : 'Klik atau drag & drop file (bisa banyak)'}
+            </p>
+            <p className="text-[11px] text-app-muted">Semua format file — maks 10MB/file (PDF dikompres otomatis)</p>
+          </div>
+          <input
+            ref={fileRef}
+            type="file"
+            multiple
+            className="hidden"
+            onChange={(e) => { ingestFiles(Array.from(e.target.files ?? [])); if (fileRef.current) fileRef.current.value = '' }}
+          />
+          {files.length > 0 && (
+            <div className="mt-4 space-y-2">
+              <p className="text-[12px] font-semibold text-app-muted">{files.length} file dipilih</p>
+              <div className="space-y-1.5 max-h-[260px] overflow-y-auto pr-1">
+                {files.map((f, i) => (
+                  <FilePreviewRow
+                    key={`${f.name}-${i}`}
+                    file={f}
+                    onRemove={() => setFiles((cur) => cur.filter((_, idx) => idx !== i))}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </form>
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border shrink-0">
+          <button type="button" onClick={onClose} className="btn-outline">Batal</button>
+          <button type="submit" form="abd-root-upload" disabled={saving || !files.length} className="btn-primary">
+            {saving ? 'Mengupload...' : `Upload${files.length ? ` (${files.length})` : ''}`}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AsBuiltDrawingPage() {
   const router = useRouter()
-  const [allRows, setAllRows] = useState<any[]>([])
+  const [folders, setFolders] = useState<any[]>([])
+  const [rootDokumen, setRootDokumen] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(20)
   const [tambahOpen, setTambahOpen] = useState(false)
-  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [uploadOpen, setUploadOpen] = useState(false)
+  const [deleteFolderId, setDeleteFolderId] = useState<string | null>(null)
+  const [deleteDokumenId, setDeleteDokumenId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
-  const [isAdminUser, setIsAdminUser] = useState(false)
+  const [preview, setPreview] = useState<any | null>(null)
 
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
+  const [isAdminUser, setIsAdminUser] = useState(false)
+  const [canUpload, setCanUpload] = useState(false)
+
   const [filterOpen, setFilterOpen] = useState(false)
   const [tahunFilter, setTahunFilter] = useState<string[]>([])
   const [towerFilter, setTowerFilter] = useState<string[]>([])
@@ -254,7 +243,10 @@ export default function AsBuiltDrawingPage() {
 
   const filterRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => { setIsAdminUser(isAdminOrSuperadmin()) }, [])
+  useEffect(() => {
+    setIsAdminUser(isAdminOrSuperadmin())
+    setCanUpload(isAdminOrSuperadmin() || isTeknisi())
+  }, [])
 
   useEffect(() => {
     towersApi.getDropdown().then((r) => {
@@ -284,14 +276,15 @@ export default function AsBuiltDrawingPage() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const params: any = { limit: 9999 }
+      const params: any = { parentId: 'root' }
       if (tahunFilter.length === 1) params.tahun = tahunFilter[0]
       if (towerFilter.length === 1) params.towerId = towerFilter[0]
       const res = await asBuiltApi.getAll(params)
       const p = res.data
-      setAllRows(Array.isArray(p) ? p : (p.data ?? []))
+      setFolders(p?.folders ?? [])
+      setRootDokumen(p?.rootDokumen ?? [])
     } catch {
-      setAllRows([])
+      setFolders([]); setRootDokumen([])
     } finally {
       setLoading(false)
     }
@@ -299,47 +292,40 @@ export default function AsBuiltDrawingPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  const filteredRows = useMemo(() => {
-    let result = allRows
-
+  const filteredFolders = useMemo(() => {
+    let result = folders
     if (search.trim()) {
       const lower = search.toLowerCase()
       result = result.filter((row) =>
         (row.nama ?? '').toLowerCase().includes(lower) ||
-        (row.namaFile ?? '').toLowerCase().includes(lower) ||
-        (row.tower?.nomorTower ?? '').toLowerCase().includes(lower) ||
-        (row.tower?.nama ?? '').toLowerCase().includes(lower) ||
-        (row.towerId ?? '').toLowerCase().includes(lower)
+        (row.tower?.nama ?? '').toLowerCase().includes(lower)
       )
     }
-
     if (tahunFilter.length > 1) {
       result = result.filter((row) => tahunFilter.includes(String(row.tahun)))
     }
     if (towerFilter.length > 1) {
       result = result.filter((row) => towerFilter.includes(row.towerId))
     }
-
     return result
-  }, [allRows, search, tahunFilter, towerFilter])
+  }, [folders, search, tahunFilter, towerFilter])
 
-  const total = filteredRows.length
-  const displayRows = filteredRows.slice((page - 1) * limit, page * limit)
+  const filteredDokumen = useMemo(() => {
+    if (!search.trim()) return rootDokumen
+    const lower = search.toLowerCase()
+    return rootDokumen.filter((d) => (d.namaFile ?? '').toLowerCase().includes(lower))
+  }, [rootDokumen, search])
 
-  async function confirmDelete() {
-    if (!deleteId) return
-    setDeleting(true)
-    try {
-      await asBuiltApi.deleteFolder(deleteId)
-      toast.success('Folder dihapus')
-      setDeleteId(null)
-      fetchData()
-    } catch {
-      toast.error('Gagal menghapus folder')
-    } finally {
-      setDeleting(false)
-    }
-  }
+  const combinedItems = useMemo(
+    () => [
+      ...filteredFolders.map((f) => ({ ...f, _kind: 'folder' as const })),
+      ...filteredDokumen.map((d) => ({ ...d, _kind: 'file' as const })),
+    ],
+    [filteredFolders, filteredDokumen],
+  )
+
+  const total = combinedItems.length
+  const displayItems = combinedItems.slice((page - 1) * limit, page * limit)
 
   const hasActiveFilter = tahunFilter.length > 0 || towerFilter.length > 0
 
@@ -348,24 +334,52 @@ export default function AsBuiltDrawingPage() {
     setTowerFilter([])
   }
 
+  async function confirmDeleteFolder() {
+    if (!deleteFolderId) return
+    setDeleting(true)
+    try {
+      await asBuiltApi.deleteFolder(deleteFolderId)
+      toast.success('Folder dihapus')
+      setDeleteFolderId(null)
+      fetchData()
+    } catch {
+      toast.error('Gagal menghapus folder')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  async function confirmDeleteDokumen() {
+    if (!deleteDokumenId) return
+    setDeleting(true)
+    try {
+      await asBuiltApi.deleteDokumen(deleteDokumenId)
+      toast.success('Dokumen dihapus')
+      setDeleteDokumenId(null)
+      fetchData()
+    } catch {
+      toast.error('Gagal menghapus dokumen')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   return (
     <>
       {/* ── Toolbar ── */}
       <div className="flex items-center gap-3 mb-5 flex-wrap">
         <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-          {/* Search */}
           <div className="flex items-center gap-3 px-4 py-[11px] bg-white border border-[#E1E8EC] rounded-lg flex-1 min-w-0">
             <Search size={16} className="text-[#5F737F] shrink-0" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari nama folder atau tower"
+              placeholder="Cari nama folder atau file"
               className="border-none outline-none font-medium text-[14px] text-[#1C1C1C] bg-transparent w-full min-w-0 placeholder:text-[#97AAB3]"
             />
           </div>
 
-          {/* Filter button + popup */}
           <div ref={filterRef} className="relative">
             <button
               onClick={() => setFilterOpen((v) => !v)}
@@ -392,7 +406,6 @@ export default function AsBuiltDrawingPage() {
                 <div className="h-px bg-[#E1E8EC]" />
 
                 <div className="max-h-[450px] overflow-y-auto">
-                  {/* Tahun */}
                   <div className="px-4 py-3 flex flex-col gap-2.5">
                     <span className="font-bold text-[14px] text-[#1C1C1C]">Tahun</span>
                     <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
@@ -409,8 +422,6 @@ export default function AsBuiltDrawingPage() {
                     </div>
                   </div>
                   <div className="h-px bg-[#E1E8EC]" />
-
-                  {/* Tower */}
                   <div className="px-4 py-3">
                     <SearchableSelect
                       label="Tower"
@@ -427,27 +438,14 @@ export default function AsBuiltDrawingPage() {
           </div>
         </div>
 
-        {/* View toggle */}
-        <div className="flex items-center bg-gray-100 rounded-xl p-1">
-          <button
-            onClick={() => setViewMode('grid')}
-            title="Grid view"
-            className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm text-app-text' : 'text-app-muted hover:text-app-text'}`}
-          >
-            <LayoutGrid size={15} />
+        {canUpload && (
+          <button onClick={() => setUploadOpen(true)} className="btn-outline shrink-0">
+            <Upload size={16} /> Upload Dokumen
           </button>
-          <button
-            onClick={() => setViewMode('table')}
-            title="Table view"
-            className={`p-2 rounded-lg transition-colors ${viewMode === 'table' ? 'bg-white shadow-sm text-app-text' : 'text-app-muted hover:text-app-text'}`}
-          >
-            <List size={15} />
-          </button>
-        </div>
-
+        )}
         {isAdminUser && (
           <button onClick={() => setTambahOpen(true)} className="btn-primary shrink-0">
-            <Plus size={16} /> Tambah Dokumen
+            <Plus size={16} /> Tambah Folder
           </button>
         )}
       </div>
@@ -458,105 +456,71 @@ export default function AsBuiltDrawingPage() {
       </div>
 
       {/* ── Grid view ── */}
-      {viewMode === 'grid' ? (
-        <>
-          {loading ? (
-            <div className="sert-grid">
-              <GridSkeleton count={Math.min(limit, 20)} />
-            </div>
-          ) : displayRows.length === 0 ? (
-            <div className="card p-10 text-center text-app-muted text-[13px]">
-              Belum ada dokumen{hasActiveFilter ? ' yang sesuai filter' : ''}.
-            </div>
-          ) : (
-            <div className="sert-grid">
-              {displayRows.map((row) => (
-                <FolderCard
-                  key={row.id}
-                  row={row}
-                  isAdminUser={isAdminUser}
-                  onClick={() => router.push(`/as-built-drawing/${row.id}`)}
-                  onDelete={() => setDeleteId(row.id)}
-                />
-              ))}
-            </div>
-          )}
-          <div className="mt-5">
-            <Pagination
-              total={total} page={page} limit={limit}
-              onChange={setPage}
-              onLimitChange={(l) => { setLimit(l); setPage(1) }}
-            />
-          </div>
-        </>
+      {loading ? (
+        <div className="sert-grid">
+          <GridSkeleton count={Math.min(limit, 20)} />
+        </div>
+      ) : displayItems.length === 0 ? (
+        <div className="card p-10 text-center text-app-muted text-[13px]">
+          Belum ada folder atau dokumen{hasActiveFilter || search ? ' yang sesuai' : ''}.
+        </div>
       ) : (
-        /* ── Table view ── */
-        <div className="card overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Tower</th>
-                  <th>Nama</th>
-                  <th>Tahun</th>
-                  <th>File</th>
-                  <th className="text-right pr-5">Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <SkeletonRow cols={5} rows={limit} />
-                ) : displayRows.length === 0 ? (
-                  <tr><td colSpan={5}><EmptyState title="Belum ada data As Built Drawing." /></td></tr>
-                ) : (
-                  displayRows.map((row) => (
-                    <tr key={row.id}>
-                      <td><span className="font-mono text-[12px] text-blue-600 font-semibold">{row.tower?.nomorTower ?? row.tower?.nama ?? row.towerId ?? '—'}</span></td>
-                      <td className="font-semibold text-app-text">{row.nama ?? row.namaFile ?? '—'}</td>
-                      <td className="font-mono text-[12px]">{row.tahun ?? '—'}</td>
-                      <td className="text-[12px] text-app-muted">{row._count?.dokumen ?? 0} file</td>
-                      <td className="text-right pr-4">
-                        <ActionMenu items={[
-                          {
-                            label: 'Buka Folder',
-                            icon: <FolderOpen size={14} />,
-                            onClick: () => router.push(`/as-built-drawing/${row.id}`),
-                          },
-                          ...(isAdminUser ? [{
-                            label: 'Hapus',
-                            icon: <span className="text-red-400">✕</span>,
-                            onClick: () => setDeleteId(row.id),
-                            danger: true,
-                            dividerBefore: true,
-                          }] : []),
-                        ]} />
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-          <Pagination
-            total={total} page={page} limit={limit}
-            onChange={setPage}
-            onLimitChange={(l) => { setLimit(l); setPage(1) }}
-          />
+        <div className="sert-grid">
+          {displayItems.map((item) => item._kind === 'folder' ? (
+            <FolderCard
+              key={`folder-${item.id}`}
+              row={item}
+              isAdminUser={isAdminUser}
+              onClick={() => router.push(`/as-built-drawing/${item.id}`)}
+              onDelete={() => setDeleteFolderId(item.id)}
+            />
+          ) : (
+            <FileCard
+              key={`file-${item.id}`}
+              doc={item}
+              showAdmin={isAdminUser}
+              onClick={() => setPreview(item)}
+              onDelete={setDeleteDokumenId}
+            />
+          ))}
         </div>
       )}
 
-      <TambahModal
+      <div className="mt-5">
+        <Pagination
+          total={total} page={page} limit={limit}
+          onChange={setPage}
+          onLimitChange={(l) => { setLimit(l); setPage(1) }}
+        />
+      </div>
+
+      <TambahFolderModal
         open={tambahOpen}
         onClose={() => setTambahOpen(false)}
         onSaved={fetchData}
         towerOptions={towerOptions}
       />
+      <UploadRootModal
+        open={uploadOpen}
+        onClose={() => setUploadOpen(false)}
+        onSaved={fetchData}
+      />
+      {preview && <PreviewModal doc={preview} onClose={() => setPreview(null)} />}
       <ConfirmModal
-        isOpen={!!deleteId}
+        isOpen={!!deleteFolderId}
         title="Hapus Folder?"
-        message="Folder beserta semua dokumen di dalamnya akan dihapus permanen."
-        onConfirm={confirmDelete}
-        onCancel={() => setDeleteId(null)}
+        message="Folder beserta semua isinya akan dihapus permanen."
+        onConfirm={confirmDeleteFolder}
+        onCancel={() => setDeleteFolderId(null)}
+        loading={deleting}
+        confirmLabel="Ya, Hapus"
+      />
+      <ConfirmModal
+        isOpen={!!deleteDokumenId}
+        title="Hapus Dokumen?"
+        message="File akan dihapus permanen dari server."
+        onConfirm={confirmDeleteDokumen}
+        onCancel={() => setDeleteDokumenId(null)}
         loading={deleting}
         confirmLabel="Ya, Hapus"
       />

@@ -2,12 +2,50 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { FileText, Plus, Upload, X, ChevronRight, Search, Download } from 'lucide-react'
+import { FileText, Plus, Upload, X, ChevronRight, Search, Download, Image as ImageIcon } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { asBuiltApi } from '@/lib/api'
 import { isAdminOrSuperadmin, isTeknisi } from '@/lib/auth'
 import { compressFiles, MAX_FILE_SIZE_BYTES } from '@/lib/compressFile'
 import { ActionMenu } from '@/components/ui/ActionMenu'
+
+// ─── File helpers ──────────────────────────────────────────────────────────────
+
+const IMAGE_EXTS = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp']
+const fileExt = (name: string) => (name.split('.').pop() ?? '').toLowerCase()
+const isImageName = (name: string) => IMAGE_EXTS.includes(fileExt(name))
+
+function FilePreviewRow({ file, onRemove }: { file: File; onRemove: () => void }) {
+  const [thumb, setThumb] = useState<string | null>(null)
+  const isImage = isImageName(file.name)
+
+  useEffect(() => {
+    if (!isImage) return
+    const url = URL.createObjectURL(file)
+    setThumb(url)
+    return () => URL.revokeObjectURL(url)
+  }, [file, isImage])
+
+  return (
+    <div className="flex items-center gap-2.5 px-2.5 py-2 bg-app-bg rounded-lg border border-app-border">
+      <div className="w-10 h-10 rounded-md bg-white border border-app-border flex items-center justify-center overflow-hidden shrink-0">
+        {isImage && thumb
+          ? <img src={thumb} alt={file.name} className="w-full h-full object-cover" />
+          : <FileText size={18} className="text-app-muted" />}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[12px] text-app-text truncate" title={file.name}>{file.name}</p>
+        <p className="text-[11px] text-app-muted">{(file.size / 1024).toFixed(0)} KB</p>
+      </div>
+      <button
+        type="button"
+        onClick={onRemove}
+        className="p-1 rounded hover:bg-red-50 text-red-500 shrink-0"
+        aria-label="Hapus"
+      ><X size={14} /></button>
+    </div>
+  )
+}
 
 // ─── Upload Modal ──────────────────────────────────────────────────────────────
 
@@ -100,18 +138,9 @@ function UploadModal({ open, folderId, onClose, onSaved }: {
           {files.length > 0 && (
             <div className="mt-4 space-y-2">
               <p className="text-[12px] font-semibold text-app-muted">{files.length} file dipilih</p>
-              <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-1">
+              <div className="space-y-1.5 max-h-[260px] overflow-y-auto pr-1">
                 {files.map((f, i) => (
-                  <div key={i} className="flex items-center gap-2 px-3 py-2 bg-app-bg rounded-lg border border-app-border">
-                    <span className="text-[12px] text-app-text flex-1 truncate" title={f.name}>{f.name}</span>
-                    <span className="text-[11px] text-app-muted shrink-0">{(f.size / 1024).toFixed(0)} KB</span>
-                    <button
-                      type="button"
-                      onClick={() => removeAt(i)}
-                      className="p-0.5 rounded hover:bg-red-50 text-red-500"
-                      aria-label="Hapus"
-                    ><X size={14} /></button>
-                  </div>
+                  <FilePreviewRow key={`${f.name}-${i}`} file={f} onRemove={() => removeAt(i)} />
                 ))}
               </div>
             </div>
@@ -135,17 +164,20 @@ function PreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState(false)
 
-  const isPdf = (doc.namaFile ?? '').toLowerCase().endsWith('.pdf')
+  const ext = fileExt(doc.namaFile ?? '')
+  const isPdf = ext === 'pdf'
+  const isImage = IMAGE_EXTS.includes(ext)
+  const canPreview = isPdf || isImage
 
   useEffect(() => {
-    if (!isPdf) { setLoading(false); return }
+    if (!canPreview) { setLoading(false); return }
     let url = ''
     asBuiltApi.previewDokumen(doc.id)
       .then((u) => { url = u; setBlobUrl(u) })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
     return () => { if (url) URL.revokeObjectURL(url) }
-  }, [doc.id, isPdf])
+  }, [doc.id, canPreview])
 
   function handleDownload() {
     if (doc.fileUrl) {
@@ -178,14 +210,22 @@ function PreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
         <div className="flex-1 overflow-auto bg-gray-50 flex items-center justify-center" style={{ minHeight: 420 }}>
           {loading ? (
             <p className="text-app-muted text-[13px]">Memuat file...</p>
-          ) : isPdf && blobUrl ? (
-            <iframe
-              src={blobUrl}
-              className="w-full h-full"
-              style={{ height: 540, border: 'none' }}
-              title={doc.namaFile}
-            />
-          ) : isPdf && error ? (
+          ) : canPreview && blobUrl ? (
+            isPdf ? (
+              <iframe
+                src={blobUrl}
+                className="w-full h-full"
+                style={{ height: 540, border: 'none' }}
+                title={doc.namaFile}
+              />
+            ) : (
+              <img
+                src={blobUrl}
+                alt={doc.namaFile}
+                className="max-w-full max-h-[540px] object-contain"
+              />
+            )
+          ) : canPreview && error ? (
             <div className="text-center">
               <p className="text-app-muted text-[13px] mb-3">Preview tidak tersedia.</p>
               <button onClick={handleDownload} className="btn-primary text-[13px]">
@@ -214,10 +254,25 @@ function FileCard({ doc, showAdmin, onClick, onDelete }: {
   doc: any; showAdmin: boolean
   onClick: () => void; onDelete: (id: string) => void
 }) {
+  const isImage = isImageName(doc.namaFile ?? '')
+  const [thumb, setThumb] = useState<string | null>(null)
+  useEffect(() => {
+    if (!isImage) return
+    let url = ''
+    asBuiltApi.previewDokumen(doc.id)
+      .then((u) => { url = u; setThumb(u) })
+      .catch(() => {})
+    return () => { if (url) URL.revokeObjectURL(url) }
+  }, [doc.id, isImage])
+
   return (
     <div className="sert-file-card" onClick={onClick}>
-      <div className="sert-file-head">
-        <FileText size={28} color="#ffffff" strokeWidth={1.5} />
+      <div className="sert-file-head" style={isImage && thumb ? { padding: 0, overflow: 'hidden' } : undefined}>
+        {isImage && thumb
+          ? <img src={thumb} alt={doc.namaFile} className="w-full h-full object-cover" />
+          : isImage
+            ? <ImageIcon size={28} color="#ffffff" strokeWidth={1.5} />
+            : <FileText size={28} color="#ffffff" strokeWidth={1.5} />}
       </div>
       <div className="sert-folder-body">
         <div className="sert-folder-row">

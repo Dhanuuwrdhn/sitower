@@ -2,57 +2,23 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { FileText, Plus, Upload, X, ChevronRight, Search, Download, Image as ImageIcon } from 'lucide-react'
+import { Plus, Upload, X, ChevronRight, Search, LayoutGrid, List } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { asBuiltApi } from '@/lib/api'
 import { isAdminOrSuperadmin, isTeknisi } from '@/lib/auth'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { compressFiles, MAX_FILE_SIZE_BYTES } from '@/lib/compressFile'
-import { ActionMenu } from '@/components/ui/ActionMenu'
-
-// ─── File helpers ──────────────────────────────────────────────────────────────
-
-const IMAGE_EXTS = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp']
-const fileExt = (name: string) => (name.split('.').pop() ?? '').toLowerCase()
-const isImageName = (name: string) => IMAGE_EXTS.includes(fileExt(name))
-
-function FilePreviewRow({ file, onRemove }: { file: File; onRemove: () => void }) {
-  const [thumb, setThumb] = useState<string | null>(null)
-  const isImage = isImageName(file.name)
-
-  useEffect(() => {
-    if (!isImage) return
-    const url = URL.createObjectURL(file)
-    setThumb(url)
-    return () => URL.revokeObjectURL(url)
-  }, [file, isImage])
-
-  return (
-    <div className="flex items-center gap-2.5 px-2.5 py-2 bg-app-bg rounded-lg border border-app-border">
-      <div className="w-10 h-10 rounded-md bg-white border border-app-border flex items-center justify-center overflow-hidden shrink-0">
-        {isImage && thumb
-          ? <img src={thumb} alt={file.name} className="w-full h-full object-cover" />
-          : <FileText size={18} className="text-app-muted" />}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-[12px] text-app-text truncate" title={file.name}>{file.name}</p>
-        <p className="text-[11px] text-app-muted">{(file.size / 1024).toFixed(0)} KB</p>
-      </div>
-      <button
-        type="button"
-        onClick={onRemove}
-        className="p-1 rounded hover:bg-red-50 text-red-500 shrink-0"
-        aria-label="Hapus"
-      ><X size={14} /></button>
-    </div>
-  )
-}
+import {
+  FolderCard, FileCard, ListRow, PreviewModal, FilePreviewRow,
+  fileExt, fmtDate,
+} from '../_shared'
 
 // ─── Upload Modal ──────────────────────────────────────────────────────────────
 
 function UploadModal({ open, folderId, onClose, onSaved }: {
   open: boolean; folderId: string; onClose: () => void; onSaved: () => void
 }) {
-  const [files, setFiles]   = useState<File[]>([])
+  const [files, setFiles] = useState<File[]>([])
   const [saving, setSaving] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -67,21 +33,8 @@ function UploadModal({ open, folderId, onClose, onSaved }: {
       if (f.size > MAX_FILE_SIZE_BYTES) rejected.push(f.name)
       else accepted.push(f)
     }
-    if (rejected.length) {
-      toast.error(`${rejected.length} file melebihi 10MB: ${rejected.join(', ')}`)
-    }
+    if (rejected.length) toast.error(`${rejected.length} file melebihi 10MB: ${rejected.join(', ')}`)
     if (accepted.length) setFiles((cur) => [...cur, ...accepted])
-  }
-
-  function onDrop(e: React.DragEvent) {
-    e.preventDefault()
-    setDragOver(false)
-    const dropped = e.dataTransfer.files
-    if (dropped && dropped.length) addFiles(dropped)
-  }
-
-  function removeAt(i: number) {
-    setFiles((cur) => cur.filter((_, idx) => idx !== i))
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -118,7 +71,7 @@ function UploadModal({ open, folderId, onClose, onSaved }: {
               if (e.currentTarget.contains(e.relatedTarget as Node)) return
               setDragOver(false)
             }}
-            onDrop={onDrop}
+            onDrop={(e) => { e.preventDefault(); setDragOver(false); addFiles(e.dataTransfer.files) }}
             className={`border-2 border-dashed rounded-xl py-8 flex flex-col items-center gap-2 cursor-pointer transition-colors ${dragOver ? 'border-blue-500 bg-blue-50' : 'border-app-border hover:border-blue-300 hover:bg-app-bg'}`}
           >
             <Upload size={24} className={dragOver ? 'text-blue-500' : 'text-app-muted'} />
@@ -134,13 +87,16 @@ function UploadModal({ open, folderId, onClose, onSaved }: {
             className="hidden"
             onChange={(e) => { addFiles(e.target.files); if (fileRef.current) fileRef.current.value = '' }}
           />
-
           {files.length > 0 && (
             <div className="mt-4 space-y-2">
               <p className="text-[12px] font-semibold text-app-muted">{files.length} file dipilih</p>
               <div className="space-y-1.5 max-h-[260px] overflow-y-auto pr-1">
                 {files.map((f, i) => (
-                  <FilePreviewRow key={`${f.name}-${i}`} file={f} onRemove={() => removeAt(i)} />
+                  <FilePreviewRow
+                    key={`${f.name}-${i}`}
+                    file={f}
+                    onRemove={() => setFiles((cur) => cur.filter((_, idx) => idx !== i))}
+                  />
                 ))}
               </div>
             </div>
@@ -157,142 +113,57 @@ function UploadModal({ open, folderId, onClose, onSaved }: {
   )
 }
 
-// ─── Preview Modal ─────────────────────────────────────────────────────────────
+// ─── Subfolder Modal ───────────────────────────────────────────────────────────
 
-function PreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
-  const [blobUrl, setBlobUrl] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError]     = useState(false)
+function SubfolderModal({ open, parentId, onClose, onSaved }: {
+  open: boolean; parentId: string; onClose: () => void; onSaved: () => void
+}) {
+  const [nama, setNama] = useState('')
+  const [saving, setSaving] = useState(false)
 
-  const ext = fileExt(doc.namaFile ?? '')
-  const isPdf = ext === 'pdf'
-  const isImage = IMAGE_EXTS.includes(ext)
-  const canPreview = isPdf || isImage
+  useEffect(() => { if (!open) setNama('') }, [open])
 
-  useEffect(() => {
-    if (!canPreview) { setLoading(false); return }
-    let url = ''
-    asBuiltApi.previewDokumen(doc.id)
-      .then((u) => { url = u; setBlobUrl(u) })
-      .catch(() => setError(true))
-      .finally(() => setLoading(false))
-    return () => { if (url) URL.revokeObjectURL(url) }
-  }, [doc.id, canPreview])
-
-  function handleDownload() {
-    if (doc.fileUrl) {
-      const a = document.createElement('a')
-      a.href = doc.fileUrl
-      a.download = doc.namaFile ?? 'dokumen'
-      a.click()
-    } else {
-      toast.error('File tidak tersedia')
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!nama.trim()) { toast.error('Nama folder wajib diisi'); return }
+    setSaving(true)
+    try {
+      await asBuiltApi.create({ nama, parentId, tahun: new Date().getFullYear() })
+      toast.success('Subfolder berhasil dibuat')
+      onSaved(); onClose()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'Gagal menyimpan')
+    } finally {
+      setSaving(false)
     }
   }
 
+  if (!open) return null
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl flex flex-col" style={{ width: 700, maxHeight: '90vh' }}>
-        <div className="flex items-center justify-between px-5 py-4 border-b border-app-border shrink-0">
-          <span className="text-[15px] font-bold text-app-text truncate pr-4">{doc.namaFile}</span>
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={handleDownload}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-app-border text-[12px] font-medium text-app-text hover:bg-app-bg transition-colors"
-            >
-              <Download size={14} /> Download
-            </button>
-            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted"><X size={18} /></button>
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-[400px]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-app-border">
+          <h2 className="text-[15px] font-bold text-app-text">Buat Subfolder</h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-app-bg text-app-muted"><X size={18} /></button>
         </div>
-
-        <div className="flex-1 overflow-auto bg-gray-50 flex items-center justify-center" style={{ minHeight: 420 }}>
-          {loading ? (
-            <p className="text-app-muted text-[13px]">Memuat file...</p>
-          ) : canPreview && blobUrl ? (
-            isPdf ? (
-              <iframe
-                src={blobUrl}
-                className="w-full h-full"
-                style={{ height: 540, border: 'none' }}
-                title={doc.namaFile}
-              />
-            ) : (
-              <img
-                src={blobUrl}
-                alt={doc.namaFile}
-                className="max-w-full max-h-[540px] object-contain"
-              />
-            )
-          ) : canPreview && error ? (
-            <div className="text-center">
-              <p className="text-app-muted text-[13px] mb-3">Preview tidak tersedia.</p>
-              <button onClick={handleDownload} className="btn-primary text-[13px]">
-                <Download size={14} /> Download File
-              </button>
-            </div>
-          ) : (
-            <div className="text-center p-8">
-              <FileText size={48} className="text-app-muted mx-auto mb-3" strokeWidth={1.5} />
-              <p className="text-[13px] text-app-muted mb-1">Format file tidak dapat dipratinjau di browser.</p>
-              <p className="text-[12px] text-app-muted mb-4">{doc.namaFile}</p>
-              <button onClick={handleDownload} className="btn-primary text-[13px]">
-                <Download size={14} /> Download File
-              </button>
-            </div>
-          )}
+        <form id="sub-form" onSubmit={handleSubmit} className="px-6 py-5">
+          <label className="block text-[12px] font-semibold text-app-text mb-1.5">Nama Folder <span className="text-red-500">*</span></label>
+          <input
+            type="text"
+            value={nama}
+            onChange={(e) => setNama(e.target.value)}
+            className="form-input"
+            placeholder="cth. Foto Lapangan"
+            autoFocus
+          />
+        </form>
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-app-border">
+          <button type="button" onClick={onClose} className="btn-outline">Batal</button>
+          <button type="submit" form="sub-form" disabled={saving} className="btn-primary">
+            {saving ? 'Menyimpan...' : 'Simpan'}
+          </button>
         </div>
-      </div>
-    </div>
-  )
-}
-
-// ─── File Card ─────────────────────────────────────────────────────────────────
-
-function FileCard({ doc, showAdmin, onClick, onDelete }: {
-  doc: any; showAdmin: boolean
-  onClick: () => void; onDelete: (id: string) => void
-}) {
-  const isImage = isImageName(doc.namaFile ?? '')
-  const [thumb, setThumb] = useState<string | null>(null)
-  useEffect(() => {
-    if (!isImage) return
-    let url = ''
-    asBuiltApi.previewDokumen(doc.id)
-      .then((u) => { url = u; setThumb(u) })
-      .catch(() => {})
-    return () => { if (url) URL.revokeObjectURL(url) }
-  }, [doc.id, isImage])
-
-  return (
-    <div className="sert-file-card" onClick={onClick}>
-      <div className="sert-file-head" style={isImage && thumb ? { padding: 0, overflow: 'hidden' } : undefined}>
-        {isImage && thumb
-          ? <img src={thumb} alt={doc.namaFile} className="w-full h-full object-cover" />
-          : isImage
-            ? <ImageIcon size={28} color="#ffffff" strokeWidth={1.5} />
-            : <FileText size={28} color="#ffffff" strokeWidth={1.5} />}
-      </div>
-      <div className="sert-folder-body">
-        <div className="sert-folder-row">
-          <p className="sert-folder-name" style={{ fontSize: 13 }}>{doc.namaFile}</p>
-          {showAdmin && (
-            <div onClick={(e) => e.stopPropagation()}>
-              <ActionMenu
-                items={[{
-                  label: 'Hapus Dokumen',
-                  icon: <span className="text-red-400">✕</span>,
-                  onClick: () => onDelete(doc.id),
-                  danger: true,
-                }]}
-              />
-            </div>
-          )}
-        </div>
-        <p className="sert-folder-meta">
-          {new Date(doc.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-        </p>
       </div>
     </div>
   )
@@ -305,13 +176,19 @@ export default function AsBuiltDrawingFolderPage() {
   const router = useRouter()
 
   const [folder, setFolder]       = useState<any>(null)
+  const [children, setChildren]   = useState<any[]>([])
   const [dokumen, setDokumen]     = useState<any[]>([])
+  const [breadcrumb, setBreadcrumb] = useState<Array<{ id: string; nama: string }>>([])
   const [loading, setLoading]     = useState(true)
   const [search, setSearch]       = useState('')
+  const [viewMode, setViewMode]   = useState<'grid' | 'list'>('grid')
   const [uploadOpen, setUploadOpen] = useState(false)
+  const [subfolderOpen, setSubfolderOpen] = useState(false)
   const [preview, setPreview]     = useState<any | null>(null)
-  const [deleteId, setDeleteId]   = useState<string | null>(null)
+  const [deleteFolderId, setDeleteFolderId] = useState<string | null>(null)
+  const [deleteDokumenId, setDeleteDokumenId] = useState<string | null>(null)
   const [deleting, setDeleting]   = useState(false)
+
   const [adminUser, setAdminUser] = useState(false)
   const [canUpload, setCanUpload] = useState(false)
 
@@ -323,9 +200,14 @@ export default function AsBuiltDrawingFolderPage() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await asBuiltApi.getFolder(id)
-      setFolder(res.data)
-      setDokumen(Array.isArray(res.data.dokumen) ? res.data.dokumen : [])
+      const [folderRes, crumbRes] = await Promise.all([
+        asBuiltApi.getFolder(id),
+        asBuiltApi.getBreadcrumb(id),
+      ])
+      setFolder(folderRes.data)
+      setChildren(Array.isArray(folderRes.data.children) ? folderRes.data.children : [])
+      setDokumen(Array.isArray(folderRes.data.dokumen) ? folderRes.data.dokumen : [])
+      setBreadcrumb(Array.isArray(crumbRes.data) ? crumbRes.data : [])
     } catch {
       toast.error('Gagal memuat data')
     } finally {
@@ -335,24 +217,45 @@ export default function AsBuiltDrawingFolderPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  async function handleDelete() {
-    if (!deleteId) return
+  async function confirmDeleteFolder() {
+    if (!deleteFolderId) return
     setDeleting(true)
     try {
-      await asBuiltApi.deleteDokumen(deleteId)
+      await asBuiltApi.deleteFolder(deleteFolderId)
+      toast.success('Folder dihapus')
+      setDeleteFolderId(null)
+      fetchData()
+    } catch {
+      toast.error('Gagal menghapus folder')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  async function confirmDeleteDokumen() {
+    if (!deleteDokumenId) return
+    setDeleting(true)
+    try {
+      await asBuiltApi.deleteDokumen(deleteDokumenId)
       toast.success('Dokumen dihapus')
+      setDeleteDokumenId(null)
       fetchData()
     } catch {
       toast.error('Gagal menghapus dokumen')
     } finally {
       setDeleting(false)
-      setDeleteId(null)
     }
   }
 
-  const filtered = dokumen.filter((d) =>
-    !search || (d.namaFile ?? '').toLowerCase().includes(search.toLowerCase())
-  )
+  const lower = search.trim().toLowerCase()
+  const filteredChildren = lower
+    ? children.filter((c) => (c.nama ?? '').toLowerCase().includes(lower))
+    : children
+  const filteredDokumen = lower
+    ? dokumen.filter((d) => (d.namaFile ?? '').toLowerCase().includes(lower))
+    : dokumen
+
+  const isEmpty = filteredChildren.length === 0 && filteredDokumen.length === 0
 
   return (
     <>
@@ -360,15 +263,35 @@ export default function AsBuiltDrawingFolderPage() {
 
       {/* Top bar */}
       <div className="flex items-center gap-3 mb-5 flex-wrap">
-        <div className="sert-search-wrap flex-1 min-w-[200px]">
-          <Search size={15} className="sert-search-icon" />
+        <div className="flex items-center gap-3 px-4 py-[11px] bg-white border border-[#E1E8EC] rounded-lg flex-1 min-w-[200px]">
+          <Search size={16} className="text-[#5F737F] shrink-0" />
           <input
-            className="sert-search-input"
-            placeholder="Cari berdasarkan nama file"
+            type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari nama folder atau file"
+            className="border-none outline-none font-medium text-[14px] text-[#1C1C1C] bg-transparent w-full min-w-0 placeholder:text-[#97AAB3]"
           />
         </div>
+
+        <div className="flex items-center bg-gray-100 rounded-xl p-1">
+          <button
+            onClick={() => setViewMode('grid')}
+            title="Grid view"
+            className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm text-app-text' : 'text-app-muted hover:text-app-text'}`}
+          ><LayoutGrid size={15} /></button>
+          <button
+            onClick={() => setViewMode('list')}
+            title="List view"
+            className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm text-app-text' : 'text-app-muted hover:text-app-text'}`}
+          ><List size={15} /></button>
+        </div>
+
+        {adminUser && (
+          <button className="btn-outline shrink-0" onClick={() => setSubfolderOpen(true)}>
+            <Plus size={16} /> Subfolder
+          </button>
+        )}
         {canUpload && (
           <button className="btn-primary shrink-0" onClick={() => setUploadOpen(true)}>
             <Plus size={16} /> Upload Dokumen
@@ -377,27 +300,39 @@ export default function AsBuiltDrawingFolderPage() {
       </div>
 
       {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-[13px] mb-5">
+      <div className="flex items-center gap-1.5 text-[13px] mb-5 flex-wrap">
         <button
           onClick={() => router.push('/as-built-drawing')}
           className="text-app-muted hover:text-blue-600 transition-colors"
         >
           Beranda
         </button>
-        <ChevronRight size={14} className="text-app-muted" />
-        <span className="font-medium text-app-text">{folder?.nama ?? '...'}</span>
+        {breadcrumb.map((c, idx) => (
+          <span key={c.id} className="flex items-center gap-1.5">
+            <ChevronRight size={14} className="text-app-muted" />
+            {idx < breadcrumb.length - 1 ? (
+              <button
+                onClick={() => router.push(`/as-built-drawing/${c.id}`)}
+                className="text-app-muted hover:text-blue-600 transition-colors"
+              >{c.nama}</button>
+            ) : (
+              <span className="font-medium text-app-text">{c.nama}</span>
+            )}
+          </span>
+        ))}
       </div>
 
       {/* Folder meta */}
       {folder && (
-        <div className="flex items-center gap-4 mb-5 text-[12px] text-app-muted">
+        <div className="flex items-center gap-4 mb-5 text-[12px] text-app-muted flex-wrap">
           {folder.tahun && <span className="font-medium">Tahun {folder.tahun}</span>}
-          {folder.tower && <span>Tower {folder.tower.nomorTower}</span>}
+          {folder.tower?.nama && <span>Tower {folder.tower.nama}</span>}
+          {folder.createdBy?.nama && <span>Dibuat oleh {folder.createdBy.nama}</span>}
           {folder.keterangan && <span className="italic">{folder.keterangan}</span>}
         </div>
       )}
 
-      {/* Grid */}
+      {/* Body */}
       {loading ? (
         <div className="sert-grid">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -410,64 +345,98 @@ export default function AsBuiltDrawingFolderPage() {
             </div>
           ))}
         </div>
-      ) : filtered.length === 0 ? (
-        <div className="card p-10 text-center">
-          <FileText size={36} className="text-app-muted mx-auto mb-3" strokeWidth={1.5} />
-          <p className="text-[13px] text-app-muted mb-1">
-            {search ? 'Tidak ada dokumen yang cocok.' : 'Belum ada dokumen di folder ini.'}
-          </p>
-          {!search && canUpload && (
-            <button className="btn-primary mt-3 text-[13px]" onClick={() => setUploadOpen(true)}>
-              <Plus size={14} /> Upload Dokumen Pertama
-            </button>
-          )}
+      ) : isEmpty ? (
+        <div className="card p-10 text-center text-app-muted text-[13px]">
+          {search ? 'Tidak ada yang cocok.' : 'Folder ini masih kosong.'}
         </div>
-      ) : (
+      ) : viewMode === 'grid' ? (
         <div className="sert-grid">
-          {filtered.map((doc) => (
-            <FileCard
-              key={doc.id}
-              doc={doc}
-              showAdmin={adminUser}
-              onClick={() => setPreview(doc)}
-              onDelete={setDeleteId}
+          {filteredChildren.map((c) => (
+            <FolderCard
+              key={`folder-${c.id}`}
+              row={c}
+              isAdminUser={adminUser}
+              onClick={() => router.push(`/as-built-drawing/${c.id}`)}
+              onDelete={() => setDeleteFolderId(c.id)}
             />
           ))}
+          {filteredDokumen.map((d) => (
+            <FileCard
+              key={`file-${d.id}`}
+              doc={d}
+              showAdmin={adminUser}
+              onClick={() => setPreview(d)}
+              onDelete={setDeleteDokumenId}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {filteredChildren.map((c) => {
+            const fc = c._count?.dokumen ?? 0
+            const cc = c._count?.children ?? 0
+            const meta = [
+              c.tahun ? `Tahun ${c.tahun}` : null,
+              (fc + cc) > 0 ? `${fc + cc} item` : null,
+              c.createdBy?.nama ? `oleh ${c.createdBy.nama}` : null,
+              fmtDate(c.createdAt),
+            ].filter(Boolean).join(' · ')
+            return (
+              <ListRow
+                key={`folder-${c.id}`}
+                kind="folder"
+                label={c.nama ?? '—'}
+                meta={meta}
+                isAdminUser={adminUser}
+                onClick={() => router.push(`/as-built-drawing/${c.id}`)}
+                onDelete={adminUser ? () => setDeleteFolderId(c.id) : undefined}
+              />
+            )
+          })}
+          {filteredDokumen.map((d) => {
+            const meta = [
+              d.createdBy?.nama ? `oleh ${d.createdBy.nama}` : null,
+              fmtDate(d.createdAt),
+            ].filter(Boolean).join(' · ')
+            return (
+              <ListRow
+                key={`file-${d.id}`}
+                kind="file"
+                label={d.namaFile}
+                meta={meta}
+                fileExtForIcon={fileExt(d.namaFile ?? '')}
+                isAdminUser={adminUser}
+                onClick={() => setPreview(d)}
+                onDelete={adminUser ? () => setDeleteDokumenId(d.id) : undefined}
+              />
+            )
+          })}
         </div>
       )}
 
       {/* Modals */}
-      <UploadModal
-        open={uploadOpen}
-        folderId={id}
-        onClose={() => setUploadOpen(false)}
-        onSaved={fetchData}
+      <UploadModal open={uploadOpen} folderId={id} onClose={() => setUploadOpen(false)} onSaved={fetchData} />
+      <SubfolderModal open={subfolderOpen} parentId={id} onClose={() => setSubfolderOpen(false)} onSaved={fetchData} />
+      {preview && <PreviewModal doc={preview} onClose={() => setPreview(null)} />}
+
+      <ConfirmModal
+        isOpen={!!deleteFolderId}
+        title="Hapus Folder?"
+        message="Folder beserta semua isinya akan dihapus permanen."
+        onConfirm={confirmDeleteFolder}
+        onCancel={() => setDeleteFolderId(null)}
+        loading={deleting}
+        confirmLabel="Ya, Hapus"
       />
-
-      {preview && (
-        <PreviewModal doc={preview} onClose={() => setPreview(null)} />
-      )}
-
-      {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/30" onClick={() => setDeleteId(null)} />
-          <div className="relative bg-white rounded-2xl shadow-xl w-[360px] p-6 text-center">
-            <p className="text-[16px] font-bold text-app-text mb-1.5">Hapus Dokumen?</p>
-            <p className="text-[13px] text-app-muted mb-5">File ini akan dihapus permanen dari server.</p>
-            <div className="flex gap-3">
-              <button onClick={() => setDeleteId(null)} className="btn-outline flex-1">Batal</button>
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="flex-1 btn-primary"
-                style={{ background: '#d92c20' }}
-              >
-                {deleting ? 'Menghapus...' : 'Ya, Hapus'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        isOpen={!!deleteDokumenId}
+        title="Hapus Dokumen?"
+        message="File akan dihapus permanen dari server."
+        onConfirm={confirmDeleteDokumen}
+        onCancel={() => setDeleteDokumenId(null)}
+        loading={deleting}
+        confirmLabel="Ya, Hapus"
+      />
     </>
   )
 }

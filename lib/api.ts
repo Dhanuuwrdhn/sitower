@@ -168,9 +168,17 @@ export const sertifikatApi = {
 
 export const asBuiltApi = {
   getAll:      (params?: any) => api.get('/as-built-drawing', { params }),
+  getBreadcrumb: (id: string) => api.get(`/as-built-drawing/breadcrumb/${id}`),
   getFolder:   (id: string)   => api.get(`/as-built-drawing/${id}`),
   create:      (data: any)    => api.post('/as-built-drawing', data),
   deleteFolder:(id: string)   => api.delete(`/as-built-drawing/${id}`),
+  uploadRootFiles: (files: File[]) => {
+    const form = new FormData()
+    files.forEach((f) => form.append('files', f))
+    return api.post('/as-built-drawing/dokumen', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  },
   uploadFiles: (id: string, files: File[]) => {
     const form = new FormData()
     files.forEach((f) => form.append('files', f))

@@ -4,13 +4,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { Plus, Upload, FolderOpen, X, SlidersHorizontal, LayoutGrid, List, Search } from 'lucide-react'
-import { asBuiltApi } from '@/lib/api'
-import { isAdmin } from '@/lib/auth'
+import { asBuiltApi, towersApi } from '@/lib/api'
+import { isAdminOrSuperadmin } from '@/lib/auth'
 import { ActionMenu } from '@/components/ui/ActionMenu'
 import { Pagination } from '@/components/ui/Pagination'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonRow } from '@/components/ui/SkeletonRow'
+import { SearchableSelect } from '@/components/ui/SearchableSelect'
 
 const TIPE_OPTIONS = ['Electrical', 'Mechanical', 'Civil', 'Grounding', 'Lainnya']
 
@@ -75,94 +76,6 @@ function GridSkeleton({ count }: { count: number }) {
   )
 }
 
-// ── Filter popup ──────────────────────────────────────────────────────────────
-
-function FilterPopup({
-  open, onClose,
-  pendingTipe, setPendingTipe,
-  pendingTahun, setPendingTahun,
-  pendingTowerId, setPendingTowerId,
-  onApply, onClear,
-}: {
-  open: boolean; onClose: () => void
-  pendingTipe: string[]; setPendingTipe: (v: string[]) => void
-  pendingTahun: string; setPendingTahun: (v: string) => void
-  pendingTowerId: string; setPendingTowerId: (v: string) => void
-  onApply: () => void; onClear: () => void
-}) {
-  if (!open) return null
-
-  const toggleTipe = (t: string) =>
-    setPendingTipe(pendingTipe.includes(t) ? pendingTipe.filter(x => x !== t) : [...pendingTipe, t])
-
-  return (
-    <div className="absolute right-0 top-full mt-2 z-30 bg-white rounded-2xl shadow-xl border border-app-border w-72" onClick={(e) => e.stopPropagation()}>
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-app-border">
-        <span className="text-[14px] font-bold text-app-text">Filter</span>
-        <button onClick={onClose} className="p-1 rounded hover:bg-app-bg text-app-muted"><X size={16} /></button>
-      </div>
-
-      <div className="px-5 py-4 space-y-4">
-        {/* Tipe */}
-        <div>
-          <p className="text-[12px] font-semibold text-app-text mb-2">Tipe</p>
-          <div className="flex flex-wrap gap-1.5">
-            {TIPE_OPTIONS.map(t => (
-              <button
-                key={t}
-                onClick={() => toggleTipe(t)}
-                className={`px-3 py-1 rounded-full text-[12px] font-medium border transition-colors ${pendingTipe.includes(t)
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-app-text border-app-border hover:border-blue-300'
-                  }`}
-              >{t}</button>
-            ))}
-          </div>
-        </div>
-
-        <hr className="border-app-border" />
-
-        {/* Tahun */}
-        <div>
-          <p className="text-[12px] font-semibold text-app-text mb-2">Tahun</p>
-          <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto">
-            {YEAR_OPTIONS.map((y) => (
-              <button
-                key={y}
-                onClick={() => setPendingTahun(pendingTahun === y ? '' : y)}
-                className={`px-3 py-1 rounded-full text-[12px] font-medium border transition-colors ${pendingTahun === y
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-app-text border-app-border hover:border-blue-300'
-                  }`}
-              >{y}</button>
-            ))}
-          </div>
-        </div>
-
-        <hr className="border-app-border" />
-
-        {/* Tower ID */}
-        <div>
-          <p className="text-[12px] font-semibold text-app-text mb-2">ID Tower</p>
-          <input
-            type="text"
-            placeholder="cth. T-001"
-            value={pendingTowerId}
-            onChange={(e) => setPendingTowerId(e.target.value)}
-            className="form-input"
-          />
-        </div>
-      </div>
-
-      <hr className="border-app-border" />
-      <div className="flex gap-2 px-5 py-3.5">
-        <button onClick={onApply} className="btn-primary flex-1 text-[13px]">Terapkan Filter</button>
-        <button onClick={onClear} className="btn-outline flex-1 text-[13px]">Hapus Filter</button>
-      </div>
-    </div>
-  )
-}
-
 // ── Tambah modal ──────────────────────────────────────────────────────────────
 
 const BLANK_FORM = {
@@ -170,9 +83,14 @@ const BLANK_FORM = {
   tahun: String(new Date().getFullYear()), keterangan: '',
 }
 
-function TambahModal({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
+function TambahModal({
+  open, onClose, onSaved, towerOptions,
+}: {
+  open: boolean; onClose: () => void; onSaved: () => void;
+  towerOptions: { value: string; label: string }[]
+}) {
   const [form, setForm] = useState(BLANK_FORM)
-  const [file, setFile] = useState<File | null>(null)
+  const [files, setFiles] = useState<File[]>([])
   const [saving, setSaving] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }))
@@ -189,10 +107,10 @@ function TambahModal({ open, onClose, onSaved }: { open: boolean; onClose: () =>
         ...(form.towerId && { towerId: form.towerId }),
         ...(form.keterangan && { keterangan: form.keterangan }),
       })
-      if (file) await asBuiltApi.uploadFile(res.data.id, file)
+      if (files.length) await asBuiltApi.uploadFiles(res.data.id, files)
       toast.success('Folder berhasil dibuat')
       onSaved(); onClose()
-      setForm(BLANK_FORM); setFile(null)
+      setForm(BLANK_FORM); setFiles([])
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? 'Gagal menyimpan')
     } finally {
@@ -229,19 +147,56 @@ function TambahModal({ open, onClose, onSaved }: { open: boolean; onClose: () =>
             </div>
           </div>
           <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">ID Tower (opsional)</label>
-            <input type="text" value={form.towerId} onChange={(e) => set('towerId', e.target.value)} className="form-input" placeholder="cth. ST-001" />
+            <SearchableSelect
+              label="Tower (opsional)"
+              placeholder="Pilih tower..."
+              options={towerOptions}
+              values={form.towerId ? [form.towerId] : []}
+              onChange={(vals) => set('towerId', vals[vals.length - 1] ?? '')}
+              onClear={() => set('towerId', '')}
+            />
           </div>
           <div>
-            <label className="block text-[12px] font-semibold text-app-text mb-1.5">Upload Dokumen (opsional)</label>
+            <label className="block text-[12px] font-semibold text-app-text mb-1.5">
+              Upload Dokumen (opsional)
+            </label>
             <div
               onClick={() => fileRef.current?.click()}
               className="border-2 border-dashed border-app-border rounded-xl py-6 flex flex-col items-center gap-1.5 cursor-pointer hover:border-blue-300 hover:bg-app-bg transition-colors"
             >
               <Upload size={20} className="text-app-muted" />
-              <p className="text-[13px] text-app-muted">{file ? file.name : 'Klik untuk upload PDF/DWG/DXF'}</p>
+              <p className="text-[13px] text-app-muted">
+                {files.length ? `${files.length} file dipilih` : 'Klik untuk upload PDF/DWG/DXF (bisa pilih banyak)'}
+              </p>
             </div>
-            <input ref={fileRef} type="file" accept=".pdf,.dwg,.dxf" className="hidden" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+            <input
+              ref={fileRef}
+              type="file"
+              multiple
+              accept=".pdf,.dwg,.dxf"
+              className="hidden"
+              onChange={(e) => {
+                const list = Array.from(e.target.files ?? [])
+                if (list.length) setFiles((prev) => [...prev, ...list])
+                if (fileRef.current) fileRef.current.value = ''
+              }}
+            />
+            {files.length > 0 && (
+              <ul className="mt-2 space-y-1">
+                {files.map((f, i) => (
+                  <li key={`${f.name}-${i}`} className="flex items-center justify-between gap-2 px-3 py-1.5 bg-app-bg rounded-lg text-[12px]">
+                    <span className="truncate text-app-text">{f.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))}
+                      className="p-0.5 rounded hover:bg-white text-app-muted shrink-0"
+                    >
+                      <X size={12} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           <div>
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">Keterangan</label>
@@ -275,18 +230,28 @@ export default function AsBuiltDrawingPage() {
 
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   const [filterOpen, setFilterOpen] = useState(false)
-  const [pendingTipe, setPendingTipe] = useState<string[]>([])
-  const [pendingTahun, setPendingTahun] = useState('')
-  const [pendingTowerId, setPendingTowerId] = useState('')
-  const [appliedTipe, setAppliedTipe] = useState<string[]>([])
-  const [appliedTahun, setAppliedTahun] = useState('')
-  const [appliedTowerId, setAppliedTowerId] = useState('')
+  const [tipeFilter, setTipeFilter] = useState<string[]>([])
+  const [tahunFilter, setTahunFilter] = useState<string[]>([])
+  const [towerFilter, setTowerFilter] = useState<string[]>([])
+  const [towers, setTowers] = useState<any[]>([])
 
   const filterRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => { setIsAdminUser(isAdmin()) }, [])
+  useEffect(() => { setIsAdminUser(isAdminOrSuperadmin()) }, [])
 
-  useEffect(() => { setPage(1) }, [search, appliedTipe, appliedTahun, appliedTowerId])
+  useEffect(() => {
+    towersApi.getDropdown().then((r) => {
+      const data = r.data
+      setTowers(Array.isArray(data) ? data : (data?.data ?? []))
+    }).catch(() => {})
+  }, [])
+
+  const towerOptions = useMemo(
+    () => towers.map((t: any) => ({ value: t.id, label: t.nama ?? t.nomorTower ?? t.id })),
+    [towers],
+  )
+
+  useEffect(() => { setPage(1) }, [search, tipeFilter, tahunFilter, towerFilter])
 
   useEffect(() => {
     if (!filterOpen) return
@@ -303,9 +268,9 @@ export default function AsBuiltDrawingPage() {
     setLoading(true)
     try {
       const params: any = { limit: 9999 }
-      if (appliedTipe.length === 1) params.tipe = appliedTipe[0]
-      if (appliedTahun) params.tahun = appliedTahun
-      if (appliedTowerId) params.towerId = appliedTowerId
+      if (tipeFilter.length === 1) params.tipe = tipeFilter[0]
+      if (tahunFilter.length === 1) params.tahun = tahunFilter[0]
+      if (towerFilter.length === 1) params.towerId = towerFilter[0]
       const res = await asBuiltApi.getAll(params)
       const p = res.data
       setAllRows(Array.isArray(p) ? p : (p.data ?? []))
@@ -314,7 +279,7 @@ export default function AsBuiltDrawingPage() {
     } finally {
       setLoading(false)
     }
-  }, [appliedTipe, appliedTahun, appliedTowerId])
+  }, [tipeFilter, tahunFilter, towerFilter])
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -324,36 +289,30 @@ export default function AsBuiltDrawingPage() {
     if (search.trim()) {
       const lower = search.toLowerCase()
       result = result.filter((row) =>
+        (row.nama ?? '').toLowerCase().includes(lower) ||
         (row.namaFile ?? '').toLowerCase().includes(lower) ||
         (row.tower?.nomorTower ?? '').toLowerCase().includes(lower) ||
+        (row.tower?.nama ?? '').toLowerCase().includes(lower) ||
         (row.towerId ?? '').toLowerCase().includes(lower) ||
         (row.tipe ?? '').toLowerCase().includes(lower)
       )
     }
 
-    // Client-side tipe for multi-select (API only accepts one at a time)
-    if (appliedTipe.length > 1) {
-      result = result.filter((row) => appliedTipe.includes(row.tipe))
+    if (tipeFilter.length > 1) {
+      result = result.filter((row) => tipeFilter.includes(row.tipe))
+    }
+    if (tahunFilter.length > 1) {
+      result = result.filter((row) => tahunFilter.includes(String(row.tahun)))
+    }
+    if (towerFilter.length > 1) {
+      result = result.filter((row) => towerFilter.includes(row.towerId))
     }
 
     return result
-  }, [allRows, search, appliedTipe])
+  }, [allRows, search, tipeFilter, tahunFilter, towerFilter])
 
   const total = filteredRows.length
   const displayRows = filteredRows.slice((page - 1) * limit, page * limit)
-
-  function applyFilter() {
-    setAppliedTipe(pendingTipe)
-    setAppliedTahun(pendingTahun)
-    setAppliedTowerId(pendingTowerId)
-    setFilterOpen(false)
-  }
-
-  function clearFilter() {
-    setPendingTipe([]); setPendingTahun(''); setPendingTowerId('')
-    setAppliedTipe([]); setAppliedTahun(''); setAppliedTowerId('')
-    setFilterOpen(false)
-  }
 
   async function confirmDelete() {
     if (!deleteId) return
@@ -370,7 +329,13 @@ export default function AsBuiltDrawingPage() {
     }
   }
 
-  const hasActiveFilter = appliedTipe.length > 0 || !!appliedTahun || !!appliedTowerId
+  const hasActiveFilter = tipeFilter.length > 0 || tahunFilter.length > 0 || towerFilter.length > 0
+
+  function resetFilters() {
+    setTipeFilter([])
+    setTahunFilter([])
+    setTowerFilter([])
+  }
 
   return (
     <>
@@ -378,43 +343,94 @@ export default function AsBuiltDrawingPage() {
       <div className="flex items-center gap-3 mb-5 flex-wrap">
         <div className="flex items-center gap-2 flex-1 min-w-[200px]">
           {/* Search */}
-          <div className="sert-search-wrap flex-1">
-            <Search size={15} className="sert-search-icon" />
+          <div className="flex items-center gap-3 px-4 py-[11px] bg-white border border-[#E1E8EC] rounded-lg flex-1 min-w-0">
+            <Search size={16} className="text-[#5F737F] shrink-0" />
             <input
-              className="sert-search-input"
-              placeholder="Cari nama file atau tower…"
+              type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari nama folder atau tower"
+              className="border-none outline-none font-medium text-[14px] text-[#1C1C1C] bg-transparent w-full min-w-0 placeholder:text-[#97AAB3]"
             />
           </div>
 
           {/* Filter button + popup */}
           <div ref={filterRef} className="relative">
             <button
-              className={`sert-filter-btn ${hasActiveFilter ? 'sert-filter-btn--active' : ''}`}
-              onClick={() => {
-                if (!filterOpen) {
-                  setPendingTipe(appliedTipe)
-                  setPendingTahun(appliedTahun)
-                  setPendingTowerId(appliedTowerId)
-                }
-                setFilterOpen((v) => !v)
-              }}
+              onClick={() => setFilterOpen((v) => !v)}
+              className="relative w-11 h-11 bg-white border border-[#E1E8EC] rounded-lg flex items-center justify-center cursor-pointer shrink-0"
+              aria-label="Filter"
             >
-              <SlidersHorizontal size={16} />
+              <SlidersHorizontal size={18} className="text-[#5F737F]" />
+              {hasActiveFilter && <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#D92D20]" />}
             </button>
-            <FilterPopup
-              open={filterOpen}
-              onClose={() => setFilterOpen(false)}
-              pendingTipe={pendingTipe}
-              setPendingTipe={setPendingTipe}
-              pendingTahun={pendingTahun}
-              setPendingTahun={setPendingTahun}
-              pendingTowerId={pendingTowerId}
-              setPendingTowerId={setPendingTowerId}
-              onApply={applyFilter}
-              onClear={clearFilter}
-            />
+
+            {filterOpen && (
+              <div className="absolute right-0 top-full mt-2 z-50 w-[min(420px,calc(100vw-2rem))] bg-white border border-[#E1E8EC] rounded-lg shadow-[0px_4px_8px_0px_rgba(28,28,28,0.15)]">
+                <div className="flex items-center justify-between px-4 py-2.5">
+                  <span className="font-bold text-[14px] text-[#1C1C1C]">Filter</span>
+                  <div className="flex items-center gap-3">
+                    {hasActiveFilter && (
+                      <button onClick={resetFilters} className="text-[12px] text-[#D92D20] font-semibold hover:underline">Reset</button>
+                    )}
+                    <button onClick={() => setFilterOpen(false)} className="p-1 hover:bg-app-bg rounded">
+                      <X size={16} className="text-[#5F737F]" />
+                    </button>
+                  </div>
+                </div>
+                <div className="h-px bg-[#E1E8EC]" />
+
+                <div className="max-h-[450px] overflow-y-auto">
+                  {/* Tipe */}
+                  <div className="px-4 py-3 flex flex-col gap-2.5">
+                    <span className="font-bold text-[14px] text-[#1C1C1C]">Tipe</span>
+                    <div className="flex flex-wrap gap-2">
+                      {TIPE_OPTIONS.map((t) => {
+                        const active = tipeFilter.includes(t)
+                        return (
+                          <button
+                            key={t}
+                            onClick={() => setTipeFilter(active ? tipeFilter.filter((v) => v !== t) : [...tipeFilter, t])}
+                            className={`px-3 py-1 rounded-full border text-[12px] font-medium transition-all ${active ? 'bg-[#076C9E] border-[#076C9E] text-white' : 'border-[#E1E8EC] text-[#5F737F] hover:border-[#076C9E]'}`}
+                          >{t}</button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                  <div className="h-px bg-[#E1E8EC]" />
+
+                  {/* Tahun */}
+                  <div className="px-4 py-3 flex flex-col gap-2.5">
+                    <span className="font-bold text-[14px] text-[#1C1C1C]">Tahun</span>
+                    <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                      {YEAR_OPTIONS.map((y) => {
+                        const active = tahunFilter.includes(y)
+                        return (
+                          <button
+                            key={y}
+                            onClick={() => setTahunFilter(active ? tahunFilter.filter((v) => v !== y) : [...tahunFilter, y])}
+                            className={`px-3 py-1 rounded-full border text-[12px] font-medium transition-all ${active ? 'bg-[#076C9E] border-[#076C9E] text-white' : 'border-[#E1E8EC] text-[#5F737F] hover:border-[#076C9E]'}`}
+                          >{y}</button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                  <div className="h-px bg-[#E1E8EC]" />
+
+                  {/* Tower */}
+                  <div className="px-4 py-3">
+                    <SearchableSelect
+                      label="Tower"
+                      placeholder="Pilih tower..."
+                      options={towerOptions}
+                      values={towerFilter}
+                      onChange={(vals) => setTowerFilter(vals)}
+                      onClear={() => setTowerFilter([])}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -503,7 +519,7 @@ export default function AsBuiltDrawingPage() {
                 ) : (
                   displayRows.map((row) => (
                     <tr key={row.id}>
-                      <td><span className="font-mono text-[12px] text-blue-600 font-semibold">{row.tower?.nomorTower ?? row.towerId ?? '—'}</span></td>
+                      <td><span className="font-mono text-[12px] text-blue-600 font-semibold">{row.tower?.nomorTower ?? row.tower?.nama ?? row.towerId ?? '—'}</span></td>
                       <td className="font-semibold text-app-text">{row.nama ?? row.namaFile ?? '—'}</td>
                       <td className="text-app-muted">{row.tipe ?? '—'}</td>
                       <td className="font-mono text-[12px]">{row.tahun ?? '—'}</td>
@@ -538,7 +554,12 @@ export default function AsBuiltDrawingPage() {
         </div>
       )}
 
-      <TambahModal open={tambahOpen} onClose={() => setTambahOpen(false)} onSaved={fetchData} />
+      <TambahModal
+        open={tambahOpen}
+        onClose={() => setTambahOpen(false)}
+        onSaved={fetchData}
+        towerOptions={towerOptions}
+      />
       <ConfirmModal
         isOpen={!!deleteId}
         title="Hapus Folder?"

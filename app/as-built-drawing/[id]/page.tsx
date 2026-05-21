@@ -16,9 +16,10 @@ function UploadModal({ open, folderId, onClose, onSaved }: {
 }) {
   const [files, setFiles]   = useState<File[]>([])
   const [saving, setSaving] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => { if (!open) setFiles([]) }, [open])
+  useEffect(() => { if (!open) { setFiles([]); setDragOver(false) } }, [open])
 
   function addFiles(list: FileList | null) {
     if (!list) return
@@ -32,6 +33,26 @@ function UploadModal({ open, folderId, onClose, onSaved }: {
       toast.error(`${rejected.length} file melebihi 10MB: ${rejected.join(', ')}`)
     }
     if (accepted.length) setFiles((cur) => [...cur, ...accepted])
+  }
+
+  function filterByAccept(list: File[]) {
+    const allowed = ['pdf', 'dwg', 'dxf']
+    return list.filter((f) => allowed.includes((f.name.split('.').pop() ?? '').toLowerCase()))
+  }
+
+  function onDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setDragOver(false)
+    const dropped = Array.from(e.dataTransfer.files ?? [])
+    if (!dropped.length) return
+    const filtered = filterByAccept(dropped)
+    const skipped = dropped.length - filtered.length
+    if (skipped > 0) toast.error(`${skipped} file dilewati (format tidak didukung)`)
+    if (filtered.length) {
+      const dt = new DataTransfer()
+      filtered.forEach((f) => dt.items.add(f))
+      addFiles(dt.files)
+    }
   }
 
   function removeAt(i: number) {
@@ -66,10 +87,19 @@ function UploadModal({ open, folderId, onClose, onSaved }: {
         <form id="upload-form" onSubmit={handleSubmit} className="px-6 py-5 overflow-y-auto">
           <div
             onClick={() => fileRef.current?.click()}
-            className="border-2 border-dashed border-app-border rounded-xl py-8 flex flex-col items-center gap-2 cursor-pointer hover:border-blue-300 hover:bg-app-bg transition-colors"
+            onDragEnter={(e) => { e.preventDefault(); setDragOver(true) }}
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+            onDragLeave={(e) => {
+              if (e.currentTarget.contains(e.relatedTarget as Node)) return
+              setDragOver(false)
+            }}
+            onDrop={onDrop}
+            className={`border-2 border-dashed rounded-xl py-8 flex flex-col items-center gap-2 cursor-pointer transition-colors ${dragOver ? 'border-blue-500 bg-blue-50' : 'border-app-border hover:border-blue-300 hover:bg-app-bg'}`}
           >
-            <Upload size={24} className="text-app-muted" />
-            <p className="text-[13px] font-medium text-app-text">Klik untuk pilih file (bisa banyak)</p>
+            <Upload size={24} className={dragOver ? 'text-blue-500' : 'text-app-muted'} />
+            <p className="text-[13px] font-medium text-app-text">
+              {dragOver ? 'Lepaskan file di sini' : 'Klik atau drag & drop file (bisa banyak)'}
+            </p>
             <p className="text-[11px] text-app-muted">Format: PDF, DWG, DXF — maks 10MB/file (PDF dikompres otomatis)</p>
           </div>
           <input

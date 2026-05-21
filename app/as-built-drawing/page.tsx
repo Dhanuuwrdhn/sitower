@@ -93,8 +93,24 @@ function TambahModal({
   const [form, setForm] = useState(BLANK_FORM)
   const [files, setFiles] = useState<File[]>([])
   const [saving, setSaving] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }))
+
+  function ingestFiles(list: File[]) {
+    const allowed = ['pdf', 'dwg', 'dxf']
+    const validFmt = list.filter((f) => allowed.includes((f.name.split('.').pop() ?? '').toLowerCase()))
+    const skipped = list.length - validFmt.length
+    if (skipped > 0) toast.error(`${skipped} file dilewati (format tidak didukung)`)
+    const accepted: File[] = []
+    const rejected: string[] = []
+    for (const f of validFmt) {
+      if (f.size > MAX_FILE_SIZE_BYTES) rejected.push(f.name)
+      else accepted.push(f)
+    }
+    if (rejected.length) toast.error(`${rejected.length} file melebihi 10MB: ${rejected.join(', ')}`)
+    if (accepted.length) setFiles((prev) => [...prev, ...accepted])
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -166,13 +182,26 @@ function TambahModal({
             </label>
             <div
               onClick={() => fileRef.current?.click()}
-              className="border-2 border-dashed border-app-border rounded-xl py-6 flex flex-col items-center gap-1.5 cursor-pointer hover:border-blue-300 hover:bg-app-bg transition-colors"
+              onDragEnter={(e) => { e.preventDefault(); setDragOver(true) }}
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+              onDragLeave={(e) => {
+                if (e.currentTarget.contains(e.relatedTarget as Node)) return
+                setDragOver(false)
+              }}
+              onDrop={(e) => {
+                e.preventDefault()
+                setDragOver(false)
+                ingestFiles(Array.from(e.dataTransfer.files ?? []))
+              }}
+              className={`border-2 border-dashed rounded-xl py-6 flex flex-col items-center gap-1.5 cursor-pointer transition-colors ${dragOver ? 'border-blue-500 bg-blue-50' : 'border-app-border hover:border-blue-300 hover:bg-app-bg'}`}
             >
-              <Upload size={20} className="text-app-muted" />
+              <Upload size={20} className={dragOver ? 'text-blue-500' : 'text-app-muted'} />
               <p className="text-[13px] text-app-muted">
-                {files.length ? `${files.length} file dipilih` : 'Klik untuk upload PDF/DWG/DXF (bisa pilih banyak)'}
+                {dragOver
+                  ? 'Lepaskan file di sini'
+                  : files.length ? `${files.length} file dipilih` : 'Klik atau drag & drop PDF/DWG/DXF (bisa banyak)'}
               </p>
-              {!files.length && (
+              {!files.length && !dragOver && (
                 <p className="text-[11px] text-app-muted">Maks 10MB/file — PDF dikompres otomatis</p>
               )}
             </div>
@@ -183,15 +212,7 @@ function TambahModal({
               accept=".pdf,.dwg,.dxf"
               className="hidden"
               onChange={(e) => {
-                const list = Array.from(e.target.files ?? [])
-                const accepted: File[] = []
-                const rejected: string[] = []
-                for (const f of list) {
-                  if (f.size > MAX_FILE_SIZE_BYTES) rejected.push(f.name)
-                  else accepted.push(f)
-                }
-                if (rejected.length) toast.error(`${rejected.length} file melebihi 10MB: ${rejected.join(', ')}`)
-                if (accepted.length) setFiles((prev) => [...prev, ...accepted])
+                ingestFiles(Array.from(e.target.files ?? []))
                 if (fileRef.current) fileRef.current.value = ''
               }}
             />

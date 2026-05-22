@@ -182,6 +182,15 @@ export default function AsBuiltDrawingFolderPage() {
   const [loading, setLoading]     = useState(true)
   const [search, setSearch]       = useState('')
   const [viewMode, setViewMode]   = useState<'grid' | 'list'>('grid')
+
+  // Default to list view on mobile; keep grid on desktop. Once the user toggles
+  // manually, leave their choice alone for the rest of the session.
+  const userTouchedView = useRef(false)
+  useEffect(() => {
+    if (userTouchedView.current) return
+    if (typeof window === 'undefined') return
+    setViewMode(window.matchMedia('(max-width: 767px)').matches ? 'list' : 'grid')
+  }, [])
   const [uploadOpen, setUploadOpen] = useState(false)
   const [subfolderOpen, setSubfolderOpen] = useState(false)
   const [preview, setPreview]     = useState<any | null>(null)
@@ -276,30 +285,30 @@ export default function AsBuiltDrawingFolderPage() {
 
         <div className="flex items-center bg-gray-100 rounded-xl p-1">
           <button
-            onClick={() => setViewMode('grid')}
+            onClick={() => { userTouchedView.current = true; setViewMode('grid') }}
             title="Grid view"
             className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm text-app-text' : 'text-app-muted hover:text-app-text'}`}
           ><LayoutGrid size={15} /></button>
           <button
-            onClick={() => setViewMode('list')}
+            onClick={() => { userTouchedView.current = true; setViewMode('list') }}
             title="List view"
             className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm text-app-text' : 'text-app-muted hover:text-app-text'}`}
           ><List size={15} /></button>
         </div>
 
         {adminUser && (
-          <button className="btn-outline shrink-0" onClick={() => setSubfolderOpen(true)}>
-            <Plus size={16} /> Subfolder
+          <button className="btn-outline shrink-0" onClick={() => setSubfolderOpen(true)} title="Buat subfolder">
+            <Plus size={16} /> <span className="hidden md:inline">Subfolder</span>
           </button>
         )}
         {canUpload && (
-          <button className="btn-primary shrink-0" onClick={() => setUploadOpen(true)}>
-            <Plus size={16} /> Upload Dokumen
+          <button className="btn-primary shrink-0" onClick={() => setUploadOpen(true)} title="Upload dokumen">
+            <Plus size={16} /> <span className="hidden md:inline">Upload Dokumen</span>
           </button>
         )}
       </div>
 
-      {/* Breadcrumb */}
+      {/* Breadcrumb — collapses to "Beranda > … > parent > current" once chain is long */}
       <div className="flex items-center gap-1.5 text-[13px] mb-5 flex-wrap">
         <button
           onClick={() => router.push('/as-built-drawing')}
@@ -307,19 +316,38 @@ export default function AsBuiltDrawingFolderPage() {
         >
           Beranda
         </button>
-        {breadcrumb.map((c, idx) => (
-          <span key={c.id} className="flex items-center gap-1.5">
-            <ChevronRight size={14} className="text-app-muted" />
-            {idx < breadcrumb.length - 1 ? (
-              <button
-                onClick={() => router.push(`/as-built-drawing/${c.id}`)}
-                className="text-app-muted hover:text-blue-600 transition-colors"
-              >{c.nama}</button>
-            ) : (
-              <span className="font-medium text-app-text">{c.nama}</span>
-            )}
-          </span>
-        ))}
+        {(() => {
+          // Show first crumb, then collapse middle into "…", then last 2 (parent + current).
+          const COLLAPSE_AFTER = 4
+          const showCollapsed = breadcrumb.length > COLLAPSE_AFTER
+          const visible = showCollapsed
+            ? [
+                { ...breadcrumb[0], _kind: 'crumb' as const },
+                { id: '__ellipsis__', nama: '…', _kind: 'ellipsis' as const },
+                ...breadcrumb.slice(-2).map((c) => ({ ...c, _kind: 'crumb' as const })),
+              ]
+            : breadcrumb.map((c) => ({ ...c, _kind: 'crumb' as const }))
+
+          return visible.map((c, idx) => {
+            const isLast = idx === visible.length - 1
+            return (
+              <span key={`${c._kind}-${c.id}-${idx}`} className="flex items-center gap-1.5 min-w-0">
+                <ChevronRight size={14} className="text-app-muted shrink-0" />
+                {c._kind === 'ellipsis' ? (
+                  <span className="text-app-muted">…</span>
+                ) : isLast ? (
+                  <span className="font-medium text-app-text truncate max-w-[180px] md:max-w-none" title={c.nama}>{c.nama}</span>
+                ) : (
+                  <button
+                    onClick={() => router.push(`/as-built-drawing/${c.id}`)}
+                    className="text-app-muted hover:text-blue-600 transition-colors truncate max-w-[140px] md:max-w-none"
+                    title={c.nama}
+                  >{c.nama}</button>
+                )}
+              </span>
+            )
+          })
+        })()}
       </div>
 
       {/* Folder meta */}

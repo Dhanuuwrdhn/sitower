@@ -45,7 +45,11 @@ export function SearchableSelect({
   return (
     <div className="flex flex-col gap-1.5" ref={ref}>
       <div className="flex items-center justify-between">
-        <span className="font-bold text-[14px] text-[#1C1C1C]">{label}</span>
+        <span className="font-bold text-[14px] text-[#1C1C1C]">
+          {label.endsWith(' *') ? (
+            <>{label.slice(0, -2)} <span className="text-red-500">*</span></>
+          ) : label}
+        </span>
         {values.length > 0 && (
           <button type="button" onClick={(e) => { e.stopPropagation(); onClear() }} className="text-[11px] text-[#D92D20] font-semibold hover:underline">
             Reset

@@ -27,9 +27,7 @@ function fmtDate(iso: string | undefined) {
   const dd = String(d.getDate()).padStart(2, '0')
   const mm = String(d.getMonth() + 1).padStart(2, '0')
   const yyyy = d.getFullYear()
-  const hh = String(d.getHours()).padStart(2, '0')
-  const mi = String(d.getMinutes()).padStart(2, '0')
-  return `${dd}/${mm}/${yyyy} ${hh}:${mi}`
+  return `${dd}/${mm}/${yyyy}`
 }
 
 // ── Form drawer ───────────────────────────────────────────────────────────────
@@ -135,13 +133,12 @@ function CUIDrawer({
           </div>
           <div>
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">
-              Tanggal & Jam <span className="text-red-500">*</span>
+              Tanggal <span className="text-red-500">*</span>
             </label>
             <DatePicker
               value={form.tanggal}
               onChange={(v) => set('tanggal', v)}
-              placeholder="Pilih tanggal & jam"
-              withTime
+              placeholder="Pilih tanggal"
             />
           </div>
           <div>

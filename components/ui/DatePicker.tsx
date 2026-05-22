@@ -110,7 +110,9 @@ export function DatePicker({
     return out
   }, [dispY, dispM])
 
-  const selectedIso = value || ''
+  // Normalize to YYYY-MM-DD so day-cell highlight works even when `value`
+  // is a full ISO string (e.g. from withTime mode or pre-existing records).
+  const selectedIso = (value || '').slice(0, 10)
   const todayIso = toIso(today.getFullYear(), today.getMonth() + 1, today.getDate())
 
   function inRange(iso: string) {

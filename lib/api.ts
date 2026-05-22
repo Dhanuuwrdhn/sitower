@@ -195,6 +195,8 @@ export const asBuiltApi = {
     })
   },
   deleteDokumen: (id: string) => api.delete(`/as-built-drawing/dokumen/${id}`),
+  bulkDelete: (folderIds: string[], dokumenIds: string[]) =>
+    api.post('/as-built-drawing/bulk-delete', { folderIds, dokumenIds }),
   previewDokumen: async (id: string): Promise<string> => {
     const token = Cookies.get('sitower_token')
     const base  = process.env.NEXT_PUBLIC_API_URL ?? ''

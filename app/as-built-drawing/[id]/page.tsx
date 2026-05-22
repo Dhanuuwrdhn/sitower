@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { Plus, Upload, X, ChevronRight, Search, LayoutGrid, List } from 'lucide-react'
+import { Plus, Upload, X, ChevronRight, Search, LayoutGrid, List, CheckSquare } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { asBuiltApi } from '@/lib/api'
 import { isAdminOrSuperadmin, isTeknisi } from '@/lib/auth'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { compressFiles, MAX_FILE_SIZE_BYTES } from '@/lib/compressFile'
 import {
-  FolderCard, FileCard, ListRow, PreviewModal, FilePreviewRow,
+  FolderCard, FileCard, ListRow, PreviewModal, FilePreviewRow, SelectionActionBar,
   fileExt, fmtDate,
 } from '../_shared'
 
@@ -201,6 +201,13 @@ export default function AsBuiltDrawingFolderPage() {
   const [adminUser, setAdminUser] = useState(false)
   const [canUpload, setCanUpload] = useState(false)
 
+  // ── Multi-select (bulk delete) ──
+  const [selectMode, setSelectMode] = useState(false)
+  const [selFolders, setSelFolders] = useState<Set<string>>(new Set())
+  const [selDokumens, setSelDokumens] = useState<Set<string>>(new Set())
+  const [bulkConfirm, setBulkConfirm] = useState(false)
+  const [bulkDeleting, setBulkDeleting] = useState(false)
+
   useEffect(() => {
     setAdminUser(isAdminOrSuperadmin())
     setCanUpload(isAdminOrSuperadmin() || isTeknisi())
@@ -266,6 +273,62 @@ export default function AsBuiltDrawingFolderPage() {
 
   const isEmpty = filteredChildren.length === 0 && filteredDokumen.length === 0
 
+  function exitSelectMode() {
+    setSelectMode(false)
+    setSelFolders(new Set())
+    setSelDokumens(new Set())
+  }
+  function toggleFolderSel(fid: string) {
+    setSelFolders((cur) => {
+      const next = new Set(cur)
+      next.has(fid) ? next.delete(fid) : next.add(fid)
+      return next
+    })
+  }
+  function toggleDokumenSel(did: string) {
+    setSelDokumens((cur) => {
+      const next = new Set(cur)
+      next.has(did) ? next.delete(did) : next.add(did)
+      return next
+    })
+  }
+
+  const totalAvailable = filteredChildren.length + filteredDokumen.length
+  const allSelected =
+    totalAvailable > 0 &&
+    filteredChildren.every((c) => selFolders.has(c.id)) &&
+    filteredDokumen.every((d) => selDokumens.has(d.id))
+
+  function toggleAll() {
+    if (allSelected) {
+      setSelFolders(new Set())
+      setSelDokumens(new Set())
+    } else {
+      setSelFolders(new Set(filteredChildren.map((c) => c.id)))
+      setSelDokumens(new Set(filteredDokumen.map((d) => d.id)))
+    }
+  }
+
+  async function confirmBulkDelete() {
+    const folderIds = Array.from(selFolders)
+    const dokumenIds = Array.from(selDokumens)
+    if (!folderIds.length && !dokumenIds.length) { setBulkConfirm(false); return }
+    setBulkDeleting(true)
+    try {
+      const res = await asBuiltApi.bulkDelete(folderIds, dokumenIds)
+      const f = res.data?.deletedFolders ?? folderIds.length
+      const d = res.data?.deletedDokumens ?? dokumenIds.length
+      toast.success(`${f} folder + ${d} file dihapus`)
+      setBulkConfirm(false)
+      exitSelectMode()
+      fetchData()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'Gagal menghapus item terpilih')
+    } finally {
+      setBulkDeleting(false)
+    }
+  }
+
   return (
     <>
       <h1 className="text-[20px] font-bold text-app-text mb-5">As Built Drawing</h1>
@@ -296,17 +359,34 @@ export default function AsBuiltDrawingFolderPage() {
           ><List size={15} /></button>
         </div>
 
-        {adminUser && (
+        {adminUser && !selectMode && totalAvailable > 0 && (
+          <button className="btn-outline shrink-0" onClick={() => setSelectMode(true)} title="Pilih untuk hapus banyak">
+            <CheckSquare size={16} /> <span className="hidden md:inline">Pilih</span>
+          </button>
+        )}
+        {adminUser && !selectMode && (
           <button className="btn-outline shrink-0" onClick={() => setSubfolderOpen(true)} title="Buat subfolder">
             <Plus size={16} /> <span className="hidden md:inline">Subfolder</span>
           </button>
         )}
-        {canUpload && (
+        {canUpload && !selectMode && (
           <button className="btn-primary shrink-0" onClick={() => setUploadOpen(true)} title="Upload dokumen">
             <Plus size={16} /> <span className="hidden md:inline">Upload Dokumen</span>
           </button>
         )}
       </div>
+
+      {selectMode && (
+        <SelectionActionBar
+          folderCount={selFolders.size}
+          dokumenCount={selDokumens.size}
+          totalAvailable={totalAvailable}
+          allSelected={allSelected}
+          onToggleAll={toggleAll}
+          onDelete={() => setBulkConfirm(true)}
+          onCancel={exitSelectMode}
+        />
+      )}
 
       {/* Breadcrumb — collapses to "Beranda > … > parent > current" once chain is long */}
       <div className="flex items-center gap-1.5 text-[13px] mb-5 flex-wrap">
@@ -386,6 +466,9 @@ export default function AsBuiltDrawingFolderPage() {
               isAdminUser={adminUser}
               onClick={() => router.push(`/as-built-drawing/${c.id}`)}
               onDelete={() => setDeleteFolderId(c.id)}
+              selectable={selectMode}
+              selected={selFolders.has(c.id)}
+              onToggleSelect={() => toggleFolderSel(c.id)}
             />
           ))}
           {filteredDokumen.map((d) => (
@@ -395,6 +478,9 @@ export default function AsBuiltDrawingFolderPage() {
               showAdmin={adminUser}
               onClick={() => setPreview(d)}
               onDelete={setDeleteDokumenId}
+              selectable={selectMode}
+              selected={selDokumens.has(d.id)}
+              onToggleSelect={() => toggleDokumenSel(d.id)}
             />
           ))}
         </div>
@@ -418,6 +504,9 @@ export default function AsBuiltDrawingFolderPage() {
                 isAdminUser={adminUser}
                 onClick={() => router.push(`/as-built-drawing/${c.id}`)}
                 onDelete={adminUser ? () => setDeleteFolderId(c.id) : undefined}
+                selectable={selectMode}
+                selected={selFolders.has(c.id)}
+                onToggleSelect={() => toggleFolderSel(c.id)}
               />
             )
           })}
@@ -436,6 +525,9 @@ export default function AsBuiltDrawingFolderPage() {
                 isAdminUser={adminUser}
                 onClick={() => setPreview(d)}
                 onDelete={adminUser ? () => setDeleteDokumenId(d.id) : undefined}
+                selectable={selectMode}
+                selected={selDokumens.has(d.id)}
+                onToggleSelect={() => toggleDokumenSel(d.id)}
               />
             )
           })}
@@ -464,6 +556,15 @@ export default function AsBuiltDrawingFolderPage() {
         onCancel={() => setDeleteDokumenId(null)}
         loading={deleting}
         confirmLabel="Ya, Hapus"
+      />
+      <ConfirmModal
+        isOpen={bulkConfirm}
+        title="Hapus item terpilih?"
+        message={`Akan dihapus: ${selFolders.size} folder${selFolders.size > 0 ? ' (beserta isinya)' : ''} + ${selDokumens.size} file. Tindakan tidak dapat dibatalkan.`}
+        onConfirm={confirmBulkDelete}
+        onCancel={() => setBulkConfirm(false)}
+        loading={bulkDeleting}
+        confirmLabel="Ya, Hapus Semua"
       />
     </>
   )

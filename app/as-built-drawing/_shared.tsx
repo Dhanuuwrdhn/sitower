@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { FileText, X, Download, FolderOpen, Image as ImageIcon } from 'lucide-react'
+import { FileText, X, Download, FolderOpen, Image as ImageIcon, Check, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { asBuiltApi } from '@/lib/api'
 import { ActionMenu } from '@/components/ui/ActionMenu'
@@ -55,8 +55,12 @@ export function FilePreviewRow({ file, onRemove }: { file: File; onRemove: () =>
 
 // ── folder card (grid view) ──────────────────────────────────────────────────
 
-export function FolderCard({ row, isAdminUser, onClick, onDelete }: {
+export function FolderCard({
+  row, isAdminUser, onClick, onDelete,
+  selectable = false, selected = false, onToggleSelect,
+}: {
   row: any; isAdminUser: boolean; onClick: () => void; onDelete: () => void
+  selectable?: boolean; selected?: boolean; onToggleSelect?: () => void
 }) {
   const label = row.nama ?? row.namaFile ?? '—'
   const fileCount = row._count?.dokumen ?? 0
@@ -70,15 +74,19 @@ export function FolderCard({ row, isAdminUser, onClick, onDelete }: {
     row.createdBy?.nama ? `oleh ${row.createdBy.nama}` : null,
   ].filter(Boolean).join(' · ')
 
+  const handleClick = selectable ? onToggleSelect : onClick
+  const ringCls = selectable && selected ? 'ring-2 ring-[#076c9e] ring-offset-1' : ''
+
   return (
-    <div className="sert-folder-card" onClick={onClick}>
+    <div className={`sert-folder-card relative ${ringCls}`} onClick={handleClick}>
+      {selectable && <SelectCheckbox checked={selected} />}
       <div className="sert-folder-head">
         <FolderOpen size={32} color="#ffffff" strokeWidth={1.5} />
       </div>
       <div className="sert-folder-body">
         <div className="sert-folder-row">
           <p className="sert-folder-name">{label}</p>
-          {isAdminUser && (
+          {!selectable && isAdminUser && (
             <div onClick={(e) => e.stopPropagation()}>
               <ActionMenu items={[{
                 label: 'Hapus',
@@ -97,9 +105,13 @@ export function FolderCard({ row, isAdminUser, onClick, onDelete }: {
 
 // ── file card (grid view) ────────────────────────────────────────────────────
 
-export function FileCard({ doc, showAdmin, onClick, onDelete }: {
+export function FileCard({
+  doc, showAdmin, onClick, onDelete,
+  selectable = false, selected = false, onToggleSelect,
+}: {
   doc: any; showAdmin: boolean
   onClick: () => void; onDelete: (id: string) => void
+  selectable?: boolean; selected?: boolean; onToggleSelect?: () => void
 }) {
   const isImage = isImageName(doc.namaFile ?? '')
   const [thumb, setThumb] = useState<string | null>(null)
@@ -112,8 +124,12 @@ export function FileCard({ doc, showAdmin, onClick, onDelete }: {
     return () => { if (url) URL.revokeObjectURL(url) }
   }, [doc.id, isImage])
 
+  const handleClick = selectable ? onToggleSelect : onClick
+  const ringCls = selectable && selected ? 'ring-2 ring-[#076c9e] ring-offset-1' : ''
+
   return (
-    <div className="sert-file-card" onClick={onClick}>
+    <div className={`sert-file-card relative ${ringCls}`} onClick={handleClick}>
+      {selectable && <SelectCheckbox checked={selected} />}
       <div className="sert-file-head" style={isImage && thumb ? { padding: 0, overflow: 'hidden' } : undefined}>
         {isImage && thumb
           ? <img src={thumb} alt={doc.namaFile} className="w-full h-full object-cover" />
@@ -124,7 +140,7 @@ export function FileCard({ doc, showAdmin, onClick, onDelete }: {
       <div className="sert-folder-body">
         <div className="sert-folder-row">
           <p className="sert-folder-name" style={{ fontSize: 13 }}>{doc.namaFile}</p>
-          {showAdmin && (
+          {!selectable && showAdmin && (
             <div onClick={(e) => e.stopPropagation()}>
               <ActionMenu items={[{
                 label: 'Hapus Dokumen',
@@ -152,17 +168,26 @@ export function FileCard({ doc, showAdmin, onClick, onDelete }: {
  */
 export function ListRow({
   kind, label, meta, isAdminUser, onClick, onDelete, fileExtForIcon,
+  selectable = false, selected = false, onToggleSelect,
 }: {
   kind: 'folder' | 'file'; label: string; meta: string
   isAdminUser: boolean; onClick: () => void; onDelete?: () => void
   fileExtForIcon?: string
+  selectable?: boolean; selected?: boolean; onToggleSelect?: () => void
 }) {
   const isImage = kind === 'file' && fileExtForIcon && IMAGE_EXTS.includes(fileExtForIcon)
+  const handleClick = selectable ? onToggleSelect : onClick
+  const selectedCls = selectable && selected ? 'border-[#076c9e] bg-[#F0F9FF]' : 'border-app-border'
   return (
     <div
-      className="flex items-center gap-3 px-3 py-2.5 bg-white border border-app-border rounded-lg hover:bg-app-bg cursor-pointer transition-colors"
-      onClick={onClick}
+      className={`flex items-center gap-3 px-3 py-2.5 bg-white border rounded-lg hover:bg-app-bg cursor-pointer transition-colors ${selectedCls}`}
+      onClick={handleClick}
     >
+      {selectable && (
+        <div className="shrink-0">
+          <SelectCheckbox checked={selected} inline />
+        </div>
+      )}
       <div className={`w-9 h-9 rounded-md flex items-center justify-center shrink-0 ${kind === 'folder' ? 'bg-[#076C9E]' : 'bg-[#5F737F]'}`}>
         {kind === 'folder'
           ? <FolderOpen size={18} color="#fff" strokeWidth={1.7} />
@@ -174,7 +199,7 @@ export function ListRow({
         <p className="text-[13px] font-semibold text-app-text truncate" title={label}>{label}</p>
         {meta && <p className="text-[11px] text-app-muted truncate">{meta}</p>}
       </div>
-      {isAdminUser && onDelete && (
+      {!selectable && isAdminUser && onDelete && (
         <div onClick={(e) => e.stopPropagation()} className="shrink-0">
           <ActionMenu items={[{
             label: 'Hapus',
@@ -184,6 +209,67 @@ export function ListRow({
           }]} />
         </div>
       )}
+    </div>
+  )
+}
+
+// ── selection primitives ─────────────────────────────────────────────────────
+
+function SelectCheckbox({ checked, inline = false }: { checked: boolean; inline?: boolean }) {
+  const positionCls = inline ? '' : 'absolute top-2 left-2 z-10'
+  const bgCls = checked ? 'bg-[#076c9e] border-[#076c9e]' : 'bg-white/95 border-app-border'
+  return (
+    <div
+      className={`${positionCls} w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${bgCls}`}
+      aria-checked={checked}
+      role="checkbox"
+    >
+      {checked && <Check size={14} color="#fff" strokeWidth={3} />}
+    </div>
+  )
+}
+
+export function SelectionActionBar({
+  folderCount, dokumenCount, totalAvailable, allSelected,
+  onToggleAll, onDelete, onCancel,
+}: {
+  folderCount: number; dokumenCount: number; totalAvailable: number; allSelected: boolean
+  onToggleAll: () => void; onDelete: () => void; onCancel: () => void
+}) {
+  const selectedTotal = folderCount + dokumenCount
+  const parts = [
+    folderCount > 0 ? `${folderCount} folder` : null,
+    dokumenCount > 0 ? `${dokumenCount} file` : null,
+  ].filter(Boolean).join(' + ')
+  const summary = selectedTotal === 0 ? `Pilih item (0 dari ${totalAvailable})` : `${parts} terpilih`
+
+  return (
+    <div className="sticky top-0 z-30 flex flex-wrap items-center gap-3 px-3 py-2.5 mb-3 bg-[#F0F9FF] border border-[#076c9e]/30 rounded-lg shadow-sm">
+      <button
+        type="button"
+        onClick={onToggleAll}
+        className="flex items-center gap-2 text-[13px] font-semibold text-app-text hover:opacity-80"
+      >
+        <SelectCheckbox checked={allSelected && totalAvailable > 0} inline />
+        <span>Pilih semua</span>
+      </button>
+      <span className="text-[12px] text-app-muted flex-1 min-w-0 truncate">{summary}</span>
+      <button
+        type="button"
+        onClick={onDelete}
+        disabled={selectedTotal === 0}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold text-white bg-[#D92D20] hover:bg-[#B42318] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        <Trash2 size={14} />
+        <span className="hidden md:inline">Hapus</span>
+      </button>
+      <button
+        type="button"
+        onClick={onCancel}
+        className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-app-text border border-app-border hover:bg-white transition-colors"
+      >
+        Batal
+      </button>
     </div>
   )
 }

@@ -19,6 +19,7 @@ import { resolveMediaUrl } from '@/lib/utils'
 import { useSidebar } from '@/components/layout/SidebarContext'
 import CalendarPickerSheet from '@/components/ui/CalendarPickerSheet'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { StyledSelect } from '@/components/ui/StyledSelect'
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -3257,17 +3258,13 @@ function LaporanDrawer({
               <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
             </button>
           ) : (
-            <select
+            <StyledSelect
               disabled={readOnly}
               value={form.jenisGangguan}
-              onChange={(e) => set('jenisGangguan', e.target.value)}
-              className="form-input truncate pr-8"
-            >
-              <option value="">Pilih kategori...</option>
-              {JENIS_OPTIONS.filter(o => o.value).map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
+              onChange={(v) => set('jenisGangguan', v)}
+              placeholder="Pilih kategori..."
+              options={JENIS_OPTIONS.filter(o => o.value)}
+            />
           )}
         </div>
 
@@ -3289,17 +3286,13 @@ function LaporanDrawer({
               <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
             </button>
           ) : (
-            <select
+            <StyledSelect
               disabled={readOnly}
               value={form.levelRisiko}
-              onChange={(e) => set('levelRisiko', e.target.value)}
-              className={`form-input truncate pr-8 ${readOnly ? 'bg-app-bg text-app-muted' : ''}`}
-            >
-              <option value="">Pilih status...</option>
-              {LEVEL_OPTIONS.map(l => (
-                <option key={l.value} value={l.value}>{l.label}</option>
-              ))}
-            </select>
+              onChange={(v) => set('levelRisiko', v)}
+              placeholder="Pilih status..."
+              options={LEVEL_OPTIONS}
+            />
           )}
           {submitErrors.levelRisiko && (
             <p className="mt-2 text-[12px] font-medium text-[#EF4444]">{submitErrors.levelRisiko}</p>
@@ -3422,15 +3415,15 @@ function LaporanDrawer({
                 <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
               </button>
             ) : (
-              <select
+              <StyledSelect
                 value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(form.progresLaporan) ? 'tidak_ada_aktifitas' : form.progresLaporan}
-                onChange={(e) => set('progresLaporan', e.target.value)}
-                className="form-input"
-              >
-                <option value="sedang_berlangsung">Sedang Berlangsung</option>
-                <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
-                <option value="selesai">Selesai</option>
-              </select>
+                onChange={(v) => set('progresLaporan', v)}
+                options={[
+                  { value: 'sedang_berlangsung', label: 'Sedang Berlangsung' },
+                  { value: 'tidak_ada_aktifitas', label: 'Tidak Ada Aktivitas' },
+                  { value: 'selesai', label: 'Selesai' },
+                ]}
+              />
             )}
           </div>
         </>

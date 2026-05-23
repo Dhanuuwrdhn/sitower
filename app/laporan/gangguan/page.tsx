@@ -1894,11 +1894,12 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                 <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
               </button>
             ) : (
-              <select className="form-input" value={riwayatForm.statusKerawanan} onChange={e => setRiwayatForm(f => ({ ...f, statusKerawanan: e.target.value }))}>
-                <option value="aman">Aman</option>
-                <option value="sedang">Sedang</option>
-                <option value="kritis">Kritis</option>
-              </select>
+              <StyledSelect
+                value={riwayatForm.statusKerawanan}
+                onChange={(v) => setRiwayatForm(f => ({ ...f, statusKerawanan: v }))}
+                placeholder="Pilih status..."
+                options={LEVEL_OPTIONS}
+              />
             )}
           </div>
 
@@ -2007,15 +2008,15 @@ function DetailReadView({ laporan, onSaved, onClose, onDelete, autoOpenUpdate }:
                   <ChevronDown size={14} style={{ color: '#5F737F', flexShrink: 0 }} />
                 </button>
               ) : (
-                <select
-                  className="form-input"
+                <StyledSelect
                   value={['tidak_ada_aktifitas', 'tidak_ada_aktivitas'].includes(riwayatForm.progresLaporan) ? 'tidak_ada_aktifitas' : riwayatForm.progresLaporan}
-                  onChange={e => setRiwayatForm(f => ({ ...f, progresLaporan: e.target.value }))}
-                >
-                  <option value="sedang_berlangsung">Sedang Berlangsung</option>
-                  <option value="tidak_ada_aktifitas">Tidak Ada Aktivitas</option>
-                  <option value="selesai">Selesai</option>
-                </select>
+                  onChange={(v) => setRiwayatForm(f => ({ ...f, progresLaporan: v }))}
+                  options={[
+                    { value: 'sedang_berlangsung', label: 'Sedang Berlangsung' },
+                    { value: 'tidak_ada_aktifitas', label: 'Tidak Ada Aktivitas' },
+                    { value: 'selesai', label: 'Selesai' },
+                  ]}
+                />
               )}
             </div>
           </div>

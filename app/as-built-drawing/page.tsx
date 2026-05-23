@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { Plus, Upload, X, SlidersHorizontal, Search, CheckSquare } from 'lucide-react'
+import { Plus, Upload, X, SlidersHorizontal, Search, CheckSquare, ChevronDown, Check, LayoutGrid, List } from 'lucide-react'
 import { asBuiltApi, towersApi } from '@/lib/api'
 import { isAdminOrSuperadmin, isTeknisi } from '@/lib/auth'
 import { Pagination } from '@/components/ui/Pagination'
@@ -11,11 +11,56 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { SearchableSelect } from '@/components/ui/SearchableSelect'
 import { compressFiles, MAX_FILE_SIZE_BYTES } from '@/lib/compressFile'
 import {
-  FolderCard, FileCard, PreviewModal, FilePreviewRow, SelectionActionBar,
+  FolderCard, FileCard, ListRow, PreviewModal, FilePreviewRow, SelectionActionBar,
+  fmtDate, fileExt,
 } from './_shared'
 
 const _cy = new Date().getFullYear()
 const YEAR_OPTIONS = Array.from({ length: _cy - 2009 }, (_, i) => String(_cy - i))
+
+// ── Year picker (styled single-select dropdown) ──────────────────────────────
+
+function YearSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    function handle(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
+  }, [])
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full min-h-[44px] px-3 py-2 border border-[#E1E8EC] rounded-lg bg-white flex items-center justify-between text-left transition-all hover:border-[#076C9E]"
+      >
+        <span className="text-[14px] font-medium text-[#1C1C1C]">{value}</span>
+        <ChevronDown size={16} className={`text-[#5F737F] transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="absolute z-30 mt-1 w-full bg-white border border-[#E1E8EC] rounded-xl shadow-lg overflow-y-auto max-h-[240px] py-1">
+          {YEAR_OPTIONS.map((y) => {
+            const active = y === value
+            return (
+              <button
+                key={y}
+                type="button"
+                onClick={() => { onChange(y); setOpen(false) }}
+                className={`w-full text-left px-4 py-2.5 flex items-center justify-between transition-colors ${active ? 'bg-[#F0F9FF]' : 'hover:bg-[#F6F9FC]'}`}
+              >
+                <span className={`text-[13px] font-medium ${active ? 'text-[#076C9E]' : 'text-[#1C1C1C]'}`}>{y}</span>
+                {active && <Check size={15} className="text-[#076C9E]" />}
+              </button>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
 
 // ── Folder skeleton ──────────────────────────────────────────────────────────
 
@@ -87,9 +132,7 @@ function TambahFolderModal({ open, onClose, onSaved, towerOptions }: {
           </div>
           <div>
             <label className="block text-[12px] font-semibold text-app-text mb-1.5">Tahun</label>
-            <select value={form.tahun} onChange={(e) => set('tahun', e.target.value)} className="form-input">
-              {YEAR_OPTIONS.map((y) => <option key={y}>{y}</option>)}
-            </select>
+            <YearSelect value={form.tahun} onChange={(v) => set('tahun', v)} />
           </div>
           <div>
             <SearchableSelect
@@ -232,6 +275,7 @@ export default function AsBuiltDrawingPage() {
   const [deleteDokumenId, setDeleteDokumenId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [preview, setPreview] = useState<any | null>(null)
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   // ── Multi-select (bulk delete) ──
   const [selectMode, setSelectMode] = useState(false)
@@ -502,6 +546,19 @@ export default function AsBuiltDrawingPage() {
           </div>
         </div>
 
+        <div className="flex items-center bg-gray-100 rounded-xl p-1 shrink-0">
+          <button
+            onClick={() => setViewMode('grid')}
+            title="Grid view"
+            className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm text-app-text' : 'text-app-muted hover:text-app-text'}`}
+          ><LayoutGrid size={15} /></button>
+          <button
+            onClick={() => setViewMode('list')}
+            title="List view"
+            className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm text-app-text' : 'text-app-muted hover:text-app-text'}`}
+          ><List size={15} /></button>
+        </div>
+
         {isAdminUser && !selectMode && (
           <button
             onClick={() => setSelectMode(true)}
@@ -550,7 +607,7 @@ export default function AsBuiltDrawingPage() {
         <div className="card p-10 text-center text-app-muted text-[13px]">
           Belum ada folder atau dokumen{hasActiveFilter || search ? ' yang sesuai' : ''}.
         </div>
-      ) : (
+      ) : viewMode === 'grid' ? (
         <div className="sert-grid">
           {displayItems.map((item) => item._kind === 'folder' ? (
             <FolderCard
@@ -575,6 +632,54 @@ export default function AsBuiltDrawingPage() {
               onToggleSelect={() => toggleDokumenSel(item.id)}
             />
           ))}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {displayItems.map((item) => {
+            if (item._kind === 'folder') {
+              const fc = item._count?.dokumen ?? 0
+              const cc = item._count?.children ?? 0
+              const meta = [
+                item.tahun ? String(item.tahun) : null,
+                item.tower?.nama ? `Tower ${item.tower.nama}` : null,
+                (fc + cc) > 0 ? `${fc + cc} item` : null,
+                item.createdBy?.nama ? `oleh ${item.createdBy.nama}` : null,
+              ].filter(Boolean).join(' · ')
+              return (
+                <ListRow
+                  key={`folder-${item.id}`}
+                  kind="folder"
+                  label={item.nama ?? '—'}
+                  meta={meta}
+                  isAdminUser={isAdminUser}
+                  onClick={() => router.push(`/as-built-drawing/${item.id}`)}
+                  onDelete={isAdminUser ? () => setDeleteFolderId(item.id) : undefined}
+                  selectable={selectMode}
+                  selected={selFolders.has(item.id)}
+                  onToggleSelect={() => toggleFolderSel(item.id)}
+                />
+              )
+            }
+            const meta = [
+              item.createdBy?.nama ? `oleh ${item.createdBy.nama}` : null,
+              fmtDate(item.createdAt),
+            ].filter(Boolean).join(' · ')
+            return (
+              <ListRow
+                key={`file-${item.id}`}
+                kind="file"
+                label={item.namaFile}
+                meta={meta}
+                fileExtForIcon={fileExt(item.namaFile ?? '')}
+                isAdminUser={isAdminUser}
+                onClick={() => setPreview(item)}
+                onDelete={isAdminUser ? () => setDeleteDokumenId(item.id) : undefined}
+                selectable={selectMode}
+                selected={selDokumens.has(item.id)}
+                onToggleSelect={() => toggleDokumenSel(item.id)}
+              />
+            )
+          })}
         </div>
       )}
 

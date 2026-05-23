@@ -1,6 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { Plus, Upload, X, SlidersHorizontal, Search, CheckSquare, ChevronDown, Check, LayoutGrid, List } from 'lucide-react'
@@ -22,42 +23,96 @@ const YEAR_OPTIONS = Array.from({ length: _cy - 2009 }, (_, i) => String(_cy - i
 
 function YearSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const [mounted, setMounted] = useState(false)
+  const [pos, setPos] = useState<{ left: number; width: number; top?: number; bottom?: number; maxH: number } | null>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => { setMounted(true) }, [])
+
+  const updatePos = () => {
+    const r = triggerRef.current?.getBoundingClientRect()
+    if (!r) return
+    const spaceBelow = window.innerHeight - r.bottom
+    const spaceAbove = r.top
+    const desired = 260
+    const openUp = spaceBelow < desired && spaceAbove > spaceBelow
+    const maxH = Math.max(160, Math.min(desired, (openUp ? spaceAbove : spaceBelow) - 12))
+    setPos({
+      left: r.left,
+      width: r.width,
+      top: openUp ? undefined : r.bottom + 4,
+      bottom: openUp ? window.innerHeight - r.top + 4 : undefined,
+      maxH,
+    })
+  }
+
   useEffect(() => {
     function handle(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      const t = e.target as Node
+      if (triggerRef.current?.contains(t)) return
+      if (panelRef.current?.contains(t)) return
+      setOpen(false)
     }
     document.addEventListener('mousedown', handle)
     return () => document.removeEventListener('mousedown', handle)
   }, [])
+
+  useLayoutEffect(() => {
+    if (!open) return
+    updatePos()
+    const onMove = () => updatePos()
+    window.addEventListener('resize', onMove)
+    window.addEventListener('scroll', onMove, true)
+    return () => {
+      window.removeEventListener('resize', onMove)
+      window.removeEventListener('scroll', onMove, true)
+    }
+  }, [open])
+
+  const panel = open && pos && (
+    <div
+      ref={panelRef}
+      style={{
+        position: 'fixed',
+        left: pos.left,
+        width: pos.width,
+        top: pos.top,
+        bottom: pos.bottom,
+        maxHeight: pos.maxH,
+        zIndex: 60,
+      }}
+      className="bg-white border border-[#E1E8EC] rounded-xl shadow-lg overflow-y-auto py-1"
+    >
+      {YEAR_OPTIONS.map((y) => {
+        const active = y === value
+        return (
+          <button
+            key={y}
+            type="button"
+            onClick={() => { onChange(y); setOpen(false) }}
+            className={`w-full text-left px-4 py-2.5 flex items-center justify-between transition-colors ${active ? 'bg-[#F0F9FF]' : 'hover:bg-[#F6F9FC]'}`}
+          >
+            <span className={`text-[13px] font-medium ${active ? 'text-[#076C9E]' : 'text-[#1C1C1C]'}`}>{y}</span>
+            {active && <Check size={15} className="text-[#076C9E]" />}
+          </button>
+        )
+      })}
+    </div>
+  )
+
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative">
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => { setOpen((v) => !v); requestAnimationFrame(updatePos) }}
         className="w-full min-h-[44px] px-3 py-2 border border-[#E1E8EC] rounded-lg bg-white flex items-center justify-between text-left transition-all hover:border-[#076C9E]"
       >
         <span className="text-[14px] font-medium text-[#1C1C1C]">{value}</span>
         <ChevronDown size={16} className={`text-[#5F737F] transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
-      {open && (
-        <div className="absolute z-30 mt-1 w-full bg-white border border-[#E1E8EC] rounded-xl shadow-lg overflow-y-auto max-h-[240px] py-1">
-          {YEAR_OPTIONS.map((y) => {
-            const active = y === value
-            return (
-              <button
-                key={y}
-                type="button"
-                onClick={() => { onChange(y); setOpen(false) }}
-                className={`w-full text-left px-4 py-2.5 flex items-center justify-between transition-colors ${active ? 'bg-[#F0F9FF]' : 'hover:bg-[#F6F9FC]'}`}
-              >
-                <span className={`text-[13px] font-medium ${active ? 'text-[#076C9E]' : 'text-[#1C1C1C]'}`}>{y}</span>
-                {active && <Check size={15} className="text-[#076C9E]" />}
-              </button>
-            )
-          })}
-        </div>
-      )}
+      {mounted && panel && createPortal(panel, document.body)}
     </div>
   )
 }

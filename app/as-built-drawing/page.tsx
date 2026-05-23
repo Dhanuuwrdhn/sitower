@@ -514,20 +514,15 @@ export default function AsBuiltDrawingPage() {
                 <div className="h-px bg-[#E1E8EC]" />
 
                 <div className="max-h-[450px] overflow-y-auto">
-                  <div className="px-4 py-3 flex flex-col gap-2.5">
-                    <span className="font-bold text-[14px] text-[#1C1C1C]">Tahun</span>
-                    <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                      {YEAR_OPTIONS.map((y) => {
-                        const active = tahunFilter.includes(y)
-                        return (
-                          <button
-                            key={y}
-                            onClick={() => setTahunFilter(active ? tahunFilter.filter((v) => v !== y) : [...tahunFilter, y])}
-                            className={`px-3 py-1 rounded-full border text-[12px] font-medium transition-all ${active ? 'bg-[#076C9E] border-[#076C9E] text-white' : 'border-[#E1E8EC] text-[#5F737F] hover:border-[#076C9E]'}`}
-                          >{y}</button>
-                        )
-                      })}
-                    </div>
+                  <div className="px-4 py-3">
+                    <SearchableSelect
+                      label="Tahun"
+                      placeholder="Pilih tahun..."
+                      options={YEAR_OPTIONS.map((y) => ({ value: y, label: y }))}
+                      values={tahunFilter}
+                      onChange={(vals) => setTahunFilter(vals)}
+                      onClear={() => setTahunFilter([])}
+                    />
                   </div>
                   <div className="h-px bg-[#E1E8EC]" />
                   <div className="px-4 py-3">

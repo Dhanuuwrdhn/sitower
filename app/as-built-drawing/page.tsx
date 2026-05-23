@@ -27,11 +27,15 @@ const YEAR_OPTIONS = Array.from({ length: YEAR_MAX - YEAR_MIN + 1 }, (_, i) => S
 function YearSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [search, setSearch] = useState('')
   const [pos, setPos] = useState<{ left: number; width: number; top?: number; bottom?: number; maxH: number } | null>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => { setMounted(true) }, [])
+  useEffect(() => { if (!open) setSearch('') }, [open])
+
+  const filtered = YEAR_OPTIONS.filter((y) => y.includes(search.trim()))
 
   const updatePos = () => {
     const r = triggerRef.current?.getBoundingClientRect()
@@ -85,22 +89,38 @@ function YearSelect({ value, onChange }: { value: string; onChange: (v: string) 
         maxHeight: pos.maxH,
         zIndex: 60,
       }}
-      className="bg-white border border-[#E1E8EC] rounded-xl shadow-lg overflow-y-auto py-1"
+      className="bg-white border border-[#E1E8EC] rounded-xl shadow-lg overflow-hidden flex flex-col"
     >
-      {YEAR_OPTIONS.map((y) => {
-        const active = y === value
-        return (
-          <button
-            key={y}
-            type="button"
-            onClick={() => { onChange(y); setOpen(false) }}
-            className={`w-full text-left px-4 py-2.5 flex items-center justify-between transition-colors ${active ? 'bg-[#F0F9FF]' : 'hover:bg-[#F6F9FC]'}`}
-          >
-            <span className={`text-[13px] font-medium ${active ? 'text-[#076C9E]' : 'text-[#1C1C1C]'}`}>{y}</span>
-            {active && <Check size={15} className="text-[#076C9E]" />}
-          </button>
-        )
-      })}
+      <div className="p-2 border-b border-[#E1E8EC]">
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-[#F6F9FC] rounded-lg border border-[#E1E8EC]">
+          <Search size={14} className="text-[#5F737F]" />
+          <input
+            autoFocus
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari tahun..."
+            inputMode="numeric"
+            className="bg-transparent border-none outline-none text-[13px] text-[#1C1C1C] w-full"
+          />
+        </div>
+      </div>
+      <div className="overflow-y-auto flex-1 py-1">
+        {filtered.map((y) => {
+          const active = y === value
+          return (
+            <button
+              key={y}
+              type="button"
+              onClick={() => { onChange(y); setOpen(false) }}
+              className={`w-full text-left px-4 py-2.5 flex items-center justify-between transition-colors ${active ? 'bg-[#F0F9FF]' : 'hover:bg-[#F6F9FC]'}`}
+            >
+              <span className={`text-[13px] font-medium ${active ? 'text-[#076C9E]' : 'text-[#1C1C1C]'}`}>{y}</span>
+              {active && <Check size={15} className="text-[#076C9E]" />}
+            </button>
+          )
+        })}
+        {filtered.length === 0 && <p className="text-center py-4 text-[13px] text-[#97AAB3]">Tidak ditemukan</p>}
+      </div>
     </div>
   )
 

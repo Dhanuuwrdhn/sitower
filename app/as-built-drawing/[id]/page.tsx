@@ -359,8 +359,13 @@ export default function AsBuiltDrawingFolderPage() {
           ><List size={15} /></button>
         </div>
 
-        {adminUser && !selectMode && totalAvailable > 0 && (
-          <button className="btn-outline shrink-0" onClick={() => setSelectMode(true)} title="Pilih untuk hapus banyak">
+        {adminUser && !selectMode && (
+          <button
+            className="btn-outline shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => setSelectMode(true)}
+            disabled={totalAvailable === 0}
+            title={totalAvailable === 0 ? 'Folder masih kosong' : 'Pilih untuk hapus banyak'}
+          >
             <CheckSquare size={16} /> <span className="hidden md:inline">Pilih</span>
           </button>
         )}

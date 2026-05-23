@@ -502,8 +502,13 @@ export default function AsBuiltDrawingPage() {
           </div>
         </div>
 
-        {isAdminUser && !selectMode && totalAvailable > 0 && (
-          <button onClick={() => setSelectMode(true)} className="btn-outline shrink-0" title="Pilih untuk hapus banyak">
+        {isAdminUser && !selectMode && (
+          <button
+            onClick={() => setSelectMode(true)}
+            className="btn-outline shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={totalAvailable === 0}
+            title={totalAvailable === 0 ? 'Belum ada folder/file' : 'Pilih untuk hapus banyak'}
+          >
             <CheckSquare size={16} /> <span className="hidden md:inline">Pilih</span>
           </button>
         )}

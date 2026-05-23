@@ -17,7 +17,10 @@ import {
 } from './_shared'
 
 const _cy = new Date().getFullYear()
-const YEAR_OPTIONS = Array.from({ length: _cy - 2009 }, (_, i) => String(_cy - i))
+// Wide range so the year is practically unlimited: current year + 10 down to 1950.
+const YEAR_MAX = _cy + 10
+const YEAR_MIN = 1950
+const YEAR_OPTIONS = Array.from({ length: YEAR_MAX - YEAR_MIN + 1 }, (_, i) => String(YEAR_MAX - i))
 
 // ── Year picker (styled single-select dropdown) ──────────────────────────────
 

@@ -9,7 +9,8 @@ import { laporanApi, towersApi, asetApi, importApi, jalurKmlApi } from '@/lib/ap
 import B2WLoader from '@/components/ui/B2WLoader'
 import { TwIcon } from '@/components/ui/TwIcon'
 
-const TowerMap = dynamic(() => import('@/components/map/TowerMapGoogle'), { ssr: false })
+// Auto-pilih Google Maps (jika ada API key) atau Leaflet (fallback) — lihat TowerMapView
+const TowerMap = dynamic(() => import('@/components/map/TowerMapView'), { ssr: false })
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface Stats {
@@ -487,6 +488,7 @@ export default function DashboardPage() {
           <div className="dash-map-container">
             <TowerMap
               towers={towerKerawanan.length > 0 ? towerKerawanan : undefined}
+              jalurKml={jalurKmlData}
             />
           </div>
         </div>

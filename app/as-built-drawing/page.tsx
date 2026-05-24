@@ -257,7 +257,7 @@ function UploadRootModal({ open, onClose, onSaved }: {
       if (f.size > MAX_FILE_SIZE_BYTES) rejected.push(f.name)
       else accepted.push(f)
     }
-    if (rejected.length) toast.error(`${rejected.length} file melebihi 10MB: ${rejected.join(', ')}`)
+    if (rejected.length) toast.error(`${rejected.length} file melebihi 100MB: ${rejected.join(', ')}`)
     if (accepted.length) setFiles((cur) => [...cur, ...accepted])
   }
 
@@ -302,7 +302,7 @@ function UploadRootModal({ open, onClose, onSaved }: {
             <p className="text-[13px] font-medium text-app-text">
               {dragOver ? 'Lepaskan file di sini' : 'Klik atau drag & drop file (bisa banyak)'}
             </p>
-            <p className="text-[11px] text-app-muted">Semua format file — maks 10MB/file (PDF dikompres otomatis)</p>
+            <p className="text-[11px] text-app-muted">Semua format file — maks 100MB/file (PDF dikompres otomatis)</p>
           </div>
           <input
             ref={fileRef}

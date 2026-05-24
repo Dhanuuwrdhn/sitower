@@ -3,43 +3,29 @@
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import {
-  MapContainer, TileLayer, Marker, Popup,
-  Polyline, CircleMarker, useMapEvents,
+  MapContainer, TileLayer, Marker, Popup, Polyline, CircleMarker,
 } from 'react-leaflet'
-import { useMemo, useState } from 'react'
-import { SlidersHorizontal, X, ChevronDown } from 'lucide-react'
-import {
-  garduInduk, towerSUTET, towerSUTT, towerSKTT,
-  jalurTransmisi, JALUR_COLORS,
-} from '@/lib/geodata'
+import { Fragment, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { SlidersHorizontal, X as XIcon, ChevronRight } from 'lucide-react'
 
-// ─── Detect jalur type dari nama (geodata.ts auto-gen semua sebagai "other") ──
-function detectJalurType(jalur: { name: string; type: string }) {
-  const n = jalur.name.toUpperCase()
-  if (n.includes('SUTET') || n.includes('500KV') || n.includes('JAWA7') || n.includes('GANDUL')) {
-    return 'SUTET_500kV' as const
-  }
-  if (n.includes('SKTT') || n.includes('JOINT SKTT') || n.includes('SPAN SKTT')) {
-    return 'SKTT_150kV' as const
-  }
-  if (n.includes('SUTT') || n.includes('150KV') || n.includes('150 KV') ||
-      ['MUARAKARANG','DURIKOSAMBI','KEMBANGAN','JATAKE','LONTAR','CENGKARENG',
-       'GROGOL','PANTAI INDAH KAPUK','DADAP','TANGERANG','KEBON JERUK',
-       'PETUKANGAN','NEW SENAYAN','ANGKE','GAJAH TUNGGAL','PASAR KEMIS'].some(k => n.includes(k))) {
-    return 'SUTT_150kV' as const
-  }
-  return 'other' as const
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// Leaflet port of TowerMapGoogle — same Props, markers, filters, popup & legend,
+// but rendered with react-leaflet + Esri World Imagery tiles (no Google API key).
+// Keep behavior in sync with components/map/TowerMapGoogle.tsx.
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface KerawananItem {
   kategori: string
-  level: 'kritis' | 'sedang' | 'aman'
+  level: string
   status: string
+  progres?: string
+  laporanId?: string
 }
 
-interface FeaturedTower {
+export interface FeaturedTower {
   id: string
   nama: string
   lat: number
@@ -48,472 +34,711 @@ interface FeaturedTower {
   tegangan?: string
   kerawanan: KerawananItem[]
   updatedAt?: string
+  bersertifikat?: boolean
+  hasCctv?: boolean
+}
+
+export interface JalurKmlItem {
+  id: number
+  nama: string
+  tipe: string   // SUTET | SUTT | SKTT
+  warna: string | null
+  path: Array<{ lat: number; lng: number; isMarker?: boolean }>
 }
 
 interface Props {
   towers?: FeaturedTower[]
   onTowerClick?: (tower: FeaturedTower) => void
+  jalurKml?: JalurKmlItem[]
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// ─── Constants (mirror TowerMapGoogle) ──────────────────────────────────────────
 
-const LEVEL_PRIORITY: Record<string, number> = { kritis: 3, sedang: 2, aman: 1 }
-const RING_COLOR: Record<string, string> = {
-  kritis: '#ef4444',
-  sedang: '#d97706',
-  aman: '#16a34a',
+const CENTER: [number, number] = [-6.18, 106.50]
+
+const LEVEL_PRIORITY: Record<string, number> = {
+  kritis_tidak_terpenuhi: 4, kritis_terpenuhi: 3, kritis: 3, sedang: 2, aman: 1,
 }
-
+const LEVEL_COLOR: Record<string, string> = {
+  kritis_tidak_terpenuhi: '#ef4444', kritis_terpenuhi: '#ef4444',
+  kritis: '#ef4444', sedang: '#f59e0b', aman: '#22c55e', normal: '#3b82f6',
+}
+// Match Figma token colors exactly (same as LEVEL_COLOR)
+const LEVEL_BG: Record<string, string> = {
+  kritis_tidak_terpenuhi: '#EF4444',
+  kritis_terpenuhi:       '#EF4444',
+  kritis:                 '#EF4444',
+  sedang:                 '#F59E0B',
+  aman:                   '#22C55E',
+  normal:                 '#3B82F6',
+}
 const KATEGORI_LABEL: Record<string, string> = {
   pekerjaan_pihak_lain: 'Pekerjaan Pihak Lain',
-  kebakaran: 'Kebakaran',
-  layangan: 'Layangan',
-  pencurian: 'Pencurian',
+  kebakaran:   'Kebakaran',
+  layangan:    'Layangan',
+  pencurian:   'Pencurian',
   pemanfaatan_lahan: 'Pemanfaatan Lahan',
 }
-
-// Mirror Dashboard / TowerMapGoogle KATEGORI_EMOJI for consistency.
 const KATEGORI_EMOJI: Record<string, string> = {
   pekerjaan_pihak_lain: '🚧',
-  kebakaran: '🔥',
-  layangan: '🪁',
-  pencurian: '☠️',
-  pemanfaatan_lahan: '🏡',
+  kebakaran:            '🔥',
+  layangan:             '🪁',
+  pencurian:            '☠️',
+  pemanfaatan_lahan:    '🏡',
+}
+const RISIKO_LABEL: Record<string, string> = {
+  kritis_tidak_terpenuhi: 'Kritis',
+  kritis_terpenuhi:       'Kritis',
+  kritis:                 'Kritis',
+  sedang:                 'Sedang',
+  aman:                   'Aman',
+}
+const PROGRES_LABEL: Record<string, string> = {
+  sedang_berlangsung:  'Sedang Berlangsung',
+  selesai:             'Selesai',
+  tidak_ada_aktifitas: 'Tidak Ada Aktivitas',
+  tidak_ada_aktivitas: 'Tidak Ada Aktivitas',
+  berlangsung:         'Berlangsung',
 }
 
-// Mock seed data – replaced by props when API data is available
-const MOCK_TOWERS: FeaturedTower[] = [
-  {
-    id: 'ST-003', nama: 'TOWER SUTET BLRJA-JAWA7 500kV #001',
-    lat: -6.1823, lng: 106.5102, tipe: 'SUTET', tegangan: '500 kV',
-    kerawanan: [
-      { kategori: 'pekerjaan_pihak_lain', level: 'kritis', status: 'berlangsung' },
-      { kategori: 'pencurian',            level: 'kritis', status: 'eskalasi' },
-      { kategori: 'gangguan',             level: 'kritis', status: 'berlangsung' },
-    ],
-    updatedAt: '2025-05-01T09:00:00',
-  },
-  {
-    id: 'ST-002', nama: 'TOWER SUTET KMBGN-DKSBI 500kV #P3',
-    lat: -6.1908, lng: 106.7311, tipe: 'SUTET', tegangan: '500 kV',
-    kerawanan: [
-      { kategori: 'kebakaran', level: 'kritis', status: 'berlangsung' },
-      { kategori: 'gangguan',  level: 'sedang', status: 'selesai' },
-    ],
-    updatedAt: '2025-05-01T14:30:00',
-  },
-  {
-    id: 'TT-002', nama: 'TOWER SUTT 150kV DKSBI-KMBNG #001',
-    lat: -6.1721, lng: 106.7268, tipe: 'SUTT', tegangan: '150 kV',
-    kerawanan: [
-      { kategori: 'pekerjaan_pihak_lain', level: 'sedang', status: 'ditangani' },
-      { kategori: 'pencurian',            level: 'sedang', status: 'pemantauan' },
-    ],
-    updatedAt: '2025-04-28T10:00:00',
-  },
-  {
-    id: 'TT-001', nama: 'TOWER SUTT 150kV LNTAR-TLKGA #EA1',
-    lat: -6.0605, lng: 106.464, tipe: 'SUTT', tegangan: '150 kV',
-    kerawanan: [{ kategori: 'layangan', level: 'sedang', status: 'ditangani' }],
-    updatedAt: '2025-04-30T16:00:00',
-  },
-  {
-    id: 'TT-003', nama: 'TOWER SUTT 150kV GMKRU-PINKA #EA1A',
-    lat: -6.1123, lng: 106.7789, tipe: 'SUTT', tegangan: '150 kV',
-    kerawanan: [{ kategori: 'cleanup', level: 'aman', status: 'selesai' }],
-    updatedAt: '2025-04-20T09:00:00',
-  },
-  {
-    id: 'GI-004', nama: 'GI Durikosambi',
-    lat: -6.17097, lng: 106.72594, tipe: 'gardu', tegangan: '150 kV',
-    kerawanan: [{ kategori: 'pemanfaatan', level: 'aman', status: 'pemantauan' }],
-    updatedAt: '2025-04-24T10:00:00',
-  },
-  {
-    id: 'SK-001', nama: 'SKTT METLAND - KEMBANGAN #1',
-    lat: -6.1885, lng: 106.7402, tipe: 'SKTT', tegangan: '150 kV',
-    kerawanan: [{ kategori: 'pemanfaatan_lahan', level: 'sedang', status: 'menunggu' }],
-    updatedAt: '2025-04-22T09:00:00',
-  },
-]
+// DB may store short aliases (e.g. "ppl") — normalize to canonical keys
+const KATEGORI_ALIAS: Record<string, string> = { ppl: 'pekerjaan_pihak_lain' }
+function normKat(k: string): string { return KATEGORI_ALIAS[k] ?? k }
 
-// ─── Icon creators ────────────────────────────────────────────────────────────
-
-function topLevel(kerawanan: KerawananItem[]) {
-  return kerawanan.reduce((best, k) =>
-    LEVEL_PRIORITY[k.level] > LEVEL_PRIORITY[best] ? k.level : best,
-    'aman' as string,
+function getTopLevel(kerawanan: KerawananItem[]): string {
+  if (!kerawanan.length) return 'normal'
+  return kerawanan.reduce((top, k) =>
+    (LEVEL_PRIORITY[k.level] ?? 0) > (LEVEL_PRIORITY[top] ?? 0) ? k.level : top,
+    'aman'
   )
 }
 
-function createGarduIcon(hasKerawanan: boolean, level: string, count: number): L.DivIcon {
-  const bgColor = hasKerawanan ? (RING_COLOR[level] ?? '#ef4444') : '#076c9e'
-  const badge = hasKerawanan
-    ? `<div style="position:absolute;top:-5px;right:-5px;background:#d92d20;color:white;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid white;">${count}</div>`
-    : ''
+// CellTower icon path dari Figma (26x26 viewBox) — sama untuk normal & gangguan
+const CELL_TOWER_PATH = `M13.3916 10.6167C13.3553 10.5439 13.2995 10.4827 13.2303 10.4399C13.1611 10.3971 13.0814 10.3744 13.0001 10.3744C12.9187 10.3744 12.839 10.3971 12.7698 10.4399C12.7007 10.4827 12.6448 10.5439 12.6085 10.6167L8.671 18.4917C8.61908 18.5955 8.61051 18.7157 8.64717 18.8258C8.68384 18.9359 8.76273 19.0269 8.86651 19.0788C8.97029 19.1307 9.09044 19.1393 9.20054 19.1026C9.31063 19.066 9.40166 18.9871 9.45358 18.8833L10.211 17.375H15.7946L16.5487 18.8833C16.5849 18.9556 16.6404 19.0164 16.709 19.0591C16.7776 19.1018 16.8568 19.1246 16.9376 19.125C17.0121 19.125 17.0855 19.1059 17.1506 19.0695C17.2157 19.0332 17.2704 18.9808 17.3096 18.9174C17.3488 18.8539 17.3711 18.7815 17.3744 18.707C17.3777 18.6325 17.3619 18.5584 17.3286 18.4917L13.3916 10.6167ZM13.0001 11.7909L14.4799 14.75H11.5202L13.0001 11.7909ZM14.7222 11.1264C14.7672 10.8745 14.7565 10.6158 14.6907 10.3685C14.625 10.1212 14.5057 9.89131 14.3415 9.69507C14.1772 9.49883 13.9719 9.341 13.7401 9.2327C13.5082 9.12441 13.2554 9.06829 12.9995 9.06829C12.7436 9.06829 12.4908 9.12441 12.259 9.2327C12.0271 9.341 11.8218 9.49883 11.6575 9.69507C11.4933 9.89131 11.3741 10.1212 11.3083 10.3685C11.2425 10.6158 11.2318 10.8745 11.2769 11.1264C11.2885 11.1835 11.2887 11.2424 11.2773 11.2996C11.2659 11.3567 11.2432 11.411 11.2105 11.4593C11.1779 11.5076 11.1359 11.5488 11.0871 11.5806C11.0382 11.6124 10.9835 11.6342 10.9262 11.6446C10.8688 11.6549 10.81 11.6538 10.7531 11.6411C10.6962 11.6284 10.6424 11.6045 10.5949 11.5708C10.5474 11.537 10.5071 11.4941 10.4764 11.4446C10.4457 11.395 10.4252 11.3399 10.4161 11.2823C10.3475 10.9041 10.3628 10.5154 10.461 10.1438C10.5591 9.77214 10.7377 9.42658 10.984 9.13154C11.2304 8.83649 11.5386 8.59915 11.8867 8.43628C12.2349 8.27341 12.6146 8.189 12.999 8.189C13.3834 8.189 13.763 8.27341 14.1112 8.43628C14.4594 8.59915 14.7675 8.83649 15.0139 9.13154C15.2603 9.42658 15.4388 9.77214 15.537 10.1438C15.6351 10.5154 15.6504 10.9041 15.5819 11.2823C15.5637 11.3831 15.5107 11.4743 15.4321 11.5401C15.3536 11.6059 15.2545 11.642 15.152 11.6421C15.1258 11.6419 15.0996 11.6395 15.0738 11.635C14.9598 11.6141 14.8587 11.5489 14.7928 11.4535C14.7268 11.3581 14.7014 11.2405 14.7222 11.1264ZM9.50827 13.449C9.01805 12.7996 8.71864 12.0264 8.64367 11.2162C8.56871 10.406 8.72116 9.59097 9.0839 8.86265C9.44664 8.13434 10.0053 7.52161 10.6971 7.09331C11.3889 6.66501 12.1864 6.43811 13.0001 6.43811C13.8137 6.43811 14.6112 6.66501 15.303 7.09331C15.9948 7.52161 16.5535 8.13434 16.9162 8.86265C17.279 9.59097 17.4314 10.406 17.3565 11.2162C17.2815 12.0264 16.9821 12.7996 16.4919 13.449C16.4212 13.5396 16.3177 13.5987 16.2038 13.6136C16.0899 13.6285 15.9747 13.598 15.8831 13.5288C15.7915 13.4595 15.7308 13.3569 15.7141 13.2433C15.6975 13.1296 15.7262 13.0139 15.794 12.9213C16.186 12.4017 16.4254 11.7832 16.4852 11.1351C16.5451 10.487 16.423 9.83506 16.1328 9.25251C15.8426 8.66996 15.3956 8.17988 14.8423 7.83732C14.2889 7.49476 13.6509 7.31328 13.0001 7.31328C12.3492 7.31328 11.7113 7.49476 11.1579 7.83732C10.6045 8.17988 10.1576 8.66996 9.86734 9.25251C9.5771 9.83506 9.45505 10.487 9.51489 11.1351C9.57473 11.7832 9.81409 12.4017 10.2061 12.9213C10.274 13.0139 10.3027 13.1296 10.286 13.2433C10.2694 13.3569 10.2087 13.4595 10.117 13.5288C10.0254 13.598 9.91022 13.6285 9.79632 13.6136C9.68242 13.5987 9.57895 13.5396 9.50827 13.449Z`
 
-  // Antenna / gardu icon sesuai Figma
-  return L.divIcon({
-    className: '',
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
-    popupAnchor: [0, -24],
-    html: `<div style="width:40px;height:40px;background:${bgColor};border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px ${bgColor}66;position:relative;border:2px solid rgba(255,255,255,0.3);">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round">
-        <line x1="12" y1="12" x2="12" y2="22"/>
-        <path d="M8.5 15 Q12 7 15.5 15" fill="none"/>
-        <path d="M5.5 18 Q12 3 18.5 18" fill="none" stroke-opacity="0.6"/>
-        <circle cx="12" cy="22" r="1.5" fill="white"/>
-      </svg>
-      ${badge}
-    </div>`,
+// Twemoji SVG bodies (36x36 viewBox, no external deps)
+const TWEMOJI_BODIES: Record<string, string> = {
+  pekerjaan_pihak_lain: `<path fill="#ffcc4d" d="M36 15a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4h28a4 4 0 0 1 4 4z"/><path fill="#292f33" d="M6 3H4a4 4 0 0 0-4 4v2zm6 0L0 15c0 1.36.682 2.558 1.72 3.28L17 3zM7 19h5L28 3h-5zm16 0L35.892 6.108A4 4 0 0 0 33.64 3.36L18 19zm13-4v-3l-7 7h3a4 4 0 0 0 4-4"/><path fill="#99aab5" d="M4 19h5v14H4zm23 0h5v14h-5z"/>`,
+  kebakaran: `<path fill="#f4900c" d="M35 19a17 17 0 0 0-1.04-5.868c-.46 5.389-3.333 8.157-6.335 6.868c-2.812-1.208-.917-5.917-.777-8.164c.236-3.809-.012-8.169-6.931-11.794c2.875 5.5.333 8.917-2.333 9.125c-2.958.231-5.667-2.542-4.667-7.042c-3.238 2.386-3.332 6.402-2.333 9c1.042 2.708-.042 4.958-2.583 5.208c-2.84.28-4.418-3.041-2.963-8.333A16.94 16.94 0 0 0 1 19c0 9.389 7.611 17 17 17s17-7.611 17-17"/><path fill="#ffcc4d" d="M28.394 23.999c.148 3.084-2.561 4.293-4.019 3.709c-2.106-.843-1.541-2.291-2.083-5.291s-2.625-5.083-5.708-6c2.25 6.333-1.247 8.667-3.08 9.084c-1.872.426-3.753-.001-3.968-4.007A11.96 11.96 0 0 0 6 30c0 .368.023.73.055 1.09C9.125 34.124 13.342 36 18 36s8.875-1.876 11.945-4.91c.032-.36.055-.722.055-1.09c0-2.187-.584-4.236-1.606-6.001"/>`,
+  layangan: `<path fill="#55acee" d="M22.45 32.289L.592 18.752L6.55.711l18.042 5.958z"/><path fill="#269" d="M20.543 29.5a1 1 0 0 1-.895-.551L6.929 3.687a1 1 0 1 1 1.786-.9l12.72 25.264a1 1 0 0 1-.892 1.449"/><path fill="#269" d="M3.12 18.48a1 1 0 0 1-.451-1.893l18.947-9.54a1 1 0 1 1 .9 1.786l-18.947 9.54a1 1 0 0 1-.449.107"/><path fill="#3b88c3" d="M27.367 35.339c-2.44 0-4.521-1.268-6.199-3.784a1 1 0 1 1 1.664-1.11c1.564 2.343 3.359 3.228 5.644 2.781c.945-.184 1.793-.98 2.27-2.132c.701-1.693.47-3.668-.62-5.282c-2.006-2.971-2.777-6.787-2.063-10.21c.615-2.956 2.24-5.344 4.698-6.905a1 1 0 0 1 1.072 1.688c-2.516 1.598-3.462 3.941-3.813 5.625c-.604 2.905.055 6.151 1.765 8.683c1.466 2.172 1.769 4.851.811 7.167c-.734 1.772-2.131 3.018-3.736 3.329q-.768.15-1.493.15"/><path fill="#9266cc" d="M31.532 30.992c-.781-2.485-2.807-4.482-4.157-2.075c-1.342 2.392 1.04 3.456 3.717 2.74c.781 2.485 2.807 4.482 4.157 2.075c1.342-2.392-1.039-3.456-3.717-2.74m-1.425-7.039c2.377 1.066 5.215.876 4.311-1.731c-.898-2.592-3.275-1.517-4.517.961c-2.377-1.066-5.215-.876-4.311 1.731c.898 2.592 3.275 1.517 4.517-.961m-1.261-6.597c1.355 2.225 3.802 3.676 4.534 1.015c.727-2.645-1.84-3.105-4.267-1.766c-1.355-2.224-3.802-3.676-4.534-1.015c-.728 2.645 1.84 3.105 4.267 1.766m2.897-6.557c-.132 2.602 1.074 5.178 3.177 3.39c2.089-1.777.226-3.602-2.534-3.861c.132-2.602-1.074-5.178-3.177-3.39c-2.089 1.777-.225 3.602 2.534 3.861"/>`,
+  pencurian: `<path fill="#ccd6dd" d="M27.865 16.751c0-6.242-4.411-9.988-9.927-9.988s-9.835 3.746-9.835 9.988c0 3.48-.103 6.485 3.897 7.89v2.722c0 1.034.966 1.872 2 1.872s2-.838 2-1.872v-1.97v1.97c0 1.034.965 1.872 2 1.872s2-.838 2-1.872v-1.97v1.97c0 1.034.966 1.872 2 1.872s2-.838 2-1.872v-2.722c4-1.405 3.865-4.41 3.865-7.89"/><circle cx="13.629" cy="15.503" r="3.121" fill="#292f33"/><path fill="#292f33" d="M25.488 15.503c0 1.724 0 3.121-3.121 3.121s-3.12-1.397-3.12-3.121a3.12 3.12 0 1 1 6.241 0m-6.301 5.656c-.157-.382-.626-.662-1.189-.662c-.561 0-1.031.28-1.188.662a.934.934 0 1 0 1.132 1.206l.056.004l.057-.004a.934.934 0 1 0 1.132-1.206"/><path fill="#aab8c2" d="M11 27c0-.367.075-.713.195-1.038c-.984-.447-1.831-1.082-2.503-1.97a280 280 0 0 1-3.127 2.695A3.47 3.47 0 0 0 3.5 26A3.5 3.5 0 0 0 0 29.5a3.49 3.49 0 0 0 3.046 3.454A3.49 3.49 0 0 0 6.5 36a3.5 3.5 0 0 0 3.5-3.5c0-.775-.26-1.485-.686-2.065c.6-.706 1.246-1.46 1.931-2.25A3 3 0 0 1 11 27m16.872-15.482c.884-.769 1.729-1.495 2.515-2.163A3.47 3.47 0 0 0 32.4 10a3.5 3.5 0 0 0 3.5-3.5a3.49 3.49 0 0 0-2.945-3.444A3.49 3.49 0 0 0 29.5 0A3.5 3.5 0 0 0 26 3.5c0 .775.26 1.485.687 2.065c-.594.7-1.233 1.445-1.911 2.227c1.3.871 2.361 2.095 3.096 3.726M3.5 10a3.47 3.47 0 0 0 2.065-.687c.799.679 1.661 1.419 2.564 2.204c.735-1.631 1.795-2.855 3.096-3.726a279 279 0 0 1-1.912-2.226A3.47 3.47 0 0 0 10 3.5A3.5 3.5 0 0 0 6.5 0a3.49 3.49 0 0 0-3.454 3.046A3.49 3.49 0 0 0 0 6.5A3.5 3.5 0 0 0 3.5 10m28.9 16c-.752 0-1.444.242-2.014.645c-.952-.809-1.99-1.701-3.079-2.653c-.672.889-1.519 1.523-2.503 1.971c.121.324.196.67.196 1.037c0 .421-.088.821-.245 1.185c.685.79 1.331 1.544 1.931 2.25A3.48 3.48 0 0 0 26 32.5c0 1.934 1.566 3.5 3.5 3.5a3.49 3.49 0 0 0 3.455-3.056A3.49 3.49 0 0 0 35.9 29.5c0-1.934-1.566-3.5-3.5-3.5"/>`,
+  pemanfaatan_lahan: `<path fill="#5c913b" d="M36 33.5a1.5 1.5 0 0 1-1.5 1.5h-33a1.5 1.5 0 0 1 0-3h33a1.5 1.5 0 0 1 1.5 1.5"/><path fill="#a0041e" d="M12.344 14.702h-2a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5"/><path fill="#ffcc4d" d="M5.942 32c-.137-4.657-.506-8-.942-8s-.804 3.343-.941 8z"/><path fill="#77b255" d="M10 18.731C10 24.306 7.762 26 5 26s-5-1.694-5-7.269C0 13.154 4 5 5 5s5 8.154 5 13.731"/><path fill="#ffe8b6" d="M8 16L21 3l13 13v16H8z"/><path fill="#ffcc4d" d="M21 16h1v16h-1z"/><path fill="#66757f" d="M34 17a1 1 0 0 1-.707-.293L21 4.414L8.707 16.707a.999.999 0 1 1-1.414-1.414l13-13a1 1 0 0 1 1.414 0l13 13A.999.999 0 0 1 34 17"/><path fill="#66757f" d="M21 17a.999.999 0 0 1-.707-1.707l6.5-6.5a.999.999 0 1 1 1.414 1.414l-6.5 6.5A1 1 0 0 1 21 17"/><path fill="#c1694f" d="M13 26h4v6h-4z"/><path fill="#55acee" d="M13 17h4v4h-4zm12.5 0h4v4h-4zm0 9h4v4h-4z"/><path fill="#77b255" d="M10.625 29.991c0 1.613-.858 2.103-1.917 2.103c-1.058 0-1.917-.49-1.917-2.103s1.533-3.973 1.917-3.973s1.917 2.359 1.917 3.973m25.25 0c0 1.613-.858 2.103-1.917 2.103c-1.058 0-1.917-.49-1.917-2.103s1.533-3.973 1.917-3.973s1.917 2.359 1.917 3.973"/>`,
+}
+
+// Jalur stroke colors by tipe (mirror TowerMapGoogle KML_JALUR_COLORS)
+const KML_JALUR_COLORS: Record<string, string> = {
+  SUTET: '#e65100',   // orange
+  SUTT:  '#0288D1',   // blue
+  SKTT:  '#FF00FF',   // magenta
+}
+// Draw order: SUTET on top, then SUTT, then SKTT (matches Google zIndex 36/26/16)
+const JALUR_DRAW_ORDER: Record<string, number> = { SKTT: 0, SUTT: 1, SUTET: 2 }
+
+const JENIS_FILTER_OPTIONS = [
+  { key: 'pekerjaan_pihak_lain', label: 'Pekerjaan Pihak Lain (PPL)' },
+  { key: 'kebakaran',            label: 'Kebakaran' },
+  { key: 'layangan',             label: 'Layang-layang' },
+  { key: 'pemanfaatan_lahan',    label: 'Pemanfaatan Lahan' },
+  { key: 'pencurian',            label: 'Pencurian' },
+] as const
+
+const ALL_LAYER_TYPES = ['SUTT', 'SUTET', 'SKTT'] as const
+
+// ─── SVG marker generators (mirror TowerMapGoogle) ──────────────────────────────
+
+/** Gardu Induk: lingkaran hitam + bank icon, badge merah jika ada gangguan */
+function makeGarduSvg(count: number) {
+  const hasCount = count > 0
+  const BASE = 26
+  const W = hasCount ? BASE + 26 : BASE
+  const H = BASE
+
+  const badge = hasCount ? `
+    <rect x="${BASE - 4}" y="2" width="22" height="14" rx="7" fill="#D32F2F"/>
+    <text x="${BASE + 7}" y="13" text-anchor="middle"
+      font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="#fff">${count}</text>
+  ` : ''
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <defs>
+      <filter id="gs${count}" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.35"/>
+      </filter>
+    </defs>
+    <rect width="26" height="26" rx="13" fill="#1F2937" filter="url(#gs${count})"/>
+    <path d="M18.8334 17.0833V18.8333H7.16675V17.0833C7.16675 16.7625 7.42925 16.5 7.75008 16.5H18.2501C18.5709 16.5 18.8334 16.7625 18.8334 17.0833Z" fill="white" stroke="white" stroke-width="0.818182" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M10.0834 12.4167H8.91675V16.5H10.0834V12.4167Z" fill="white"/>
+    <path d="M12.4167 12.4167H11.25V16.5H12.4167V12.4167Z" fill="white"/>
+    <path d="M14.7499 12.4167H13.5833V16.5H14.7499V12.4167Z" fill="white"/>
+    <path d="M17.0834 12.4167H15.9167V16.5H17.0834V12.4167Z" fill="white"/>
+    <path d="M19.4166 19.2708H6.58325C6.34409 19.2708 6.14575 19.0725 6.14575 18.8333C6.14575 18.5941 6.34409 18.3958 6.58325 18.3958H19.4166C19.6558 18.3958 19.8541 18.5941 19.8541 18.8333C19.8541 19.0725 19.6558 19.2708 19.4166 19.2708Z" fill="white"/>
+    <path d="M18.4659 9.35418L13.2159 7.25418C13.0992 7.20751 12.9009 7.20751 12.7842 7.25418L7.53425 9.35418C7.33008 9.43584 7.16675 9.67501 7.16675 9.89668V11.8333C7.16675 12.1542 7.42925 12.4167 7.75008 12.4167H18.2501C18.5709 12.4167 18.8334 12.1542 18.8334 11.8333V9.89668C18.8334 9.67501 18.6701 9.43584 18.4659 9.35418ZM13.0001 10.9583C12.5159 10.9583 12.1251 10.5675 12.1251 10.0833C12.1251 9.59918 12.5159 9.20834 13.0001 9.20834C13.4842 9.20834 13.8751 9.59918 13.8751 10.0833C13.8751 10.5675 13.4842 10.9583 13.0001 10.9583Z" fill="white"/>
+    ${badge}
+  </svg>`
+  return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg)
+}
+
+/** Tower marker — normal dot, atau lingkaran status + tower icon + Twemoji badge(s) */
+function makeTowerSvg(topLevel: string, tipe: 'SUTET'|'SUTT'|'SKTT'|'gardu', kerawanan: KerawananItem[]) {
+  if (topLevel === 'normal') {
+    let dotColor = '#0288D1'
+    if (tipe === 'SUTET') dotColor = '#e65100'
+    if (tipe === 'SKTT') dotColor = '#FF00FF'
+    const W = 8, H = 8, cx = 4, cy = 4, r = 3
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="${dotColor}" stroke="#FFFFFF" stroke-width="1"/>
+    </svg>`
+    return {
+      url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
+      size: [W, H] as [number, number],
+      anchor: [cx, cy] as [number, number],
+    }
+  }
+
+  // Stacked pill: dot on top, badges stacked BELOW in rows of 2.
+  const CIRCLE_D = 32
+  const PAD_TOP  = 4
+  const BADGE_D  = 18
+  const COL_GAP  = 2
+  const ROW_GAP  = 2
+  const DOT_GAP  = 3
+  const R  = CIRCLE_D / 2 - 1
+  const bgColor = LEVEL_BG[topLevel] ?? '#076C9E'
+  const filterId = `f${topLevel}${kerawanan.length}`
+
+  const numBadges = kerawanan.length
+  const numRows = Math.ceil(numBadges / 2)
+  const widestRowW = numBadges >= 2 ? (BADGE_D * 2 + COL_GAP) : BADGE_D
+  const SVG_W = Math.max(CIRCLE_D, widestRowW) + 4
+  const CX = SVG_W / 2
+  const CY = CIRCLE_D / 2 + PAD_TOP
+  const badgesStartY = CIRCLE_D + PAD_TOP + DOT_GAP
+  const SVG_H = numBadges === 0
+    ? CIRCLE_D + PAD_TOP
+    : badgesStartY + numRows * BADGE_D + (numRows - 1) * ROW_GAP + 2
+
+  const mainCircle = `
+    <defs>
+      <filter id="${filterId}" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="${bgColor}" flood-opacity="0.45"/>
+      </filter>
+    </defs>
+    <circle cx="${CX}" cy="${CY}" r="${R}" fill="${bgColor}" filter="url(#${filterId})"/>
+    <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+    <svg x="${CX - 13}" y="${CY - 13}" width="26" height="26" viewBox="0 0 26 26">
+      <path d="${CELL_TOWER_PATH}" fill="white" opacity="0.9"/>
+    </svg>
+  `
+
+  const renderBadge = (idx: number, bx: number, by: number) => {
+    const bcx = bx + BADGE_D / 2, bcy = by + BADGE_D / 2
+    const iconBody = TWEMOJI_BODIES[normKat(kerawanan[idx].kategori)] ?? ''
+    return `
+      <circle cx="${bcx}" cy="${bcy}" r="${BADGE_D / 2 + 1.5}" fill="white"/>
+      <svg x="${bx}" y="${by}" width="${BADGE_D}" height="${BADGE_D}" viewBox="0 0 36 36">${iconBody}</svg>
+    `
+  }
+
+  let badgeContent = ''
+  for (let row = 0; row < numRows; row++) {
+    const startIdx = row * 2
+    const countInRow = Math.min(2, numBadges - startIdx)
+    const rowW = countInRow * BADGE_D + (countInRow - 1) * COL_GAP
+    const rowX0 = CX - rowW / 2
+    const by = badgesStartY + row * (BADGE_D + ROW_GAP)
+    for (let i = 0; i < countInRow; i++) {
+      const bx = rowX0 + i * (BADGE_D + COL_GAP)
+      badgeContent += renderBadge(startIdx + i, bx, by)
+    }
+  }
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${SVG_W}" height="${SVG_H}" viewBox="0 0 ${SVG_W} ${SVG_H}">
+    ${mainCircle}
+    ${badgeContent}
+  </svg>`
+
+  return {
+    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
+    size: [SVG_W, SVG_H] as [number, number],
+    anchor: [CX, CY] as [number, number],
+  }
+}
+
+// ─── Leaflet icon helpers ───────────────────────────────────────────────────────
+
+function leafletTowerIcon(tower: FeaturedTower): L.Icon {
+  const topLevel = getTopLevel(tower.kerawanan)
+  if (tower.tipe === 'gardu') {
+    const count = tower.kerawanan?.length ?? 0
+    const W = count > 0 ? 52 : 26
+    return L.icon({
+      iconUrl: makeGarduSvg(count),
+      iconSize: [W, 26],
+      iconAnchor: [13, 13],
+      popupAnchor: [0, -15],
+    })
+  }
+  const d = makeTowerSvg(topLevel, tower.tipe, tower.kerawanan)
+  return L.icon({
+    iconUrl: d.url,
+    iconSize: d.size,
+    iconAnchor: d.anchor,
+    popupAnchor: [0, -d.anchor[1]],
   })
 }
 
-function createTowerIcon(
-  _tipe: string,
-  hasKerawanan: boolean,
-  level: string,
-  count: number,
-): L.DivIcon {
-  const ring = hasKerawanan ? RING_COLOR[level] ?? '#ef4444' : '#1a1a1a'
-  const pulse = hasKerawanan && level === 'kritis'
-    ? 'animation:pulse-ring 2s infinite;'
-    : ''
-  const badge = hasKerawanan
-    ? `<div style="position:absolute;top:-5px;right:-5px;background:white;color:${ring};border:2px solid ${ring};border-radius:50%;width:18px;height:18px;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;">${count}</div>`
-    : ''
+// ─── Popup content (mirror TowerMapGoogle InfoWindow) ───────────────────────────
 
-  return L.divIcon({
-    className: '',
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
-    popupAnchor: [0, -22],
-    html: `<div style="width:36px;height:36px;background:${ring};border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.4);position:relative;${pulse}">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round">
-        <path d="M12 2L8 22M12 2L16 22M8 8h8M9 14h6"/>
-        <path d="M7 22h10"/>
-      </svg>
-      ${badge}
-    </div>`,
-  })
-}
-
-function createBgGarduIcon(): L.DivIcon {
-  return L.divIcon({
-    className: '',
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
-    popupAnchor: [0, -18],
-    html: `<div style="width:32px;height:32px;background:#076c9e;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(7,108,158,0.4);border:2px solid rgba(255,255,255,0.25);">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round">
-        <line x1="12" y1="12" x2="12" y2="22"/>
-        <path d="M8.5 15 Q12 7 15.5 15" fill="none"/>
-        <path d="M5.5 18 Q12 3 18.5 18" fill="none" stroke-opacity="0.5"/>
-        <circle cx="12" cy="22" r="1.5" fill="white"/>
-      </svg>
-    </div>`,
-  })
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function formatDate(iso?: string) {
-  if (!iso) return '—'
-  return new Date(iso).toLocaleDateString('id-ID', {
-    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
-  })
-}
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function ZoomTracker({ onZoom }: { onZoom: (z: number) => void }) {
-  useMapEvents({ zoomend: (e) => onZoom(e.target.getZoom()) })
-  return null
-}
-
-function TowerPopup({ tower }: { tower: FeaturedTower }) {
-  return (
-    <div style={{ minWidth: 220, fontFamily: 'Inter, sans-serif' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderBottom: '1px solid #f1f5f9' }}>
-        <span style={{ fontWeight: 700, fontSize: 13 }}>Informasi Tower</span>
-        <span style={{ fontSize: 10, color: '#94a3b8', background: '#f8fafc', padding: '2px 8px', borderRadius: 20 }}>
-          {tower.tegangan ?? tower.tipe}
-        </span>
-      </div>
-      <div style={{ padding: '12px 14px' }}>
-        <p style={{ fontWeight: 700, fontSize: 13, marginBottom: 2 }}>{tower.nama}</p>
-        <p style={{ color: '#94a3b8', fontSize: 11, marginBottom: 10 }}>
-          {tower.lat.toFixed(6)}, {tower.lng.toFixed(6)}
-        </p>
-
-        {tower.kerawanan.length > 0 && (
-          <>
-            <p style={{ fontWeight: 600, fontSize: 12, marginBottom: 6 }}>Kerawanan Aktif</p>
-            {tower.kerawanan.map((k, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                <span style={{ fontSize: 13 }}>{KATEGORI_EMOJI[k.kategori] ?? '•'}</span>
-                <span style={{ fontSize: 12, flex: 1 }}>{KATEGORI_LABEL[k.kategori] ?? k.kategori}</span>
-                <span style={{
-                  fontSize: 10, fontWeight: 600, padding: '1px 7px', borderRadius: 20,
-                  background: k.level === 'kritis' ? '#fef2f2' : k.level === 'sedang' ? '#fffbeb' : '#f0fdf4',
-                  color: k.level === 'kritis' ? '#ef4444' : k.level === 'sedang' ? '#d97706' : '#16a34a',
-                }}>
-                  {k.level}
-                </span>
-              </div>
-            ))}
-          </>
-        )}
-
-        <p style={{ color: '#94a3b8', fontSize: 11, marginTop: 10 }}>
-          Diperbarui: {formatDate(tower.updatedAt)}
-        </p>
-      </div>
-    </div>
-  )
-}
-
-// ─── Filters ──────────────────────────────────────────────────────────────────
-
-interface Filters {
-  kategori: string
-  level: string
-  tipe: string
-}
-
-function FilterPanel({
-  filters, onChange, onClose,
-}: {
-  filters: Filters
-  onChange: (f: Filters) => void
-  onClose: () => void
+function TowerPopupContent({ tower, onKerawananClick }: {
+  tower: FeaturedTower
+  onKerawananClick?: (laporanId: string) => void
 }) {
-  const set = (k: keyof Filters, v: string) => onChange({ ...filters, [k]: v })
+  const hasKerawanan = tower.kerawanan.length > 0
+  return (
+    <div style={{ minWidth: 240, maxWidth: 280, maxHeight: 400, overflowY: 'auto', fontFamily: 'Inter, sans-serif', fontSize: 12, padding: 4 }}>
+      <div style={{ fontWeight: 700, fontSize: 12, color: '#1c1c1c', marginBottom: 6 }}>
+        Informasi Tower
+      </div>
+      <div style={{ color: '#1c1c1c', fontWeight: 600, marginBottom: 2, lineHeight: 1.4 }}>{tower.nama}</div>
+      <div style={{ color: '#97aab3', fontSize: 11, marginBottom: 6 }}>
+        {tower.tipe}{tower.tegangan ? ` · ${tower.tegangan}` : ''}
+      </div>
+      {tower.tipe !== 'SKTT' && (
+        <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          <span style={{
+            fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
+            background: tower.bersertifikat ? '#dcfce7' : '#fee2e2',
+            color: tower.bersertifikat ? '#16a34a' : '#dc2626',
+          }}>
+            {tower.bersertifikat ? 'Bersertifikat' : 'Belum Bersertifikat'}
+          </span>
+          <span style={{
+            fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
+            background: tower.hasCctv ? '#dcfce7' : '#fee2e2',
+            color: tower.hasCctv ? '#16a34a' : '#dc2626',
+          }}>
+            {tower.hasCctv ? 'Terpasang CCTV' : 'Belum Ada CCTV'}
+          </span>
+        </div>
+      )}
 
-  const select = (label: string, key: keyof Filters, opts: string[]) => (
-    <div className="mb-3">
-      <p className="text-[11px] font-semibold text-app-muted uppercase tracking-wide mb-1.5">{label}</p>
-      <div className="flex flex-wrap gap-1">
-        {['Semua', ...opts].map((o) => {
-          const val = o === 'Semua' ? '' : o
-          const active = filters[key] === val
-          return (
-            <button
-              key={o}
-              onClick={() => set(key, val)}
-              className="text-[11px] px-2.5 py-1 rounded-full border transition-colors"
-              style={{
-                background: active ? '#2563eb' : '#fff',
-                color: active ? '#fff' : '#4a5568',
-                borderColor: active ? '#2563eb' : '#e8edf2',
-                fontWeight: active ? 600 : 400,
-              }}
-            >
-              {o === 'pekerjaan_pihak_lain' ? 'PPL' : o.charAt(0).toUpperCase() + o.slice(1)}
-            </button>
-          )
-        })}
+      {hasKerawanan ? (
+        <div>
+          <div style={{ fontWeight: 600, color: '#1c1c1c', marginBottom: 6 }}>
+            Kerawanan ({tower.kerawanan.length})
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            {tower.kerawanan.map((k, i) => {
+              const clickable = !!(k.laporanId && onKerawananClick)
+              return (
+                <div key={i}
+                  onClick={clickable ? () => onKerawananClick!(k.laporanId!) : undefined}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '4px 6px', margin: '-4px -6px',
+                    borderRadius: 6,
+                    cursor: clickable ? 'pointer' : 'default',
+                    transition: 'background-color 120ms',
+                  }}
+                  onMouseEnter={(e) => { if (clickable) (e.currentTarget as HTMLElement).style.background = '#F1F5F9' }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+                >
+                  <span style={{ fontSize: 14, lineHeight: 1 }}>{KATEGORI_EMOJI[normKat(k.kategori)] ?? '⚠️'}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
+                    <span style={{ color: '#374151', fontSize: 11 }}>{KATEGORI_LABEL[normKat(k.kategori)] ?? k.kategori}</span>
+                    {k.progres && (
+                      <span style={{ fontSize: 9, fontWeight: 600, color: '#64748b' }}>
+                        {PROGRES_LABEL[k.progres] ?? k.progres}
+                      </span>
+                    )}
+                  </div>
+                  <span style={{
+                    fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 999,
+                    background: (LEVEL_COLOR[k.level] ?? '#94a3b8') + '22',
+                    color: LEVEL_COLOR[k.level] ?? '#94a3b8',
+                    textTransform: 'uppercase', whiteSpace: 'nowrap',
+                  }}>
+                    {RISIKO_LABEL[k.level] ?? k.level}
+                  </span>
+                  {clickable && <ChevronRight size={12} style={{ color: '#94a3b8' }} />}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      ) : (
+        <div style={{ color: '#5f737f', fontSize: 11 }}>Tidak ada kerawanan aktif</div>
+      )}
+
+      <div style={{ marginTop: 10, color: '#97aab3', fontSize: 10 }}>
+        Terakhir update: {tower.updatedAt ? new Date(tower.updatedAt).toLocaleString('id-ID') : '—'}
       </div>
     </div>
   )
+}
 
+// ─── Legend (mirror TowerMapGoogle) ─────────────────────────────────────────────
+
+function Legend() {
+  const [collapsed, setCollapsed] = useState(false)
   return (
-    <div
-      className="absolute top-4 left-4 z-[1000] bg-white rounded-xl shadow-popup border border-app-border"
-      style={{ width: 220, padding: '14px 14px 10px' }}
-    >
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal size={14} className="text-app-muted" />
-          <span className="text-[13px] font-semibold text-app-text">Filter Peta</span>
-        </div>
-        <button onClick={onClose} className="text-app-subtle hover:text-app-muted">
-          <X size={14} />
+    <div style={{
+      position: 'absolute', bottom: 28, left: 12, zIndex: 1000,
+      background: 'rgba(255,255,255,0.96)', borderRadius: 8,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.15)', padding: '8px 12px', fontSize: 11, lineHeight: 1.9,
+      minWidth: 170,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: collapsed ? 0 : 4 }}>
+        <p style={{ fontWeight: 700, fontSize: 11.5, color: '#0f172a', margin: 0 }}>Legenda</p>
+        <button
+          onClick={() => setCollapsed(v => !v)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 2px', color: '#64748b', lineHeight: 1, fontSize: 14 }}
+          title={collapsed ? 'Tampilkan legenda' : 'Sembunyikan legenda'}
+        >
+          {collapsed ? '▲' : '▼'}
         </button>
       </div>
 
-      {select('Kategori', 'kategori', [
-        'pekerjaan_pihak_lain', 'kebakaran', 'layangan',
-        'pencurian', 'pemanfaatan_lahan',
-      ])}
-      {select('Level', 'level', ['kritis', 'sedang', 'aman'])}
-      {select('Tipe Tower', 'tipe', ['gardu', 'SUTET', 'SUTT', 'SKTT'])}
-
-      {/* Legend */}
-      <div className="border-t border-app-border pt-3 mt-1">
-        <p className="text-[11px] font-semibold text-app-muted uppercase tracking-wide mb-2">Jalur</p>
-        {[
-          { label: 'SUTET 500kV', color: JALUR_COLORS.SUTET_500kV },
-          { label: 'SUTT 150kV',  color: JALUR_COLORS.SUTT_150kV },
-          { label: 'SKTT 150kV',  color: JALUR_COLORS.SKTT_150kV },
-        ].map(({ label, color }) => (
-          <div key={label} className="flex items-center gap-2 mb-1.5">
-            <div className="flex-1" style={{ height: 2, background: `repeating-linear-gradient(90deg, ${color} 0, ${color} 4px, transparent 4px, transparent 8px)` }} />
-            <span className="text-[10px] text-app-muted">{label}</span>
+      {!collapsed && (
+        <>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#0288D1', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #0288D1', flexShrink: 0 }} />
+            <span style={{ color: '#374151' }}>Tower SUTT (Normal)</span>
           </div>
-        ))}
-      </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#e65100', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #e65100', flexShrink: 0 }} />
+            <span style={{ color: '#374151' }}>Tower SUTET (Normal)</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FF00FF', border: '1.5px solid #fff', boxShadow: '0 0 0 1px #FF00FF', flexShrink: 0 }} />
+            <span style={{ color: '#374151' }}>SKTT (Normal)</span>
+          </div>
+          {([
+            { bg: '#22C55E', label: 'Aman' },
+            { bg: '#F59E0B', label: 'Sedang' },
+            { bg: '#EF4444', label: 'Kritis' },
+          ] as { bg: string; label: string }[]).map(({ bg, label }) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <svg width="14" height="14" viewBox="0 0 26 26" fill="none" style={{ flexShrink: 0 }}>
+                <rect width="26" height="26" rx="13" fill={bg}/>
+                <path d={CELL_TOWER_PATH} fill="white"/>
+              </svg>
+              <span style={{ color: '#374151' }}>Kerawanan {label}</span>
+            </div>
+          ))}
+        </>
+      )}
     </div>
   )
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// ─── Main component ─────────────────────────────────────────────────────────────
 
-export default function TowerMap({ towers, onTowerClick }: Props) {
-  const [zoom, setZoom] = useState(11)
-  const [filterOpen, setFilterOpen] = useState(true)
-  const [filters, setFilters] = useState<Filters>({ kategori: '', level: '', tipe: '' })
+export default function TowerMap({ towers, onTowerClick, jalurKml }: Props) {
+  const router = useRouter()
+  const [activeJenis, setActiveJenis] = useState<string[]>([])
+  const [activeStatus, setActiveStatus] = useState<string[]>([])
+  const [visibleLayers, setVisibleLayers] = useState<Set<string>>(new Set(['SUTT', 'SUTET', 'SKTT']))
+  const [filterOpen, setFilterOpen] = useState(false)
 
-  const featured = towers ?? MOCK_TOWERS
+  function handleKerawananClick(laporanId: string) {
+    router.push(`/laporan/gangguan?laporan=${encodeURIComponent(laporanId)}`)
+  }
 
-  const filtered = useMemo(() => {
-    return featured.filter((t) => {
-      if (filters.tipe && t.tipe !== filters.tipe) return false
-      if (filters.kategori || filters.level) {
-        const match = t.kerawanan.some(
-          (k) =>
-            (!filters.kategori || k.kategori === filters.kategori) &&
-            (!filters.level || k.level === filters.level),
-        )
-        if (!match && t.kerawanan.length > 0) return false
-      }
-      return true
+  function toggleJenis(k: string) {
+    setActiveJenis(prev => prev.includes(k) ? prev.filter(x => x !== k) : [...prev, k])
+  }
+  function toggleStatus(k: string) {
+    setActiveStatus(prev => prev.includes(k) ? prev.filter(x => x !== k) : [...prev, k])
+  }
+  function toggleLayer(k: string) {
+    setVisibleLayers(prev => {
+      const next = new Set(prev)
+      if (next.has(k)) next.delete(k); else next.add(k)
+      return next
     })
-  }, [featured, filters])
+  }
+  function clearFilters() {
+    setActiveJenis([])
+    setActiveStatus([])
+    setVisibleLayers(new Set(['SUTT', 'SUTET', 'SKTT']))
+  }
 
-  // Gardu Induk background (not in featured list)
-  const featuredCoords = new Set(filtered.map((t) => `${t.lat},${t.lng}`))
-  const bgGardu = useMemo(
-    () => garduInduk.filter((g) => !featuredCoords.has(`${g.lat},${g.lng}`)),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filtered],
-  )
+  const displayTowers = useMemo<FeaturedTower[]>(() => {
+    const all = towers ?? []
+    const byLayer = all.filter((t) => t.tipe === 'gardu' || visibleLayers.has(t.tipe))
 
-  const bgGarduIcon = useMemo(() => createBgGarduIcon(), [])
+    const wantTidakAda = activeStatus.includes('tidak_ada_aktivitas')
+    const itemLevels = activeStatus.filter((s) => s !== 'tidak_ada_aktivitas')
+    const hasJenis = activeJenis.length > 0
+    const hasItemStatus = itemLevels.length > 0
+
+    if (!hasJenis && activeStatus.length === 0) return byLayer
+
+    return byLayer.flatMap((t) => {
+      const matching = t.kerawanan.filter((k) => {
+        if (hasJenis && !activeJenis.includes(normKat(k.kategori))) return false
+        if (hasItemStatus) {
+          const key = (k.level === 'kritis' || k.level === 'kritis_terpenuhi' || k.level === 'kritis_tidak_terpenuhi')
+            ? 'kritis'
+            : k.level
+          if (!itemLevels.includes(key)) return false
+        }
+        return true
+      })
+      if (matching.length > 0) return [{ ...t, kerawanan: matching }]
+      if (wantTidakAda && !hasJenis && t.kerawanan.length === 0) return [t]
+      return []
+    })
+  }, [towers, activeJenis, activeStatus, visibleLayers])
+
+  const hasActiveFilter = activeJenis.length > 0 || activeStatus.length > 0 || visibleLayers.size < ALL_LAYER_TYPES.length
+
+  // Only show layer options that have data — from either jalur or towers
+  const availableLayerTypes = useMemo(() => {
+    const types = new Set<string>()
+    for (const j of jalurKml ?? []) types.add(j.tipe)
+    for (const t of towers ?? []) if (t.tipe !== 'gardu') types.add(t.tipe)
+    return ALL_LAYER_TYPES.filter((t) => types.has(t))
+  }, [jalurKml, towers])
+
+  // Visible jalur sorted so higher-priority types render on top
+  const visibleJalur = useMemo(() => {
+    return (jalurKml ?? [])
+      .filter((j) => j.path && j.path.length >= 1 && visibleLayers.has(j.tipe))
+      .slice()
+      .sort((a, b) => (JALUR_DRAW_ORDER[a.tipe] ?? 0) - (JALUR_DRAW_ORDER[b.tipe] ?? 0))
+  }, [jalurKml, visibleLayers])
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <MapContainer
-        center={[-6.17, 106.65]}
-        zoom={11}
+        center={CENTER}
+        zoom={10}
         style={{ width: '100%', height: '100%' }}
-        zoomControl={true}
+        scrollWheelZoom
+        zoomControl
       >
+        {/* Esri World Imagery (satelit) + label jalan/tempat overlay → mirip Google Hybrid */}
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+          attribution='Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics'
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          maxZoom={19}
         />
-        <ZoomTracker onZoom={setZoom} />
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+          maxZoom={19}
+        />
 
-        {/* ── Jalur transmisi — type dideteksi dari nama ── */}
-        {jalurTransmisi
-          .filter((jalur) => detectJalurType(jalur) !== 'other')
-          .map((jalur, i) => {
-            const type = detectJalurType(jalur)
-            const isSutet = type === 'SUTET_500kV'
-            const isSktt  = type === 'SKTT_150kV'
-            const positions = jalur.path.map((p) => [p.lat, p.lng] as [number, number])
-            const style = isSutet
-              ? { color: JALUR_COLORS.SUTET_500kV, weight: 3.5, opacity: 0.9 }
-              : isSktt
-              ? { color: JALUR_COLORS.SKTT_150kV, weight: 2.5, opacity: 0.85, dashArray: '6 6' }
-              : { color: JALUR_COLORS.SUTT_150kV, weight: 2.5, opacity: 0.85 }
-            return (
-              <Polyline key={i} positions={positions} pathOptions={style} />
-            )
-          })
-        }
+        {/* ── Jalur transmisi (dinamis dari DB) ── */}
+        {visibleJalur.map((jalur) => {
+          const isSktt  = jalur.tipe === 'SKTT'
+          const isSutet = jalur.tipe === 'SUTET'
+          const color = jalur.warna ?? KML_JALUR_COLORS[jalur.tipe] ?? '#6B7280'
+          const positions = jalur.path.map((p) => [p.lat, p.lng] as [number, number])
+          const joints = jalur.path.filter((p) => p.isMarker)
 
-        {/* ── Background tower dots (titik kecil per tiang/tower) ── */}
-        {zoom >= 10 && towerSUTET.map((t, i) => (
-          <CircleMarker
-            key={`sutet-${i}`}
-            center={[t.lat, t.lng]}
-            radius={3}
-            pathOptions={{ color: '#fff', fillColor: JALUR_COLORS.SUTET_500kV, fillOpacity: 0.85, weight: 1 }}
-          />
-        ))}
-        {zoom >= 11 && towerSUTT.map((t, i) => (
-          <CircleMarker
-            key={`sutt-${i}`}
-            center={[t.lat, t.lng]}
-            radius={2.5}
-            pathOptions={{ color: '#fff', fillColor: JALUR_COLORS.SUTT_150kV, fillOpacity: 0.85, weight: 1 }}
-          />
-        ))}
-        {zoom >= 12 && towerSKTT.map((t, i) => (
-          <CircleMarker
-            key={`sktt-${i}`}
-            center={[t.lat, t.lng]}
-            radius={2}
-            pathOptions={{ color: '#fff', fillColor: JALUR_COLORS.SKTT_150kV, fillOpacity: 0.8, weight: 1 }}
-          />
-        ))}
+          return (
+            <Fragment key={jalur.id}>
+              {positions.length >= 2 && (
+                isSktt ? (
+                  <Polyline
+                    positions={positions}
+                    pathOptions={{ color, weight: 2, opacity: 1, dashArray: '1 14', lineCap: 'round' }}
+                  >
+                    <Popup>
+                      <div style={{ fontFamily: 'Inter,sans-serif', fontSize: 12, minWidth: 180 }}>
+                        <div style={{ fontWeight: 700, color: '#1c1c1c', marginBottom: 4 }}>Jalur SKTT</div>
+                        <div style={{ color: '#5f737f', marginBottom: 4 }}>{jalur.nama}</div>
+                        <div style={{ fontSize: 11, color: '#97aab3' }}>{jalur.path.length} titik koordinat</div>
+                      </div>
+                    </Popup>
+                  </Polyline>
+                ) : (
+                  <>
+                    {/* white halo beneath */}
+                    <Polyline
+                      positions={positions}
+                      pathOptions={{ color: '#FFFFFF', opacity: 0.3, weight: (isSutet ? 2 : 1.5) + 1 }}
+                    />
+                    <Polyline
+                      positions={positions}
+                      pathOptions={{ color, opacity: 0.85, weight: isSutet ? 2 : 1.5 }}
+                    />
+                  </>
+                )
+              )}
 
-        {/* ── Background Gardu Induk ── */}
-        {bgGardu.map((g, i) => (
-          <Marker key={`bg-gi-${i}`} position={[g.lat, g.lng]} icon={bgGarduIcon}>
+              {/* SKTT joints (isMarker points) */}
+              {isSktt && joints.map((pt, i) => (
+                <CircleMarker
+                  key={i}
+                  center={[pt.lat, pt.lng]}
+                  radius={3}
+                  pathOptions={{ color: '#FFFFFF', weight: 1, fillColor: color, fillOpacity: 1 }}
+                >
+                  <Popup>
+                    <div style={{ fontFamily: 'Inter,sans-serif', fontSize: 12, minWidth: 180 }}>
+                      <div style={{ fontWeight: 700, color: '#1c1c1c', marginBottom: 4 }}>Jalur SKTT</div>
+                      <div style={{ color: '#5f737f', marginBottom: 4 }}>{jalur.nama}</div>
+                      <div style={{ fontSize: 11, color: '#97aab3' }}>{Number(pt.lat).toFixed(6)}, {Number(pt.lng).toFixed(6)}</div>
+                    </div>
+                  </Popup>
+                </CircleMarker>
+              ))}
+            </Fragment>
+          )
+        })}
+
+        {/* ── Tower / Gardu markers ── */}
+        {displayTowers.map((tower) => (
+          <Marker
+            key={tower.id}
+            position={[tower.lat, tower.lng]}
+            icon={leafletTowerIcon(tower)}
+            eventHandlers={{ click: () => onTowerClick?.(tower) }}
+          >
             <Popup>
-              <div style={{ fontFamily: 'Inter,sans-serif', padding: '8px 10px', minWidth: 160 }}>
-                <p style={{ fontWeight: 700, fontSize: 13 }}>{g.name}</p>
-                <p style={{ color: '#94a3b8', fontSize: 11, marginTop: 2 }}>Gardu Induk</p>
-              </div>
+              <TowerPopupContent tower={tower} onKerawananClick={handleKerawananClick} />
             </Popup>
           </Marker>
         ))}
-
-        {/* ── Featured towers ── */}
-        {filtered.map((tower) => {
-          const hasK = (tower.kerawanan?.length ?? 0) > 0
-          const level = hasK ? topLevel(tower.kerawanan) : 'aman'
-          const count = tower.kerawanan?.length ?? 0
-          const icon =
-            tower.tipe === 'gardu'
-              ? createGarduIcon(hasK, level, count)
-              : createTowerIcon(tower.tipe, hasK, level, count)
-
-          return (
-            <Marker
-              key={tower.id}
-              position={[tower.lat, tower.lng]}
-              icon={icon}
-              eventHandlers={{ click: () => onTowerClick?.(tower) }}
-            >
-              <Popup>
-                <TowerPopup tower={tower} />
-              </Popup>
-            </Marker>
-          )
-        })}
       </MapContainer>
 
-      {/* ── Filter toggle button ── */}
-      {!filterOpen && (
+      {/* Filter button — top right of map */}
+      <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 1000 }}>
         <button
-          onClick={() => setFilterOpen(true)}
-          className="absolute top-4 left-4 z-[1000] flex items-center gap-2 bg-white rounded-xl shadow-dropdown border border-app-border px-3 py-2 text-sm font-semibold text-app-text hover:bg-app-bg transition-colors"
+          onClick={() => setFilterOpen(v => !v)}
+          aria-label="Filter"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            padding: '0 12px', height: 36, borderRadius: 8,
+            background: filterOpen ? '#076c9e' : '#fff',
+            color: filterOpen ? '#fff' : '#374151',
+            border: '1px solid #E1E8EC',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+            fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            position: 'relative',
+          }}
         >
-          <SlidersHorizontal size={14} />
+          <SlidersHorizontal size={15} />
           Filter
-          <ChevronDown size={12} />
+          {hasActiveFilter && !filterOpen && (
+            <span style={{
+              position: 'absolute', top: 4, right: 4,
+              width: 7, height: 7, borderRadius: '50%',
+              background: '#D92D20',
+            }} />
+          )}
         </button>
-      )}
 
-      {filterOpen && (
-        <FilterPanel
-          filters={filters}
-          onChange={setFilters}
-          onClose={() => setFilterOpen(false)}
-        />
-      )}
+        {filterOpen && (
+          <div style={{
+            position: 'absolute', top: 42, right: 0,
+            background: '#fff', borderRadius: 10,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+            border: '1px solid #E1E8EC',
+            padding: 12, width: 240, maxWidth: '85vw',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, color: '#1C1C1C' }}>Filter</h3>
+              <button onClick={() => setFilterOpen(false)} style={{ padding: 2, background: 'transparent', border: 'none', cursor: 'pointer', color: '#64748b' }}>
+                <XIcon size={16} />
+              </button>
+            </div>
 
-      {/* ── Zoom hint ── */}
-      {zoom < 10 && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 text-xs text-app-muted shadow-dropdown border border-app-border">
-          Zoom in untuk melihat tower
-        </div>
-      )}
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#5F737F', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>Jenis Kerawanan</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 12 }}>
+              {JENIS_FILTER_OPTIONS.map(({ key, label }) => {
+                const active = activeJenis.includes(key)
+                return (
+                  <button
+                    key={key}
+                    onClick={() => toggleJenis(key)}
+                    style={{
+                      padding: '4px 10px', borderRadius: 16, fontSize: 11, fontWeight: 500,
+                      cursor: 'pointer',
+                      border: active ? '1px solid #076C9E' : '1px solid #E1E8EC',
+                      background: active ? '#076C9E' : '#fff',
+                      color: active ? '#FFFFFF' : '#5F737F',
+                    }}
+                  >
+                    {label}
+                  </button>
+                )
+              })}
+            </div>
+
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#5F737F', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>Jalur</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 12 }}>
+              {(['SKTT', 'SUTET', 'SUTT'] as const)
+                .filter((t) => availableLayerTypes.length === 0 || availableLayerTypes.includes(t))
+                .map((t) => {
+                  const active = visibleLayers.has(t)
+                  return (
+                    <button
+                      key={t}
+                      onClick={() => toggleLayer(t)}
+                      style={{
+                        padding: '4px 12px', borderRadius: 16, fontSize: 11, fontWeight: 500,
+                        cursor: 'pointer',
+                        border: active ? '1px solid #076C9E' : '1px solid #E1E8EC',
+                        background: active ? '#076C9E' : '#fff',
+                        color: active ? '#FFFFFF' : '#5F737F',
+                      }}
+                    >
+                      {t}
+                    </button>
+                  )
+                })}
+            </div>
+
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#5F737F', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>Status</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 12 }}>
+              {([
+                { key: 'aman',                label: 'Aman',                color: '#22C55E' },
+                { key: 'sedang',              label: 'Sedang',              color: '#F59E0B' },
+                { key: 'kritis',              label: 'Kritis',              color: '#EF4444' },
+                { key: 'tidak_ada_aktivitas', label: 'Tidak Ada Aktivitas', color: '#94A3B8' },
+              ] as { key: string; label: string; color: string }[]).map(({ key, label, color }) => {
+                const active = activeStatus.includes(key)
+                return (
+                  <button
+                    key={key}
+                    onClick={() => toggleStatus(key)}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 5,
+                      padding: '4px 10px', borderRadius: 16, fontSize: 11, fontWeight: 500,
+                      cursor: 'pointer',
+                      border: active ? `1px solid ${color}` : '1px solid #E1E8EC',
+                      background: active ? color : '#fff',
+                      color: active ? '#FFFFFF' : '#5F737F',
+                    }}
+                  >
+                    <span style={{ width: 7, height: 7, borderRadius: '50%', background: active ? 'rgba(255,255,255,0.7)' : color, flexShrink: 0, display: 'inline-block' }} />
+                    {label}
+                  </button>
+                )
+              })}
+            </div>
+
+            {hasActiveFilter && (
+              <button
+                onClick={clearFilters}
+                style={{
+                  width: '100%', padding: '7px 0', borderRadius: 16, fontSize: 12, fontWeight: 600,
+                  background: '#fff', color: '#dc2626', border: '1px solid #fecaca', cursor: 'pointer',
+                }}
+              >
+                Hapus Filter
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      <Legend />
     </div>
   )
 }

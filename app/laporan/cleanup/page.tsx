@@ -5,7 +5,6 @@ import toast from 'react-hot-toast'
 import { Plus, Pencil, Trash2, X, Search, SlidersHorizontal } from 'lucide-react'
 import { cleanupApi, towersApi } from '@/lib/api'
 import { isAdminOrSuperadmin } from '@/lib/auth'
-import { StatusBadge } from '@/components/ui/StatusBadge'
 import { ActionMenu } from '@/components/ui/ActionMenu'
 import { Pagination } from '@/components/ui/Pagination'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
@@ -13,12 +12,6 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonRow } from '@/components/ui/SkeletonRow'
 import { SearchableSelect } from '@/components/ui/SearchableSelect'
 import { DatePicker } from '@/components/ui/DatePicker'
-
-const STATUS_OPTIONS: { value: string; label: string }[] = [
-  { value: 'selesai',             label: 'Selesai' },
-  { value: 'sedang_berlangsung',  label: 'Sedang Berlangsung' },
-  { value: 'tidak_ada_aktifitas', label: 'Tidak Ada Aktifitas' },
-]
 
 const SIRKIT_OPTIONS: { value: string; label: string }[] = [
   { value: 'sirkit_1', label: 'Sirkit 1' },
@@ -52,7 +45,6 @@ function CleanupDrawer({
     sirkit: 'sirkit_1',
     tanggal: new Date().toISOString(),
     keterangan: '',
-    status: 'sedang_berlangsung',
   })
   const [saving, setSaving] = useState(false)
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }))
@@ -65,7 +57,6 @@ function CleanupDrawer({
         sirkit:     initial.sirkit ?? 'sirkit_1',
         tanggal:    initial.tanggal ? new Date(initial.tanggal).toISOString() : new Date().toISOString(),
         keterangan: initial.keterangan ?? '',
-        status:     initial.status ?? 'sedang_berlangsung',
       })
     } else {
       setForm({
@@ -73,7 +64,6 @@ function CleanupDrawer({
         sirkit: 'sirkit_1',
         tanggal: new Date().toISOString(),
         keterangan: '',
-        status: 'sedang_berlangsung',
       })
     }
   }, [open, initial])
@@ -99,7 +89,6 @@ function CleanupDrawer({
         sirkit: form.sirkit,
         tanggal: form.tanggal,
         keterangan: form.keterangan || undefined,
-        status: form.status,
       }
       if (initial?.id) await cleanupApi.update(initial.id, payload)
       else             await cleanupApi.create(payload)
@@ -174,16 +163,6 @@ function CleanupDrawer({
               placeholder="Opsional"
             />
           </div>
-          <div>
-            <SearchableSelect
-              label="Status"
-              placeholder="Pilih status..."
-              options={STATUS_OPTIONS}
-              values={form.status ? [form.status] : []}
-              onChange={(vals) => set('status', vals[vals.length - 1] ?? '')}
-              onClear={() => set('status', '')}
-            />
-          </div>
         </form>
         <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-app-border shrink-0">
           <button type="button" onClick={onClose} className="btn-outline">Batal</button>
@@ -212,7 +191,6 @@ export default function CleanupPage() {
   const [towers, setTowers]         = useState<any[]>([])
 
   // Filter state
-  const [statusFilter, setStatusFilter] = useState<string[]>([])
   const [sirkitFilter, setSirkitFilter] = useState<string[]>([])
   const [jalurFilter, setJalurFilter]   = useState<string[]>([])
   const [tglMulai, setTglMulai] = useState('')
@@ -262,7 +240,6 @@ export default function CleanupPage() {
         page,
         limit,
         search: q || undefined,
-        status: statusFilter.length ? statusFilter.join(',') : undefined,
         sirkit: sirkitFilter.length ? sirkitFilter.join(',') : undefined,
         jalur: jalurFilter.length ? jalurFilter.join(',') : undefined,
         tglMulai: tglMulai || undefined,
@@ -276,14 +253,13 @@ export default function CleanupPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, limit, q, statusFilter, sirkitFilter, jalurFilter, tglMulai, tglAkhir])
+  }, [page, limit, q, sirkitFilter, jalurFilter, tglMulai, tglAkhir])
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  const hasActiveFilters = Boolean(statusFilter.length || sirkitFilter.length || jalurFilter.length || tglMulai || tglAkhir)
+  const hasActiveFilters = Boolean(sirkitFilter.length || jalurFilter.length || tglMulai || tglAkhir)
 
   function resetFilters() {
-    setStatusFilter([])
     setSirkitFilter([])
     setJalurFilter([])
     setTglMulai('')
@@ -356,23 +332,6 @@ export default function CleanupPage() {
 
               <div className="max-h-[450px] overflow-y-auto">
                 <div className="px-4 py-3 flex flex-col gap-2.5">
-                  <span className="font-bold text-[14px] text-[#1C1C1C]">Status</span>
-                  <div className="flex flex-wrap gap-2">
-                    {STATUS_OPTIONS.map(o => {
-                      const active = statusFilter.includes(o.value)
-                      return (
-                        <button
-                          key={o.value}
-                          onClick={() => { setStatusFilter(active ? statusFilter.filter(v => v !== o.value) : [...statusFilter, o.value]); setPage(1) }}
-                          className={`px-3 py-1 rounded-full border text-[12px] font-medium transition-all ${active ? 'bg-[#076C9E] border-[#076C9E] text-white' : 'border-[#E1E8EC] text-[#5F737F] hover:border-[#076C9E]'}`}
-                        >{o.label}</button>
-                      )
-                    })}
-                  </div>
-                </div>
-                <div className="h-px bg-[#E1E8EC]" />
-
-                <div className="px-4 py-3 flex flex-col gap-2.5">
                   <span className="font-bold text-[14px] text-[#1C1C1C]">Sirkit</span>
                   <div className="flex flex-wrap gap-2">
                     {SIRKIT_OPTIONS.map(o => {
@@ -438,22 +397,20 @@ export default function CleanupPage() {
                 <th>Sirkit</th>
                 <th>Tanggal</th>
                 <th>Keterangan</th>
-                <th>Status</th>
                 <th className="text-right pr-5">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {loading
-                ? <SkeletonRow cols={6} rows={limit} />
+                ? <SkeletonRow cols={5} rows={limit} />
                 : rows.length === 0
-                  ? <tr><td colSpan={6}><EmptyState title="Belum ada Cleanup" /></td></tr>
+                  ? <tr><td colSpan={5}><EmptyState title="Belum ada Cleanup" /></td></tr>
                   : rows.map((row) => (
                     <tr key={row.id}>
                       <td className="font-semibold text-[13px] text-app-text">{row.tower?.nama ?? '—'}</td>
                       <td className="text-[12px] text-app-muted whitespace-nowrap">{SIRKIT_LABEL[row.sirkit] ?? row.sirkit}</td>
                       <td className="text-[12px] text-app-muted whitespace-nowrap">{fmtDate(row.tanggal)}</td>
                       <td className="max-w-[280px] truncate text-[12px] text-app-muted">{row.keterangan ?? '—'}</td>
-                      <td><StatusBadge status={row.status?.toLowerCase()} /></td>
                       <td className="text-right pr-4">
                         <ActionMenu items={[
                           { label: 'Edit', icon: <Pencil size={14} />, onClick: () => { setEditRow(row); setDrawerOpen(true) } },
@@ -490,9 +447,8 @@ export default function CleanupPage() {
               ]} />
             </div>
             {row.keterangan && (
-              <p className="text-[12px] text-app-muted mb-2 line-clamp-3">{row.keterangan}</p>
+              <p className="text-[12px] text-app-muted line-clamp-3">{row.keterangan}</p>
             )}
-            <StatusBadge status={row.status?.toLowerCase()} />
           </div>
         ))}
         <div className="card overflow-hidden">

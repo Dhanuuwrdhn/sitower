@@ -30,14 +30,16 @@ export default function GlobalError({
               <ServerCrash size={28} className="text-indigo-600" />
             </div>
             <h1 className="mb-2 text-xl font-bold text-slate-900">
-              {isStaging ? 'Staging API offline' : 'Something went wrong'}
+              {isStaging ? 'Staging offline' : 'Something went wrong'}
             </h1>
             <p className="mb-5 text-sm leading-relaxed text-slate-600">
               {isStaging ? (
                 <>
-                  Staging API is currently unreachable. This is usually a manual
-                  pause outside the scheduled 02:00 – 05:00 WIB maintenance window.
-                  Please wait a moment, or contact the dev team if it persists.
+                  Staging is offline during the daily maintenance window{' '}
+                  <span className="font-semibold text-slate-800">
+                    02:00 – 05:00 WIB
+                  </span>
+                  . Please try again later.
                 </>
               ) : (
                 <>

@@ -117,36 +117,22 @@ export default function MaintenanceOverlay() {
           )}
         </div>
         <h1 id="maintenance-title" className="mb-2 text-xl font-bold text-slate-900">
-          {inWindow ? 'Scheduled maintenance' : 'Staging API offline'}
+          Staging offline
         </h1>
         <p className="mb-5 text-sm leading-relaxed text-slate-600">
-          {inWindow ? (
-            <>
-              The staging API is paused for the daily maintenance window{' '}
-              <span className="font-semibold text-slate-800">02:00 – 05:00 WIB</span>.
-              Service will resume automatically at 05:00 WIB.
-            </>
-          ) : (
-            <>
-              Staging API is currently unreachable. This is usually a manual pause
-              outside the scheduled window. Please wait a moment, or contact the
-              dev team if it persists.
-            </>
-          )}
+          Staging is offline during the daily maintenance window{' '}
+          <span className="font-semibold text-slate-800">02:00 – 05:00 WIB</span>.
+          {inWindow
+            ? ' Service will resume automatically at 05:00 WIB.'
+            : ' Please try again later.'}
         </p>
-        {inWindow ? (
+        {inWindow && (
           <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
               Time until resume
             </p>
             <p className="mt-1 font-mono text-2xl font-bold tabular-nums text-slate-900">
               {fmtHMS(remaining)}
-            </p>
-          </div>
-        ) : (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-            <p className="text-[12px] text-amber-900">
-              This page will refresh automatically once the API responds again.
             </p>
           </div>
         )}

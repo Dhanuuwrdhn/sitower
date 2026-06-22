@@ -5,9 +5,12 @@
 
 set -e
 
+# Load secrets from /etc/spektra/staging.env if present (must define GMAPS_KEY)
+[ -f /etc/spektra/staging.env ] && set -a && . /etc/spektra/staging.env && set +a
+
 STAGING_DIR="/opt/frontend-staging"
-API_URL="https://staging.spektra.biz.id/api"
-GMAPS_KEY="***REDACTED-GMAPS-KEY***"
+API_URL="${API_URL:-https://staging.spektra.biz.id/api}"
+GMAPS_KEY="${GMAPS_KEY:?GMAPS_KEY required (export it or put in /etc/spektra/staging.env)}"
 SERVICE="sitower-staging-frontend"
 
 echo "[1/5] Pulling latest code..."

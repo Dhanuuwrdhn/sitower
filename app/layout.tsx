@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
 import './globals.css'
 import ClientLayout from '@/components/layout/ClientLayout'
+import MaintenanceOverlay from '@/components/layout/MaintenanceOverlay'
 
 export const metadata: Metadata = {
   title: 'SPEKTRA – Sistem Pemantauan Kerawanan Transmisi',
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id">
       <body className="antialiased">
         <ClientLayout>{children}</ClientLayout>
+        <MaintenanceOverlay />
         <Script id="sw-register" strategy="afterInteractive">
           {`if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js') }`}
         </Script>

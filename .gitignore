@@ -14,8 +14,6 @@
 .DS_Store
 *.pem
 
-# Claude Code — hanya settings.local.json yang di-ignore, skills boleh di-commit
-.claude/settings.local.json
 .env
 .env.local
 .env.development.local

@@ -41,6 +41,39 @@ Setiap tower memiliki salah satu dari empat status yang ditampilkan sebagai badg
 
 ---
 
+## Library Pihak Ketiga
+
+Daftar dependency utama (lihat `package.json` untuk versi lengkap).
+
+### Runtime (dependencies)
+
+| Library | Versi | Kegunaan |
+|---|---|---|
+| `next` | 14.2 | Framework React (App Router) |
+| `react`, `react-dom` | ^18 | Library UI inti |
+| `leaflet`, `react-leaflet` | ^1.9 / ^4.2 | Peta interaktif (OpenStreetMap) |
+| `@vis.gl/react-google-maps` | ^1.8 | Komponen Google Maps |
+| `axios` | ^1.16 | HTTP client ke backend API |
+| `js-cookie` | ^3 | Penyimpanan token di cookie (auth) |
+| `lucide-react` | ^0.441 | Ikon |
+| `@iconify/react`, `@iconify-json/twemoji` | ^6 / ^1.2 | Ikon tambahan (Iconify/Twemoji) |
+| `react-hot-toast` | ^2.6 | Notifikasi toast |
+| `sweetalert2` | ^11 | Dialog/alert modal |
+| `yet-another-react-lightbox` | ^3 | Lightbox galeri foto |
+| `pdf-lib` | ^1.17 | Generate/manipulasi PDF |
+| `exifr` | ^7.1 | Baca metadata EXIF foto (mis. GPS) |
+| `clsx`, `tailwind-merge` | ^2 | Utilitas penggabungan className |
+
+### Development (devDependencies)
+
+| Library | Kegunaan |
+|---|---|
+| `typescript`, `@types/*` | TypeScript + type definitions |
+| `tailwindcss`, `postcss`, `autoprefixer` | Styling (Tailwind CSS) |
+| `eslint`, `eslint-config-next` | Linting |
+
+---
+
 ## Struktur Proyek
 
 ```
